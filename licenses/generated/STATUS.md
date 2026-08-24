@@ -1,6 +1,6 @@
 # Third-party license audit status
 
-- Source SHA: `471b4ea93d24d664ba82c5ab6c034c2606702ec7`
+- Source SHA: `df922f156fc71d5e4403d62a6dbbb33e9367a87d`
 - Pipeline complete: **false**
 - Release-license complete: **false**
 - Embedded resources: 556
@@ -8,9 +8,9 @@
 - Ambiguous resources: 56
 - Unmapped resources: 5
 - Resources missing license metadata: 137
-- Cargo packages: 448
+- Cargo packages: 366
 - Cargo packages missing metadata: 0
-- Rust packages without collected notice files: 37
+- Rust packages without collected notice files: 31
 - Native libraries without collected notice files: 0
 
 ## Pipeline stages

@@ -1,21 +1,23 @@
-# Rust dependency license inventory
+# Rust release dependency license inventory
 
-- Packages: 448
-- Workspace packages: 3
-- Third-party packages: 445
+- Release root: `texpdf-stata`
+- Release target: `aarch64-apple-darwin`
+- Packages: 366
+- Workspace packages: 2
+- Third-party packages: 364
 - Packages missing license metadata: 0
+
+The graph includes normal and build dependencies reachable from the
+release plugin and excludes dev/test-only and unrelated workspace crates.
 
 | Crate | Version | License | Source |
 |---|---:|---|---|
-| `adler2` | `2.0.1` | `0BSD OR MIT OR Apache-2.0` | https://github.com/oyvindln/adler2 |
 | `ahash` | `0.7.8` | `MIT OR Apache-2.0` | https://github.com/tkaitchuck/ahash |
 | `aho-corasick` | `1.1.5` | `Unlicense OR MIT` | https://github.com/BurntSushi/aho-corasick |
-| `android_system_properties` | `0.1.6` | `MIT OR Apache-2.0` | https://github.com/nical/android_system_properties |
 | `anstream` | `1.0.0` | `MIT OR Apache-2.0` | https://github.com/rust-cli/anstyle.git |
 | `anstyle` | `1.0.14` | `MIT OR Apache-2.0` | https://github.com/rust-cli/anstyle.git |
 | `anstyle-parse` | `1.0.0` | `MIT OR Apache-2.0` | https://github.com/rust-cli/anstyle.git |
 | `anstyle-query` | `1.1.5` | `MIT OR Apache-2.0` | https://github.com/rust-cli/anstyle.git |
-| `anstyle-wincon` | `3.0.11` | `MIT OR Apache-2.0` | https://github.com/rust-cli/anstyle.git |
 | `anyhow` | `1.0.104` | `MIT OR Apache-2.0` | https://github.com/dtolnay/anyhow |
 | `arrayvec` | `0.7.8` | `MIT OR Apache-2.0` | https://github.com/bluss/arrayvec |
 | `async-priority-channel` | `0.2.0` | `Apache-2.0 OR MIT` | https://github.com/rmcgibbo/async-priority-channel |
@@ -55,7 +57,6 @@
 | `clap_lex` | `1.1.0` | `MIT OR Apache-2.0` | https://github.com/clap-rs/clap |
 | `cmake` | `0.1.58` | `MIT OR Apache-2.0` | https://github.com/rust-lang/cmake-rs |
 | `colorchoice` | `1.0.5` | `MIT OR Apache-2.0` | https://github.com/rust-cli/anstyle.git |
-| `combine` | `4.6.7` | `MIT` | https://github.com/Marwes/combine |
 | `concurrent-queue` | `2.5.0` | `Apache-2.0 OR MIT` | https://github.com/smol-rs/concurrent-queue |
 | `const-oid` | `0.10.2` | `Apache-2.0 OR MIT` | https://github.com/RustCrypto/formats |
 | `core-foundation` | `0.10.1` | `MIT OR Apache-2.0` | https://github.com/servo/core-foundation-rs |
@@ -147,7 +148,6 @@
 | `hyper-rustls` | `0.27.9` | `Apache-2.0 OR ISC OR MIT` | https://github.com/rustls/hyper-rustls |
 | `hyper-util` | `0.1.20` | `MIT` | https://github.com/hyperium/hyper-util |
 | `iana-time-zone` | `0.1.65` | `MIT OR Apache-2.0` | https://github.com/strawlab/iana-time-zone |
-| `iana-time-zone-haiku` | `0.1.2` | `MIT OR Apache-2.0` | https://github.com/strawlab/iana-time-zone |
 | `icu_collections` | `2.3.0` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `icu_locale_core` | `2.3.0` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `icu_normalizer` | `2.3.0` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
@@ -160,32 +160,17 @@
 | `ignore` | `0.4.33` | `Unlicense OR MIT` | https://github.com/BurntSushi/ripgrep/tree/master/crates/ignore |
 | `ignore-files` | `3.0.7` | `Apache-2.0` | https://github.com/watchexec/watchexec |
 | `indexmap` | `2.14.0` | `Apache-2.0 OR MIT` | https://github.com/indexmap-rs/indexmap |
-| `inotify` | `0.11.5` | `ISC` | https://github.com/hannobraun/inotify-rs |
-| `inotify-sys` | `0.1.8` | `ISC` | https://github.com/hannobraun/inotify-sys |
 | `ipnet` | `2.12.1` | `MIT OR Apache-2.0` | https://github.com/krisprice/ipnet |
-| `is-docker` | `0.2.0` | `MIT` | https://github.com/TheLarkInn/is-docker |
-| `is-wsl` | `0.4.0` | `MIT` | https://github.com/TheLarkInn/is-wsl |
 | `is_terminal_polyfill` | `1.70.2` | `MIT OR Apache-2.0` | https://github.com/polyfill-rs/is_terminal_polyfill |
 | `itoa` | `1.0.18` | `MIT OR Apache-2.0` | https://github.com/dtolnay/itoa |
 | `jiff` | `0.2.35` | `Unlicense OR MIT` | https://github.com/BurntSushi/jiff |
 | `jiff-core` | `0.1.0` | `Unlicense OR MIT` | https://github.com/BurntSushi/jiff |
 | `jiff-static` | `0.2.35` | `Unlicense OR MIT` | https://github.com/BurntSushi/jiff |
-| `jiff-tzdb` | `0.1.8` | `Unlicense OR MIT` | https://github.com/BurntSushi/jiff |
-| `jiff-tzdb-platform` | `0.1.3` | `Unlicense OR MIT` | https://github.com/BurntSushi/jiff |
-| `jni` | `0.22.4` | `MIT OR Apache-2.0` | https://github.com/jni-rs/jni-rs |
-| `jni-macros` | `0.22.4` | `MIT OR Apache-2.0` | https://github.com/jni-rs/jni-rs |
-| `jni-sys` | `0.4.1` | `MIT OR Apache-2.0` | https://github.com/jni-rs/jni-sys |
-| `jni-sys-macros` | `0.4.1` | `MIT OR Apache-2.0` | https://github.com/jni-rs/jni-sys |
 | `jobserver` | `0.1.35` | `MIT OR Apache-2.0` | https://github.com/rust-lang/jobserver-rs |
-| `js-sys` | `0.3.104` | `MIT OR Apache-2.0` | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/js-sys |
-| `kqueue` | `1.2.1` | `MIT` | https://gitlab.com/rust-kqueue/rust-kqueue |
-| `kqueue-sys` | `1.1.2` | `MIT` | https://gitlab.com/rust-kqueue/rust-kqueue-sys |
 | `lazy_static` | `1.5.0` | `MIT OR Apache-2.0` | https://github.com/rust-lang-nursery/lazy-static.rs |
 | `libc` | `0.2.189` | `MIT OR Apache-2.0` | https://github.com/rust-lang/libc |
 | `libm` | `0.2.16` | `MIT` | https://github.com/rust-lang/compiler-builtins |
-| `libredox` | `0.1.20` | `MIT` | https://gitlab.redox-os.org/redox-os/libredox.git |
 | `libz-sys` | `1.1.29` | `MIT OR Apache-2.0` | https://github.com/rust-lang/libz-sys |
-| `linux-raw-sys` | `0.12.1` | `Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT` | https://github.com/sunfishcode/linux-raw-sys |
 | `litemap` | `0.8.3` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `lock_api` | `0.4.14` | `MIT OR Apache-2.0` | https://github.com/Amanieu/parking_lot |
 | `log` | `0.4.34` | `MIT OR Apache-2.0` | https://github.com/rust-lang/log |
@@ -197,7 +182,6 @@
 | `miette` | `7.6.0` | `Apache-2.0` | https://github.com/zkat/miette |
 | `miette-derive` | `7.6.0` | `Apache-2.0` | https://github.com/zkat/miette |
 | `mime` | `0.3.17` | `MIT OR Apache-2.0` | https://github.com/hyperium/mime |
-| `miniz_oxide` | `0.8.9` | `MIT OR Zlib OR Apache-2.0` | https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide |
 | `mio` | `1.2.2` | `MIT` | https://github.com/tokio-rs/mio |
 | `nibble_vec` | `0.1.0` | `MIT` | https://github.com/michaelsproul/rust_nibble_vec |
 | `nix` | `0.31.3` | `MIT` | https://github.com/nix-rust/nix |
@@ -207,9 +191,7 @@
 | `nu-ansi-term` | `0.50.3` | `MIT` | https://github.com/nushell/nu-ansi-term |
 | `num-traits` | `0.2.19` | `MIT OR Apache-2.0` | https://github.com/rust-num/num-traits |
 | `once_cell` | `1.21.4` | `MIT OR Apache-2.0` | https://github.com/matklad/once_cell |
-| `once_cell_polyfill` | `1.70.2` | `MIT OR Apache-2.0` | https://github.com/polyfill-rs/once_cell_polyfill |
 | `open` | `5.4.2` | `MIT` | https://github.com/Byron/open-rs |
-| `openssl-probe` | `0.2.1` | `MIT OR Apache-2.0` | https://github.com/rustls/openssl-probe |
 | `option-ext` | `0.2.0` | `MPL-2.0` | https://github.com/soc/option-ext.git |
 | `parking` | `2.2.1` | `Apache-2.0 OR MIT` | https://github.com/smol-rs/parking |
 | `parking_lot` | `0.12.5` | `MIT OR Apache-2.0` | https://github.com/Amanieu/parking_lot |
@@ -228,8 +210,6 @@
 | `pin-project-lite` | `0.2.17` | `Apache-2.0 OR MIT` | https://github.com/taiki-e/pin-project-lite |
 | `pinot` | `0.1.5` | `MIT OR Apache-2.0` | https://github.com/dfrg/pinot |
 | `pkg-config` | `0.3.34` | `MIT OR Apache-2.0` | https://github.com/rust-lang/pkg-config-rs |
-| `portable-atomic` | `1.15.0` | `Apache-2.0 OR MIT` | https://github.com/taiki-e/portable-atomic |
-| `portable-atomic-util` | `0.2.7` | `Apache-2.0 OR MIT` | https://github.com/taiki-e/portable-atomic-util |
 | `potential_utf` | `0.1.6` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `ppv-lite86` | `0.2.21` | `MIT OR Apache-2.0` | https://github.com/cryptocorrosion/cryptocorrosion |
 | `proc-macro-crate` | `3.5.0` | `MIT OR Apache-2.0` | https://github.com/bkchr/proc-macro-crate |
@@ -244,7 +224,6 @@
 | `quinn-proto` | `0.11.17` | `MIT OR Apache-2.0` | https://github.com/quinn-rs/quinn |
 | `quinn-udp` | `0.5.15` | `MIT OR Apache-2.0` | https://github.com/quinn-rs/quinn |
 | `quote` | `1.0.47` | `MIT OR Apache-2.0` | https://github.com/dtolnay/quote |
-| `r-efi` | `6.0.0` | `MIT OR Apache-2.0 OR LGPL-2.1-or-later` | https://github.com/r-efi/r-efi |
 | `radium` | `0.7.0` | `MIT` | https://github.com/bitvecto-rs/radium |
 | `radix_trie` | `0.3.0` | `MIT` | https://github.com/michaelsproul/rust_radix_trie |
 | `rand` | `0.10.2` | `MIT OR Apache-2.0` | https://github.com/rust-random/rand |
@@ -253,8 +232,6 @@
 | `rand_core` | `0.10.1` | `MIT OR Apache-2.0` | https://github.com/rust-random/rand_core |
 | `rand_core` | `0.6.4` | `MIT OR Apache-2.0` | https://github.com/rust-random/rand |
 | `rand_pcg` | `0.10.2` | `MIT OR Apache-2.0` | https://github.com/rust-random/rngs |
-| `redox_syscall` | `0.5.18` | `MIT` | https://gitlab.redox-os.org/redox-os/syscall |
-| `redox_users` | `0.5.2` | `MIT` | https://gitlab.redox-os.org/redox-os/users |
 | `ref-cast` | `1.0.27` | `MIT OR Apache-2.0` | https://github.com/dtolnay/ref-cast |
 | `ref-cast-impl` | `1.0.27` | `MIT OR Apache-2.0` | https://github.com/dtolnay/ref-cast |
 | `regex` | `1.13.1` | `MIT OR Apache-2.0` | https://github.com/rust-lang/regex |
@@ -267,23 +244,17 @@
 | `rkyv_derive` | `0.7.46` | `MIT` | https://github.com/rkyv/rkyv |
 | `rust_decimal` | `1.42.1` | `MIT` | https://github.com/paupino/rust-decimal |
 | `rustc-hash` | `2.1.3` | `Apache-2.0 OR MIT` | https://github.com/rust-lang/rustc-hash |
-| `rustc_version` | `0.4.1` | `MIT OR Apache-2.0` | https://github.com/djc/rustc-version-rs |
 | `rustix` | `1.1.4` | `Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT` | https://github.com/bytecodealliance/rustix |
 | `rustls` | `0.23.43` | `Apache-2.0 OR ISC OR MIT` | https://github.com/rustls/rustls |
-| `rustls-native-certs` | `0.8.4` | `Apache-2.0 OR ISC OR MIT` | https://github.com/rustls/rustls-native-certs |
 | `rustls-pki-types` | `1.15.1` | `MIT OR Apache-2.0` | https://github.com/rustls/pki-types |
 | `rustls-platform-verifier` | `0.7.0` | `MIT OR Apache-2.0` | https://github.com/rustls/rustls-platform-verifier |
-| `rustls-platform-verifier-android` | `0.1.1` | `MIT OR Apache-2.0` | https://github.com/rustls/rustls-platform-verifier |
 | `rustls-webpki` | `0.103.15` | `ISC` | https://github.com/rustls/webpki |
-| `rustversion` | `1.0.23` | `MIT OR Apache-2.0` | https://github.com/dtolnay/rustversion |
 | `same-file` | `1.0.6` | `Unlicense/MIT` | https://github.com/BurntSushi/same-file |
-| `schannel` | `0.1.29` | `MIT` | https://github.com/steffengy/schannel-rs |
 | `schemars` | `1.2.2` | `MIT` | https://github.com/GREsau/schemars |
 | `scopeguard` | `1.2.0` | `MIT OR Apache-2.0` | https://github.com/bluss/scopeguard |
 | `seahash` | `4.1.0` | `MIT` | https://gitlab.redox-os.org/redox-os/seahash |
 | `security-framework` | `3.7.0` | `MIT OR Apache-2.0` | https://github.com/kornelski/rust-security-framework |
 | `security-framework-sys` | `2.17.0` | `MIT OR Apache-2.0` | https://github.com/kornelski/rust-security-framework |
-| `semver` | `1.0.28` | `MIT OR Apache-2.0` | https://github.com/dtolnay/semver |
 | `serde` | `1.0.229` | `MIT OR Apache-2.0` | https://github.com/serde-rs/serde |
 | `serde_core` | `1.0.229` | `MIT OR Apache-2.0` | https://github.com/serde-rs/serde |
 | `serde_derive` | `1.0.229` | `MIT OR Apache-2.0` | https://github.com/serde-rs/serde |
@@ -295,7 +266,6 @@
 | `shlex` | `2.0.1` | `MIT OR Apache-2.0` | https://github.com/comex/rust-shlex |
 | `signal-hook-registry` | `1.4.8` | `MIT OR Apache-2.0` | https://github.com/vorner/signal-hook |
 | `simd-adler32` | `0.3.10` | `MIT` | https://github.com/mcountryman/simd-adler32 |
-| `simd_cesu8` | `1.2.0` | `Apache-2.0 OR MIT` | https://github.com/seancroach/simd_cesu8 |
 | `simdutf8` | `0.1.5` | `MIT OR Apache-2.0` | https://github.com/rusticstuff/simdutf8 |
 | `siphasher` | `1.0.3` | `MIT/Apache-2.0` | https://github.com/jedisct1/rust-siphash |
 | `slab` | `0.4.12` | `MIT` | https://github.com/tokio-rs/slab |
@@ -317,7 +287,6 @@
 | `tectonic` | `0.17.0` | `MIT` | https://github.com/tectonic-typesetting/tectonic/ |
 | `tectonic_bridge_core` | `0.5.3` | `MIT` | https://github.com/tectonic-typesetting/tectonic/ |
 | `tectonic_bridge_flate` | `0.1.10` | `MIT` | https://github.com/tectonic-typesetting/tectonic/ |
-| `tectonic_bridge_fontconfig` | `0.1.3` | `MIT` | https://github.com/tectonic-typesetting/tectonic/ |
 | `tectonic_bridge_freetype2` | `0.3.2` | `MIT` | https://github.com/tectonic-typesetting/tectonic/ |
 | `tectonic_bridge_graphite2` | `0.3.2` | `MIT` | https://github.com/tectonic-typesetting/tectonic/ |
 | `tectonic_bridge_harfbuzz` | `0.3.3` | `MIT` | https://github.com/tectonic-typesetting/tectonic/ |
@@ -341,7 +310,6 @@
 | `tempfile` | `3.27.0` | `MIT OR Apache-2.0` | https://github.com/Stebalien/tempfile |
 | `tera` | `1.20.1` | `MIT` | https://github.com/Keats/tera |
 | `termcolor` | `1.4.1` | `Unlicense OR MIT` | https://github.com/BurntSushi/termcolor |
-| `texpdf-bundle-resolver` | `0.1.0` | `MIT` | https://github.com/johannes-schmieder/texpdf |
 | `texpdf-core` | `0.1.0` | `MIT` | https://github.com/johannes-schmieder/texpdf |
 | `texpdf-stata` | `0.1.0` | `MIT` | https://github.com/johannes-schmieder/texpdf |
 | `thiserror` | `2.0.20` | `MIT OR Apache-2.0` | https://github.com/dtolnay/thiserror |
@@ -382,61 +350,17 @@
 | `utf8_iter` | `1.0.4` | `Apache-2.0 OR MIT` | https://github.com/hsivonen/utf8_iter |
 | `utf8parse` | `0.2.2` | `Apache-2.0 OR MIT` | https://github.com/alacritty/vte |
 | `uuid` | `1.25.0` | `Apache-2.0 OR MIT` | https://github.com/uuid-rs/uuid |
-| `valuable` | `0.1.1` | `MIT` | https://github.com/tokio-rs/valuable |
 | `vcpkg` | `0.2.15` | `MIT/Apache-2.0` | https://github.com/mcgoo/vcpkg-rs |
 | `version_check` | `0.9.5` | `MIT/Apache-2.0` | https://github.com/SergioBenitez/version_check |
 | `walkdir` | `2.5.0` | `Unlicense/MIT` | https://github.com/BurntSushi/walkdir |
 | `want` | `0.3.1` | `MIT` | https://github.com/seanmonstar/want |
-| `wasi` | `0.11.1+wasi-snapshot-preview1` | `Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT` | https://github.com/bytecodealliance/wasi |
-| `wasm-bindgen` | `0.2.127` | `MIT OR Apache-2.0` | https://github.com/wasm-bindgen/wasm-bindgen |
-| `wasm-bindgen-futures` | `0.4.77` | `MIT OR Apache-2.0` | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/futures |
-| `wasm-bindgen-macro` | `0.2.127` | `MIT OR Apache-2.0` | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/macro |
-| `wasm-bindgen-macro-support` | `0.2.127` | `MIT OR Apache-2.0` | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/macro-support |
-| `wasm-bindgen-shared` | `0.2.127` | `MIT OR Apache-2.0` | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/shared |
 | `watchexec` | `8.4.0` | `Apache-2.0` | https://github.com/watchexec/watchexec |
 | `watchexec-events` | `6.1.2` | `Apache-2.0 OR MIT` | https://github.com/watchexec/watchexec |
 | `watchexec-filterer-globset` | `8.0.2` | `Apache-2.0` | https://github.com/watchexec/watchexec |
 | `watchexec-filterer-ignore` | `7.0.2` | `Apache-2.0` | https://github.com/watchexec/watchexec |
 | `watchexec-signals` | `5.1.1` | `Apache-2.0 OR MIT` | https://github.com/watchexec/watchexec |
 | `watchexec-supervisor` | `5.3.1` | `Apache-2.0 OR MIT` | https://github.com/watchexec/watchexec |
-| `web-sys` | `0.3.104` | `MIT OR Apache-2.0` | https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/web-sys |
-| `web-time` | `1.1.0` | `MIT OR Apache-2.0` | https://github.com/daxpedda/web-time |
-| `webpki-root-certs` | `1.0.9` | `CDLA-Permissive-2.0` | https://github.com/rustls/webpki-roots |
 | `which` | `8.0.5` | `MIT` | https://github.com/harryfei/which-rs.git |
-| `winapi-util` | `0.1.11` | `Unlicense OR MIT` | https://github.com/BurntSushi/winapi-util |
-| `windows` | `0.62.2` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-collections` | `0.3.2` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-core` | `0.62.2` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-future` | `0.3.2` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-implement` | `0.60.2` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-interface` | `0.59.3` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-link` | `0.2.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-numerics` | `0.3.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-registry` | `0.6.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-result` | `0.4.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-strings` | `0.5.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-sys` | `0.52.0` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-sys` | `0.60.2` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-sys` | `0.61.2` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-targets` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-targets` | `0.53.5` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows-threading` | `0.2.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_aarch64_gnullvm` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_aarch64_gnullvm` | `0.53.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_aarch64_msvc` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_aarch64_msvc` | `0.53.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_i686_gnu` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_i686_gnu` | `0.53.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_i686_gnullvm` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_i686_gnullvm` | `0.53.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_i686_msvc` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_i686_msvc` | `0.53.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_x86_64_gnu` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_x86_64_gnu` | `0.53.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_x86_64_gnullvm` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_x86_64_gnullvm` | `0.53.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_x86_64_msvc` | `0.52.6` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
-| `windows_x86_64_msvc` | `0.53.1` | `MIT OR Apache-2.0` | https://github.com/microsoft/windows-rs |
 | `winnow` | `1.0.4` | `MIT` | https://github.com/winnow-rs/winnow |
 | `writeable` | `0.6.4` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `wyz` | `0.5.1` | `MIT` | https://github.com/myrrlyn/wyz |
@@ -444,7 +368,6 @@
 | `yoke` | `0.8.3` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `yoke-derive` | `0.8.2` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `zerocopy` | `0.8.56` | `BSD-2-Clause OR Apache-2.0 OR MIT` | https://github.com/google/zerocopy |
-| `zerocopy-derive` | `0.8.56` | `BSD-2-Clause OR Apache-2.0 OR MIT` | https://github.com/google/zerocopy |
 | `zerofrom` | `0.1.8` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `zerofrom-derive` | `0.1.7` | `Unicode-3.0` | https://github.com/unicode-org/icu4x |
 | `zeroize` | `1.9.0` | `Apache-2.0 OR MIT` | https://github.com/RustCrypto/utils |
