@@ -1,10 +1,35 @@
 {
-  "build_outcome": "failure",
-  "diagnosis_complete": false,
-  "growth_gate": null,
+  "build_outcome": "success",
+  "diagnosis_complete": true,
+  "growth_gate": false,
   "interpretation": "Growth in this Rust-only process implicates texpdf-core/Tectonic or its native dependencies rather than Stata or the SPI bridge. A flat Rust-only result would redirect investigation to the Stata/bridge path.",
-  "memory": {},
-  "probe_outcome": "skipped",
+  "memory": {
+    "duration_seconds": 142,
+    "growth_gate": false,
+    "iterations_requested": 1000,
+    "kind": "Rust-only repeated texpdf-core compilation probe",
+    "late_median_probe_rss_kib": 1186104,
+    "late_window": [
+      900,
+      1000
+    ],
+    "max_allowed_growth_kib": 524288,
+    "peak_probe_rss_kib": 1237104,
+    "peak_tree_rss_kib": 1237104,
+    "post_warmup_growth_kib": 822584,
+    "post_warmup_growth_ratio": 3.2628301056338027,
+    "probe_log_tail": "TEXPDF_RUST_MEMORY_PROGRESS iteration=100\nTEXPDF_RUST_MEMORY_PROGRESS iteration=200\nTEXPDF_RUST_MEMORY_PROGRESS iteration=300\nTEXPDF_RUST_MEMORY_PROGRESS iteration=400\nTEXPDF_RUST_MEMORY_PROGRESS iteration=500\nTEXPDF_RUST_MEMORY_PROGRESS iteration=600\nTEXPDF_RUST_MEMORY_PROGRESS iteration=700\nTEXPDF_RUST_MEMORY_PROGRESS iteration=800\nTEXPDF_RUST_MEMORY_PROGRESS iteration=900\nTEXPDF_RUST_MEMORY_PROGRESS iteration=1000\nTEXPDF_RUST_MEMORY_PASS iterations=1000 workspace=/Users/johannes/actions-runners/texpdf-stata/_work/_temp/texpdf-rust-memory-work-32748221958-1",
+    "probe_rc": 0,
+    "probe_sample_count": 462,
+    "sample_count": 462,
+    "schema_version": 1,
+    "warm_median_probe_rss_kib": 363520,
+    "warm_window": [
+      100,
+      200
+    ]
+  },
+  "probe_outcome": "failure",
   "schema_version": 1,
-  "source_sha": "85912cb8901b955dca7c1f9716e7bd144ec38333"
+  "source_sha": "f86c5023239aafb0cbee3fc1cf0da7e2a9f2e272"
 }
