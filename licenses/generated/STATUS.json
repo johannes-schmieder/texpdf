@@ -41,7 +41,7 @@
   "release_license_complete": false,
   "resource_count_matches_manifest": true,
   "schema_version": 2,
-  "source_sha": "549be7ee38e234c21de68b7b0e9f4998f1b1df2f",
+  "source_sha": "dc005e728971607a17a181f18ec2a2a06e944c6d",
   "stage_return_codes": {
     "cargo_inventory": 0,
     "collect_license_texts": 1,
@@ -88,7 +88,7 @@
       "name": "tex_inventory",
       "return_code": 1,
       "stderr_tail": "",
-      "stdout_tail": "TEXPDF_LICENSE_INVENTORY resources=556 mapped=358 ambiguous=56 unmapped=5 missing_license=137"
+      "stdout_tail": "TEXPDF_LICENSE_INVENTORY resources=556 mapped=406 ambiguous=8 unmapped=5 missing_license=137"
     },
     {
       "command": [
@@ -150,11 +150,11 @@
     }
   ],
   "tex_resources": {
-    "ambiguous": 56,
+    "ambiguous": 8,
     "license_expression_count": 12,
-    "mapped": 358,
+    "mapped": 406,
     "missing_license": 137,
-    "package_count": 130,
+    "package_count": 135,
     "resource_count": 556,
     "unmapped": 5
   },

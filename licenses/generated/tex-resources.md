@@ -7,11 +7,11 @@ release blockers until reviewed.
 ## Summary
 
 - Resources: 556
-- Mapped: 358
-- Ambiguous: 56
+- Mapped: 406
+- Ambiguous: 8
 - Unmapped: 5
 - Mapped without license metadata: 137
-- Packages represented: 130
+- Packages represented: 135
 
 ## Review failures
 
@@ -19,32 +19,15 @@ release blockers until reviewed.
 |---|---|---|
 | `SpecialCasing.txt` | `ambiguous` | 00texlive.installer, tlperl.win32, unicode-data |
 | `UnicodeData.txt` | `ambiguous` | bibtexperllibs, unicode-data |
-| `amsbsy.sty` | `ambiguous` | amsmath, latex-amsmath-dev |
-| `amsgen.sty` | `ambiguous` | amsmath, latex-amsmath-dev |
-| `amsmath.sty` | `ambiguous` | amsmath, latex-amsmath-dev |
-| `amsopn.sty` | `ambiguous` | amsmath, latex-amsmath-dev |
-| `amstext.sty` | `ambiguous` | amsmath, latex-amsmath-dev |
-| `array.sty` | `ambiguous` | latex-tools-dev, tools |
-| `article.cls` | `ambiguous` | latex, latex-base-dev |
-| `atbegshi-ltx.sty` | `ambiguous` | latex, latex-base-dev |
-| `atveryend-ltx.sty` | `ambiguous` | latex, latex-base-dev |
-| `calc.sty` | `ambiguous` | latex-tools-dev, tools |
 | `color.cfg` | `ambiguous` | dviout.win32, graphics-cfg, pgf |
-| `color.sty` | `ambiguous` | graphics, latex-graphics-dev |
-| `dcolumn.sty` | `ambiguous` | latex-tools-dev, tools |
 | `dehyphn-x-2022-03-16.pat` | `unmapped` | — |
 | `dehyphn-x-2022-03-16.tex` | `unmapped` | — |
 | `dehypht-x-2022-03-16.pat` | `unmapped` | — |
 | `dehypht-x-2022-03-16.tex` | `unmapped` | — |
 | `dumyhyph.tex` | `missing_license` | hyphen-base |
-| `fontmath.cfg` | `ambiguous` | latex, latex-base-dev |
-| `fontmath.ltx` | `ambiguous` | latex, latex-base-dev |
 | `fonttext.cfg` | `ambiguous` | cslatex, latex, latex-base-dev |
-| `fonttext.ltx` | `ambiguous` | latex, latex-base-dev |
 | `glyphlist.txt` | `missing_license` | glyphlist |
 | `graphics.cfg` | `ambiguous` | dviout.win32, graphics-cfg, latex-graphics-companion |
-| `graphics.sty` | `ambiguous` | graphics, latex-graphics-dev |
-| `graphicx.sty` | `ambiguous` | graphics, latex-graphics-dev |
 | `hyph-af.tex` | `missing_license` | hyphen-afrikaans |
 | `hyph-as.tex` | `missing_license` | hyphen-indic |
 | `hyph-be.tex` | `missing_license` | hyphen-belarusian |
@@ -117,12 +100,8 @@ release blockers until reviewed.
 | `hyphen.cfg` | `ambiguous` | antomega, babel, cslatex |
 | `hyphen.tex` | `missing_license` | hyphen-base |
 | `ibyhyph.tex` | `missing_license` | hyphen-ancientgreek |
-| `ifthen.sty` | `ambiguous` | latex, latex-base-dev |
 | `kanjix.map` | `missing_license` | 00texlive.image |
-| `keyval.sty` | `ambiguous` | graphics, latex-graphics-dev |
 | `language.dat` | `ambiguous` | hyphen-base, lambda |
-| `latex.ltx` | `ambiguous` | latex, latex-base-dev |
-| `latex2e-first-aid-for-external-files.ltx` | `ambiguous` | firstaid, latex-firstaid-dev |
 | `loadhyph-af.tex` | `missing_license` | hyphen-afrikaans |
 | `loadhyph-as.tex` | `missing_license` | hyphen-indic |
 | `loadhyph-be.tex` | `missing_license` | hyphen-belarusian |
@@ -183,37 +162,10 @@ release blockers until reviewed.
 | `loadhyph-tk.tex` | `missing_license` | hyphen-turkmen |
 | `loadhyph-uk.tex` | `missing_license` | hyphen-ukrainian |
 | `loadhyph-zh-latn-pinyin.tex` | `missing_license` | hyphen-chinese |
-| `longtable.sty` | `ambiguous` | latex-tools-dev, tools |
-| `lscape.sty` | `ambiguous` | graphics, latex-graphics-dev |
-| `omlcmm.fd` | `ambiguous` | latex, latex-base-dev |
-| `omlenc.def` | `ambiguous` | latex, latex-base-dev |
-| `omscmsy.fd` | `ambiguous` | latex, latex-base-dev |
-| `omsenc.def` | `ambiguous` | latex, latex-base-dev |
-| `omxcmex.fd` | `ambiguous` | latex, latex-base-dev |
-| `ot1cmr.fd` | `ambiguous` | latex, latex-base-dev |
-| `ot1cmss.fd` | `ambiguous` | latex, latex-base-dev |
-| `ot1cmtt.fd` | `ambiguous` | latex, latex-base-dev |
-| `ot1enc.def` | `ambiguous` | latex, latex-base-dev |
 | `pdfglyphlist.txt` | `missing_license` | glyphlist |
 | `pdftex.map` | `missing_license` | 00texlive.image |
-| `preload.cfg` | `ambiguous` | latex, latex-base-dev |
-| `preload.ltx` | `ambiguous` | latex, latex-base-dev |
-| `rotating.sty` | `ambiguous` | graphics, latex-graphics-dev |
-| `size10.clo` | `ambiguous` | latex, latex-base-dev |
-| `t1cmr.fd` | `ambiguous` | latex, latex-base-dev |
-| `t1enc.def` | `ambiguous` | latex, latex-base-dev |
-| `tabularx.sty` | `ambiguous` | latex-tools-dev, tools |
 | `tectonic-format-latex.tex` | `unmapped` | — |
 | `texglyphlist.txt` | `missing_license` | glyphlist |
-| `texsys.cfg` | `ambiguous` | latex, latex-base-dev |
-| `trig.sty` | `ambiguous` | graphics, latex-graphics-dev |
-| `ts1cmr.fd` | `ambiguous` | latex, latex-base-dev |
-| `ts1enc.def` | `ambiguous` | latex, latex-base-dev |
-| `tuenc.def` | `ambiguous` | latex, latex-base-dev |
-| `tulmr.fd` | `ambiguous` | latex, latex-base-dev |
-| `tulmss.fd` | `ambiguous` | latex, latex-base-dev |
-| `tulmtt.fd` | `ambiguous` | latex, latex-base-dev |
-| `ucmr.fd` | `ambiguous` | latex, latex-base-dev |
 | `zerohyph.tex` | `missing_license` | hyphen-base |
 
 ## License expressions

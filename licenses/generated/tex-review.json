@@ -2,45 +2,6 @@
   "candidate_groups": [
     {
       "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "resource_count": 30,
-      "resources": [
-        "article.cls",
-        "atbegshi-ltx.sty",
-        "atveryend-ltx.sty",
-        "fontmath.cfg",
-        "fontmath.ltx",
-        "fonttext.ltx",
-        "ifthen.sty",
-        "latex.ltx",
-        "omlcmm.fd",
-        "omlenc.def",
-        "omscmsy.fd",
-        "omsenc.def",
-        "omxcmex.fd",
-        "ot1cmr.fd",
-        "ot1cmss.fd",
-        "ot1cmtt.fd",
-        "ot1enc.def",
-        "preload.cfg",
-        "preload.ltx",
-        "size10.clo",
-        "t1cmr.fd",
-        "t1enc.def",
-        "texsys.cfg",
-        "ts1cmr.fd",
-        "ts1enc.def",
-        "tuenc.def",
-        "tulmr.fd",
-        "tulmss.fd",
-        "tulmtt.fd",
-        "ucmr.fd"
-      ]
-    },
-    {
-      "candidate_packages": [
         "hyphen-indic"
       ],
       "resource_count": 24,
@@ -73,22 +34,6 @@
     },
     {
       "candidate_packages": [
-        "graphics",
-        "latex-graphics-dev"
-      ],
-      "resource_count": 7,
-      "resources": [
-        "color.sty",
-        "graphics.sty",
-        "graphicx.sty",
-        "keyval.sty",
-        "lscape.sty",
-        "rotating.sty",
-        "trig.sty"
-      ]
-    },
-    {
-      "candidate_packages": [
         "hyphen-german"
       ],
       "resource_count": 6,
@@ -114,20 +59,6 @@
     },
     {
       "candidate_packages": [
-        "amsmath",
-        "latex-amsmath-dev"
-      ],
-      "resource_count": 5,
-      "resources": [
-        "amsbsy.sty",
-        "amsgen.sty",
-        "amsmath.sty",
-        "amsopn.sty",
-        "amstext.sty"
-      ]
-    },
-    {
-      "candidate_packages": [
         "hyphen-norwegian"
       ],
       "resource_count": 5,
@@ -137,20 +68,6 @@
         "hyph-no.tex",
         "loadhyph-nb.tex",
         "loadhyph-nn.tex"
-      ]
-    },
-    {
-      "candidate_packages": [
-        "latex-tools-dev",
-        "tools"
-      ],
-      "resource_count": 5,
-      "resources": [
-        "array.sty",
-        "calc.sty",
-        "dcolumn.sty",
-        "longtable.sty",
-        "tabularx.sty"
       ]
     },
     {
@@ -675,16 +592,6 @@
     },
     {
       "candidate_packages": [
-        "firstaid",
-        "latex-firstaid-dev"
-      ],
-      "resource_count": 1,
-      "resources": [
-        "latex2e-first-aid-for-external-files.ltx"
-      ]
-    },
-    {
-      "candidate_packages": [
         "hyphen-base",
         "lambda"
       ],
@@ -727,106 +634,6 @@
     },
     {
       "candidate_packages": [
-        "amsmath",
-        "latex-amsmath-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "amsbsy.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "amsmath",
-        "latex-amsmath-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "amsgen.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "amsmath",
-        "latex-amsmath-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "amsmath.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "amsmath",
-        "latex-amsmath-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "amsopn.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "amsmath",
-        "latex-amsmath-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "amstext.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex-tools-dev",
-        "tools"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "array.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "article.cls",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "atbegshi-ltx.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "atveryend-ltx.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex-tools-dev",
-        "tools"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "calc.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
         "dviout.win32",
         "graphics-cfg",
         "pgf"
@@ -834,46 +641,6 @@
       "method": "unique_basename",
       "origin": "",
       "resource": "color.cfg",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "graphics",
-        "latex-graphics-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "color.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex-tools-dev",
-        "tools"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "dcolumn.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "fontmath.cfg",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "fontmath.ltx",
       "status": "ambiguous"
     },
     {
@@ -889,16 +656,6 @@
     },
     {
       "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "fonttext.ltx",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
         "dviout.win32",
         "graphics-cfg",
         "latex-graphics-companion"
@@ -906,26 +663,6 @@
       "method": "unique_basename",
       "origin": "",
       "resource": "graphics.cfg",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "graphics",
-        "latex-graphics-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "graphics.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "graphics",
-        "latex-graphics-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "graphicx.sty",
       "status": "ambiguous"
     },
     {
@@ -951,322 +688,12 @@
     },
     {
       "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "ifthen.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "graphics",
-        "latex-graphics-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "keyval.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
         "hyphen-base",
         "lambda"
       ],
       "method": "unique_basename",
       "origin": "",
       "resource": "language.dat",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "latex.ltx",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "firstaid",
-        "latex-firstaid-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "latex2e-first-aid-for-external-files.ltx",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex-tools-dev",
-        "tools"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "longtable.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "graphics",
-        "latex-graphics-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "lscape.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "omlcmm.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "omlenc.def",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "omscmsy.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "omsenc.def",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "omxcmex.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "ot1cmr.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "ot1cmss.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "ot1cmtt.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "ot1enc.def",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "preload.cfg",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "preload.ltx",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "graphics",
-        "latex-graphics-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "rotating.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "size10.clo",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "t1cmr.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "t1enc.def",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex-tools-dev",
-        "tools"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "tabularx.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "texsys.cfg",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "graphics",
-        "latex-graphics-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "trig.sty",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "ts1cmr.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "ts1enc.def",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "tuenc.def",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "tulmr.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "tulmss.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "tulmtt.fd",
-      "status": "ambiguous"
-    },
-    {
-      "candidate_packages": [
-        "latex",
-        "latex-base-dev"
-      ],
-      "method": "unique_basename",
-      "origin": "",
-      "resource": "ucmr.fd",
       "status": "ambiguous"
     },
     {
@@ -2952,11 +2379,11 @@
   "schema_version": 1,
   "summary": {
     "by_status": {
-      "ambiguous": 56,
+      "ambiguous": 8,
       "missing_license": 137,
       "unmapped": 5
     },
-    "candidate_group_count": 61,
-    "review_resource_count": 198
+    "candidate_group_count": 56,
+    "review_resource_count": 150
   }
 }
