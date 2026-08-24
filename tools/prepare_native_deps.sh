@@ -18,15 +18,20 @@ host="$(${RUSTC:-rustc} -vV | /usr/bin/sed -n 's/^host: //p')"
 case "$host" in
   aarch64-apple-darwin)
     triplet="arm64-osx"
+    cc="${CC:-/usr/bin/clang}"
     ;;
   x86_64-apple-darwin)
     triplet="x64-osx"
+    cc="${CC:-/usr/bin/clang}"
     ;;
   x86_64-unknown-linux-gnu)
     triplet="x64-linux"
+    cc="${CC:-cc}"
     ;;
   x86_64-pc-windows-msvc)
     triplet="x64-windows-static-release"
+    echo "TEXPDF_NATIVE_DEPS_ERROR private pkgconf bootstrap is not yet implemented for MSVC" >&2
+    return 2 2>/dev/null || exit 2
     ;;
   *)
     echo "TEXPDF_NATIVE_DEPS_ERROR unsupported Rust host: $host" >&2
@@ -34,10 +39,61 @@ case "$host" in
     ;;
 esac
 
+probe_declaration() {
+  local symbol="$1"
+  local header="$2"
+  local probe_dir="$pkgconf_root/.texpdf-probes"
+  local source="$probe_dir/$symbol.c"
+  local object="$probe_dir/$symbol.o"
+  mkdir -p "$probe_dir"
+  cat > "$source" <<EOF
+#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#include <$header>
+int main(void) { (void) $symbol; return 0; }
+EOF
+  if "$cc" -std=c99 -Werror=implicit-function-declaration -c "$source" -o "$object" >/dev/null 2>&1; then
+    printf '1'
+  else
+    printf '0'
+  fi
+}
+
+write_pkgconf_config() {
+  local config="$pkgconf_root/libpkgconf/config.h"
+  local temporary="$config.tmp"
+  local name header macro declared
+  {
+    echo '#define PACKAGE_NAME "pkgconf-lite"'
+    echo '#define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues"'
+    echo '#define PACKAGE_VERSION "2.5.1"'
+    echo '#define PACKAGE "pkgconf-lite 2.5.1"'
+    echo '#define STDC_HEADERS 1'
+    echo '#define _DARWIN_USE_64_BIT_INODE 1'
+    echo '#define __EXTENSIONS__ 1'
+    for entry in \
+      'strlcat:string.h' \
+      'strlcpy:string.h' \
+      'strndup:string.h' \
+      'reallocarray:stdlib.h' \
+      'pledge:unistd.h' \
+      'unveil:unistd.h'; do
+      name="${entry%%:*}"
+      header="${entry#*:}"
+      macro="$(printf '%s' "$name" | /usr/bin/tr '[:lower:]' '[:upper:]')"
+      declared="$(probe_declaration "$name" "$header")"
+      echo "#define HAVE_DECL_${macro} ${declared}"
+      echo "#define HAVE_${macro} ${declared}"
+    done
+  } > "$temporary"
+  mv "$temporary" "$config"
+}
+
 # vcpkg requires a pkg-config frontend even while it is building the libraries
-# that will later supply .pc files. Build pkgconf-lite from a pinned upstream
-# commit. This needs only the platform C compiler and make, and is installed
-# solely into the private build cache.
+# that later supply .pc files. Build pkgconf-lite from a pinned upstream commit.
+# Makefile.lite's stock config target uses obsolete HAVE_* names, so generate
+# the declaration macros from real host compiler probes before invoking make.
 if [[ ! -x "$pkgconf_root/bin/pkg-config" ]] ||
    [[ ! -f "$pkgconf_root/.texpdf-revision" ]] ||
    [[ "$(cat "$pkgconf_root/.texpdf-revision" 2>/dev/null || true)" != "$pkgconf_rev" ]]; then
@@ -48,8 +104,9 @@ if [[ ! -x "$pkgconf_root/bin/pkg-config" ]] ||
   git -C "$pkgconf_root" fetch --depth 1 origin "$pkgconf_rev"
   git -C "$pkgconf_root" checkout --detach FETCH_HEAD
   [[ "$(git -C "$pkgconf_root" rev-parse HEAD)" == "$pkgconf_rev" ]]
+  write_pkgconf_config
   /usr/bin/make -C "$pkgconf_root" -f Makefile.lite \
-    CC=/usr/bin/clang \
+    CC="$cc" \
     STRIP=/usr/bin/strip \
     SYSTEM_LIBDIR='/usr/lib:/usr/local/lib:/opt/homebrew/lib' \
     SYSTEM_INCLUDEDIR='/usr/include:/usr/local/include:/opt/homebrew/include' \
