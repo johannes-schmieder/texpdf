@@ -1,0 +1,42 @@
+name: Release readiness audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "Cargo.lock"
+      - "stata/**"
+      - "bundle/**"
+      - "platform/**"
+      - "tools/check_release_readiness.py"
+      - ".github/workflows/release-audit.yml"
+
+concurrency:
+  group: texpdf-release-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Generate release-readiness report
+        run: python3 tools/check_release_readiness.py
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-release-audit-${{ github.sha }}
+          path: |
+            RELEASE_READINESS.json
+            RELEASE_READINESS.md
+          if-no-files-found: error
+          retention-days: 30
