@@ -12,7 +12,7 @@ Public cross-platform v1 ready: **false**
 | `package_file_stata.toc` | PASS | no | no | stata/stata.toc |
 | `cargo_lock` | PASS | no | no | Cargo.lock is committed |
 | `target_registry` | PASS | no | no | target count=4 |
-| `macos_arm_runtime` | PASS | no | no | source=d9be7615bd69b260b5841730d51d9a9ee03958f0; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
+| `macos_arm_runtime` | PASS | no | no | source=6fc34a9335a2328d0a13729151975811239910c6; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=98532016; arm_runtime=True |
 | `macos_intel_build` | PASS | no | no | source=e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1; plugin_bytes=49098680 |
 | `macos_intel_runtime` | FAIL | yes | yes | Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed |

@@ -21,10 +21,10 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
+| Latest exact green source | `6fc34a9335a2328d0a13729151975811239910c6` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
-| Current ARM64 artifact source | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
+| Current ARM64 artifact source | `6fc34a9335a2328d0a13729151975811239910c6` |
 | Current universal build source | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1` |
 | Current license-audit source | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
 | Latest memory-stress attempt | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1`; qualified=yes |
@@ -41,12 +41,12 @@ the helper process, so a compiler crash does not run inside Stata.
 
 | Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
-| `aarch64-apple-darwin` | required | yes | yes | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
+| `aarch64-apple-darwin` | required | yes | yes | `6fc34a9335a2328d0a13729151975811239910c6` |
 | `x86_64-apple-darwin` | required | yes | no | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1` |
 | `x86_64-pc-windows-msvc` | deferred | no | no | `not recorded` |
 | `x86_64-unknown-linux-gnu` | deferred | no | no | `not recorded` |
 
-The current ARM64 plugin is 47.14 MiB (`09d439b8d05ded255ca60481b4a791de83cea210a3ec2b083389af09b8713db7`). The current universal plugin record is 93.97 MiB (`1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f`).
+The current ARM64 plugin is 47.14 MiB (`bc6575fbc0e876734065f9378ca1d4cdc31390f19b3e2b59a4d634953b3e69d7`). The current universal plugin record is 93.97 MiB (`1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f`).
 
 ## Active private-candidate blockers
 
