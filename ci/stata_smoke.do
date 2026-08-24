@@ -82,6 +82,45 @@ if `full_engine' {
         confirm file `"`compiled_pdf'"'
     }
 
+    * Verify spaces, Unicode paths, relative includes, default naming, and replace.
+    local path_root `"`c(tmpdir)'/texpdf path é"'
+    local path_sections `"`path_root'/sections"'
+    capture mkdir `"`path_root'"'
+    capture mkdir `"`path_sections'"'
+    local path_source `"`path_root'/main file é.tex"'
+    local path_part `"`path_sections'/content.tex"'
+    local path_pdf `"`path_root'/main file é.pdf"'
+
+    file open `handle' using `"`path_source'"', write text replace
+    file write `handle' "\documentclass{article}" _n
+    file write `handle' "\begin{document}" _n
+    file write `handle' "\input{sections/content.tex}" _n
+    file write `handle' "\end{document}" _n
+    file close `handle'
+    file open `handle' using `"`path_part'"', write text replace
+    file write `handle' "Relative input from a Unicode path." _n
+    file close `handle'
+
+    texpdf using `"`path_source'"'
+    confirm file `"`path_pdf'"'
+    assert `"`r(pdf)'"' == `"`path_pdf'"'
+    capture noisily texpdf using `"`path_source'"'
+    local path_overwrite_rc = _rc
+    assert `path_overwrite_rc' == 602
+    texpdf using `"`path_source'"', replace
+    confirm file `"`path_pdf'"'
+
+    capture noisily texpdf using `"`path_source'"', saving(`"`path_source'"') replace
+    local same_path_rc = _rc
+    assert `same_path_rc' == 198
+    confirm file `"`path_source'"'
+
+    capture erase `"`path_pdf'"'
+    capture erase `"`path_part'"'
+    capture erase `"`path_source'"'
+    capture rmdir `"`path_sections'"'
+    capture rmdir `"`path_root'"'
+
     local full_marker = "TEXPDF FULL ENGINE STATA " + "PASS"
     display as result `"`full_marker'"'
 }
