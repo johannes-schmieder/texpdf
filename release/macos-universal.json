@@ -31,29 +31,29 @@
   "slices": {
     "arm64": {
       "embedded_helper": {
-        "sha256": "182180d7473b37e456ac440d8af0851a6904bda747da88fb1576cfc076945637",
+        "sha256": "cfe5d91d7b691549000230bee62e436b421bef2e0c15e0893dc65e2894cbfd06",
         "size_bytes": 48516288,
         "target": "aarch64-apple-darwin"
       },
-      "sha256": "74703bb6a8f0f2e3801b0c4462620d68b6e2749fdb1d1fe2f3d51e772397ceac",
-      "size_bytes": 49429184,
+      "sha256": "283ec2d412ff6ac8cf3eb06de95752aa059f3ed31b860f7ce5d27646ac582a92",
+      "size_bytes": 49429168,
       "target": "aarch64-apple-darwin"
     },
     "x86_64": {
       "embedded_helper": {
-        "sha256": "607cf620d6a034b03885d4bb970387c867939cb39ddf2e51dd28373588ed1dbf",
-        "size_bytes": 48574392,
+        "sha256": "16c18263b100ee939d6b4cb4cbd2b0dc2701c7da7eb404d9fd1ef3257119f298",
+        "size_bytes": 48574376,
         "target": "x86_64-apple-darwin"
       },
-      "sha256": "38c44d72b957e8b339b4791560309017343fb4976d90d0d8a92a953558ebfc1e",
-      "size_bytes": 49098688,
+      "sha256": "f697476cf74c78c407cf70344dc2b60360a1afebc7a69fa25e78abead2af32bb",
+      "size_bytes": 49098680,
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "d9be7615bd69b260b5841730d51d9a9ee03958f0",
+  "source_sha": "e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1",
   "universal": {
-    "sha256": "a486545968b11647cf726bfecc2159c07e5dc3f00d8e3af4c6c9ab2a394c9964",
-    "size_bytes": 98532032,
+    "sha256": "1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f",
+    "size_bytes": 98532016,
     "target": "universal2-apple-darwin"
   }
 }
