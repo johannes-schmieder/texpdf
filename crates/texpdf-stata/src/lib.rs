@@ -14,8 +14,7 @@ use std::{
 };
 
 use texpdf_core::{
-    bundle_info, compile, CompileRequest, Diagnostic, DiagnosticKind, TexPdfError,
-    TECTONIC_VERSION,
+    bundle_info, compile, CompileRequest, Diagnostic, DiagnosticKind, TexPdfError, TECTONIC_VERSION,
 };
 
 const SPI_VERSION_3_0: c_int = 3;
