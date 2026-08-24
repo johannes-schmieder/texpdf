@@ -129,24 +129,28 @@ PY
 }
 
 patch_vcpkg_ports() {
-  # The pinned gperf release archive already contains a generated configure
-  # script. The port's AUTORECONF flag needlessly requires autoconf, automake,
-  # and libtoolize to be installed on the host. Remove only that flag, leaving
-  # vcpkg's pinned source URL and SHA-512 verification unchanged.
-  /usr/bin/python3 - "$vcpkg_root/ports/gperf/portfile.cmake" <<'PY'
+  # The pinned GNU gperf and ICU release archives both contain generated
+  # configure scripts. Their AUTORECONF flags needlessly require host-level
+  # autoconf, automake, and libtoolize. Remove exactly those flags while leaving
+  # vcpkg's source URLs, hashes, patches, and configure options unchanged.
+  /usr/bin/python3 - \
+    "$vcpkg_root/ports/gperf/portfile.cmake:gperf" \
+    "$vcpkg_root/ports/icu/portfile.cmake:icu" <<'PY'
 from pathlib import Path
 import sys
 
-path = Path(sys.argv[1])
-text = path.read_text(encoding="utf-8")
-needle = "    AUTORECONF\n"
-if needle in text:
-    if text.count(needle) != 1:
-        raise SystemExit("unexpected number of gperf AUTORECONF flags")
-    text = text.replace(needle, "", 1)
-elif "vcpkg_make_configure(" not in text:
-    raise SystemExit("cannot validate pinned gperf portfile")
-path.write_text(text, encoding="utf-8")
+for specification in sys.argv[1:]:
+    path_text, label = specification.rsplit(":", 1)
+    path = Path(path_text)
+    text = path.read_text(encoding="utf-8")
+    needle = "    AUTORECONF\n"
+    if needle in text:
+        if text.count(needle) != 1:
+            raise SystemExit(f"unexpected number of {label} AUTORECONF flags")
+        text = text.replace(needle, "", 1)
+    elif "vcpkg_make_configure(" not in text:
+        raise SystemExit(f"cannot validate pinned {label} portfile")
+    path.write_text(text, encoding="utf-8")
 PY
 }
 
