@@ -1,0 +1,10 @@
+{
+  "build_outcome": "failure",
+  "diagnosis_complete": false,
+  "growth_gate": null,
+  "interpretation": "Growth in this Rust-only process implicates texpdf-core/Tectonic or its native dependencies rather than Stata or the SPI bridge. A flat Rust-only result would redirect investigation to the Stata/bridge path.",
+  "memory": {},
+  "probe_outcome": "skipped",
+  "schema_version": 1,
+  "source_sha": "85912cb8901b955dca7c1f9716e7bd144ec38333"
+}
