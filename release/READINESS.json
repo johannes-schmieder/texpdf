@@ -56,7 +56,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
+      "detail": "source=ddb2c26415520ebd3625467ecdc6b453aaa4fb45; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
       "passed": true,
       "public_release_blocker": false,
