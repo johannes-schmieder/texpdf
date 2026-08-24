@@ -150,18 +150,12 @@ fn resolve_output_path(path: &Path) -> Result<PathBuf, TexPdfError> {
     let parent = absolute
         .parent()
         .ok_or_else(|| TexPdfError::Bundle("output has no parent directory".to_owned()))?;
-    if !parent.is_dir() {
-        return Err(TexPdfError::io(
-            format!("output directory does not exist: {}", parent.display()),
-            std::io::Error::new(std::io::ErrorKind::NotFound, "directory not found"),
-        ));
-    }
-    if absolute.file_name().is_none() {
-        return Err(TexPdfError::Bundle(
-            "output has no file name".to_owned(),
-        ));
-    }
-    Ok(absolute)
+    let canonical_parent = fs::canonicalize(parent)
+        .map_err(|error| TexPdfError::io("cannot resolve output directory", error))?;
+    let name = absolute
+        .file_name()
+        .ok_or_else(|| TexPdfError::Bundle("output has no file name".to_owned()))?;
+    Ok(canonical_parent.join(name))
 }
 
 fn format_cache_path(bundle_digest: &str) -> PathBuf {
@@ -182,14 +176,6 @@ mod tests {
 Hello from texpdf. $\hat\beta=(X'X)^{-1}X'y$.
 \end{document}
 "#;
-
-    #[test]
-    fn resolves_existing_output_directory_without_canonicalizing_it() {
-        let workspace = tempfile::tempdir().expect("tempdir");
-        let spelling = format!("{}//result.pdf", workspace.path().display());
-        let resolved = resolve_output_path(Path::new(&spelling)).expect("resolve output");
-        assert_eq!(resolved.file_name().and_then(|name| name.to_str()), Some("result.pdf"));
-    }
 
     #[test]
     fn compiles_minimal_document_and_enforces_replace() {
