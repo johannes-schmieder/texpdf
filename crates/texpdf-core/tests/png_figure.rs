@@ -74,9 +74,7 @@ fn embedded_engine_includes_a_png_figure() {
     .expect("write TeX fixture");
 
     let result = compile(&CompileRequest::new(&input, &output)).expect("compile PNG figure");
-    assert!(
-        fs::read(result.output)
-            .expect("read generated PDF")
-            .starts_with(b"%PDF-")
-    );
+    assert!(fs::read(result.output)
+        .expect("read generated PDF")
+        .starts_with(b"%PDF-"));
 }

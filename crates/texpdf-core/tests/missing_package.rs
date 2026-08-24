@@ -23,10 +23,9 @@ This document must not compile.
     assert!(matches!(error, TexPdfError::Engine { .. }));
     assert!(!output.exists());
     assert!(
-        error
-            .diagnostics()
-            .iter()
-            .any(|diagnostic| diagnostic.message.contains("texpdf-package-that-does-not-exist")),
+        error.diagnostics().iter().any(|diagnostic| diagnostic
+            .message
+            .contains("texpdf-package-that-does-not-exist")),
         "the missing package name should appear in bounded diagnostics"
     );
 }

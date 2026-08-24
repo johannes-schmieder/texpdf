@@ -32,9 +32,7 @@ fn embedded_engine_includes_a_generated_pdf_figure() {
     )
     .expect("write figure source");
     let result = compile(&CompileRequest::new(&input, &output)).expect("include PDF figure");
-    assert!(
-        fs::read(result.output)
-            .expect("read generated PDF")
-            .starts_with(b"%PDF-")
-    );
+    assert!(fs::read(result.output)
+        .expect("read generated PDF")
+        .starts_with(b"%PDF-"));
 }
