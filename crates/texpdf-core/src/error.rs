@@ -15,6 +15,10 @@ pub enum TexPdfError {
     #[error("input path is not a regular file: {0}")]
     InputNotFile(PathBuf),
 
+    /// The final output resolves to the primary source path.
+    #[error("output PDF must not be the input TeX file: {0}")]
+    OutputIsInput(PathBuf),
+
     /// The output exists and replacement was not authorized.
     #[error("output file already exists; specify replace: {0}")]
     OutputExists(PathBuf),

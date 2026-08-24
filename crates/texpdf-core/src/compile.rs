@@ -9,7 +9,8 @@ use tectonic::driver::{OutputFormat, ProcessingSessionBuilder};
 
 use crate::{
     bundle::{bundle_info, open_bundle},
-    CompileRequest, CompileResult, DiagnosticCollector, TexPdfError, TECTONIC_VERSION,
+    diagnostics::DiagnosticCollector,
+    CompileRequest, CompileResult, TexPdfError, TECTONIC_VERSION,
 };
 
 static ENGINE_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
@@ -31,9 +32,17 @@ fn compile_locked(request: &CompileRequest) -> Result<CompileResult, TexPdfError
 
     let input = fs::canonicalize(&request.input)
         .map_err(|error| TexPdfError::io("cannot resolve input path", error))?;
-    let output = absolute_path(&request.output)?;
-    if output.exists() && !request.replace {
-        return Err(TexPdfError::OutputExists(output));
+    let output = resolve_output_path(&request.output)?;
+
+    if output.exists() {
+        let existing_output = fs::canonicalize(&output)
+            .map_err(|error| TexPdfError::io("cannot resolve existing output path", error))?;
+        if existing_output == input {
+            return Err(TexPdfError::OutputIsInput(output));
+        }
+        if !request.replace {
+            return Err(TexPdfError::OutputExists(output));
+        }
     }
 
     let input_dir = input
@@ -46,12 +55,6 @@ fn compile_locked(request: &CompileRequest) -> Result<CompileResult, TexPdfError
     let output_parent = output
         .parent()
         .ok_or_else(|| TexPdfError::Bundle("output has no parent directory".to_owned()))?;
-    if !output_parent.is_dir() {
-        return Err(TexPdfError::io(
-            format!("output directory does not exist: {}", output_parent.display()),
-            std::io::Error::new(std::io::ErrorKind::NotFound, "directory not found"),
-        ));
-    }
 
     let info = bundle_info()?.clone();
     let format_cache = format_cache_path(&info.tectonic_bundle_digest);
@@ -76,19 +79,25 @@ fn compile_locked(request: &CompileRequest) -> Result<CompileResult, TexPdfError
         .keep_logs(request.keep_log)
         .print_stdout(false)
         .shell_escape_disabled()
-        .build_date_from_env(true)
+        .build_date_from_env(false)
         .bundle(open_bundle()?);
 
-    let mut session = builder.create(&mut status).map_err(|error| TexPdfError::Engine {
-        message: format!("cannot initialize Tectonic: {error:#}"),
-        diagnostics: status.snapshot(),
-    })?;
-    session.run(&mut status).map_err(|error| TexPdfError::Engine {
-        message: format!("LaTeX compilation failed: {error:#}"),
-        diagnostics: status.snapshot(),
-    })?;
+    let mut session = builder
+        .create(&mut status)
+        .map_err(|error| TexPdfError::Engine {
+            message: format!("cannot initialize Tectonic: {error:#}"),
+            diagnostics: status.snapshot(),
+        })?;
+    session
+        .run(&mut status)
+        .map_err(|error| TexPdfError::Engine {
+            message: format!("LaTeX compilation failed: {error:#}"),
+            diagnostics: status.snapshot(),
+        })?;
 
-    let generated_pdf = staging.path().join(Path::new(input_name).with_extension("pdf"));
+    let generated_pdf = staging
+        .path()
+        .join(Path::new(input_name).with_extension("pdf"));
     if !generated_pdf.is_file() {
         return Err(TexPdfError::Engine {
             message: "Tectonic reported success but produced no PDF".to_owned(),
@@ -104,7 +113,9 @@ fn compile_locked(request: &CompileRequest) -> Result<CompileResult, TexPdfError
         .map_err(|error| TexPdfError::io("cannot install compiled PDF", error))?;
 
     if request.keep_log {
-        let generated_log = staging.path().join(Path::new(input_name).with_extension("log"));
+        let generated_log = staging
+            .path()
+            .join(Path::new(input_name).with_extension("log"));
         if generated_log.is_file() {
             let output_log = output.with_extension("log");
             if output_log.exists() && request.replace {
@@ -133,6 +144,19 @@ fn absolute_path(path: &Path) -> Result<PathBuf, TexPdfError> {
     env::current_dir()
         .map(|directory| directory.join(path))
         .map_err(|error| TexPdfError::io("cannot resolve current directory", error))
+}
+
+fn resolve_output_path(path: &Path) -> Result<PathBuf, TexPdfError> {
+    let absolute = absolute_path(path)?;
+    let parent = absolute
+        .parent()
+        .ok_or_else(|| TexPdfError::Bundle("output has no parent directory".to_owned()))?;
+    let canonical_parent = fs::canonicalize(parent)
+        .map_err(|error| TexPdfError::io("cannot resolve output directory", error))?;
+    let name = absolute
+        .file_name()
+        .ok_or_else(|| TexPdfError::Bundle("output has no file name".to_owned()))?;
+    Ok(canonical_parent.join(name))
 }
 
 fn format_cache_path(bundle_digest: &str) -> PathBuf {
@@ -173,6 +197,19 @@ Hello from texpdf. $\hat\beta=(X'X)^{-1}X'y$.
         let mut replacement = request;
         replacement.replace = true;
         compile(&replacement).expect("replace output");
+    }
+
+    #[test]
+    fn rejects_output_that_is_the_input_even_with_replace() {
+        let workspace = tempfile::tempdir().expect("tempdir");
+        let input = workspace.path().join("source.tex");
+        fs::write(&input, MINIMAL).expect("write source");
+        let mut request = CompileRequest::new(&input, &input);
+        request.replace = true;
+
+        let error = compile(&request).expect_err("source overwrite must be rejected");
+        assert!(matches!(error, TexPdfError::OutputIsInput(_)));
+        assert_eq!(fs::read_to_string(input).expect("source survives"), MINIMAL);
     }
 
     #[test]
