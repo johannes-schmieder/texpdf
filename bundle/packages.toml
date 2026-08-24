@@ -1,0 +1,68 @@
+# Top-level compatibility targets for the v1 academic bundle.
+# Presence in this file is not a support claim until the corresponding fixture passes.
+
+[bundle]
+name = "texpdf-academic"
+target_compressed_megabytes = [20, 50]
+include_bibtex = true
+include_biber = false
+include_shell_escape = false
+
+[groups.core]
+packages = ["latex-base", "tools", "graphics", "xcolor"]
+
+[groups.math]
+packages = ["amsmath", "amssymb", "amsfonts", "amscls", "mathtools"]
+
+[groups.tables]
+packages = [
+  "booktabs",
+  "array",
+  "longtable",
+  "tabularx",
+  "multirow",
+  "threeparttable",
+  "threeparttablex",
+  "dcolumn",
+  "siunitx",
+  "adjustbox",
+]
+
+[groups.figures_layout]
+packages = [
+  "graphicx",
+  "geometry",
+  "float",
+  "placeins",
+  "rotating",
+  "pdflscape",
+  "caption",
+  "subcaption",
+]
+
+[groups.formatting_references]
+packages = [
+  "hyperref",
+  "url",
+  "setspace",
+  "enumitem",
+  "fancyhdr",
+  "titlesec",
+  "microtype",
+  "natbib",
+]
+
+[groups.fonts]
+packages = ["latin-modern"]
+optional_packages = ["tex-gyre"]
+
+[excluded]
+packages = [
+  "beamer",
+  "tikz",
+  "pgf",
+  "pstricks",
+  "biblatex",
+  "biber",
+  "minted",
+]
