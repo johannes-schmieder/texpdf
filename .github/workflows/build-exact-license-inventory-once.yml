@@ -1,0 +1,485 @@
+name: Build exact embedded-resource license inventory once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-exact-license-inventory-once.yml"
+      - "release/V1_READINESS.json"
+      - "tools/report_v1_readiness.py"
+
+concurrency:
+  group: texpdf-build-exact-license-inventory-once
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  inventory:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    env:
+      TEXPDF_RUST_PROFILE: engine
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Synchronize
+        id: state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if [[ -x tools/report_v1_readiness.py ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Add exact inventory builder and tests
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p tools ci/tests licenses/inventory
+          cat > tools/build_tex_resource_license_inventory.py <<'PY'
+          #!/usr/bin/env python3
+          """Map every resource in the exact embedded ZIP to package-license evidence."""
+
+          from __future__ import annotations
+
+          import argparse
+          from collections import defaultdict
+          import hashlib
+          import json
+          from pathlib import Path
+          import sys
+          from typing import Any
+          import zipfile
+
+
+          def load(path: Path) -> Any:
+              return json.loads(path.read_text(encoding="utf-8"))
+
+
+          def sha256(path: Path) -> str:
+              digest = hashlib.sha256()
+              with path.open("rb") as stream:
+                  while chunk := stream.read(1024 * 1024):
+                      digest.update(chunk)
+              return digest.hexdigest()
+
+
+          def normalize_resource(value: str) -> str:
+              return value.replace("\\", "/").lstrip("./")
+
+
+          def load_overrides(path: Path | None) -> dict[str, dict[str, Any]]:
+              if path is None or not path.is_file():
+                  return {}
+              raw = load(path)
+              overrides: dict[str, dict[str, Any]] = {}
+
+              def add(resource: str, value: Any) -> None:
+                  if isinstance(value, str):
+                      record = {"package": value}
+                  elif isinstance(value, dict):
+                      record = dict(value)
+                  else:
+                      return
+                  overrides[normalize_resource(resource)] = record
+
+              if isinstance(raw, dict):
+                  candidate = raw.get("overrides", raw)
+                  if isinstance(candidate, dict):
+                      for resource, value in candidate.items():
+                          add(str(resource), value)
+                  elif isinstance(candidate, list):
+                      for record in candidate:
+                          if isinstance(record, dict) and record.get("resource"):
+                              add(str(record["resource"]), record)
+              elif isinstance(raw, list):
+                  for record in raw:
+                      if isinstance(record, dict) and record.get("resource"):
+                          add(str(record["resource"]), record)
+              return overrides
+
+
+          def package_metadata(resolution: dict[str, Any]) -> dict[str, dict[str, Any]]:
+              return {
+                  str(record["name"]): dict(record)
+                  for record in resolution.get("packages", [])
+                  if isinstance(record, dict) and record.get("name")
+              }
+
+
+          def build_inventory(
+              bundle_path: Path,
+              resolution_path: Path,
+              override_path: Path | None,
+          ) -> dict[str, Any]:
+              resolution = load(resolution_path)
+              if not isinstance(resolution, dict):
+                  raise ValueError("package resolution must be a JSON object")
+              overrides = load_overrides(override_path)
+              packages = package_metadata(resolution)
+
+              evidence: dict[str, set[str]] = defaultdict(set)
+              methods: dict[tuple[str, str], set[str]] = defaultdict(set)
+              for record in resolution.get("matches", []):
+                  if not isinstance(record, dict):
+                      continue
+                  resource = record.get("resource")
+                  package = record.get("package")
+                  if resource and package:
+                      normalized = normalize_resource(str(resource))
+                      evidence[normalized].add(str(package))
+                      methods[(normalized, str(package))].add(str(record.get("method") or "match"))
+              for record in resolution.get("ambiguous_runfiles", []):
+                  if not isinstance(record, dict) or not record.get("package"):
+                      continue
+                  package = str(record["package"])
+                  for resource in record.get("candidates", []):
+                      normalized = normalize_resource(str(resource))
+                      evidence[normalized].add(package)
+                      methods[(normalized, package)].add("ambiguous_candidate_union")
+
+              with zipfile.ZipFile(bundle_path) as archive:
+                  resources = sorted(
+                      normalize_resource(name)
+                      for name in archive.namelist()
+                      if name and not name.endswith("/")
+                  )
+
+              resolved: list[dict[str, Any]] = []
+              ambiguous: list[dict[str, Any]] = []
+              unresolved: list[str] = []
+              packages_used: set[str] = set()
+              missing_license_packages: set[str] = set()
+              override_count = 0
+
+              for resource in resources:
+                  override = overrides.get(resource)
+                  if override is not None:
+                      package = override.get("package")
+                      license_value = override.get("license")
+                      if package:
+                          package = str(package)
+                          packages_used.add(package)
+                          metadata = dict(packages.get(package, {}))
+                          if license_value and not metadata.get("license"):
+                              metadata["license"] = license_value
+                          if metadata:
+                              packages.setdefault(package, metadata)
+                          resolved.append(
+                              {
+                                  "resource": resource,
+                                  "package": package,
+                                  "license": metadata.get("license") or license_value,
+                                  "mapping_source": "reviewed_override",
+                                  "review_note": override.get("note") or override.get("reason"),
+                              }
+                          )
+                          override_count += 1
+                          if not (metadata.get("license") or license_value):
+                              missing_license_packages.add(package)
+                          continue
+
+                  candidates = sorted(evidence.get(resource, set()))
+                  if len(candidates) == 1:
+                      package = candidates[0]
+                      metadata = packages.get(package, {})
+                      packages_used.add(package)
+                      if not metadata.get("license"):
+                          missing_license_packages.add(package)
+                      resolved.append(
+                          {
+                              "resource": resource,
+                              "package": package,
+                              "license": metadata.get("license"),
+                              "mapping_source": "texlive_package_resolution",
+                              "methods": sorted(methods[(resource, package)]),
+                          }
+                      )
+                  elif len(candidates) > 1:
+                      ambiguous.append({"resource": resource, "packages": candidates})
+                  else:
+                      unresolved.append(resource)
+
+              package_records = []
+              for package in sorted(packages_used):
+                  metadata = packages.get(package, {})
+                  package_records.append(
+                      {
+                          "name": package,
+                          "catalogue_version": metadata.get("catalogue_version"),
+                          "license": metadata.get("license"),
+                      }
+                  )
+
+              license_complete = not (
+                  unresolved or ambiguous or missing_license_packages
+              )
+              return {
+                  "schema_version": 1,
+                  "bundle": str(bundle_path),
+                  "bundle_zip_sha256": sha256(bundle_path),
+                  "resource_count": len(resources),
+                  "resolved_resource_count": len(resolved),
+                  "reviewed_override_count": override_count,
+                  "resolved_resources": resolved,
+                  "unresolved_resources": unresolved,
+                  "ambiguous_resources": ambiguous,
+                  "packages": package_records,
+                  "packages_without_license_metadata": sorted(missing_license_packages),
+                  "conflicts": [],
+                  "license_complete": license_complete,
+                  "notice_texts_complete": False,
+                  "public_redistribution_ready": False,
+              }
+
+
+          def write_atomic(path: Path, payload: dict[str, Any]) -> None:
+              path.parent.mkdir(parents=True, exist_ok=True)
+              temporary = path.with_suffix(path.suffix + ".tmp")
+              temporary.write_text(
+                  json.dumps(payload, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+              temporary.replace(path)
+
+
+          def main() -> int:
+              parser = argparse.ArgumentParser()
+              parser.add_argument(
+                  "--bundle",
+                  type=Path,
+                  default=Path("bundle/generated/texpdf-bundle.zip"),
+              )
+              parser.add_argument(
+                  "--resolution",
+                  type=Path,
+                  default=Path("bundle/package-resolution.json"),
+              )
+              parser.add_argument(
+                  "--overrides",
+                  type=Path,
+                  default=Path("licenses/tex-resource-overrides.json"),
+              )
+              parser.add_argument(
+                  "--output",
+                  type=Path,
+                  default=Path("licenses/inventory/tex-resources.json"),
+              )
+              parser.add_argument("--require-complete", action="store_true")
+              args = parser.parse_args()
+              try:
+                  inventory = build_inventory(args.bundle, args.resolution, args.overrides)
+                  write_atomic(args.output, inventory)
+              except (OSError, ValueError, KeyError, json.JSONDecodeError, zipfile.BadZipFile) as error:
+                  print(f"TEXPDF_EXACT_LICENSE_INVENTORY_ERROR {error}", file=sys.stderr)
+                  return 2
+              print(
+                  "TEXPDF_EXACT_LICENSE_INVENTORY "
+                  f"resources={inventory['resource_count']} "
+                  f"resolved={inventory['resolved_resource_count']} "
+                  f"unresolved={len(inventory['unresolved_resources'])} "
+                  f"ambiguous={len(inventory['ambiguous_resources'])} "
+                  f"missing_license_packages={len(inventory['packages_without_license_metadata'])} "
+                  f"complete={str(inventory['license_complete']).lower()}"
+              )
+              return 1 if args.require_complete and not inventory["license_complete"] else 0
+
+
+          if __name__ == "__main__":
+              raise SystemExit(main())
+          PY
+          chmod +x tools/build_tex_resource_license_inventory.py
+
+          cat > ci/tests/test_exact_license_inventory.py <<'PY'
+          from __future__ import annotations
+
+          import importlib.util
+          import json
+          from pathlib import Path
+          import tempfile
+          import unittest
+          import zipfile
+
+          MODULE_PATH = Path(__file__).resolve().parents[2] / "tools/build_tex_resource_license_inventory.py"
+          SPEC = importlib.util.spec_from_file_location("exact_license_inventory", MODULE_PATH)
+          assert SPEC is not None and SPEC.loader is not None
+          MODULE = importlib.util.module_from_spec(SPEC)
+          SPEC.loader.exec_module(MODULE)
+
+
+          class ExactLicenseInventoryTests(unittest.TestCase):
+              def test_resolved_and_unresolved_resources(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      bundle = root / "bundle.zip"
+                      with zipfile.ZipFile(bundle, "w") as archive:
+                          archive.writestr("known.sty", "known")
+                          archive.writestr("unknown.cfg", "unknown")
+                      resolution = root / "resolution.json"
+                      resolution.write_text(
+                          json.dumps(
+                              {
+                                  "matches": [
+                                      {
+                                          "resource": "known.sty",
+                                          "package": "known-package",
+                                          "method": "runfile",
+                                      }
+                                  ],
+                                  "packages": [
+                                      {
+                                          "name": "known-package",
+                                          "catalogue_version": "1.0",
+                                          "license": "lppl1.3c",
+                                      }
+                                  ],
+                              }
+                          ),
+                          encoding="utf-8",
+                      )
+                      inventory = MODULE.build_inventory(bundle, resolution, None)
+                      self.assertEqual(inventory["resource_count"], 2)
+                      self.assertEqual(inventory["resolved_resource_count"], 1)
+                      self.assertEqual(inventory["unresolved_resources"], ["unknown.cfg"])
+                      self.assertFalse(inventory["license_complete"])
+
+              def test_reviewed_override_can_close_mapping(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      bundle = root / "bundle.zip"
+                      with zipfile.ZipFile(bundle, "w") as archive:
+                          archive.writestr("generated.dat", "data")
+                      resolution = root / "resolution.json"
+                      resolution.write_text('{"matches": [], "packages": []}', encoding="utf-8")
+                      overrides = root / "overrides.json"
+                      overrides.write_text(
+                          json.dumps(
+                              {
+                                  "overrides": {
+                                      "generated.dat": {
+                                          "package": "reviewed-source",
+                                          "license": "MIT",
+                                          "note": "synthetic fixture",
+                                      }
+                                  }
+                              }
+                          ),
+                          encoding="utf-8",
+                      )
+                      inventory = MODULE.build_inventory(bundle, resolution, overrides)
+                      self.assertTrue(inventory["license_complete"])
+                      self.assertEqual(inventory["reviewed_override_count"], 1)
+
+              def test_ambiguous_mapping_fails_closed(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      bundle = root / "bundle.zip"
+                      with zipfile.ZipFile(bundle, "w") as archive:
+                          archive.writestr("shared.sty", "data")
+                      resolution = root / "resolution.json"
+                      resolution.write_text(
+                          json.dumps(
+                              {
+                                  "matches": [
+                                      {"resource": "shared.sty", "package": "a"},
+                                      {"resource": "shared.sty", "package": "b"},
+                                  ],
+                                  "packages": [
+                                      {"name": "a", "license": "lppl1.3c"},
+                                      {"name": "b", "license": "lppl1.3c"},
+                                  ],
+                              }
+                          ),
+                          encoding="utf-8",
+                      )
+                      inventory = MODULE.build_inventory(bundle, resolution, None)
+                      self.assertEqual(len(inventory["ambiguous_resources"]), 1)
+                      self.assertFalse(inventory["license_complete"])
+
+
+          if __name__ == "__main__":
+              unittest.main()
+          PY
+
+          /usr/bin/python3 -m unittest ci.tests.test_exact_license_inventory
+      - name: Build and test exact embedded bundle
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/record_rust_quick.sh
+          grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+          test -f bundle/generated/texpdf-bundle.zip
+      - name: Generate exact resource inventory and readiness report
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/build_tex_resource_license_inventory.py
+          /usr/bin/python3 tools/report_v1_readiness.py
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          inventory = json.loads(
+              Path("licenses/inventory/tex-resources.json").read_text(encoding="utf-8")
+          )
+          missing = inventory["packages_without_license_metadata"]
+          text = f'''# Embedded TeX resource license inventory status
+
+This report is generated from the **exact ZIP embedded in the tested plugin**,
+not merely from the desired package list.
+
+- Bundle SHA-256: `{inventory["bundle_zip_sha256"]}`
+- Embedded resources: `{inventory["resource_count"]}`
+- Resolved resources: `{inventory["resolved_resource_count"]}`
+- Reviewed overrides: `{inventory["reviewed_override_count"]}`
+- Unresolved resources: `{len(inventory["unresolved_resources"])}`
+- Ambiguous resources: `{len(inventory["ambiguous_resources"])}`
+- Packages lacking license metadata: `{len(missing)}`
+- Mapping complete: `{str(inventory["license_complete"]).lower()}`
+- Notice texts complete: `{str(inventory["notice_texts_complete"]).lower()}`
+- Public redistribution ready: `{str(inventory["public_redistribution_ready"]).lower()}`
+
+Unresolved, ambiguous, or missing-license entries remain hard release blockers.
+Reviewed overrides must identify their provenance and review basis; the tooling
+does not infer a blanket license for TeX Live resources.
+
+The complete machine-readable map is
+`licenses/inventory/tex-resources.json`. Required license and notice texts are a
+separate gate even after every resource has a package/license mapping.
+'''
+          Path("docs/RESOURCE_LICENSE_STATUS.md").write_text(text, encoding="utf-8")
+          PY
+          rm -f .github/workflows/build-exact-license-inventory-once.yml
+      - name: Commit exact inventory
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf bundle/generated .ci/stata/run dist
+          rm -f stata/_texpdf_plugin.plugin
+          git add tools/build_tex_resource_license_inventory.py
+          git add ci/tests/test_exact_license_inventory.py
+          git add licenses/inventory/tex-resources.json
+          git add docs/RESOURCE_LICENSE_STATUS.md docs/V1_READINESS.md
+          git add release/V1_READINESS.json
+          git add -u .github/workflows/build-exact-license-inventory-once.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "license: inventory the exact embedded TeX resource set"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
