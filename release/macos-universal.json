@@ -7,33 +7,15 @@
   "arm_stata_profile": "quick",
   "arm_stata_receipt": ".ci/stata/run/receipt.json",
   "dynamic_dependencies": [
-    "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
-    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
-    "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
-    "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
-    "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
-    "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
     "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)"
   ],
   "dynamic_dependencies_by_arch": {
     "arm64": [
-      "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
-      "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
-      "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
-      "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
-      "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
-      "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
       "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
       "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)"
     ],
     "x86_64": [
-      "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
-      "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
-      "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
-      "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
-      "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
-      "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
       "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
       "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)"
     ]
@@ -48,20 +30,30 @@
   "schema_version": 1,
   "slices": {
     "arm64": {
-      "sha256": "ff588d40f34bfba810c9f2b36a43dda1dcc2694830db17a542c397849750cb16",
-      "size_bytes": 49998192,
+      "embedded_helper": {
+        "sha256": "f259014d40e41d868d360884267195bcc30f78ff13891fcc1ed0b5d0ef4eb644",
+        "size_bytes": 50233536,
+        "target": "aarch64-apple-darwin"
+      },
+      "sha256": "63af48751c317f4401b1cc5eb154f030bdb8a3eecf9cfb4619d6dec765bc216c",
+      "size_bytes": 51146432,
       "target": "aarch64-apple-darwin"
     },
     "x86_64": {
-      "sha256": "632e8ec115408402952ccfaf730ef58b464bcd6e8e81b5c68bfb00fed2462d83",
-      "size_bytes": 50043664,
+      "embedded_helper": {
+        "sha256": "d887e2a90feea7513c14fae3c0fe700a4c3c9dd479e21531d5ef585d74d62f34",
+        "size_bytes": 50278328,
+        "target": "x86_64-apple-darwin"
+      },
+      "sha256": "1dff6901b57181823acb154ac76ed49599773fe14805327fe51cd41ad1265474",
+      "size_bytes": 50802624,
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "32bceb84df47a1c955c10cf75cb60a9d0fbb8d96",
+  "source_sha": "5ba3a83e098dcf7eb47c7b0db92b28ac46a9297b",
   "universal": {
-    "sha256": "dffd41aa5e27cef155c47e21d41b260ec7c938966d86883961dc5ae8e5012cf5",
-    "size_bytes": 100051312,
+    "sha256": "271c7a88f578fca075218f0acc141d4b41e3015b150f22b45e63cb8dd95f2203",
+    "size_bytes": 101953216,
     "target": "universal2-apple-darwin"
   }
 }
