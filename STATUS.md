@@ -26,7 +26,7 @@ tracked independently:
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
 | Current ARM64 artifact source | `6fc34a9335a2328d0a13729151975811239910c6` |
 | Current universal build source | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1` |
-| Current license-audit source | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
+| Current license-audit source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
 | Latest memory-stress attempt | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1`; qualified=yes |
 
 ## Architecture
@@ -50,7 +50,9 @@ The current ARM64 plugin is 47.14 MiB (`bc6575fbc0e876734065f9378ca1d4cdc31390f1
 
 ## Active private-candidate blockers
 
+- `macos_arm_runtime`
 - `macos_intel_runtime`
+- `private_candidate_package`
 
 ## License evidence
 
@@ -58,11 +60,13 @@ The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 amb
 
 ## Memory evidence
 
-The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 16 KiB against a 65536 KiB gate; growth gate passed: yes. This failed attempt is retained as evidence and is not described as qualification.
+The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 16 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
 
 ## Deferred public-release blockers
 
+- `macos_arm_runtime`
 - `macos_intel_runtime`
+- `private_candidate_package`
 - `x86_64-pc-windows-msvc_runtime`
 - `x86_64-unknown-linux-gnu_runtime`
 - `public_distribution`

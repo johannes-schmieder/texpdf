@@ -1,6 +1,8 @@
 {
   "candidate_blockers": [
-    "macos_intel_runtime"
+    "macos_arm_runtime",
+    "macos_intel_runtime",
+    "private_candidate_package"
   ],
   "candidate_ready": false,
   "candidate_version": "0.1.0-rc.1",
@@ -54,12 +56,12 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": false,
+      "candidate_release_blocker": true,
       "detail": "source=6fc34a9335a2328d0a13729151975811239910c6; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
-      "passed": true,
-      "public_release_blocker": false,
-      "release_blocker": false
+      "passed": false,
+      "public_release_blocker": true,
+      "release_blocker": true
     },
     {
       "candidate_release_blocker": false,
@@ -81,6 +83,14 @@
       "candidate_release_blocker": true,
       "detail": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed",
       "key": "macos_intel_runtime",
+      "passed": false,
+      "public_release_blocker": true,
+      "release_blocker": true
+    },
+    {
+      "candidate_release_blocker": true,
+      "detail": "version=None; zip_bytes=None; license_evidence=None; both_runtimes=None",
+      "key": "private_candidate_package",
       "passed": false,
       "public_release_blocker": true,
       "release_blocker": true
@@ -119,7 +129,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=d9be7615bd69b260b5841730d51d9a9ee03958f0; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
+      "detail": "source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
       "key": "third_party_license_complete",
       "passed": true,
       "public_release_blocker": false,
@@ -150,16 +160,20 @@
       "release_blocker": false
     }
   ],
-  "implementation_complete_macos_arm64": true,
+  "implementation_complete_macos_arm64": false,
   "public_release_blockers": [
+    "macos_arm_runtime",
     "macos_intel_runtime",
+    "private_candidate_package",
     "x86_64-pc-windows-msvc_runtime",
     "x86_64-unknown-linux-gnu_runtime",
     "public_distribution"
   ],
   "public_release_ready": false,
   "release_blockers": [
-    "macos_intel_runtime"
+    "macos_arm_runtime",
+    "macos_intel_runtime",
+    "private_candidate_package"
   ],
   "release_kind": "private_release_candidate",
   "schema_version": 3
