@@ -49,11 +49,11 @@ probe_declaration() {
   # pkgconf's fallback implementations, which then collide with the SDK.
   if [[ "$host" == *-apple-darwin ]]; then
     case "$symbol" in
-      strlcat|strlcpy|strndup|reallocarray)
+      strlcat|strlcpy|strndup)
         printf '1'
         return
         ;;
-      pledge|unveil)
+      reallocarray|pledge|unveil)
         printf '0'
         return
         ;;
