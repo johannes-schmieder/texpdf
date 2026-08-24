@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "qualified_source_sha": "63b997d290ec3adde0af33dbb49a96972d1e30c9",
+  "qualified_at": "2026-08-24T12:01:52.107232Z",
+  "ci": {
+    "profile": "quick",
+    "run_id": 32724852879,
+    "run_attempt": 1,
+    "overall_status": "success",
+    "stata_status": "success",
+    "rust_status": "success",
+    "rust_mode": "repository-engine",
+    "required_markers": [
+      "TEXPDF STRESS PASS",
+      "TEXPDF NET INSTALL PASS",
+      "TEXPDF FULL ENGINE STATA PASS",
+      "TEXPDF STATA MATA SMOKE PASS"
+    ]
+  },
+  "platform": {
+    "os": "macOS",
+    "architecture": "Apple Silicon",
+    "rust_target": "aarch64-apple-darwin",
+    "stata_version": "18",
+    "stata_edition": "MP",
+    "stata_bundle_version": "18.0.130"
+  },
+  "engine": {
+    "name": "tectonic",
+    "version": "0.17.0"
+  },
+  "bundle": {
+    "name": "texpdf-academic-v1",
+    "version": "33-academic-v1",
+    "transform_version": "range-closure-v1",
+    "file_count": 477,
+    "zip_size_bytes": 6692142,
+    "uncompressed_resource_bytes": 14393356,
+    "zip_sha256": "164a849049ae627d0b15ae28a9b5ad5930121c95b17827b528e1666fd62ca6e6",
+    "content_digest": "675375703bc247518c61902cbefccb2066d9e41c4d613c274f4a97fdf9fcce31",
+    "source_sha256": "5cdfdff3ec95e376341c4963dec8347c579cb32c89925631789e2207f13c36e8",
+    "index_sha256": "467e2612066ae6052059b06d45e33b43168a27f2b17fa44948ad8963f2d2d19c",
+    "selection_manifest": "bundle/curated-manifest.json"
+  },
+  "plugin": {
+    "size_bytes": 49996816,
+    "sha256": "5648aeef9894077d74b4ba12b7120fb2a730db0bcc8a5c1d395fab61be7ea4f1",
+    "exports": [
+      "pginit",
+      "stata_call"
+    ],
+    "dynamic_dependencies": [
+      "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+      "/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices",
+      "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+      "/usr/lib/libSystem.B.dylib",
+      "/usr/lib/libc++.1.dylib",
+      "/usr/lib/libiconv.2.dylib",
+      "/usr/lib/libresolv.9.dylib",
+      "/usr/lib/libxml2.2.dylib"
+    ]
+  },
+  "package": {
+    "installed_size_bytes": 50007160,
+    "zip_size_bytes": 23480504,
+    "zip_sha256": "fe8202fb30ad94be1147d378c670dfe8b266d2b12cd4ea833797fb05893bc94d",
+    "net_install_tested": true
+  },
+  "tests": {
+    "full_academic_corpus": true,
+    "bibtex_natbib": true,
+    "relative_inputs": true,
+    "spaces_in_paths": true,
+    "unicode_paths": true,
+    "overwrite_protection": true,
+    "failed_compile_recovery": true,
+    "repeated_in_process_compiles": 100,
+    "system_tex_hidden": true,
+    "runtime_network_provider": false
+  },
+  "qualification_boundary": "This record qualifies the macOS Apple Silicon plugin under licensed Stata/MP 18. Windows, Linux, macOS Intel, and older Stata versions require separate runtime qualification."
+}
