@@ -22,14 +22,14 @@ permissions:
 
 jobs:
   audit:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
     timeout-minutes: 10
     steps:
       - name: Check out exact source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Generate release-readiness report
-        run: python3 tools/check_release_readiness.py
+        run: /usr/bin/python3 tools/check_release_readiness.py
 
       - name: Upload audit report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
