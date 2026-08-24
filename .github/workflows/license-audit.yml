@@ -17,6 +17,7 @@ on:
       - "tools/generate_cargo_license_inventory.py"
       - "tools/generate_dependency_inventory.py"
       - "tools/collect_dependency_license_texts.py"
+      - "tools/summarize_license_review.py"
       - "tools/prepare_curated_bundle.py"
       - "tools/prepare_native_deps.sh"
 
@@ -136,6 +137,10 @@ jobs:
         shell: bash
         run: /usr/bin/python3 ci/run_license_audit.py
 
+      - name: Generate compact review queues
+        shell: bash
+        run: /usr/bin/python3 tools/summarize_license_review.py
+
       - name: Upload complete and partial audit evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -172,10 +177,11 @@ jobs:
             mkdir -p "$publish_tree/licenses/generated" "$publish_tree/bundle"
             for name in \
               STATUS.json STATUS.md \
-              tex-resources.json tex-resources.md \
+              tex-resources.json tex-resources.md tex-review.json \
               cargo.json cargo.md \
               dependencies.json dependencies.md \
-              license-texts.json license-sources.lock.json; do
+              license-texts.json rust-notice-review.json \
+              license-sources.lock.json; do
               if [[ -f "$source_dir/$name" ]]; then
                 cp "$source_dir/$name" "$publish_tree/licenses/generated/$name"
               else
