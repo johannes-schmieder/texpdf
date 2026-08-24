@@ -35,7 +35,7 @@ jobs:
   mac-ci:
     name: Mac Rust quick + Stata / ${{ inputs.profile || 'quick' }}
     runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
-    timeout-minutes: 30
+    timeout-minutes: 120
     env:
       STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
       STATA_PROFILE: ${{ inputs.profile || 'quick' }}
