@@ -1,0 +1,150 @@
+name: Publish current artifact summary
+
+on:
+  workflow_run:
+    workflows:
+      - Licensed Stata and Rust CI
+    types:
+      - completed
+
+concurrency:
+  group: texpdf-artifact-summary-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 15
+    env:
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+      SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+      SOURCE_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: stata-${{ env.SOURCE_SHA }}-${{ env.SOURCE_RUN_ID }}-${{ env.SOURCE_RUN_ATTEMPT }}
+          path: ${{ runner.temp }}/texpdf-summary-evidence
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+
+      - name: Generate exact human-readable summary
+        id: summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "texpdf-summary-evidence"
+          source_sha = os.environ["SOURCE_SHA"]
+
+          def load(name: str) -> dict:
+              matches = sorted(root.rglob(name))
+              return json.loads(matches[0].read_text(encoding="utf-8")) if matches else {}
+
+          receipt = load("receipt.json")
+          bundle = load("bundle-info.json")
+          plugin = load("plugin-manifest.json")
+          package = load("package-manifest.json") or load("BUILD_INFO.json")
+          if receipt.get("tested_sha") != source_sha or receipt.get("rust_mode") != "repository-engine":
+              Path(".ci/artifact-summary.skip").write_text("not a qualifying engine run\n", encoding="utf-8")
+              raise SystemExit(0)
+          if receipt.get("status") != "success" or receipt.get("stata_status") != "success" or receipt.get("rust_status") != "success":
+              raise SystemExit("qualifying statuses are not all success")
+
+          bundle_bytes = bundle.get("zip_size_bytes")
+          plugin_bytes = plugin.get("size_bytes") or plugin.get("plugin_size_bytes")
+          if not isinstance(bundle_bytes, int) or not isinstance(plugin_bytes, int):
+              raise SystemExit("artifact byte counts are missing")
+
+          def mib(value: int) -> str:
+              return f"{value / 1024 / 1024:.2f} MiB"
+
+          lines = [
+              "# Current exact artifact measurement",
+              "",
+              "This file is generated only from a successful exact-source-SHA",
+              "embedded-engine Rust and licensed Stata run.",
+              "",
+              f"- Source SHA: `{source_sha}`",
+              f"- CI profile: `{receipt.get('profile')}`",
+              f"- Overall status: `{receipt.get('status')}`",
+              f"- Stata status: `{receipt.get('stata_status')}`",
+              f"- Rust status: `{receipt.get('rust_status')}`",
+              f"- Rust mode: `{receipt.get('rust_mode')}`",
+              f"- Platform: `{receipt.get('platform')}`",
+              f"- Stata: `{receipt.get('stata_edition')} {receipt.get('stata_version')}`",
+              "",
+              "## Embedded resource bundle",
+              "",
+              f"- Logical files: `{bundle.get('file_count')}`",
+              f"- Exact bytes: `{bundle_bytes}`",
+              f"- Binary size: **{mib(bundle_bytes)}**",
+              f"- ZIP SHA-256: `{bundle.get('zip_sha256')}`",
+              f"- Tectonic digest: `{bundle.get('tectonic_bundle_digest')}`",
+              "",
+              "## Standalone plugin",
+              "",
+              f"- Exact bytes: `{plugin_bytes}`",
+              f"- Binary size: **{mib(plugin_bytes)}**",
+              f"- SHA-256: `{plugin.get('sha256') or plugin.get('plugin_sha256')}`",
+              f"- Target/platform: `{plugin.get('target') or plugin.get('platform')}`",
+              "",
+          ]
+          if package:
+              lines.extend(
+                  [
+                      "## Installation package",
+                      "",
+                      f"- Recorded metadata: `{json.dumps(package, sort_keys=True)}`",
+                      "",
+                  ]
+              )
+          lines.extend(
+              [
+                  "Build-only or failed runs never update this file.",
+                  "",
+              ]
+          )
+          destination = Path("docs/generated/CURRENT_ARTIFACT.md")
+          destination.parent.mkdir(parents=True, exist_ok=True)
+          destination.write_text("\n".join(lines), encoding="utf-8")
+          print(
+              "TEXPDF_ARTIFACT_SUMMARY_READY "
+              f"bundle_bytes={bundle_bytes} plugin_bytes={plugin_bytes}"
+          )
+          PY
+          if [[ -f .ci/artifact-summary.skip ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit generated summary
+        if: ${{ steps.summary.outputs.changed == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/generated/CURRENT_ARTIFACT.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(artifacts): update exact size summary [skip ci]"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
