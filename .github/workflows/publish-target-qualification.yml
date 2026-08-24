@@ -1,0 +1,156 @@
+name: Publish macOS ARM64 target qualification
+
+on:
+  workflow_run:
+    workflows:
+      - Licensed Stata and Rust CI
+    types:
+      - completed
+
+concurrency:
+  group: texpdf-target-qualification-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 15
+    env:
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+      SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+      SOURCE_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download exact evidence
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: stata-${{ env.SOURCE_SHA }}-${{ env.SOURCE_RUN_ID }}-${{ env.SOURCE_RUN_ATTEMPT }}
+          path: ${{ runner.temp }}/texpdf-target-evidence
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+
+      - name: Update target record from exact evidence
+        id: update
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import re
+
+          evidence = Path(os.environ["RUNNER_TEMP"]) / "texpdf-target-evidence"
+          source_sha = os.environ["SOURCE_SHA"]
+
+          def find(name: str) -> dict:
+              matches = sorted(evidence.rglob(name))
+              if not matches:
+                  return {}
+              return json.loads(matches[0].read_text(encoding="utf-8"))
+
+          receipt = find("receipt.json")
+          plugin = find("plugin-manifest.json")
+          bundle = find("bundle-info.json")
+          required = {
+              "tested_sha": source_sha,
+              "status": "success",
+              "stata_status": "success",
+              "rust_status": "success",
+              "rust_mode": "repository-engine",
+          }
+          if any(receipt.get(key) != value for key, value in required.items()):
+              Path(".ci/target-qualification.skip").write_text(
+                  "receipt is not a qualifying engine run\n", encoding="utf-8"
+              )
+              raise SystemExit(0)
+
+          plugin_sha = plugin.get("sha256") or plugin.get("plugin_sha256")
+          if not isinstance(plugin_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", plugin_sha):
+              raise SystemExit("plugin manifest has no valid SHA-256")
+          plugin_size = plugin.get("size_bytes") or plugin.get("plugin_size_bytes")
+          if not isinstance(plugin_size, int) or plugin_size <= 0:
+              raise SystemExit("plugin manifest has no valid size")
+
+          targets_path = Path("release/targets.json")
+          if targets_path.is_file():
+              payload = json.loads(targets_path.read_text(encoding="utf-8"))
+          else:
+              payload = {"schema_version": 1, "targets": {}}
+          targets = payload.setdefault("targets", {})
+          targets["aarch64-apple-darwin"] = {
+              "artifact": "_texpdf_plugin.plugin",
+              "plugin_sha256": plugin_sha,
+              "plugin_size_bytes": plugin_size,
+              "bundle_zip_sha256": bundle.get("zip_sha256"),
+              "bundle_zip_size_bytes": bundle.get("zip_size_bytes"),
+              "qualified_source_sha": source_sha,
+              "qualification_profile": receipt.get("profile"),
+              "stata_runtime_qualified": True,
+              "stata_version": receipt.get("stata_version"),
+              "stata_edition": receipt.get("stata_edition"),
+              "platform": receipt.get("platform"),
+              "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run",
+          }
+          for target in (
+              "x86_64-apple-darwin",
+              "x86_64-pc-windows-msvc",
+              "x86_64-unknown-linux-gnu",
+          ):
+              targets.setdefault(
+                  target,
+                  {
+                      "artifact": "_texpdf_plugin.plugin",
+                      "plugin_sha256": "",
+                      "qualified_source_sha": "",
+                      "qualification_profile": "",
+                      "stata_runtime_qualified": False,
+                      "stata_version": "",
+                      "status": "native build and Stata runtime qualification pending",
+                  },
+              )
+          targets_path.parent.mkdir(parents=True, exist_ok=True)
+          targets_path.write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(
+              "TEXPDF_TARGET_QUALIFIED target=aarch64-apple-darwin "
+              f"source_sha={source_sha} plugin_bytes={plugin_size}"
+          )
+          PY
+          if [[ -f .ci/target-qualification.skip ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit target evidence
+        if: ${{ steps.update.outputs.changed == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release/targets.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "ci(target): qualify ${SOURCE_SHA:0:12} macOS ARM64 [skip ci]"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
