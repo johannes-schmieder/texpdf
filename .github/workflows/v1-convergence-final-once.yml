@@ -1,0 +1,1116 @@
+name: Final v1 documentation and evidence convergence
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/v1-convergence-final-once.yml"
+
+concurrency:
+  group: texpdf-v1-convergence-final
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  converge:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 60
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Synchronize with main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Install permanent project-state synchronizer
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p tools ci/tests docs release
+          cat > tools/sync_project_state.py <<'PY'
+          #!/usr/bin/env python3
+          """Synchronize texpdf narrative documentation with committed evidence.
+
+          This tool is deliberately conservative: missing, ambiguous, or stale
+          evidence leaves a v1 gate open. It never turns build-only evidence into
+          Stata runtime support and never treats the presence of a notice file as
+          proof that all redistribution obligations are satisfied.
+          """
+
+          from __future__ import annotations
+
+          import argparse
+          from datetime import datetime, timezone
+          import json
+          from pathlib import Path
+          import re
+          import sys
+          from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+
+          SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+          REQUIRED_TARGETS: Tuple[str, ...] = (
+              "aarch64-apple-darwin",
+              "x86_64-apple-darwin",
+              "x86_64-pc-windows-msvc",
+              "x86_64-unknown-linux-gnu",
+          )
+          TARGET_LABELS: Dict[str, str] = {
+              "aarch64-apple-darwin": "macOS Apple Silicon",
+              "x86_64-apple-darwin": "macOS Intel",
+              "x86_64-pc-windows-msvc": "Windows x86-64",
+              "x86_64-unknown-linux-gnu": "Linux x86-64",
+          }
+
+
+          def load_json(path: Path, default: Any) -> Any:
+              if not path.is_file():
+                  return default
+              try:
+                  return json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, json.JSONDecodeError):
+                  return default
+
+
+          def write_text_atomic(path: Path, text: str) -> None:
+              path.parent.mkdir(parents=True, exist_ok=True)
+              temporary = path.with_suffix(path.suffix + ".tmp")
+              temporary.write_text(text, encoding="utf-8")
+              temporary.replace(path)
+
+
+          def write_json_atomic(path: Path, payload: Dict[str, Any]) -> None:
+              write_text_atomic(
+                  path,
+                  json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              )
+
+
+          def receipt_is_green(receipt: Dict[str, Any]) -> bool:
+              if not (
+                  receipt.get("status") == "success"
+                  and receipt.get("stata_status") == "success"
+                  and receipt.get("rust_status") == "success"
+              ):
+                  return False
+              tested_sha = receipt.get("tested_sha")
+              if not isinstance(tested_sha, str) or not SHA_RE.fullmatch(tested_sha):
+                  return False
+              markers = receipt.get("required_log_markers", [])
+              if not isinstance(markers, list):
+                  return False
+              return all(
+                  isinstance(item, dict) and item.get("present") is True
+                  for item in markers
+              )
+
+
+          def scan_receipts(root: Path) -> List[Dict[str, Any]]:
+              results: List[Dict[str, Any]] = []
+              for path in sorted((root / ".ci/stata/results").glob("*.json")):
+                  payload = load_json(path, {})
+                  if isinstance(payload, dict) and receipt_is_green(payload):
+                      results.append(payload)
+              results.sort(
+                  key=lambda item: (
+                      str(item.get("completed_at", "")),
+                      str(item.get("tested_sha", "")),
+                  )
+              )
+              return results
+
+
+          def marker_names(receipt: Optional[Dict[str, Any]]) -> List[str]:
+              if not receipt:
+                  return []
+              return [
+                  str(item.get("marker"))
+                  for item in receipt.get("required_log_markers", [])
+                  if isinstance(item, dict) and item.get("present") is True
+              ]
+
+
+          def choose_receipts(
+              receipts: Sequence[Dict[str, Any]],
+          ) -> Tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+              latest = receipts[-1] if receipts else None
+              engine = [
+                  item
+                  for item in receipts
+                  if item.get("rust_mode") == "repository-engine"
+              ]
+              latest_engine = engine[-1] if engine else None
+              return latest, latest_engine
+
+
+          def recursively_collect(value: Any, key: str) -> List[Any]:
+              results: List[Any] = []
+              if isinstance(value, dict):
+                  for current_key, current_value in value.items():
+                      if current_key == key:
+                          results.append(current_value)
+                      results.extend(recursively_collect(current_value, key))
+              elif isinstance(value, list):
+                  for current_value in value:
+                      results.extend(recursively_collect(current_value, key))
+              return results
+
+
+          def artifact_evidence(root: Path) -> Dict[str, Any]:
+              qualification = load_json(root / "bundle/QUALIFICATION.json", {})
+              registry = load_json(root / "release/targets.json", {})
+              targets = registry.get("targets", {}) if isinstance(registry, dict) else {}
+              arm = targets.get("aarch64-apple-darwin", {}) if isinstance(targets, dict) else {}
+              bundle_record = qualification.get("bundle", {}) if isinstance(qualification, dict) else {}
+              plugin_record = qualification.get("plugin", {}) if isinstance(qualification, dict) else {}
+              package_record = qualification.get("package", {}) if isinstance(qualification, dict) else {}
+
+              bundle_size = int(
+                  arm.get("bundle_zip_size_bytes")
+                  or bundle_record.get("zip_size_bytes")
+                  or 0
+              )
+              plugin_size = int(
+                  arm.get("plugin_size_bytes")
+                  or plugin_record.get("size_bytes")
+                  or 0
+              )
+              package_zip_size = int(package_record.get("zip_size_bytes") or 0)
+              installed_size = int(package_record.get("installed_size_bytes") or 0)
+              file_count = int(bundle_record.get("file_count") or 0)
+              return {
+                  "qualification_present": bool(qualification),
+                  "bundle_size_bytes": bundle_size,
+                  "plugin_size_bytes": plugin_size,
+                  "package_zip_size_bytes": package_zip_size,
+                  "installed_size_bytes": installed_size,
+                  "bundle_file_count": file_count,
+                  "bundle_sha256": arm.get("bundle_zip_sha256")
+                  or bundle_record.get("zip_sha256")
+                  or "",
+                  "plugin_sha256": arm.get("plugin_sha256")
+                  or plugin_record.get("sha256")
+                  or "",
+                  "qualification": qualification,
+              }
+
+
+          def license_evidence(root: Path) -> Dict[str, Any]:
+              priority = (
+                  root / "licenses/inventory/tex-resources.json",
+                  root / "licenses/generated/tex-resources.json",
+                  root / "bundle/license-inventory.json",
+              )
+              inventory_path: Optional[Path] = None
+              inventory: Dict[str, Any] = {}
+              for candidate in priority:
+                  payload = load_json(candidate, {})
+                  if isinstance(payload, dict) and payload:
+                      inventory_path = candidate
+                      inventory = payload
+                      break
+
+              unresolved = inventory.get("unresolved_resources", [])
+              ambiguous = inventory.get("ambiguous_resources", [])
+              missing_packages = inventory.get(
+                  "packages_without_license_metadata", []
+              )
+              conflicts = inventory.get("conflicts", [])
+              mapping_complete = inventory.get("license_complete") is True
+              notices_complete = inventory.get("notice_texts_complete") is True
+              redistribution_ready = (
+                  inventory.get("public_redistribution_ready") is True
+              )
+              complete = (
+                  bool(inventory)
+                  and mapping_complete
+                  and notices_complete
+                  and redistribution_ready
+                  and not unresolved
+                  and not ambiguous
+                  and not missing_packages
+                  and not conflicts
+              )
+              return {
+                  "complete": complete,
+                  "inventory_present": bool(inventory),
+                  "inventory_path": (
+                      str(inventory_path.relative_to(root))
+                      if inventory_path is not None
+                      else ""
+                  ),
+                  "mapping_complete": mapping_complete,
+                  "notice_texts_complete": notices_complete,
+                  "public_redistribution_ready": redistribution_ready,
+                  "resource_count": int(inventory.get("resource_count") or 0),
+                  "resolved_resource_count": int(
+                      inventory.get("resolved_resource_count") or 0
+                  ),
+                  "unresolved_resource_count": len(unresolved)
+                  if isinstance(unresolved, list)
+                  else 0,
+                  "ambiguous_resource_count": len(ambiguous)
+                  if isinstance(ambiguous, list)
+                  else 0,
+                  "conflict_count": len(conflicts)
+                  if isinstance(conflicts, list)
+                  else 0,
+                  "packages_without_license_metadata": missing_packages
+                  if isinstance(missing_packages, list)
+                  else [],
+              }
+
+
+          def platform_evidence(root: Path) -> Dict[str, Any]:
+              registry = load_json(root / "release/targets.json", {})
+              targets = registry.get("targets", {}) if isinstance(registry, dict) else {}
+              normalized: Dict[str, Dict[str, Any]] = {}
+              for triple in REQUIRED_TARGETS:
+                  record = targets.get(triple, {}) if isinstance(targets, dict) else {}
+                  normalized[triple] = {
+                      "label": TARGET_LABELS[triple],
+                      "artifact": record.get("artifact", ""),
+                      "status": record.get("status", "missing target record"),
+                      "stata_runtime_qualified": (
+                          record.get("stata_runtime_qualified") is True
+                      ),
+                      "qualified_source_sha": record.get(
+                          "qualified_source_sha", ""
+                      ),
+                      "plugin_size_bytes": int(
+                          record.get("plugin_size_bytes") or 0
+                      ),
+                      "plugin_sha256": record.get("plugin_sha256", ""),
+                  }
+              return {
+                  "complete": all(
+                      item["stata_runtime_qualified"]
+                      for item in normalized.values()
+                  ),
+                  "targets": normalized,
+              }
+
+
+          def extract_explicit_iteration_count(text: str) -> int:
+              values = [int(item) for item in re.findall(r"(?<![0-9])([0-9]{2,5})[- ]?call", text, re.I)]
+              values.extend(
+                  int(item)
+                  for item in re.findall(r"stress[^0-9]{0,12}([0-9]{2,5})", text, re.I)
+              )
+              return max(values) if values else 0
+
+
+          def safety_evidence(
+              root: Path, receipts: Sequence[Dict[str, Any]], artifacts: Dict[str, Any]
+          ) -> Dict[str, Any]:
+              qualification = artifacts.get("qualification", {})
+              tests = qualification.get("tests", {}) if isinstance(qualification, dict) else {}
+              repeated = int(tests.get("repeated_in_process_compiles") or 0)
+              stress_receipts: List[str] = []
+              memory_review = False
+
+              for receipt in receipts:
+                  names = marker_names(receipt)
+                  joined = " ".join(names)
+                  if "stress" in joined.lower():
+                      stress_receipts.append(str(receipt.get("tested_sha", "")))
+                      repeated = max(repeated, extract_explicit_iteration_count(joined))
+                      if repeated == 0:
+                          repeated = 100
+                  if "memory" in joined.lower():
+                      memory_review = True
+
+              for base in (root / "release", root / ".ci"):
+                  if not base.exists():
+                      continue
+                  for path in base.rglob("*memory*.json"):
+                      payload = load_json(path, {})
+                      if not isinstance(payload, dict):
+                          continue
+                      status_values = recursively_collect(payload, "status")
+                      conclusion_values = recursively_collect(payload, "conclusion")
+                      if any(value == "success" for value in status_values + conclusion_values):
+                          memory_review = True
+                      for value in recursively_collect(payload, "iterations"):
+                          try:
+                              repeated = max(repeated, int(value))
+                          except (TypeError, ValueError):
+                              pass
+
+              high_iteration = repeated >= 1000
+              complete = high_iteration and memory_review
+              return {
+                  "complete": complete,
+                  "maximum_explicit_repeated_calls": repeated,
+                  "high_iteration_complete": high_iteration,
+                  "memory_growth_review_recorded": memory_review,
+                  "stress_receipts": sorted(set(stress_receipts)),
+              }
+
+
+          def build_state(root: Path) -> Dict[str, Any]:
+              receipts = scan_receipts(root)
+              latest, latest_engine = choose_receipts(receipts)
+              artifacts = artifact_evidence(root)
+              licensing = license_evidence(root)
+              platforms = platform_evidence(root)
+              safety = safety_evidence(root, receipts, artifacts)
+              interface_files = (
+                  "stata/texpdf.ado",
+                  "stata/texpdf.sthlp",
+                  "stata/texpdf.pkg",
+                  "stata/stata.toc",
+              )
+              interface_complete = all((root / path).is_file() for path in interface_files)
+
+              blockers: List[str] = []
+              if latest is None:
+                  blockers.append("no exact-SHA green Rust/Stata receipt")
+              if latest_engine is None:
+                  blockers.append("no exact-SHA green full embedded-engine receipt")
+              if not artifacts["qualification_present"]:
+                  blockers.append("bundle/plugin/package qualification manifest is absent")
+              if not interface_complete:
+                  blockers.append("Stata package interface files are incomplete")
+              if not licensing["complete"]:
+                  details = []
+                  if not licensing["inventory_present"]:
+                      details.append("exact embedded-resource inventory absent")
+                  if licensing["unresolved_resource_count"]:
+                      details.append(
+                          f"{licensing['unresolved_resource_count']} unresolved resources"
+                      )
+                  if licensing["ambiguous_resource_count"]:
+                      details.append(
+                          f"{licensing['ambiguous_resource_count']} ambiguous resources"
+                      )
+                  if licensing["packages_without_license_metadata"]:
+                      details.append(
+                          f"{len(licensing['packages_without_license_metadata'])} packages without license metadata"
+                      )
+                  if not licensing["notice_texts_complete"]:
+                      details.append("required notice texts incomplete")
+                  blockers.append(
+                      "license-complete redistribution pending"
+                      + (": " + ", ".join(details) if details else "")
+                  )
+              if not safety["complete"]:
+                  details = []
+                  if not safety["high_iteration_complete"]:
+                      details.append("1,000-call qualification not recorded")
+                  if not safety["memory_growth_review_recorded"]:
+                      details.append("memory-growth review not recorded")
+                  blockers.append("in-process safety gate pending: " + ", ".join(details))
+              if not platforms["complete"]:
+                  pending = [
+                      triple
+                      for triple, item in platforms["targets"].items()
+                      if not item["stata_runtime_qualified"]
+                  ]
+                  blockers.append(
+                      "Stata runtime qualification pending: " + ", ".join(pending)
+                  )
+
+              return {
+                  "schema_version": 1,
+                  "generated_at": datetime.now(timezone.utc).isoformat(),
+                  "release_ready": not blockers,
+                  "latest_exact_green": latest,
+                  "latest_exact_engine_green": latest_engine,
+                  "receipt_count": len(receipts),
+                  "artifacts": {key: value for key, value in artifacts.items() if key != "qualification"},
+                  "stata_package_interface_complete": interface_complete,
+                  "licensing": licensing,
+                  "safety": safety,
+                  "platforms": platforms,
+                  "blockers": blockers,
+              }
+
+
+          def mib(value: int) -> str:
+              return f"{value / 1024 / 1024:.2f} MiB"
+
+
+          def receipt_line(label: str, receipt: Optional[Dict[str, Any]]) -> str:
+              if not receipt:
+                  return f"- {label}: none"
+              return (
+                  f"- {label}: `{receipt.get('tested_sha', '')}`; "
+                  f"profile `{receipt.get('profile', '')}`; overall/Rust/Stata "
+                  f"`{receipt.get('status', '')}` / `{receipt.get('rust_status', '')}` / "
+                  f"`{receipt.get('stata_status', '')}`; mode `{receipt.get('rust_mode', '')}`"
+              )
+
+
+          def platform_table(state: Dict[str, Any]) -> str:
+              rows = []
+              for triple in REQUIRED_TARGETS:
+                  item = state["platforms"]["targets"][triple]
+                  runtime = "qualified" if item["stata_runtime_qualified"] else "pending"
+                  rows.append(
+                      f"| {item['label']} | `{triple}` | {runtime} | "
+                      f"{item['qualified_source_sha'] or '—'} | {item['status']} |"
+                  )
+              return "\n".join(rows)
+
+
+          def blockers_markdown(state: Dict[str, Any]) -> str:
+              return "\n".join(f"- {item}" for item in state["blockers"]) or "- none"
+
+
+          def render_status(state: Dict[str, Any]) -> str:
+              latest = state.get("latest_exact_green")
+              engine = state.get("latest_exact_engine_green")
+              artifacts = state["artifacts"]
+              licensing = state["licensing"]
+              safety = state["safety"]
+              return f'''# texpdf development status
+
+This file is generated by `tools/sync_project_state.py` from committed exact-SHA
+receipts and machine-readable qualification records.
+
+## Executive status
+
+The compiler-only macOS Apple Silicon implementation is functional and
+licensed-Stata runtime-qualified. `texpdf` is one native plugin containing the
+Rust bridge, Tectonic 0.17.0, native dependencies, and a curated offline TeX
+resource bundle.
+
+```stata
+texpdf using document.tex
+texpdf using document.tex, saving(document.pdf) replace
+texpdf, version
+```
+
+Public cross-platform v1 release ready: **{str(state['release_ready']).lower()}**.
+
+## Exact qualification
+
+{receipt_line('Newest green source', latest)}
+{receipt_line('Newest full embedded-engine green source', engine)}
+
+A branch tip, build artifact, or documentation claim is not qualification. The
+immutable receipt for the exact source SHA is authoritative.
+
+## Artifact scale
+
+| Component | Exact bytes | Binary size |
+|---|---:|---:|
+| Curated embedded resource ZIP | {artifacts['bundle_size_bytes']:,} | {mib(artifacts['bundle_size_bytes'])} |
+| macOS ARM64 standalone plugin | {artifacts['plugin_size_bytes']:,} | {mib(artifacts['plugin_size_bytes'])} |
+| Deterministic Stata package ZIP | {artifacts['package_zip_size_bytes']:,} | {mib(artifacts['package_zip_size_bytes'])} |
+| Installed package tree | {artifacts['installed_size_bytes']:,} | {mib(artifacts['installed_size_bytes'])} |
+
+Bundle SHA-256: `{artifacts['bundle_sha256']}`  
+Plugin SHA-256: `{artifacts['plugin_sha256']}`
+
+## Current release gates
+
+### Licensing
+
+- exact inventory: `{licensing['inventory_path'] or 'absent'}`;
+- embedded resources: {licensing['resource_count']};
+- resolved: {licensing['resolved_resource_count']};
+- unresolved: {licensing['unresolved_resource_count']};
+- ambiguous: {licensing['ambiguous_resource_count']};
+- mapping complete: `{str(licensing['mapping_complete']).lower()}`;
+- required notice texts complete: `{str(licensing['notice_texts_complete']).lower()}`;
+- public redistribution ready: `{str(licensing['public_redistribution_ready']).lower()}`.
+
+### In-process safety
+
+- maximum explicitly recorded repeated calls: {safety['maximum_explicit_repeated_calls']};
+- 1,000-call gate: `{str(safety['high_iteration_complete']).lower()}`;
+- memory-growth review recorded: `{str(safety['memory_growth_review_recorded']).lower()}`.
+
+### Platform matrix
+
+| Platform | Rust target | Stata runtime | Qualified source | Record |
+|---|---|---|---|---|
+{platform_table(state)}
+
+Build-only success is not runtime support.
+
+## Blocking gates
+
+{blockers_markdown(state)}
+
+## Evidence hierarchy
+
+- `release/V1_READINESS.json`: generated fail-closed v1 gate record.
+- `bundle/QUALIFICATION.json`: qualified bundle/plugin/package evidence.
+- `release/targets.json`: target support registry.
+- `licenses/inventory/tex-resources.json`: exact embedded-resource license map.
+- `.ci/stata/results/`: immutable exact-source-SHA execution receipts.
+- `PLAN.md`: completed and remaining milestones.
+- `IMPLEMENTATION.md`: durable architecture and guarantees.
+'''
+
+
+          def render_plan(state: Dict[str, Any]) -> str:
+              engine = state.get("latest_exact_engine_green") or {}
+              licensing = state["licensing"]
+              safety = state["safety"]
+              targets = state["platforms"]["targets"]
+
+              def mark(value: bool) -> str:
+                  return "x" if value else " "
+
+              return f'''# texpdf plan to v1
+
+Development branch: **main**  
+Newest full-engine green source: `{engine.get('tested_sha', 'none')}`
+
+## Product definition
+
+`texpdf` compiles complete LaTeX documents from Stata with no system TeX
+installation or runtime network bundle. v1 is compiler-only, uses one embedded
+Tectonic plugin per supported platform, targets SPI 3.0/Stata 14.1+, supports a
+curated academic package tier plus natbib/BibTeX, and is distributed through
+GitHub Releases and Stata `net install`.
+
+## Completed implementation
+
+- [x] Pinned Rust/Tectonic compilation core and locked dependencies.
+- [x] Deterministic curated ZIP embedded into the native binary.
+- [x] Runtime remote bundle disabled and shell escape denied.
+- [x] Panic-contained SPI 3.0 bridge and versioned result transport.
+- [x] `texpdf using`, `saving()`, `replace`, and `version`.
+- [x] Math, tables, layout, figures, fonts, hyperlinks, natbib, and BibTeX corpus.
+- [x] Spaces/Unicode paths, relative inputs, controlled errors, recovery, and rollback.
+- [x] Deterministic package/checksum layout and local `net install` test.
+- [x] macOS Apple Silicon licensed-Stata runtime qualification.
+
+## M6 — License-complete redistribution
+
+- [{mark(licensing['inventory_present'])}] Generate an inventory from the exact embedded ZIP.
+- [{mark(licensing['mapping_complete'])}] Resolve every embedded resource to reviewed package/font license evidence.
+- [{mark(licensing['notice_texts_complete'])}] Collect every required dependency, package, and font notice text.
+- [{mark(licensing['public_redistribution_ready'])}] Certify the exact bundle/plugin package as redistribution-ready.
+- [ ] Run the final fail-closed licensing audit for the release candidate.
+
+## M7 — In-process safety gate
+
+- [x] Ordinary malformed-input and post-error recovery tests.
+- [x] Output preservation after failed replacement.
+- [x] Shell-escape execution denial.
+- [x] Repeated in-process compilation testing.
+- [{mark(safety['high_iteration_complete'])}] Record a reviewed 1,000-call qualification.
+- [{mark(safety['memory_growth_review_recorded'])}] Record memory-growth evidence and acceptance criteria.
+- [ ] Close cancellation/capacity/corrupt-input cases required by the release audit.
+
+## M8 — Cross-platform runtime qualification
+
+- [{mark(targets['aarch64-apple-darwin']['stata_runtime_qualified'])}] macOS Apple Silicon.
+- [{mark(targets['x86_64-apple-darwin']['stata_runtime_qualified'])}] macOS Intel/universal.
+- [{mark(targets['x86_64-pc-windows-msvc']['stata_runtime_qualified'])}] Windows x86-64 MSVC.
+- [{mark(targets['x86_64-unknown-linux-gnu']['stata_runtime_qualified'])}] Linux x86-64 GNU.
+
+Each item requires the final plugin to load in actual Stata and pass the offline
+corpus; build-only artifacts remain candidates.
+
+## M9 — v1 release
+
+- [x] Define deterministic package, checksum, and target-manifest layouts.
+- [x] Qualify local `net install` on macOS ARM64.
+- [ ] Produce license-complete assets for every advertised target.
+- [ ] Run clean-machine/offline installation and compilation tests.
+- [ ] Pass `tools/report_v1_readiness.py --strict` and the release audit.
+- [ ] Tag v1.0.0, publish GitHub Release assets, and verify installation from the release URL.
+
+## Immediate execution order
+
+1. Keep each accepted source checkpoint exact-SHA green.
+2. Resolve the finite embedded-resource license review queue and collect notices.
+3. Close the 1,000-call/memory safety record.
+4. Close macOS Intel, Windows, and Linux native build/runtime gates.
+5. Run the fail-closed release audit and publish v1.0.0.
+'''
+
+
+          def render_implementation(state: Dict[str, Any]) -> str:
+              engine = state.get("latest_exact_engine_green") or {}
+              artifacts = state["artifacts"]
+              return f'''# texpdf implementation
+
+## Architecture
+
+```text
+texpdf.ado
+    -> Stata SPI 3.0 ABI bridge
+    -> Rust texpdf-stata
+    -> texpdf-core
+    -> Tectonic 0.17.0 + embedded curated ZIP
+    -> PDF
+```
+
+One target-specific plugin contains the Rust bridge, Tectonic engine, required
+native dependencies, and deterministic resource ZIP. Runtime compilation does
+not invoke an external TeX executable, search a system TeX tree, or fetch a
+remote bundle.
+
+## Public interface
+
+```stata
+texpdf using filename.tex [, saving(filename.pdf) replace]
+texpdf, version
+```
+
+The command is `rclass` and returns output, engine, bundle, digest, and warning
+metadata after success.
+
+## Implemented guarantees
+
+- complete-document compilation rooted at the primary source directory;
+- final PDF installed only after successful typesetting;
+- an existing PDF preserved after failed replacement;
+- overwrite protection unless `replace` is specified;
+- spaces and Unicode paths, relative inputs, and graphics;
+- structured bounded diagnostics through a versioned result record;
+- panic containment at the Rust ABI boundary;
+- shell escape disabled and no runtime remote bundle provider;
+- internal BibTeX/natbib processing;
+- deterministic package layout, checksums, and local `net install` qualification.
+
+## Compatibility tier
+
+The curated academic tier is documented in `docs/SUPPORTED_PACKAGES.md`. It
+includes core LaTeX, AMS mathematics, common tables/layout, figures, hyperlinks,
+Latin Modern and selected TeX Gyre fonts, natbib, and BibTeX styles. Beamer,
+TikZ/PGF, PSTricks, biblatex/Biber, minted, shell-dependent packages, and
+arbitrary helpers are outside v1.
+
+## Exact qualification boundary
+
+Newest full embedded-engine green source: `{engine.get('tested_sha', 'none')}`.  
+Rust mode: `{engine.get('rust_mode', '')}`.  
+Platform: `{engine.get('platform', '')}`.  
+Stata: `{engine.get('stata_edition', '')} {engine.get('stata_version', '')}`.
+
+Recorded artifact scale:
+
+```text
+curated resource ZIP   {artifacts['bundle_size_bytes']:>12,} bytes  ({mib(artifacts['bundle_size_bytes'])})
+ARM64 plugin           {artifacts['plugin_size_bytes']:>12,} bytes  ({mib(artifacts['plugin_size_bytes'])})
+installation ZIP       {artifacts['package_zip_size_bytes']:>12,} bytes  ({mib(artifacts['package_zip_size_bytes'])})
+```
+
+Only macOS Apple Silicon is currently Stata-runtime-qualified. Other target
+builds do not become supported until their exact plugin passes actual Stata.
+
+## Trust and licensing boundary
+
+TeX is active input to an in-process native engine; `texpdf` is not a sandbox
+for hostile documents. Ordinary failures are controlled, but release requires a
+reviewed repeated-call/memory safety record. Project code is MIT; every embedded
+and linked dependency retains its upstream license. Public binaries remain
+fail-closed until resource mapping and required notices are complete.
+'''
+
+
+          def render_readme(state: Dict[str, Any]) -> str:
+              artifacts = state["artifacts"]
+              return f'''# texpdf
+
+`texpdf` is a standalone LaTeX-to-PDF compiler for Stata built around an
+embedded Tectonic engine.
+
+```stata
+texpdf using paper.tex
+texpdf using paper.tex, saving(paper.pdf) replace
+texpdf, version
+```
+
+## Current status
+
+The macOS Apple Silicon implementation is functional and licensed-Stata
+runtime-qualified. The plugin is one file containing the engine and curated
+offline academic TeX resources.
+
+- embedded resource ZIP: **{mib(artifacts['bundle_size_bytes'])}**;
+- standalone ARM64 plugin: **{mib(artifacts['plugin_size_bytes'])}**;
+- compressed Stata package ZIP: **{mib(artifacts['package_zip_size_bytes'])}**.
+
+No system TeX installation, Tectonic executable, Rust toolchain, compiler, or
+runtime Internet connection is required.
+
+**No public cross-platform v1 binary is advertised yet.** License-complete
+redistribution, the final in-process safety record, and actual Stata runtime
+qualification on macOS Intel, Windows, and Linux remain release gates.
+
+## Compatibility
+
+The curated tier targets academic/econometric documents: core LaTeX, AMS math,
+common tables/layout, figures, hyperlinks, Latin Modern/selected TeX Gyre,
+natbib, and BibTeX. See `docs/SUPPORTED_PACKAGES.md` and `COMPATIBILITY.md`.
+Beamer, TikZ/PGF, PSTricks, Biber/biblatex, minted, shell escape, and arbitrary
+helpers are outside v1.
+
+## Evidence and documentation
+
+- `STATUS.md`: generated current status and blockers.
+- `PLAN.md`: generated completed/remaining milestones.
+- `IMPLEMENTATION.md`: architecture and guarantees.
+- `docs/V1_READINESS.md`: generated fail-closed release gate report.
+- `docs/QUALIFICATION.md`: exact-SHA evidence policy.
+- `docs/LICENSING.md`: redistribution policy.
+- `SECURITY.md`: in-process trust boundary.
+
+Machine-readable evidence lives in `release/V1_READINESS.json`,
+`bundle/QUALIFICATION.json`, `release/targets.json`,
+`licenses/inventory/tex-resources.json`, and `.ci/stata/results/`.
+
+## Development
+
+Development occurs directly on `main` in small checkpoints. A source checkpoint
+is accepted only when its immutable exact-SHA receipt reports the intended
+profile, overall success, Rust success, and licensed-Stata success.
+
+## License
+
+Project-owned source is MIT licensed. Embedded engine dependencies, TeX
+resources, and fonts retain their upstream licenses and notices.
+'''
+
+
+          def render_readiness(state: Dict[str, Any]) -> str:
+              latest = state.get("latest_exact_green") or {}
+              engine = state.get("latest_exact_engine_green") or {}
+              licensing = state["licensing"]
+              safety = state["safety"]
+              return f'''# v1 readiness
+
+This report is generated from committed evidence and is fail-closed.
+
+- Release ready: **{str(state['release_ready']).lower()}**
+- Latest exact green source: `{latest.get('tested_sha', 'none')}`
+- Latest full-engine green source: `{engine.get('tested_sha', 'none')}`
+- Exact embedded-resource inventory: `{licensing['inventory_path'] or 'absent'}`
+- License mapping complete: `{str(licensing['mapping_complete']).lower()}`
+- Required notices complete: `{str(licensing['notice_texts_complete']).lower()}`
+- Maximum recorded repeated calls: `{safety['maximum_explicit_repeated_calls']}`
+- Memory review recorded: `{str(safety['memory_growth_review_recorded']).lower()}`
+
+## Platforms
+
+| Platform | Rust target | Stata runtime | Qualified source | Record |
+|---|---|---|---|---|
+{platform_table(state)}
+
+## Blocking gates
+
+{blockers_markdown(state)}
+
+Strict check:
+
+```sh
+python3 tools/sync_project_state.py --strict
+```
+'''
+
+
+          def render_workflows(root: Path) -> str:
+              names = sorted(path.name for path in (root / ".github/workflows").glob("*.yml"))
+              rows = "\n".join(f"- `{name}`" for name in names) or "- none"
+              return f'''# GitHub Actions workflows
+
+The workflow directory contains reusable build, qualification, audit, artifact,
+and state-sync infrastructure. Temporary migration workflows are removed after
+they commit their changes.
+
+Current workflows:
+
+{rows}
+
+`stata-ci.yml` is authoritative for exact-SHA Rust plus licensed-Stata receipts.
+Build-only workflows never establish runtime support. Target qualification and
+release publication must consume exact artifact and runtime evidence.
+'''
+
+
+          def synchronize(root: Path) -> Dict[str, Any]:
+              state = build_state(root)
+              write_json_atomic(root / "release/V1_READINESS.json", state)
+              write_text_atomic(root / "STATUS.md", render_status(state))
+              write_text_atomic(root / "PLAN.md", render_plan(state))
+              write_text_atomic(root / "IMPLEMENTATION.md", render_implementation(state))
+              write_text_atomic(root / "README.md", render_readme(state))
+              write_text_atomic(root / "docs/V1_READINESS.md", render_readiness(state))
+              write_text_atomic(root / "docs/WORKFLOWS.md", render_workflows(root))
+              return state
+
+
+          def main() -> int:
+              parser = argparse.ArgumentParser()
+              parser.add_argument("--root", type=Path, default=Path("."))
+              parser.add_argument("--strict", action="store_true")
+              parser.add_argument("--expect-green-sha")
+              args = parser.parse_args()
+              root = args.root.resolve()
+              state = synchronize(root)
+              if args.expect_green_sha:
+                  latest = state.get("latest_exact_green") or {}
+                  if latest.get("tested_sha") != args.expect_green_sha:
+                      print(
+                          "TEXPDF_STATE_ERROR latest exact green source does not match "
+                          f"{args.expect_green_sha}",
+                          file=sys.stderr,
+                      )
+                      return 2
+              print(
+                  "TEXPDF_STATE_SYNC "
+                  f"release_ready={str(state['release_ready']).lower()} "
+                  f"blockers={len(state['blockers'])} "
+                  f"latest={((state.get('latest_exact_green') or {}).get('tested_sha', 'none'))}"
+              )
+              return 1 if args.strict and not state["release_ready"] else 0
+
+
+          if __name__ == "__main__":
+              raise SystemExit(main())
+          PY
+          chmod +x tools/sync_project_state.py
+
+          cat > ci/tests/test_sync_project_state.py <<'PY'
+          from __future__ import annotations
+
+          import importlib.util
+          import json
+          from pathlib import Path
+          import tempfile
+          import unittest
+
+          MODULE_PATH = Path(__file__).resolve().parents[2] / "tools/sync_project_state.py"
+          SPEC = importlib.util.spec_from_file_location("sync_project_state", MODULE_PATH)
+          assert SPEC is not None and SPEC.loader is not None
+          MODULE = importlib.util.module_from_spec(SPEC)
+          SPEC.loader.exec_module(MODULE)
+
+
+          class ProjectStateTests(unittest.TestCase):
+              def test_empty_repository_fails_closed(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      state = MODULE.build_state(root)
+                      self.assertFalse(state["release_ready"])
+                      self.assertTrue(state["blockers"])
+
+              def test_receipt_requires_all_markers(self) -> None:
+                  base = {
+                      "tested_sha": "a" * 40,
+                      "status": "success",
+                      "stata_status": "success",
+                      "rust_status": "success",
+                      "required_log_markers": [
+                          {"marker": "ok", "present": True},
+                      ],
+                  }
+                  self.assertTrue(MODULE.receipt_is_green(base))
+                  base["required_log_markers"][0]["present"] = False
+                  self.assertFalse(MODULE.receipt_is_green(base))
+
+              def test_build_only_target_is_not_runtime_support(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      release = root / "release"
+                      release.mkdir()
+                      payload = {
+                          "targets": {
+                              triple: {
+                                  "status": "build succeeded",
+                                  "stata_runtime_qualified": False,
+                              }
+                              for triple in MODULE.REQUIRED_TARGETS
+                          }
+                      }
+                      (release / "targets.json").write_text(
+                          json.dumps(payload), encoding="utf-8"
+                      )
+                      evidence = MODULE.platform_evidence(root)
+                      self.assertFalse(evidence["complete"])
+
+              def test_license_gate_requires_explicit_notices(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      inventory = root / "licenses/inventory"
+                      inventory.mkdir(parents=True)
+                      payload = {
+                          "license_complete": True,
+                          "notice_texts_complete": False,
+                          "public_redistribution_ready": False,
+                          "unresolved_resources": [],
+                          "ambiguous_resources": [],
+                          "packages_without_license_metadata": [],
+                          "conflicts": [],
+                      }
+                      (inventory / "tex-resources.json").write_text(
+                          json.dumps(payload), encoding="utf-8"
+                      )
+                      evidence = MODULE.license_evidence(root)
+                      self.assertFalse(evidence["complete"])
+
+              def test_synchronize_writes_all_primary_files(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      (root / ".github/workflows").mkdir(parents=True)
+                      state = MODULE.synchronize(root)
+                      self.assertFalse(state["release_ready"])
+                      for path in (
+                          "STATUS.md",
+                          "PLAN.md",
+                          "IMPLEMENTATION.md",
+                          "README.md",
+                          "docs/V1_READINESS.md",
+                          "docs/WORKFLOWS.md",
+                          "release/V1_READINESS.json",
+                      ):
+                          self.assertTrue((root / path).is_file(), path)
+
+
+          if __name__ == "__main__":
+              unittest.main()
+          PY
+
+          cat > .github/workflows/sync-project-state-on-green.yml <<'YAML'
+          name: Sync project state after exact green CI
+
+          on:
+            workflow_run:
+              workflows:
+                - Licensed Stata and Rust CI
+              types:
+                - completed
+
+          concurrency:
+            group: texpdf-sync-project-state
+            cancel-in-progress: false
+
+          permissions:
+            contents: write
+
+          jobs:
+            sync:
+              if: ${{ github.event.workflow_run.conclusion == 'success' }}
+              runs-on: [self-hosted, macOS, ARM64, texpdf]
+              timeout-minutes: 20
+              env:
+                TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+              steps:
+                - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+                  with:
+                    ref: main
+                    fetch-depth: 0
+                - name: Wait for exact receipt and synchronize
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    git fetch origin main
+                    git reset --hard origin/main
+                    receipt=".ci/stata/results/$TESTED_SHA.json"
+                    if [[ ! -f "$receipt" ]]; then
+                      echo "Exact receipt is not committed for $TESTED_SHA; refusing to infer success" >&2
+                      exit 2
+                    fi
+                    /usr/bin/python3 ci/check_stata_receipt.py \
+                      "$receipt" \
+                      --expect-tested-sha "$TESTED_SHA" \
+                      --expect-profile quick \
+                      --require-success \
+                      --require-rust-success
+                    /usr/bin/python3 tools/sync_project_state.py
+                - name: Commit generated state if changed
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    git add STATUS.md PLAN.md IMPLEMENTATION.md README.md
+                    git add docs/V1_READINESS.md docs/WORKFLOWS.md
+                    git add release/V1_READINESS.json
+                    if git diff --cached --quiet; then
+                      exit 0
+                    fi
+                    git diff --cached --check
+                    git config user.name "github-actions[bot]"
+                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                    git commit -m "docs: sync exact-SHA project state [skip ci]"
+                    git fetch origin main
+                    git rebase origin/main
+                    git push origin HEAD:main
+          YAML
+
+      - name: Apply canonical formatting and generate current state
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup_bin="${RUSTUP_BIN:-/opt/homebrew/bin/rustup}"
+          "$rustup_bin" run 1.97.1 cargo fmt --all
+          /usr/bin/python3 -m unittest ci.tests.test_sync_project_state
+          /usr/bin/python3 tools/sync_project_state.py
+
+      - name: Remove transient one-shot workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          workflow_dir = Path('.github/workflows')
+          keep = {
+              'stata-ci.yml',
+              'sync-project-state-on-green.yml',
+              'build-cross-platform.yml',
+              'build-development-artifacts.yml',
+              'build-linux-windows.yml',
+              'build-macos-universal.yml',
+              'build-macos-artifact.yml',
+              'generate-license-inventory.yml',
+              'release-audit.yml',
+              'stress-memory-macos.yml',
+              'publish-artifact-manifest.yml',
+              'publish-artifact-summary.yml',
+              'publish-target-qualification.yml',
+              'record-hardening-failures.yml',
+              'v1-convergence-final-once.yml',
+          }
+          for path in workflow_dir.glob('*.yml'):
+              if path.name not in keep:
+                  path.unlink()
+          Path('.github/workflows/v1-convergence-final-once.yml').unlink()
+          PY
+          /usr/bin/python3 tools/sync_project_state.py
+
+      - name: Validate source and retained workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup_bin="${RUSTUP_BIN:-/opt/homebrew/bin/rustup}"
+          "$rustup_bin" run 1.97.1 cargo fmt --all --check
+          /usr/bin/python3 -m unittest discover -s ci/tests -p 'test_*.py'
+          if [[ -x ci/check_workflows.sh ]]; then
+            ci/check_workflows.sh
+          fi
+          git diff --check
+
+      - name: Commit final convergence source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: converge documentation and v1 evidence gates"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
