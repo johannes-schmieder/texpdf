@@ -64,8 +64,18 @@ else:
 PY
 )"
         trace_path="bundle/generated/resource-trace.txt"
+        set +e
         "$toolchain_cargo" run --locked --package texpdf-bundle-resolver -- \
           "$source_url" "$trace_path" tests/fixtures/bundle_corpus.tex
+        resolver_rc=$?
+        set -e
+        if [[ -f "$trace_path" ]]; then
+          /bin/cp "$trace_path" .ci/stata/run/resource-trace.txt
+        fi
+        if [[ $resolver_rc -ne 0 ]]; then
+          echo "TEXPDF_BUNDLE_RESOLVER_FAILED rc=$resolver_rc trace=$trace_path" >&2
+          exit "$resolver_rc"
+        fi
         /usr/bin/python3 tools/prepare_curated_bundle.py \
           --trace "$trace_path" \
           --write-manifest bundle/generated/curated-manifest.json \
