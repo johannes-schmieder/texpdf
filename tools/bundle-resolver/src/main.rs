@@ -5,7 +5,7 @@ use std::{
     fmt::Arguments,
     fs,
     io::{Cursor, Read},
-    path::{Path, PathBuf},
+    path::{Component, Path, PathBuf},
     sync::{Arc, Mutex},
 };
 
@@ -18,6 +18,8 @@ use tectonic_io_base::{
 use tectonic_status_base::{MessageKind, StatusBackend};
 
 const MAX_TEX_LOG_BYTES: usize = 256 * 1024;
+
+type SharedResources = Arc<Mutex<HashMap<String, Vec<u8>>>>;
 
 #[derive(Default)]
 struct ResolverStatus;
@@ -55,12 +57,21 @@ impl StatusBackend for ResolverStatus {
 struct RecordingBundle {
     inner: Box<dyn Bundle>,
     requested: Arc<Mutex<BTreeSet<String>>>,
-    cache: HashMap<String, Vec<u8>>,
+    resources: SharedResources,
 }
 
 impl RecordingBundle {
     fn cached_handle(name: &str, data: Vec<u8>) -> InputHandle {
         InputHandle::new_read_only(name, Cursor::new(data), InputOrigin::Other)
+    }
+
+    fn cached_bytes(&self, name: &str) -> OpenResult<Option<Vec<u8>>> {
+        match self.resources.lock() {
+            Ok(resources) => OpenResult::Ok(resources.get(name).cloned()),
+            Err(_) => OpenResult::Err(
+                std::io::Error::other("resolver resource cache lock was poisoned").into(),
+            ),
+        }
     }
 }
 
@@ -74,8 +85,11 @@ impl IoProvider for RecordingBundle {
             requested.insert(name.to_owned());
         }
 
-        if let Some(data) = self.cache.get(name) {
-            return OpenResult::Ok(Self::cached_handle(name, data.clone()));
+        match self.cached_bytes(name) {
+            OpenResult::Ok(Some(data)) => return OpenResult::Ok(Self::cached_handle(name, data)),
+            OpenResult::Ok(None) => {}
+            OpenResult::NotAvailable => unreachable!("cache lookup cannot be unavailable"),
+            OpenResult::Err(error) => return OpenResult::Err(error),
         }
 
         match self.inner.input_open_name(name, status) {
@@ -84,7 +98,17 @@ impl IoProvider for RecordingBundle {
                 if let Err(error) = handle.read_to_end(&mut data) {
                     return OpenResult::Err(error.into());
                 }
-                self.cache.insert(name.to_owned(), data.clone());
+                match self.resources.lock() {
+                    Ok(mut resources) => {
+                        resources.insert(name.to_owned(), data.clone());
+                    }
+                    Err(_) => {
+                        return OpenResult::Err(
+                            std::io::Error::other("resolver resource cache lock was poisoned")
+                                .into(),
+                        );
+                    }
+                }
                 OpenResult::Ok(Self::cached_handle(name, data))
             }
             OpenResult::NotAvailable => OpenResult::NotAvailable,
@@ -110,6 +134,7 @@ fn compile_source(
     bundle_url: &str,
     source: &Path,
     requested: Arc<Mutex<BTreeSet<String>>>,
+    resources: SharedResources,
 ) -> Result<(), Box<dyn Error>> {
     let input = fs::canonicalize(source)?;
     let input_dir = input.parent().ok_or("source has no parent directory")?;
@@ -124,7 +149,7 @@ fn compile_source(
     let recording = RecordingBundle {
         inner: Box::new(network_bundle),
         requested,
-        cache: HashMap::new(),
+        resources,
     };
     let mut status = ResolverStatus;
     let mut builder = ProcessingSessionBuilder::default();
@@ -174,6 +199,45 @@ fn write_trace(path: &Path, requested: &Arc<Mutex<BTreeSet<String>>>) -> Result<
     Ok(())
 }
 
+fn safe_resource_path(root: &Path, name: &str) -> Result<PathBuf, Box<dyn Error>> {
+    let relative = Path::new(name);
+    if relative.as_os_str().is_empty()
+        || relative.is_absolute()
+        || relative
+            .components()
+            .any(|component| !matches!(component, Component::Normal(_)))
+    {
+        return Err(format!("unsafe logical bundle path: {name:?}").into());
+    }
+    Ok(root.join(relative))
+}
+
+fn write_resources(root: &Path, resources: &SharedResources) -> Result<usize, Box<dyn Error>> {
+    if root.exists() {
+        fs::remove_dir_all(root)?;
+    }
+    fs::create_dir_all(root)?;
+    let resources = resources
+        .lock()
+        .map_err(|_| "resolver resource cache lock was poisoned")?;
+    for (name, data) in resources.iter() {
+        let destination = safe_resource_path(root, name)?;
+        if let Some(parent) = destination.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let temporary = destination.with_file_name(format!(
+            "{}.tmp",
+            destination
+                .file_name()
+                .ok_or("logical bundle path has no file name")?
+                .to_string_lossy()
+        ));
+        fs::write(&temporary, data)?;
+        fs::rename(temporary, destination)?;
+    }
+    Ok(resources.len())
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let mut arguments = env::args_os().skip(1);
     let bundle_url = arguments
@@ -192,9 +256,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     let requested = Arc::new(Mutex::new(BTreeSet::new()));
+    let resources = Arc::new(Mutex::new(HashMap::new()));
     let mut first_error: Option<Box<dyn Error>> = None;
     for source in &sources {
-        if let Err(error) = compile_source(&bundle_url, source, Arc::clone(&requested)) {
+        if let Err(error) = compile_source(
+            &bundle_url,
+            source,
+            Arc::clone(&requested),
+            Arc::clone(&resources),
+        ) {
             eprintln!(
                 "TEXPDF_RESOLVER_COMPILE_FAILURE source={} error={error:#}",
                 source.display()
@@ -204,11 +274,22 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
     write_trace(&trace, &requested)?;
-    let count = requested
+    let resource_dir = trace
+        .parent()
+        .unwrap_or_else(|| Path::new("."))
+        .join("resolved-resources");
+    let resource_count = write_resources(&resource_dir, &resources)?;
+    let requested_count = requested
         .lock()
         .map_err(|_| "resource trace lock was poisoned")?
         .len();
-    println!("TEXPDF_BUNDLE_TRACE_READY path={} files={count}", trace.display());
+    println!(
+        "TEXPDF_BUNDLE_TRACE_READY path={} requested={} cached={} resource_dir={}",
+        trace.display(),
+        requested_count,
+        resource_count,
+        resource_dir.display()
+    );
     if let Some(error) = first_error {
         return Err(error);
     }
