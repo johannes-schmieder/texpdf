@@ -1,0 +1,125 @@
+name: macOS ARM64 1000-call memory stress
+
+on:
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: Successful compile calls (100-10000)
+        required: true
+        default: "1000"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/stress-memory-macos.yml"
+
+concurrency:
+  group: texpdf-macos-memory-stress
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  stress:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      TEXPDF_RUST_PROFILE: engine
+      TEXPDF_STRESS_ITERATIONS: ${{ inputs.iterations || '1000' }}
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out tested source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Validate iteration count and add temporary profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$TEXPDF_STRESS_ITERATIONS" in
+            ''|*[!0-9]*) echo "iterations must be an integer" >&2; exit 2 ;;
+          esac
+          test "$TEXPDF_STRESS_ITERATIONS" -ge 100
+          test "$TEXPDF_STRESS_ITERATIONS" -le 10000
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          path = Path("ci/stata_profiles.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          profiles = data.get("profiles", data)
+          if "quick" not in profiles:
+              raise SystemExit("quick Stata profile is missing")
+          profile = dict(profiles["quick"])
+          suite_keys = [
+              key for key, value in profile.items()
+              if isinstance(value, str) and value.endswith(".do")
+          ]
+          if len(suite_keys) != 1:
+              raise SystemExit(f"cannot identify suite key: {suite_keys}")
+          profile[suite_keys[0]] = "ci/stata_stress_1000.do"
+          marker_keys = [key for key in profile if "marker" in key.lower()]
+          if marker_keys:
+              profile[marker_keys[0]] = ["TEXPDF STRESS 1000 PASS"]
+          else:
+              profile["required_log_markers"] = ["TEXPDF STRESS 1000 PASS"]
+          timeout_keys = [key for key in profile if "timeout" in key.lower()]
+          if timeout_keys:
+              profile[timeout_keys[0]] = 7200
+          profiles["stress1000"] = profile
+          path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+          git add ci/stata_profiles.json
+
+      - name: Build and test the real embedded plugin
+        shell: bash
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/texpdf-rust-evidence"
+          mkdir -p "$RUNNER_TEMP/texpdf-rust-evidence"
+          cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-rust-evidence/"
+
+      - name: Run licensed Stata stress with RSS sampling
+        shell: bash
+        run: /bin/bash ci/run_memory_stress.sh stress1000
+
+      - name: Restore Rust evidence and validate combined receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -R "$RUNNER_TEMP/texpdf-rust-evidence/." .ci/stata/run/
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            .ci/stata/run/receipt.json \
+            .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile stress1000 \
+            --require-success \
+            --require-rust-success
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          data = json.loads(Path(".ci/stata/run/memory-stress.json").read_text(encoding="utf-8"))
+          if data["iterations_requested"] < 1000:
+              raise SystemExit("the qualification run used fewer than 1000 iterations")
+          if data["runner_rc"] != 0 or data["growth_gate"] is not True:
+              raise SystemExit("memory stress gate failed")
+          print("TEXPDF_MEMORY_STRESS_GREEN", data)
+          PY
+
+      - name: Upload exact-source stress evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-memory-stress-${{ github.sha }}-${{ github.run_id }}
+          path: .ci/stata/run/
+          if-no-files-found: error
+          retention-days: 30
