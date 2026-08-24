@@ -22,7 +22,7 @@ on:
 
 concurrency:
   group: texpdf-mac-${{ github.repository }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -33,9 +33,9 @@ env:
 
 jobs:
   mac-ci:
-    name: Mac Rust quick + Stata / ${{ inputs.profile || 'quick' }}
+    name: Mac Rust + Stata / ${{ inputs.profile || 'quick' }}
     runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
-    timeout-minutes: 120
+    timeout-minutes: 180
     env:
       STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
       STATA_PROFILE: ${{ inputs.profile || 'quick' }}
@@ -46,15 +46,31 @@ jobs:
       - name: Test CI receipt machinery
         run: /usr/bin/python3 -m unittest discover -s ci/tests -p 'test_*.py'
 
+      - name: Build and test Rust plugin
+        if: ${{ always() }}
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust evidence
+        if: ${{ always() }}
+        run: |
+          rm -rf "$RUNNER_TEMP/texpdf-rust-evidence"
+          mkdir -p "$RUNNER_TEMP/texpdf-rust-evidence"
+          if [[ -d .ci/stata/run ]]; then
+            cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-rust-evidence/"
+          fi
+
       - name: Run licensed Stata profile
         if: ${{ always() }}
         run: /bin/bash ci/run_stata_ci.sh "$STATA_PROFILE"
 
-      - name: Run quick Rust checks
+      - name: Restore Rust evidence
         if: ${{ always() }}
-        run: /bin/bash ci/record_rust_quick.sh
+        run: |
+          if [[ -d "$RUNNER_TEMP/texpdf-rust-evidence" ]]; then
+            cp -R "$RUNNER_TEMP/texpdf-rust-evidence/." .ci/stata/run/
+          fi
 
-      - name: Add Rust result to the exact-SHA receipt
+      - name: Add Rust result to exact-SHA receipt
         if: ${{ always() }}
         run: >-
           /usr/bin/python3 ci/augment_ci_receipt.py

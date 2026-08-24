@@ -1,0 +1,25 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{natbib}
+\begin{document}
+\section*{Standalone texpdf qualification}
+The fitted coefficient is
+\[
+  \widehat\beta=(X'X)^{-1}X'y.
+\]
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Statistic & Value \\
+\midrule
+Observations & 100 \\
+Coefficient & 1.25 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The bibliography is processed internally \citep{smith2020}.
+\bibliographystyle{plainnat}
+\bibliography{references}
+\end{document}

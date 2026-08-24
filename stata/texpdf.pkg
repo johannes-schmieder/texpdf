@@ -1,0 +1,8 @@
+v 3
+d texpdf: standalone LaTeX-to-PDF compilation for Stata
+d
+d Project-owned source is MIT licensed. Bundled engine and TeX resources
+d retain their upstream licenses and notices.
+f texpdf.ado
+f texpdf.sthlp
+f _texpdf_plugin.plugin

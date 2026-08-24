@@ -1,0 +1,3 @@
+v 3
+d texpdf: standalone LaTeX-to-PDF compiler for Stata
+p texpdf Compile LaTeX documents with an embedded offline Tectonic engine
