@@ -24,10 +24,10 @@ tracked independently:
 | Latest exact green source | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
-| Current ARM64 artifact source | `5ba3a83e098dcf7eb47c7b0db92b28ac46a9297b` |
-| Current universal build source | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
+| Current ARM64 artifact source | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
+| Current universal build source | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1` |
 | Current license-audit source | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
-| Latest memory-stress attempt | `2906be9e4628cd44197e5d6310a810b74f2aca7e`; qualified=no |
+| Latest memory-stress attempt | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1`; qualified=yes |
 
 ## Architecture
 
@@ -41,17 +41,16 @@ the helper process, so a compiler crash does not run inside Stata.
 
 | Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
-| `aarch64-apple-darwin` | required | yes | yes | `5ba3a83e098dcf7eb47c7b0db92b28ac46a9297b` |
-| `x86_64-apple-darwin` | required | yes | no | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
+| `aarch64-apple-darwin` | required | yes | yes | `d9be7615bd69b260b5841730d51d9a9ee03958f0` |
+| `x86_64-apple-darwin` | required | yes | no | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1` |
 | `x86_64-pc-windows-msvc` | deferred | no | no | `not recorded` |
 | `x86_64-unknown-linux-gnu` | deferred | no | no | `not recorded` |
 
-The current ARM64 plugin is 48.78 MiB (`ee4a0ae513b66ad956c0c52c1d5b76ba2fe75212e055fbd6c7297f4d9826fda0`). The current universal plugin record is 93.97 MiB (`a486545968b11647cf726bfecc2159c07e5dc3f00d8e3af4c6c9ab2a394c9964`).
+The current ARM64 plugin is 47.14 MiB (`09d439b8d05ded255ca60481b4a791de83cea210a3ec2b083389af09b8713db7`). The current universal plugin record is 93.97 MiB (`1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f`).
 
 ## Active private-candidate blockers
 
 - `macos_intel_runtime`
-- `macos_arm_memory_stress`
 
 ## License evidence
 
@@ -59,14 +58,13 @@ The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 amb
 
 ## Memory evidence
 
-The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 819480 KiB against a 524288 KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
+The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 16 KiB against a 65536 KiB gate; growth gate passed: yes. This failed attempt is retained as evidence and is not described as qualification.
 
 ## Deferred public-release blockers
 
 - `macos_intel_runtime`
 - `x86_64-pc-windows-msvc_runtime`
 - `x86_64-unknown-linux-gnu_runtime`
-- `macos_arm_memory_stress`
 - `public_distribution`
 
 See `release/READINESS.md` for the fail-closed check details and
