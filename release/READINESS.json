@@ -1,0 +1,111 @@
+{
+  "checks": [
+    {
+      "detail": "stata/texpdf.ado",
+      "key": "package_file_texpdf.ado",
+      "passed": true,
+      "release_blocker": false
+    },
+    {
+      "detail": "stata/texpdf.sthlp",
+      "key": "package_file_texpdf.sthlp",
+      "passed": true,
+      "release_blocker": false
+    },
+    {
+      "detail": "stata/texpdf.pkg",
+      "key": "package_file_texpdf.pkg",
+      "passed": true,
+      "release_blocker": false
+    },
+    {
+      "detail": "stata/stata.toc",
+      "key": "package_file_stata.toc",
+      "passed": true,
+      "release_blocker": false
+    },
+    {
+      "detail": "Cargo.lock is committed",
+      "key": "cargo_lock",
+      "passed": false,
+      "release_blocker": true
+    },
+    {
+      "detail": "target count=4",
+      "key": "target_registry",
+      "passed": true,
+      "release_blocker": false
+    },
+    {
+      "detail": "source=55dc0a564a260a210ce43fd22910af6ef483eb60; plugin_bytes=49997392; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
+      "key": "macos_arm_runtime",
+      "passed": true,
+      "release_blocker": false
+    },
+    {
+      "detail": "architectures=['arm64', 'x86_64']; universal_bytes=100051312; arm_runtime=True",
+      "key": "macos_universal_build",
+      "passed": true,
+      "release_blocker": false
+    },
+    {
+      "detail": "source=32bceb84df47a1c955c10cf75cb60a9d0fbb8d96; plugin_bytes=50043664",
+      "key": "macos_intel_build",
+      "passed": true,
+      "release_blocker": false
+    },
+    {
+      "detail": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending",
+      "key": "macos_intel_runtime",
+      "passed": false,
+      "release_blocker": true
+    },
+    {
+      "detail": "native build and Stata runtime qualification pending",
+      "key": "x86_64-pc-windows-msvc_build",
+      "passed": false,
+      "release_blocker": false
+    },
+    {
+      "detail": "native build and Stata runtime qualification pending",
+      "key": "x86_64-pc-windows-msvc_runtime",
+      "passed": false,
+      "release_blocker": true
+    },
+    {
+      "detail": "native build and Stata runtime qualification pending",
+      "key": "x86_64-unknown-linux-gnu_build",
+      "passed": false,
+      "release_blocker": false
+    },
+    {
+      "detail": "native build and Stata runtime qualification pending",
+      "key": "x86_64-unknown-linux-gnu_runtime",
+      "passed": false,
+      "release_blocker": true
+    },
+    {
+      "detail": "missing source-bound audit status licenses/generated/STATUS.json",
+      "key": "third_party_license_complete",
+      "passed": false,
+      "release_blocker": true
+    },
+    {
+      "detail": "missing permanent qualification record release/memory-stress-macos-arm64.json",
+      "key": "macos_arm_memory_stress",
+      "passed": false,
+      "release_blocker": true
+    }
+  ],
+  "implementation_complete_macos_arm64": false,
+  "public_release_ready": false,
+  "release_blockers": [
+    "cargo_lock",
+    "macos_intel_runtime",
+    "x86_64-pc-windows-msvc_runtime",
+    "x86_64-unknown-linux-gnu_runtime",
+    "third_party_license_complete",
+    "macos_arm_memory_stress"
+  ],
+  "schema_version": 2
+}
