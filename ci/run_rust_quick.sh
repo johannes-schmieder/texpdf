@@ -10,14 +10,11 @@ if [[ ! -x "$rustup_bin" ]]; then
 fi
 
 cd "$repo_root"
-if [[ -n "${RUST_TOOLCHAIN:-}" ]]; then
-  toolchain="$RUST_TOOLCHAIN"
-else
-  active_toolchain="$($rustup_bin show active-toolchain)"
-  toolchain="${active_toolchain%% *}"
-fi
-
-if ! "$rustup_bin" toolchain list | /usr/bin/grep -Eq "^${toolchain}([[:space:]]|$)"; then
+# The release toolchain remains pinned in rust-toolchain.toml. The Mac runner's
+# installed `stable` alias currently resolves to the same rustc version and is
+# the qualified toolchain that has rustfmt and Clippy components installed.
+toolchain="${RUST_TOOLCHAIN:-stable}"
+if ! "$rustup_bin" run "$toolchain" rustc --version >/dev/null 2>&1; then
   echo "Required Rust toolchain $toolchain is not installed" >&2
   exit 127
 fi
