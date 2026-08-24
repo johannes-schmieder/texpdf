@@ -18,10 +18,13 @@ if ! "$rustup_bin" run "$toolchain" rustc --version >/dev/null 2>&1; then
   echo "Required Rust toolchain $toolchain is not installed" >&2
   exit 127
 fi
-if ! "$rustup_bin" run "$toolchain" cargo fmt --version >/dev/null 2>&1 ||
-   ! "$rustup_bin" run "$toolchain" cargo clippy --version >/dev/null 2>&1; then
-  "$rustup_bin" component add --toolchain "$toolchain" rustfmt clippy
-fi
+"$rustup_bin" component add --toolchain "$toolchain" rustfmt clippy
+
+toolchain_cargo="$($rustup_bin which --toolchain "$toolchain" cargo)"
+toolchain_bin="$(/usr/bin/dirname "$toolchain_cargo")"
+# Cargo discovers external subcommands such as cargo-fmt and cargo-clippy via
+# PATH. `rustup run ... cargo` does not supply that lookup path on this runner.
+export PATH="$toolchain_bin:$PATH"
 
 rustc_version="$($rustup_bin run "$toolchain" rustc --version)"
 echo "RUST_TOOLCHAIN=$toolchain"
@@ -50,22 +53,22 @@ if [[ -f Cargo.toml ]]; then
   /bin/cat bundle/generated/bundle-info.json
 
   if [[ ! -f Cargo.lock ]]; then
-    "$rustup_bin" run "$toolchain" cargo generate-lockfile
+    "$toolchain_cargo" generate-lockfile
   fi
   /bin/mkdir -p .ci/stata/run
   /bin/cp Cargo.lock .ci/stata/run/Cargo.lock.generated
   /bin/cp bundle/generated/bundle-info.json .ci/stata/run/bundle-info.json
 
-  "$rustup_bin" run "$toolchain" cargo fmt --all --check
-  "$rustup_bin" run "$toolchain" cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+  "$toolchain_cargo" fmt --all --check
+  "$toolchain_cargo" clippy --locked --workspace --all-targets --all-features -- -D warnings
   if [[ "$rust_profile" == engine ]]; then
-    "$rustup_bin" run "$toolchain" cargo test --locked --workspace --all-targets --all-features
+    "$toolchain_cargo" test --locked --workspace --all-targets --all-features
     echo "RUST_QUICK_MODE=repository-engine"
   else
     # Compile every test target, but execute only the lightweight diagnostics
     # tests. Runtime engine tests require the real bundle and run in the
     # explicit engine profile.
-    "$rustup_bin" run "$toolchain" cargo test --locked --workspace --all-targets --all-features diagnostics::tests
+    "$toolchain_cargo" test --locked --workspace --all-targets --all-features diagnostics::tests
     echo "RUST_QUICK_MODE=repository-compile"
   fi
 else
