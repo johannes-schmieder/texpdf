@@ -91,5 +91,18 @@ directory. Never store a token in this file or Git.
 
 ## Qualification record
 
-The bootstrap, deliberate-failure, restored-green, merge, and final-main run
-identifiers are recorded here after end-to-end qualification.
+- Initial repository-runner success: source
+  `2ecbf988c3ee300829480da892509dbd1da4e383`, run `32697818280`, with
+  `status=success`, `stata_status=success`, and `rust_status=success`.
+- Deliberate Stata failure: source
+  `f464880fa2e8aa0a174c746b5b6d8f2c2ee39da5`, run `32698195283`, with
+  `failure_kind=stata_error`, `process_rc=0`, `stata_rc=9`, and Rust still
+  successful. This proves why the explicit Stata status is authoritative.
+- Restored branch success: source
+  `e7361956689feca0aade4d92061eaf6dc347372f`, run `32698294950`, with both
+  Stata and Rust successful.
+- Green `main` verification of the finalized infrastructure source:
+  `2ecbf988c3ee300829480da892509dbd1da4e383`, run `32698298249`.
+
+The deliberate failure remains only in bootstrap-branch history and its
+immutable receipt; it is not an ancestor of `main`.
