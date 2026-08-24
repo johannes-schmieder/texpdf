@@ -1,0 +1,138 @@
+name: Build qualified development artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Licensed Stata profile to run after building the real engine
+        required: true
+        type: choice
+        options:
+          - quick
+          - stress
+        default: quick
+      stress_iterations:
+        description: Stress iterations when profile=stress
+        required: false
+        default: "100"
+
+concurrency:
+  group: texpdf-development-artifact-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  macos-arm64:
+    name: macOS ARM64 standalone plugin and Stata package
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: ${{ inputs.profile }}
+      TEXPDF_RUST_PROFILE: engine
+      TEXPDF_STRESS_ITERATIONS: ${{ inputs.stress_iterations }}
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Validate stress input
+        if: ${{ inputs.profile == 'stress' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$TEXPDF_STRESS_ITERATIONS" in
+            ''|*[!0-9]*) echo "stress_iterations must be an integer" >&2; exit 2 ;;
+          esac
+          test "$TEXPDF_STRESS_ITERATIONS" -ge 1
+          test "$TEXPDF_STRESS_ITERATIONS" -le 10000
+
+      - name: Build and test the embedded engine
+        shell: bash
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust and artifact evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/texpdf-rust-evidence"
+          rm -rf "$evidence"
+          mkdir -p "$evidence"
+          if [[ -d .ci/stata/run ]]; then
+            cp -R .ci/stata/run/. "$evidence/"
+          fi
+          if [[ -f bundle/generated/bundle-info.json ]]; then
+            cp bundle/generated/bundle-info.json "$evidence/"
+          fi
+          if [[ -f bundle/generated/curated-manifest.json ]]; then
+            cp bundle/generated/curated-manifest.json "$evidence/"
+          fi
+
+      - name: Run licensed Stata profile
+        shell: bash
+        run: /bin/bash ci/run_stata_ci.sh "$STATA_PROFILE"
+
+      - name: Restore build evidence
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/texpdf-rust-evidence"
+          mkdir -p .ci/stata/run
+          if [[ -d "$evidence" ]]; then
+            cp -R "$evidence/." .ci/stata/run/
+          fi
+
+      - name: Add Rust result to receipt
+        if: ${{ always() }}
+        shell: bash
+        run: >-
+          /usr/bin/python3 ci/augment_ci_receipt.py
+          .ci/stata/run/receipt.json
+          .ci/stata/run/rust-quick.status
+
+      - name: Validate exact-source receipt
+        shell: bash
+        run: >-
+          /usr/bin/python3 ci/check_stata_receipt.py
+          .ci/stata/run/receipt.json
+          --expect-tested-sha "$GITHUB_SHA"
+          --expect-profile "$STATA_PROFILE"
+          --require-success
+          --require-rust-success
+
+      - name: Write artifact checksum inventory
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .ci/stata/run
+          : > .ci/stata/run/artifact-checksums.sha256
+          for path in \
+            stata/_texpdf_plugin.plugin \
+            dist/texpdf-macos-arm64.zip \
+            bundle/generated/texpdf-bundle.zip; do
+            if [[ -f "$path" ]]; then
+              /usr/bin/shasum -a 256 "$path" >> .ci/stata/run/artifact-checksums.sha256
+              /usr/bin/stat -f '%z %N' "$path" >> .ci/stata/run/artifact-sizes.txt
+            fi
+          done
+
+      - name: Upload plugin, installation package, and qualification evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-macos-arm64-${{ github.sha }}-${{ inputs.profile }}
+          path: |
+            stata/_texpdf_plugin.plugin
+            dist/texpdf-macos-arm64.zip
+            dist/texpdf-macos-arm64/
+            bundle/generated/bundle-info.json
+            bundle/generated/curated-manifest.json
+            .ci/stata/run/
+          if-no-files-found: error
+          retention-days: 30
