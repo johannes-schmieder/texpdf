@@ -12,9 +12,7 @@ use std::{
 use tectonic::driver::{OutputFormat, ProcessingSessionBuilder};
 use tectonic_bundles::{itar::ItarBundle, Bundle};
 use tectonic_errors::{Error as TectonicError, Result as TectonicResult};
-use tectonic_io_base::{
-    digest::DigestData, InputHandle, InputOrigin, IoProvider, OpenResult,
-};
+use tectonic_io_base::{digest::DigestData, InputHandle, InputOrigin, IoProvider, OpenResult};
 use tectonic_status_base::{MessageKind, StatusBackend};
 
 const MAX_TEX_LOG_BYTES: usize = 256 * 1024;
@@ -170,7 +168,9 @@ fn compile_source(
     eprintln!("TEXPDF_RESOLVER_COMPILE_BEGIN source={}", input.display());
     let mut session = builder.create(&mut status)?;
     session.run(&mut status)?;
-    let pdf = output.path().join(Path::new(input_name).with_extension("pdf"));
+    let pdf = output
+        .path()
+        .join(Path::new(input_name).with_extension("pdf"));
     if !pdf.is_file() {
         return Err("Tectonic resolver produced no PDF".into());
     }
@@ -182,8 +182,13 @@ fn compile_source(
     Ok(())
 }
 
-fn write_trace(path: &Path, requested: &Arc<Mutex<BTreeSet<String>>>) -> Result<(), Box<dyn Error>> {
-    let values = requested.lock().map_err(|_| "resource trace lock was poisoned")?;
+fn write_trace(
+    path: &Path,
+    requested: &Arc<Mutex<BTreeSet<String>>>,
+) -> Result<(), Box<dyn Error>> {
+    let values = requested
+        .lock()
+        .map_err(|_| "resource trace lock was poisoned")?;
     let mut text = String::new();
     for value in values.iter() {
         text.push_str(value);
