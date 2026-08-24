@@ -132,6 +132,34 @@ PY
     /bin/cp bundle/generated/curated-manifest.json .ci/stata/run/curated-manifest.json
   fi
 
+  "$toolchain_cargo" build --locked --release --package texpdf-helper
+  helper_name=texpdf-helper
+  if [[ "${OS:-}" == Windows_NT ]]; then helper_name=texpdf-helper.exe; fi
+  export TEXPDF_HELPER_PATH="$CARGO_TARGET_DIR/release/$helper_name"
+  test -f "$TEXPDF_HELPER_PATH"
+  /usr/bin/python3 - "$TEXPDF_HELPER_PATH" .ci/stata/run/helper-manifest.json <<'PY'
+from pathlib import Path
+import hashlib
+import json
+import os
+import sys
+
+source = Path(sys.argv[1])
+output = Path(sys.argv[2])
+payload = {
+    "schema_version": 1,
+    "path": str(source),
+    "size_bytes": source.stat().st_size,
+    "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+    "target": os.environ.get("TARGET", "native"),
+}
+output.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+print(
+    "TEXPDF_HELPER_READY "
+    f"path={source} size_bytes={payload['size_bytes']} sha256={payload['sha256']}"
+)
+PY
+
   "$toolchain_cargo" fmt --all --check
   "$toolchain_cargo" clippy --locked --workspace --all-targets --all-features -- -D warnings
   if [[ "$rust_profile" == engine ]]; then

@@ -12,5 +12,9 @@ description = "Stata SPI 3.0 bridge for the standalone texpdf compiler"
 crate-type = ["cdylib"]
 
 [dependencies]
+sha2.workspace = true
 tempfile.workspace = true
-texpdf-core = { path = "../texpdf-core" }
+texpdf-protocol = { path = "../texpdf-protocol" }
+
+[build-dependencies]
+sha2.workspace = true

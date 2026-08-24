@@ -11,3 +11,6 @@ description = "Isolated Tectonic compiler embedded in the texpdf Stata plugin"
 [dependencies]
 texpdf-core = { path = "../texpdf-core" }
 texpdf-protocol = { path = "../texpdf-protocol" }
+
+[dev-dependencies]
+tempfile.workspace = true

@@ -107,11 +107,7 @@ impl ResultRecord {
     }
 
     /// Build a failure record without additional metadata.
-    pub fn failure(
-        rc: i32,
-        message: impl Into<String>,
-        diagnostics: &[Diagnostic],
-    ) -> Self {
+    pub fn failure(rc: i32, message: impl Into<String>, diagnostics: &[Diagnostic]) -> Self {
         Self::failure_with_fields(rc, message, Vec::new(), diagnostics)
     }
 
@@ -149,10 +145,7 @@ fn append_diagnostics(fields: &mut Vec<(String, String)>, diagnostics: &[Diagnos
         .filter(|item| item.kind != DiagnosticKind::Note)
         .take(MAX_RESULT_DIAGNOSTICS)
         .collect();
-    fields.push((
-        "diagnostic_count".to_owned(),
-        retained.len().to_string(),
-    ));
+    fields.push(("diagnostic_count".to_owned(), retained.len().to_string()));
     for (index, diagnostic) in retained.into_iter().enumerate() {
         let number = index + 1;
         fields.push((
@@ -228,8 +221,7 @@ pub fn read_result_file(path: &Path) -> io::Result<ParsedResult> {
         .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "missing result rc"))?
         .parse::<i32>()
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
-    if (status == ResultStatus::Success && rc != 0)
-        || (status == ResultStatus::Failure && rc == 0)
+    if (status == ResultStatus::Success && rc != 0) || (status == ResultStatus::Failure && rc == 0)
     {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,

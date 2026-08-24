@@ -13,8 +13,8 @@ use texpdf_core::{
     DiagnosticKind as CoreDiagnosticKind, TexPdfError, TECTONIC_VERSION,
 };
 use texpdf_protocol::{
-    write_result_file, Diagnostic, DiagnosticKind, ResultRecord, RESULT_SCHEMA_VERSION,
-    RC_INPUT_MISSING, RC_INTERNAL, RC_IO, RC_OUTPUT_EXISTS, RC_SYNTAX, RC_TEX_FAILURE,
+    write_result_file, Diagnostic, DiagnosticKind, ResultRecord, RC_INPUT_MISSING, RC_INTERNAL,
+    RC_IO, RC_OUTPUT_EXISTS, RC_SYNTAX, RC_TEX_FAILURE, RESULT_SCHEMA_VERSION,
 };
 
 #[derive(Debug)]
@@ -50,9 +50,8 @@ fn operation_name(arguments: &[OsString]) -> String {
         .to_owned()
 }
 
-fn common_fields(operation: &str) -> Vec<(String, String)> {
+fn common_fields() -> Vec<(String, String)> {
     let mut fields = vec![
-        ("operation".to_owned(), operation.to_owned()),
         ("execution_model".to_owned(), "embedded_helper".to_owned()),
         (
             "helper_protocol".to_owned(),
@@ -73,17 +72,14 @@ fn success_record(
     mut fields: Vec<(String, String)>,
     diagnostics: &[Diagnostic],
 ) -> ResultRecord {
-    fields.extend(common_fields(operation));
+    fields.extend(common_fields());
     ResultRecord::success(operation, fields, diagnostics)
 }
 
 fn failure_record(operation: &str, failure: HelperFailure) -> ResultRecord {
-    ResultRecord::failure_with_fields(
-        failure.rc,
-        failure.message,
-        common_fields(operation),
-        &failure.diagnostics,
-    )
+    let mut fields = common_fields();
+    fields.insert(0, ("operation".to_owned(), operation.to_owned()));
+    ResultRecord::failure_with_fields(failure.rc, failure.message, fields, &failure.diagnostics)
 }
 
 fn dispatch(arguments: &[OsString]) -> Result<ResultRecord, HelperFailure> {
@@ -136,14 +132,15 @@ fn compile_command(arguments: &[OsString]) -> Result<ResultRecord, HelperFailure
     let replace = parse_flag(&arguments[4], "replace")?;
     let keep_log = parse_flag(&arguments[5], "keep-log")?;
     let mut request = CompileRequest::new(
-        PathBuf::from(&arguments[1]),
-        PathBuf::from(&arguments[2]),
+        PathBuf::from(arguments[1].clone()),
+        PathBuf::from(arguments[2].clone()),
     );
     request.replace = replace;
     request.keep_log = keep_log;
 
     let result = compile(&request).map_err(map_core_error)?;
     let diagnostics = convert_diagnostics(&result.diagnostics);
+    let warning_count = result.warning_count();
     Ok(success_record(
         "compile",
         vec![
@@ -155,11 +152,8 @@ fn compile_command(arguments: &[OsString]) -> Result<ResultRecord, HelperFailure
             ("engine_version".to_owned(), result.engine_version),
             ("bundle_version".to_owned(), result.bundle_version),
             ("bundle_digest".to_owned(), result.bundle_digest),
-            (
-                "bundle_zip_sha256".to_owned(),
-                result.bundle_zip_sha256,
-            ),
-            ("warnings".to_owned(), result.warning_count().to_string()),
+            ("bundle_zip_sha256".to_owned(), result.bundle_zip_sha256),
+            ("warnings".to_owned(), warning_count.to_string()),
         ],
         &diagnostics,
     ))
@@ -246,10 +240,7 @@ mod tests {
     #[test]
     fn result_path_is_selected_by_operation() {
         assert_eq!(
-            expected_result_path(&[
-                OsString::from("version"),
-                OsString::from("result.txt"),
-            ]),
+            expected_result_path(&[OsString::from("version"), OsString::from("result.txt"),]),
             Some(PathBuf::from("result.txt"))
         );
         assert_eq!(
@@ -273,11 +264,8 @@ mod tests {
 
     #[test]
     fn version_record_uses_embedded_bundle_metadata() {
-        let record = version_command(&[
-            OsString::from("version"),
-            OsString::from("result.txt"),
-        ])
-        .expect("version record");
+        let record = version_command(&[OsString::from("version"), OsString::from("result.txt")])
+            .expect("version record");
         assert_eq!(record.rc, 0);
         assert!(record
             .fields

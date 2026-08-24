@@ -13,8 +13,8 @@ use std::{
 
 use sha2::{Digest, Sha256};
 use texpdf_protocol::{
-    read_result_file, ParsedResult, ResultStatus, RESULT_SCHEMA_VERSION, RC_INTERNAL, RC_IO,
-    RC_SYNTAX, RC_TIMEOUT,
+    read_result_file, ParsedResult, ResultStatus, RC_INTERNAL, RC_IO, RC_SYNTAX, RC_TIMEOUT,
+    RESULT_SCHEMA_VERSION,
 };
 
 static HELPER_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/texpdf-helper.bin"));
@@ -32,7 +32,7 @@ pub(crate) struct HelperBridgeError {
 }
 
 impl HelperBridgeError {
-    fn new(rc: i32, message: impl Into<String>) -> Self {
+    pub(crate) fn new(rc: i32, message: impl Into<String>) -> Self {
         Self {
             rc,
             message: message.into(),
@@ -45,13 +45,10 @@ impl HelperBridgeError {
 }
 
 /// Execute one helper operation and validate the result it wrote.
-pub(crate) fn run(arguments: &[String], result_path: &Path) -> Result<ParsedResult, HelperBridgeError> {
-    if cfg!(texpdf_helper_stub) {
-        return Err(HelperBridgeError::new(
-            RC_INTERNAL,
-            "this plugin was built without a real embedded helper executable",
-        ));
-    }
+pub(crate) fn run(
+    arguments: &[String],
+    result_path: &Path,
+) -> Result<ParsedResult, HelperBridgeError> {
     let operation = arguments
         .first()
         .ok_or_else(|| HelperBridgeError::new(RC_SYNTAX, "missing helper operation"))?;
@@ -101,9 +98,7 @@ pub(crate) fn run(arguments: &[String], result_path: &Path) -> Result<ParsedResu
     if !status.success() {
         return Err(HelperBridgeError::new(
             RC_INTERNAL,
-            format!(
-                "isolated Tectonic helper terminated without a valid result ({status})"
-            ),
+            format!("isolated Tectonic helper terminated without a valid result ({status})"),
         ));
     }
 
@@ -176,9 +171,7 @@ fn helper_timeout() -> Result<Duration, HelperBridgeError> {
     if !(1..=MAX_TIMEOUT_SECONDS).contains(&seconds) {
         return Err(HelperBridgeError::new(
             RC_SYNTAX,
-            format!(
-                "TEXPDF_HELPER_TIMEOUT_SECONDS must be between 1 and {MAX_TIMEOUT_SECONDS}"
-            ),
+            format!("TEXPDF_HELPER_TIMEOUT_SECONDS must be between 1 and {MAX_TIMEOUT_SECONDS}"),
         ));
     }
     Ok(Duration::from_secs(seconds))
@@ -215,11 +208,7 @@ fn ensure_helper_from_bytes(
             .map_err(|error| HelperBridgeError::io("cannot replace invalid helper cache", error))?;
     }
 
-    let temporary = directory.join(format!(
-        ".{}-{}.tmp",
-        helper_filename(),
-        std::process::id()
-    ));
+    let temporary = directory.join(format!(".{}-{}.tmp", helper_filename(), std::process::id()));
     if temporary.exists() {
         fs::remove_file(&temporary).map_err(|error| {
             HelperBridgeError::io("cannot remove stale helper extraction", error)
@@ -347,7 +336,7 @@ fn sha256_file(path: &Path) -> io::Result<String> {
         }
         digest.update(&buffer[..count]);
     }
-    Ok(format!("{digest:x}"))
+    Ok(format!("{:x}", digest.finalize()))
 }
 
 #[cfg(unix)]
@@ -383,11 +372,11 @@ mod tests {
         let directory = tempfile::tempdir().expect("tempdir");
         let bytes = b"embedded helper fixture";
         let digest = sha256_bytes(bytes);
-        let path = ensure_helper_from_bytes(bytes, &digest, directory.path())
-            .expect("extract helper");
+        let path =
+            ensure_helper_from_bytes(bytes, &digest, directory.path()).expect("extract helper");
         fs::write(&path, b"corrupt").expect("corrupt helper");
-        let repaired = ensure_helper_from_bytes(bytes, &digest, directory.path())
-            .expect("repair helper");
+        let repaired =
+            ensure_helper_from_bytes(bytes, &digest, directory.path()).expect("repair helper");
         assert_eq!(fs::read(repaired).expect("read helper"), bytes);
     }
 
@@ -424,8 +413,8 @@ mod tests {
         let directory = tempfile::tempdir().expect("tempdir");
         let bytes = b"helper permissions fixture";
         let digest = sha256_bytes(bytes);
-        let path = ensure_helper_from_bytes(bytes, &digest, directory.path())
-            .expect("extract helper");
+        let path =
+            ensure_helper_from_bytes(bytes, &digest, directory.path()).expect("extract helper");
         assert_eq!(
             fs::metadata(path).expect("metadata").permissions().mode() & 0o777,
             0o700
