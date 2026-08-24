@@ -5,6 +5,8 @@
       "artifact": "_texpdf_plugin.plugin",
       "bundle_zip_sha256": "05688ffcca2e82a12143c836708e3dc3b811a30dbe2b74caf951eb7b409792ab",
       "bundle_zip_size_bytes": 6690289,
+      "embedded_helper_sha256": "182180d7473b37e456ac440d8af0851a6904bda747da88fb1576cfc076945637",
+      "embedded_helper_size_bytes": 48516288,
       "platform": "Unix; Mac (Apple Silicon)",
       "plugin_sha256": "ee4a0ae513b66ad956c0c52c1d5b76ba2fe75212e055fbd6c7297f4d9826fda0",
       "plugin_size_bytes": 51146384,
@@ -13,21 +15,28 @@
       "stata_edition": "MP",
       "stata_runtime_qualified": true,
       "stata_version": "18",
-      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run"
+      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run",
+      "universal_arm_runtime_qualified": true,
+      "universal_arm_slice_sha256": "74703bb6a8f0f2e3801b0c4462620d68b6e2749fdb1d1fe2f3d51e772397ceac",
+      "universal_build_source_sha": "d9be7615bd69b260b5841730d51d9a9ee03958f0",
+      "universal_plugin_sha256": "a486545968b11647cf726bfecc2159c07e5dc3f00d8e3af4c6c9ab2a394c9964",
+      "universal_plugin_size_bytes": 98532032
     },
     "x86_64-apple-darwin": {
       "artifact": "_texpdf_plugin.plugin",
       "build_qualified": true,
-      "build_source_sha": "5ba3a83e098dcf7eb47c7b0db92b28ac46a9297b",
-      "plugin_sha256": "1dff6901b57181823acb154ac76ed49599773fe14805327fe51cd41ad1265474",
-      "plugin_size_bytes": 50802624,
+      "build_source_sha": "d9be7615bd69b260b5841730d51d9a9ee03958f0",
+      "embedded_helper_sha256": "607cf620d6a034b03885d4bb970387c867939cb39ddf2e51dd28373588ed1dbf",
+      "embedded_helper_size_bytes": 48574392,
+      "plugin_sha256": "38c44d72b957e8b339b4791560309017343fb4976d90d0d8a92a953558ebfc1e",
+      "plugin_size_bytes": 49098688,
       "qualification_profile": "build + ARM licensed-Stata universal smoke",
       "qualified_source_sha": "",
       "stata_runtime_qualified": false,
       "stata_version": "",
       "status": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending",
-      "universal_plugin_sha256": "271c7a88f578fca075218f0acc141d4b41e3015b150f22b45e63cb8dd95f2203",
-      "universal_plugin_size_bytes": 101953216
+      "universal_plugin_sha256": "a486545968b11647cf726bfecc2159c07e5dc3f00d8e3af4c6c9ab2a394c9964",
+      "universal_plugin_size_bytes": 98532032
     },
     "x86_64-pc-windows-msvc": {
       "artifact": "_texpdf_plugin.plugin",
