@@ -19,6 +19,12 @@ on:
     paths-ignore:
       - ".ci/stata/latest.json"
       - ".ci/stata/results/**"
+      - ".ci/artifacts/**"
+      - ".ci/implementation-failures/**"
+      - "docs/generated/**"
+      - "licenses/generated/**"
+      - "release/*.json"
+      - "**/*.md"
 
 concurrency:
   group: texpdf-mac-${{ github.repository }}
