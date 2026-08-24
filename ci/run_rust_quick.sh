@@ -69,10 +69,15 @@ source = Path("bundle/resource-trace.txt.gz.b64")
 destination = Path("bundle/generated/resource-trace.txt")
 destination.parent.mkdir(parents=True, exist_ok=True)
 compressed = base64.b64decode(source.read_bytes(), validate=True)
-destination.write_bytes(gzip.decompress(compressed))
+names = set(gzip.decompress(compressed).decode("utf-8").splitlines())
+required = Path("bundle/required-resources.txt")
+if required.is_file():
+    names.update(required.read_text(encoding="utf-8").splitlines())
+names.discard("")
+destination.write_text("\n".join(sorted(names)) + "\n", encoding="utf-8")
 print(
     "TEXPDF_COMMITTED_TRACE_READY "
-    f"path={destination} lines={len(destination.read_text(encoding='utf-8').splitlines())}"
+    f"path={destination} lines={len(names)}"
 )
 PY
           /usr/bin/python3 tools/prepare_curated_bundle.py \
