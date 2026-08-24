@@ -1,0 +1,642 @@
+name: One-shot Stata package implementation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/implement-stata-package.yml"
+
+concurrency:
+  group: texpdf-one-shot-stata-package
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  implement-and-test:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 120
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: quick
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Write package and CI source
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          def write(path: str, text: str) -> None:
+              target = Path(path)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(textwrap.dedent(text).lstrip(), encoding="utf-8")
+
+          bridge = Path("crates/texpdf-stata/src/lib.rs")
+          bridge_text = bridge.read_text(encoding="utf-8")
+          old = ".map_err(|error| map_core_error(error))?"
+          if bridge_text.count(old) not in {0, 2}:
+              raise SystemExit("unexpected redundant-closure count in Stata bridge")
+          bridge_text = bridge_text.replace(old, ".map_err(map_core_error)?")
+          if bridge_text.count(".map_err(map_core_error)?") < 2:
+              raise SystemExit("Stata bridge error mapping was not repaired")
+          bridge.write_text(bridge_text, encoding="utf-8")
+
+          write("stata/texpdf.ado", r'''
+          *! version 0.1.0 24aug2026
+          program define texpdf, rclass
+              version 14.1
+              syntax [using/] [, SAVing(string asis) REPLACE VERSION]
+
+              if "`version'" != "" {
+                  if `"`using'"' != "" | `"`saving'"' != "" | "`replace'" != "" {
+                      display as error "option version may not be combined with using, saving(), or replace"
+                      exit 198
+                  }
+
+                  tempfile result
+                  capture noisily plugin call _texpdf_plugin, version `"`result'"'
+                  local plugin_rc = _rc
+                  if `plugin_rc' {
+                      display as error "texpdf native plugin invocation failed (r(`plugin_rc'))"
+                      exit `plugin_rc'
+                  }
+
+                  quietly _texpdf_read_result using `"`result'"'
+                  local native_status `"`r(status)'"'
+                  local native_rc = r(rc)
+                  local native_message `"`r(message)'"'
+                  local native_diagnostics `"`r(diagnostics)'"'
+                  local engine `"`r(engine)'"'
+                  local engine_version `"`r(engine_version)'"'
+                  local bundle_version `"`r(bundle_version)'"'
+                  local bundle_digest `"`r(bundle_digest)'"'
+                  local bundle_zip_sha256 `"`r(bundle_zip_sha256)'"'
+                  local warnings = r(warnings)
+
+                  if `"`native_status'"' != "success" {
+                      if `"`native_message'"' != "" {
+                          display as error `"`native_message'"'
+                      }
+                      if `"`native_diagnostics'"' != "" {
+                          display as error `"`native_diagnostics'"'
+                      }
+                      if missing(`native_rc') | `native_rc' == 0 {
+                          local native_rc 710
+                      }
+                      exit `native_rc'
+                  }
+
+                  display as text "texpdf 0.1.0; engine " as result "Tectonic `engine_version'"
+                  return local engine `"`engine'"'
+                  return local engine_version `"`engine_version'"'
+                  return local bundle_version `"`bundle_version'"'
+                  return local bundle_digest `"`bundle_digest'"'
+                  return local bundle_zip_sha256 `"`bundle_zip_sha256'"'
+                  return scalar warnings = `warnings'
+                  exit
+              }
+
+              if `"`using'"' == "" {
+                  display as error "using filename is required"
+                  exit 198
+              }
+
+              local input `"`using'"'
+              local output `"`saving'"'
+              if `"`output'"' == "" {
+                  local input_length = ustrlen(`"`input'"')
+                  local suffix ""
+                  if `input_length' >= 4 {
+                      local suffix_start = `input_length' - 3
+                      local suffix = ustrlower(usubstr(`"`input'"', `suffix_start', 4))
+                  }
+                  if `"`suffix'"' == ".tex" {
+                      local prefix_length = `input_length' - 4
+                      local prefix = usubstr(`"`input'"', 1, `prefix_length')
+                      local output `"`prefix'.pdf"'
+                  }
+                  else {
+                      local output `"`input'.pdf"'
+                  }
+              }
+
+              local replace_flag = cond("`replace'" == "", 0, 1)
+              tempfile result
+              capture noisily plugin call _texpdf_plugin, compile `"`input'"' `"`output'"' `"`result'"' `replace_flag' 0
+              local plugin_rc = _rc
+              if `plugin_rc' {
+                  display as error "texpdf native plugin invocation failed (r(`plugin_rc'))"
+                  exit `plugin_rc'
+              }
+
+              quietly _texpdf_read_result using `"`result'"'
+              local native_status `"`r(status)'"'
+              local native_rc = r(rc)
+              local native_message `"`r(message)'"'
+              local native_diagnostics `"`r(diagnostics)'"'
+              local pdf `"`r(pdf)'"'
+              local engine `"`r(engine)'"'
+              local engine_version `"`r(engine_version)'"'
+              local bundle_version `"`r(bundle_version)'"'
+              local bundle_digest `"`r(bundle_digest)'"'
+              local bundle_zip_sha256 `"`r(bundle_zip_sha256)'"'
+              local warnings = r(warnings)
+
+              if `"`native_status'"' != "success" {
+                  if `"`native_message'"' != "" {
+                      display as error `"`native_message'"'
+                  }
+                  if `"`native_diagnostics'"' != "" {
+                      display as error `"`native_diagnostics'"'
+                  }
+                  if missing(`native_rc') | `native_rc' == 0 {
+                      local native_rc 710
+                  }
+                  exit `native_rc'
+              }
+
+              display as text "PDF written to " as result `"`pdf'"'
+              return local pdf `"`pdf'"'
+              return local engine `"`engine'"'
+              return local engine_version `"`engine_version'"'
+              return local bundle_version `"`bundle_version'"'
+              return local bundle_digest `"`bundle_digest'"'
+              return local bundle_zip_sha256 `"`bundle_zip_sha256'"'
+              return scalar warnings = `warnings'
+          end
+
+          program define _texpdf_read_result, rclass
+              version 14.1
+              syntax using/
+
+              capture confirm file `"`using'"'
+              if _rc {
+                  display as error "texpdf native plugin did not create a result record"
+                  exit 710
+              }
+
+              tempname handle
+              capture file open `handle' using `"`using'"', read text
+              if _rc {
+                  display as error "texpdf could not open the native result record"
+                  exit 710
+              }
+
+              local schema_version ""
+              local status ""
+              local native_rc ""
+              local operation ""
+              local message ""
+              local diagnostics ""
+              local pdf ""
+              local engine ""
+              local engine_version ""
+              local bundle_version ""
+              local bundle_digest ""
+              local bundle_zip_sha256 ""
+              local warnings "0"
+              local diagnostic_count "0"
+
+              file read `handle' line
+              while r(eof) == 0 {
+                  local equals = ustrpos(`"`line'"', "=")
+                  if `equals' > 1 {
+                      local key = usubstr(`"`line'"', 1, `equals' - 1)
+                      local value_length = ustrlen(`"`line'"') - `equals'
+                      local value = usubstr(`"`line'"', `equals' + 1, `value_length')
+
+                      if `"`key'"' == "schema_version" local schema_version `"`value'"'
+                      else if `"`key'"' == "status" local status `"`value'"'
+                      else if `"`key'"' == "rc" local native_rc `"`value'"'
+                      else if `"`key'"' == "operation" local operation `"`value'"'
+                      else if `"`key'"' == "message" local message `"`value'"'
+                      else if `"`key'"' == "pdf" local pdf `"`value'"'
+                      else if `"`key'"' == "engine" local engine `"`value'"'
+                      else if `"`key'"' == "engine_version" local engine_version `"`value'"'
+                      else if `"`key'"' == "bundle_version" local bundle_version `"`value'"'
+                      else if `"`key'"' == "bundle_digest" local bundle_digest `"`value'"'
+                      else if `"`key'"' == "bundle_zip_sha256" local bundle_zip_sha256 `"`value'"'
+                      else if `"`key'"' == "warnings" local warnings `"`value'"'
+                      else if `"`key'"' == "diagnostic_count" local diagnostic_count `"`value'"'
+                      else if regexm(`"`key'"', "^diagnostic_[0-9]+_message$") {
+                          if `"`diagnostics'"' == "" local diagnostics `"`value'"'
+                          else local diagnostics `"`diagnostics' | `value'"'
+                      }
+                  }
+                  file read `handle' line
+              }
+              file close `handle'
+
+              if `"`schema_version'"' != "1" {
+                  display as error "unsupported or malformed texpdf native result record"
+                  exit 710
+              }
+              if !inlist(`"`status'"', "success", "failure") {
+                  display as error "malformed texpdf native status"
+                  exit 710
+              }
+
+              local rc_number = real(`"`native_rc'"')
+              if missing(`rc_number') {
+                  display as error "malformed texpdf native return code"
+                  exit 710
+              }
+              local warning_number = real(`"`warnings'"')
+              if missing(`warning_number') local warning_number 0
+              local diagnostic_number = real(`"`diagnostic_count'"')
+              if missing(`diagnostic_number') local diagnostic_number 0
+
+              return local status `"`status'"'
+              return scalar rc = `rc_number'
+              return local operation `"`operation'"'
+              return local message `"`message'"'
+              return local diagnostics `"`diagnostics'"'
+              return local pdf `"`pdf'"'
+              return local engine `"`engine'"'
+              return local engine_version `"`engine_version'"'
+              return local bundle_version `"`bundle_version'"'
+              return local bundle_digest `"`bundle_digest'"'
+              return local bundle_zip_sha256 `"`bundle_zip_sha256'"'
+              return scalar warnings = `warning_number'
+              return scalar diagnostic_count = `diagnostic_number'
+          end
+
+          program define _texpdf_plugin, plugin
+          ''')
+
+          write("stata/texpdf.sthlp", r'''
+          {smcl}
+          {* *! version 0.1.0 24aug2026}{...}
+          {vieweralsosee "texpdf" "help texpdf"}{...}
+          {title:Title}
+
+          {phang}
+          {bf:texpdf} {hline 2} compile a LaTeX document to PDF with the standalone embedded Tectonic engine
+
+          {title:Syntax}
+
+          {p 8 16 2}
+          {cmd:texpdf using} {it:filename.tex}
+          [{cmd:,} {opt saving(filename.pdf)} {opt replace}]
+
+          {p 8 16 2}
+          {cmd:texpdf, version}
+
+          {title:Description}
+
+          {pstd}
+          {cmd:texpdf} compiles one complete LaTeX document.  The released package
+          contains the Tectonic engine and its supported TeX resources inside one
+          native Stata plugin.  No system TeX installation and no network connection
+          are used at runtime.
+
+          {pstd}
+          Relative input files, figures, bibliography files, and other document assets
+          are resolved from the directory containing the primary input file.  If
+          {opt saving()} is omitted, a final {cmd:.tex} suffix is replaced with
+          {cmd:.pdf}; otherwise {cmd:.pdf} is appended.
+
+          {title:Options}
+
+          {phang}
+          {opt saving(filename.pdf)} specifies the output PDF.
+
+          {phang}
+          {opt replace} permits replacement of an existing output file.
+
+          {phang}
+          {opt version} reports the embedded engine and resource-bundle versions.  It
+          may not be combined with compilation arguments.
+
+          {title:Stored results}
+
+          {pstd}
+          {cmd:texpdf} stores the following in {cmd:r()} after successful compilation:
+
+          {synoptset 24 tabbed}{...}
+          {synopt:{cmd:r(pdf)}}absolute output PDF path{p_end}
+          {synopt:{cmd:r(engine)}}{cmd:tectonic}{p_end}
+          {synopt:{cmd:r(engine_version)}}embedded Tectonic version{p_end}
+          {synopt:{cmd:r(bundle_version)}}embedded resource-bundle version{p_end}
+          {synopt:{cmd:r(bundle_digest)}}Tectonic bundle content digest{p_end}
+          {synopt:{cmd:r(bundle_zip_sha256)}}SHA-256 of the embedded ZIP bundle{p_end}
+          {synopt:{cmd:r(warnings)}}number of warning diagnostics{p_end}
+
+          {pstd}
+          With {opt version}, all entries except {cmd:r(pdf)} are returned.
+
+          {title:Remarks}
+
+          {pstd}
+          Version 1 is a compiler only.  Shell escape, arbitrary external helper
+          programs, Biber/{cmd:biblatex}, Beamer, TikZ/PGF, and PSTricks are outside
+          the initial supported compatibility tier.  BibTeX with {cmd:natbib} is a
+          planned v1 capability.
+
+          {title:Author}
+
+          {pstd}
+          Johannes Schmieder
+          ''')
+
+          write("stata/texpdf.pkg", r'''
+          v 3
+          d texpdf: standalone LaTeX-to-PDF compilation for Stata
+          d
+          d Project-owned source is MIT licensed. Bundled engine and TeX resources
+          d retain their upstream licenses and notices.
+          f texpdf.ado
+          f texpdf.sthlp
+          f _texpdf_plugin.plugin
+          ''')
+
+          write("stata/stata.toc", r'''
+          v 3
+          d texpdf: standalone LaTeX-to-PDF compiler for Stata
+          p texpdf Compile LaTeX documents with an embedded offline Tectonic engine
+          ''')
+
+          write("ci/stata_smoke.do", r'''
+          version 18.0
+          clear all
+          set more off
+
+          assert c(stata_version) == "18"
+          assert inlist(c(MP), 0, 1)
+          assert c(processors) >= 1
+
+          mata:
+          assert(sum((1, 2, 3)) == 6)
+          end
+
+          local repo `"`c(pwd)'"'
+          adopath ++ `"`repo'/stata"'
+          which texpdf
+
+          texpdf, version
+          assert `"`r(engine)'"' == "tectonic"
+          assert `"`r(engine_version)'"' == "0.17.0"
+          assert strlen(`"`r(bundle_digest)'"') == 64
+          assert strlen(`"`r(bundle_zip_sha256)'"') == 64
+          assert r(warnings) == 0
+
+          capture noisily texpdf
+          assert _rc == 198
+
+          tempfile missing
+          capture noisily texpdf using `"`missing'"'
+          assert _rc == 601
+
+          tempfile source output
+          tempname handle
+          file open `handle' using `"`source'"', write text replace
+          file write `handle' "not compiled in the quick stub-bundle profile" _n
+          file close `handle'
+          file open `handle' using `"`output'"', write text replace
+          file write `handle' "existing output" _n
+          file close `handle'
+          capture noisily texpdf using `"`source'"', saving(`"`output'"')
+          assert _rc == 602
+
+          display as result "TEXPDF STATA MATA SMOKE PASS"
+          ''')
+
+          write(".github/workflows/stata-ci.yml", r'''
+          name: Licensed Stata and Rust CI
+
+          on:
+            workflow_dispatch:
+              inputs:
+                profile:
+                  description: Mac Stata/Rust test profile
+                  required: true
+                  type: choice
+                  options:
+                    - version
+                    - smoke
+                    - quick
+                  default: quick
+            push:
+              branches:
+                - main
+                - "codex/**"
+              paths-ignore:
+                - ".ci/stata/latest.json"
+                - ".ci/stata/results/**"
+
+          concurrency:
+            group: texpdf-mac-${{ github.repository }}
+            cancel-in-progress: true
+
+          permissions:
+            contents: read
+
+          env:
+            CARGO_TERM_COLOR: always
+            RUST_BACKTRACE: "1"
+
+          jobs:
+            mac-ci:
+              name: Mac Rust quick + Stata / ${{ inputs.profile || 'quick' }}
+              runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+              timeout-minutes: 120
+              env:
+                STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+                STATA_PROFILE: ${{ inputs.profile || 'quick' }}
+              steps:
+                - name: Check out tested commit
+                  uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+                - name: Test CI receipt machinery
+                  run: /usr/bin/python3 -m unittest discover -s ci/tests -p 'test_*.py'
+
+                - name: Build and test Rust plugin
+                  if: ${{ always() }}
+                  run: /bin/bash ci/record_rust_quick.sh
+
+                - name: Preserve Rust evidence
+                  if: ${{ always() }}
+                  run: |
+                    rm -rf "$RUNNER_TEMP/texpdf-rust-evidence"
+                    mkdir -p "$RUNNER_TEMP/texpdf-rust-evidence"
+                    if [[ -d .ci/stata/run ]]; then
+                      cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-rust-evidence/"
+                    fi
+
+                - name: Run licensed Stata profile
+                  if: ${{ always() }}
+                  run: /bin/bash ci/run_stata_ci.sh "$STATA_PROFILE"
+
+                - name: Restore Rust evidence
+                  if: ${{ always() }}
+                  run: |
+                    if [[ -d "$RUNNER_TEMP/texpdf-rust-evidence" ]]; then
+                      cp -R "$RUNNER_TEMP/texpdf-rust-evidence/." .ci/stata/run/
+                    fi
+
+                - name: Add Rust result to the exact-SHA receipt
+                  if: ${{ always() }}
+                  run: >-
+                    /usr/bin/python3 ci/augment_ci_receipt.py
+                    .ci/stata/run/receipt.json
+                    .ci/stata/run/rust-quick.status
+
+                - name: Validate combined receipt
+                  if: ${{ always() }}
+                  run: >-
+                    /usr/bin/python3 ci/check_stata_receipt.py
+                    .ci/stata/run/receipt.json
+                    --expect-tested-sha "$GITHUB_SHA"
+                    --expect-profile "$STATA_PROFILE"
+                    --require-success
+                    --require-rust-success
+
+                - name: Upload Mac CI logs and receipt
+                  if: ${{ always() }}
+                  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+                  with:
+                    name: stata-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+                    path: .ci/stata/run/
+                    if-no-files-found: error
+                    retention-days: 30
+
+            publish-receipt:
+              name: Publish exact-SHA receipt
+              needs: mac-ci
+              if: ${{ always() && needs.mac-ci.result != 'cancelled' }}
+              runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+              timeout-minutes: 10
+              permissions:
+                contents: write
+              steps:
+                - name: Check out receipt publisher
+                  uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+                  with:
+                    fetch-depth: 0
+
+                - name: Download CI receipt
+                  uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+                  with:
+                    name: stata-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+                    path: ${{ runner.temp }}/texpdf-ci-receipt
+
+                - name: Validate receipt identity
+                  env:
+                    STATA_PROFILE: ${{ inputs.profile || 'quick' }}
+                  run: >-
+                    /usr/bin/python3 ci/check_stata_receipt.py
+                    "$RUNNER_TEMP/texpdf-ci-receipt/receipt.json"
+                    --expect-tested-sha "$GITHUB_SHA"
+                    --expect-profile "$STATA_PROFILE"
+
+                - name: Commit immutable receipt and guarded latest pointer
+                  shell: bash
+                  env:
+                    RECEIPT: ${{ runner.temp }}/texpdf-ci-receipt/receipt.json
+                  run: |
+                    set -euo pipefail
+                    branch="$GITHUB_REF_NAME"
+                    result_path=".ci/stata/results/$GITHUB_SHA.json"
+                    publish_tree=""
+
+                    cleanup_publish_tree() {
+                      if [[ -n "$publish_tree" ]]; then
+                        cd "$GITHUB_WORKSPACE"
+                        git worktree remove --force "$publish_tree" 2>/dev/null || true
+                        git worktree prune
+                        publish_tree=""
+                      fi
+                    }
+                    trap cleanup_publish_tree EXIT
+
+                    for attempt in 1 2 3; do
+                      git fetch origin "$branch"
+                      publish_tree="$RUNNER_TEMP/texpdf-publish-$attempt"
+                      git worktree add --detach "$publish_tree" "origin/$branch"
+                      cd "$publish_tree"
+
+                      mkdir -p .ci/stata/results
+                      cp "$RECEIPT" "$result_path"
+
+                      if git merge-base --is-ancestor "$GITHUB_SHA" HEAD &&
+                         git diff --quiet "$GITHUB_SHA..HEAD" -- . \
+                           ':(exclude).ci/stata/results/**' \
+                           ':(exclude).ci/stata/latest.json'; then
+                        cp "$RECEIPT" .ci/stata/latest.json
+                      fi
+
+                      git config user.name "github-actions[bot]"
+                      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                      git add "$result_path" .ci/stata/latest.json 2>/dev/null || git add "$result_path"
+
+                      if git diff --cached --quiet; then
+                        exit 0
+                      fi
+
+                      git commit -m "ci(stata): record ${GITHUB_SHA:0:12} [skip ci]"
+                      if git push origin "HEAD:refs/heads/$branch"; then
+                        exit 0
+                      fi
+
+                      cleanup_publish_tree
+                    done
+
+                    echo "receipt publication lost three branch update races" >&2
+                    exit 1
+          ''')
+
+          for transient in (
+              ".github/workflows/repair-bridge.yml",
+              ".github/workflows/implement-stata-package.yml",
+          ):
+              Path(transient).unlink(missing_ok=True)
+          PY
+
+          git add crates/texpdf-stata/src/lib.rs stata ci/stata_smoke.do .github/workflows/stata-ci.yml
+          git add -u .github/workflows/repair-bridge.yml .github/workflows/implement-stata-package.yml || true
+
+      - name: Run repository Rust checks and build plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/record_rust_quick.sh
+          /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+
+      - name: Run licensed Stata package tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/run_stata_ci.sh quick
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success
+
+      - name: Commit tested source to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset -- stata/_texpdf_plugin.plugin 2>/dev/null || true
+          rm -f stata/_texpdf_plugin.plugin
+          rm -rf .ci/stata/run bundle/generated
+          git add Cargo.lock
+          git add -u
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat(stata): add end-to-end texpdf command"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
