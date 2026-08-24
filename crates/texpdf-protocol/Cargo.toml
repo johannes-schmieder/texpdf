@@ -1,0 +1,12 @@
+[package]
+name = "texpdf-protocol"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Versioned result-file protocol shared by the texpdf plugin and helper"
+
+[dependencies]
+tempfile.workspace = true
