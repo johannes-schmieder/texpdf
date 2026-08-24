@@ -1,23 +1,23 @@
 {
   "memory": {
-    "duration_seconds": 144,
+    "duration_seconds": 142,
     "growth_gate": false,
     "iterations_requested": 1000,
-    "late_median_stata_rss_kib": 1199984,
+    "late_median_stata_rss_kib": 1198264,
     "late_window": [
       900,
       1000
     ],
     "max_allowed_growth_kib": 524288,
-    "peak_stata_rss_kib": 1252000,
-    "peak_tree_rss_kib": 1281104,
-    "post_warmup_growth_kib": 819744,
-    "post_warmup_growth_ratio": 3.1558594571849357,
+    "peak_stata_rss_kib": 1249968,
+    "peak_tree_rss_kib": 1278976,
+    "post_warmup_growth_kib": 819480,
+    "post_warmup_growth_ratio": 3.163449353721382,
     "runner_rc": 0,
     "sample_count": 461,
     "schema_version": 1,
     "stata_sample_count": 459,
-    "warm_median_stata_rss_kib": 380240,
+    "warm_median_stata_rss_kib": 378784,
     "warm_window": [
       100,
       200
@@ -31,7 +31,7 @@
   "rust_mode": null,
   "rust_status": "not_run",
   "schema_version": 2,
-  "source_sha": "5f728f8ac0e0a434407dd380ff7fd16802834806",
+  "source_sha": "2906be9e4628cd44197e5d6310a810b74f2aca7e",
   "stata_edition": "MP",
   "stata_status": "success",
   "stata_version": "18",
