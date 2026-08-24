@@ -34,13 +34,15 @@ position and build-only artifacts are never treated as runtime qualification.
 
 ### 1. License-complete redistribution inventory
 
-- [ ] Resolve every ambiguous, unmapped, and missing-license TeX/font resource.
-- [ ] Preserve evidence for every reviewed override.
-- [ ] Include complete Rust, native-library, TeX, and font notice texts.
-- [ ] Bind the notice tree to the exact bundle and package hashes.
-- [ ] Require a zero-count source-bound audit before candidate packaging.
+- [x] Resolve every ambiguous, unmapped, and missing-license TeX/font resource.
+- [x] Preserve evidence for every reviewed override.
+- [x] Include complete Rust, native-library, TeX, and font notice texts.
+- [x] Bind the notice tree to the exact bundle and package hashes.
+- [x] Require a zero-count source-bound audit before candidate packaging.
 
-Exit: `third_party_license_complete` passes.
+Exit achieved: `third_party_license_complete` passes. Candidate assembly
+materializes the complete source-bound notice tree and keeps it archive-only so
+Stata's package-index size limit does not truncate the evidence.
 
 ### 2. macOS universal and Intel runtime qualification
 
@@ -67,8 +69,8 @@ Exit: `macos_arm_memory_stress` passes with a reviewed permanent record.
 ### 4. Private RC package
 
 - [ ] Freeze `v0.1.0-rc.1` metadata and release notes.
-- [ ] Assemble the deterministic macOS universal Stata ZIP with notices and
-      checksums; do not enable public-release mode.
+- [x] Implement deterministic macOS universal Stata ZIP assembly with notices,
+      checksums, and two-slice helper provenance without public-release mode.
 - [ ] Test install and offline compilation from the exact ZIP on a clean local
       Stata setup under both architectures.
 - [ ] Run `tools/sync_project_state.py --require-candidate-ready`.

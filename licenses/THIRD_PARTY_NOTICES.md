@@ -4,6 +4,11 @@ This file is a human-readable index. The public release package must include
 complete license texts and a generated machine-readable inventory tied to the
 exact plugin and resource-bundle checksums.
 
+The deterministic ZIP carries that complete tree under `LICENSES/`. It is not
+enumerated in `texpdf.pkg`, because Stata imposes a package-file size limit;
+`net install` installs this index and the runtime files, while the adjacent ZIP
+is the authoritative complete notice archive.
+
 ## Tectonic
 
 `texpdf` embeds Tectonic 0.17.0. Tectonic is distributed under the MIT License.

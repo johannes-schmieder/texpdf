@@ -132,11 +132,16 @@ def validate_arm_target(
     source_sha = str(record.get("qualified_source_sha", ""))
     artifact_valid = (
         record.get("stata_runtime_qualified") is True
+        and record.get("build_qualified") is True
+        and record.get("build_source_sha") == source_sha
         and valid_source_sha(source_sha)
         and int(record.get("plugin_size_bytes", 0)) > 0
         and valid_sha256(record.get("plugin_sha256"))
         and int(record.get("bundle_zip_size_bytes", 0)) > 0
         and valid_sha256(record.get("bundle_zip_sha256"))
+        and int(record.get("embedded_helper_size_bytes", 0)) > 0
+        and valid_sha256(record.get("embedded_helper_sha256"))
+        and record.get("receipt") == f".ci/stata/results/{source_sha}.json"
         and bool(record.get("stata_version"))
     )
     receipt_ok, receipt_detail = (
@@ -183,6 +188,9 @@ def validate_universal(
                 isinstance(slices.get(name), dict)
                 and int(slices[name].get("size_bytes", 0)) > 0
                 and valid_sha256(slices[name].get("sha256"))
+                and isinstance(slices[name].get("embedded_helper"), dict)
+                and int(slices[name]["embedded_helper"].get("size_bytes", 0)) > 0
+                and valid_sha256(slices[name]["embedded_helper"].get("sha256"))
                 for name in ("arm64", "x86_64")
             )
             and data.get("arm_runtime_qualified") is True
@@ -210,6 +218,10 @@ def validate_universal(
         and intel.get("build_source_sha") == data.get("source_sha")
         and intel.get("plugin_size_bytes") == intel_slice.get("size_bytes")
         and intel.get("plugin_sha256") == intel_slice.get("sha256")
+        and intel.get("embedded_helper_size_bytes")
+        == intel_slice.get("embedded_helper", {}).get("size_bytes")
+        and intel.get("embedded_helper_sha256")
+        == intel_slice.get("embedded_helper", {}).get("sha256")
         and intel.get("universal_plugin_size_bytes") == universal.get("size_bytes")
         and intel.get("universal_plugin_sha256") == universal.get("sha256")
     )
@@ -239,6 +251,10 @@ def validate_universal(
         and intel_runtime.get("universal_plugin_sha256") == universal.get("sha256")
         and intel_runtime.get("intel_slice_size_bytes") == intel_slice.get("size_bytes")
         and intel_runtime.get("intel_slice_sha256") == intel_slice.get("sha256")
+        and intel_runtime.get("intel_helper_size_bytes")
+        == intel_slice.get("embedded_helper", {}).get("size_bytes")
+        and intel_runtime.get("intel_helper_sha256")
+        == intel_slice.get("embedded_helper", {}).get("sha256")
         and isinstance(intel_runtime.get("receipt"), dict)
         and intel_runtime["receipt"].get("tested_sha") == intel_source
         and intel_runtime["receipt"].get("status") == "success"
@@ -256,6 +272,33 @@ def validate_universal(
             f"{intel.get('status', 'actual Intel Stata runtime qualification is absent')}; "
             f"runtime_record={'valid' if runtime_record_ok else 'missing/invalid'}; "
             f"{intel_receipt_detail}"
+        ),
+    )
+
+    candidate = data.get("candidate_package", {}) if isinstance(data, dict) else {}
+    arm = targets.get("aarch64-apple-darwin", {})
+    package_ok = (
+        isinstance(candidate, dict)
+        and candidate.get("version") == "0.1.0-rc.1"
+        and int(candidate.get("zip_size_bytes", 0)) > 0
+        and valid_sha256(candidate.get("zip_sha256"))
+        and candidate.get("license_evidence_included") is True
+        and candidate.get("public_release") is False
+        and candidate.get("arm_and_intel_runtime_tested") is True
+        and data.get("arm_runtime_qualified") is True
+        and data.get("intel_runtime_qualified") is True
+        and arm.get("candidate_package_sha256") == candidate.get("zip_sha256")
+        and intel.get("candidate_package_sha256") == candidate.get("zip_sha256")
+    )
+    add_check(
+        checks,
+        "private_candidate_package",
+        package_ok,
+        (
+            f"version={candidate.get('version')}; "
+            f"zip_bytes={candidate.get('zip_size_bytes')}; "
+            f"license_evidence={candidate.get('license_evidence_included')}; "
+            f"both_runtimes={candidate.get('arm_and_intel_runtime_tested')}"
         ),
     )
 
@@ -337,7 +380,9 @@ def validate_license_status(checks: list[dict[str, Any]]) -> None:
     )
 
 
-def validate_memory(checks: list[dict[str, Any]]) -> None:
+def validate_memory(
+    targets: dict[str, dict[str, Any]], checks: list[dict[str, Any]]
+) -> None:
     if not MEMORY_PATH.is_file():
         add_check(
             checks,
@@ -348,15 +393,41 @@ def validate_memory(checks: list[dict[str, Any]]) -> None:
         return
     data = read_json(MEMORY_PATH)
     memory = data.get("memory", {})
+    plugin = data.get("plugin", {})
+    helper = data.get("helper", {})
+    arm = targets.get("aarch64-apple-darwin", {})
+    iterations = memory.get("iterations_requested") if isinstance(memory, dict) else None
+    expected_failures = iterations // 25 + 2 if isinstance(iterations, int) else None
     passed = (
-        valid_source_sha(data.get("source_sha"))
+        data.get("schema_version") == 3
+        and valid_source_sha(data.get("source_sha"))
+        and data.get("qualified") is True
         and data.get("overall_status") == "success"
         and data.get("stata_status") == "success"
         and data.get("rust_status") == "success"
+        and data.get("rust_mode") == "repository-engine"
+        and isinstance(plugin, dict)
+        and valid_sha256(plugin.get("sha256"))
+        and int(plugin.get("size_bytes", 0)) > 0
+        and isinstance(helper, dict)
+        and valid_sha256(helper.get("sha256"))
+        and int(helper.get("size_bytes", 0)) > 0
+        and arm.get("plugin_sha256") == plugin.get("sha256")
+        and arm.get("embedded_helper_sha256") == helper.get("sha256")
         and isinstance(memory, dict)
-        and int(memory.get("iterations_requested", 0)) >= 1000
+        and isinstance(iterations, int)
+        and iterations >= 1000
         and memory.get("runner_rc") == 0
         and memory.get("growth_gate") is True
+        and memory.get("successful_compile_count") == iterations
+        and memory.get("injected_failure_count") == expected_failures
+        and memory.get("expected_injected_failure_count") == expected_failures
+        and memory.get("post_error_recovery") is True
+        and int(memory.get("helper_sample_count", 0)) > 0
+        and memory.get("max_concurrent_helpers") == 1
+        and memory.get("retained_helper_pids") == []
+        and valid_sha256(memory.get("stata_log_sha256"))
+        and int(memory.get("max_allowed_growth_kib", 0)) <= 64 * 1024
     )
     add_check(
         checks,
@@ -461,7 +532,7 @@ def build_result() -> dict[str, Any]:
     validate_universal(targets, checks)
     validate_other_targets(targets, checks)
     validate_license_status(checks)
-    validate_memory(checks)
+    validate_memory(targets, checks)
     scope = validate_scope(checks)
 
     mac_required = {

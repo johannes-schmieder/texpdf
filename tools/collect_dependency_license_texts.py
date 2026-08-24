@@ -52,14 +52,18 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def notice_files(root: Path) -> list[Path]:
+def notice_files(root: Path, *, include_notice_directories: bool = True) -> list[Path]:
     candidates: set[Path] = set()
     for path in root.iterdir():
         if path.is_file():
             upper = path.name.upper()
             if any(upper.startswith(prefix) for prefix in NOTICE_PREFIXES):
                 candidates.add(path)
-        elif path.is_dir() and path.name.upper() in NOTICE_DIRECTORIES:
+        elif (
+            include_notice_directories
+            and path.is_dir()
+            and path.name.upper() in NOTICE_DIRECTORIES
+        ):
             candidates.update(child for child in path.rglob("*") if child.is_file())
     return sorted(candidates, key=lambda path: path.as_posix().casefold())
 
@@ -71,10 +75,17 @@ def safe_component(value: str) -> str:
     )
 
 
-def copy_notices(source_root: Path, destination: Path) -> list[dict[str, object]]:
+def copy_notices(
+    source_root: Path,
+    destination: Path,
+    *,
+    include_notice_directories: bool = True,
+) -> list[dict[str, object]]:
     records: list[dict[str, object]] = []
     destination.mkdir(parents=True, exist_ok=True)
-    for source in notice_files(source_root):
+    for source in notice_files(
+        source_root, include_notice_directories=include_notice_directories
+    ):
         relative = source.relative_to(source_root)
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -159,7 +170,15 @@ def collect_rust(
                     }
                 )
         if not notices and package.get("source") is None:
-            notices = copy_notices(workspace_root, destination)
+            # The repository's lowercase `licenses/` directory contains audit
+            # inputs and generated outputs, not the project crate's license
+            # payload. Recursing into it here previously copied the collector's
+            # own output repeatedly for every workspace crate.
+            notices = copy_notices(
+                workspace_root,
+                destination,
+                include_notice_directories=False,
+            )
             notice_origin = "workspace_root"
         if not notices:
             notices = copy_canonical_spdx_texts(package.get("license"), destination)

@@ -14,6 +14,8 @@ The release configuration provides these boundaries:
 - the embedded helper is architecture-checked and SHA-256-verified before use;
 - the helper is launched directly without a shell and has a bounded timeout;
 - helper identity and versioned results are validated on every operation;
+- result values are normalized before Stata interpolation so compiler text
+  cannot be reinterpreted as quote or macro syntax;
 - Rust panics are caught at the ABI boundary and helper dispatch;
 - diagnostics are bounded and output replacement is atomic.
 

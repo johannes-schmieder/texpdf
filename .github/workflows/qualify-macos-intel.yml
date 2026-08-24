@@ -53,6 +53,25 @@ jobs:
         shell: bash
         run: /bin/bash tools/build_macos_universal.sh
 
+      - name: Materialize complete source-bound notice tree
+        shell: bash
+        run: /bin/bash ci/prepare_release_license_evidence.sh
+
+      - name: Assemble exact private candidate with notices
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/package_release.py \
+            --plugin dist/macos-universal/_texpdf_plugin.plugin \
+            --embedded-helper-manifest dist/macos-universal/manifest.json \
+            --bundle-info bundle/generated/bundle-info.json \
+            --output-dir dist/macos-universal/texpdf \
+            --zip dist/macos-universal/texpdf-macos-universal-0.1.0-rc.1.zip \
+            --manifest dist/macos-universal/package-manifest.json \
+            --target universal2-apple-darwin \
+            --package-version 0.1.0-rc.1 \
+            --include-license-evidence
+
       - name: Run actual x86_64 Stata process
         shell: bash
         run: |
@@ -66,12 +85,25 @@ jobs:
           SH
           chmod +x "$wrapper"
           export STATA_BIN="$wrapper"
+          export TEXPDF_STATA_PACKAGE_DIR="$GITHUB_WORKSPACE/dist/macos-universal/texpdf"
           /bin/bash ci/run_stata_ci.sh quick
           /usr/bin/python3 ci/check_stata_receipt.py \
             .ci/stata/run/receipt.json \
             --expect-tested-sha "$SOURCE_SHA" \
             --expect-profile quick \
             --require-success
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          receipt = json.loads(
+              Path(".ci/stata/run/receipt.json").read_text(encoding="utf-8")
+          )
+          if "Intel" not in str(receipt.get("platform")):
+              raise SystemExit(
+                  f"Stata did not report an Intel process: {receipt.get('platform')}"
+              )
+          PY
 
       - name: Build exact Intel runtime record
         shell: bash
@@ -84,6 +116,7 @@ jobs:
 
           receipt = json.loads(Path(".ci/stata/run/receipt.json").read_text(encoding="utf-8"))
           manifest = json.loads(Path("dist/macos-universal/manifest.json").read_text(encoding="utf-8"))
+          package = json.loads(Path("dist/macos-universal/package-manifest.json").read_text(encoding="utf-8"))
           source = os.environ["SOURCE_SHA"]
           if receipt.get("tested_sha") != source or receipt.get("status") != "success":
               raise SystemExit("Intel Stata receipt is not exact and green")
@@ -97,12 +130,27 @@ jobs:
               "universal_plugin_sha256": manifest["universal"]["sha256"],
               "intel_slice_size_bytes": manifest["slices"]["x86_64"]["size_bytes"],
               "intel_slice_sha256": manifest["slices"]["x86_64"]["sha256"],
+              "intel_helper_size_bytes": manifest["slices"]["x86_64"]["embedded_helper"]["size_bytes"],
+              "intel_helper_sha256": manifest["slices"]["x86_64"]["embedded_helper"]["sha256"],
+              "candidate_package_version": package["package_version"],
+              "candidate_package_size_bytes": package["package_zip_size_bytes"],
+              "candidate_package_sha256": package["package_zip_sha256"],
+              "candidate_package_license_evidence_included": package["license_evidence_included"],
+              "candidate_package_public_release": package["public_release_mode"],
           }
           Path("release/macos-intel-runtime.json").write_text(
               json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
           )
           manifest["intel_runtime_qualified"] = True
           manifest["intel_runtime_source_sha"] = source
+          manifest["candidate_package"] = {
+              "version": package["package_version"],
+              "zip_sha256": package["package_zip_sha256"],
+              "zip_size_bytes": package["package_zip_size_bytes"],
+              "license_evidence_included": package["license_evidence_included"],
+              "public_release": package["public_release_mode"],
+              "arm_and_intel_runtime_tested": True,
+          }
           manifest["qualification_boundary"] = (
               "Both slices were built from the exact source. The universal plugin was "
               "loaded and exercised in licensed ARM64 and x86_64 Stata/MP 18 processes."
@@ -141,6 +189,17 @@ jobs:
               "stata_edition": record["receipt"].get("stata_edition"),
               "runtime_plugin_sha256": record["universal_plugin_sha256"],
               "runtime_plugin_size_bytes": record["universal_plugin_size_bytes"],
+              "runtime_helper_sha256": record["intel_helper_sha256"],
+              "runtime_helper_size_bytes": record["intel_helper_size_bytes"],
+              "candidate_package_sha256": record["candidate_package_sha256"],
+              "candidate_package_size_bytes": record["candidate_package_size_bytes"],
+              "candidate_package_version": record["candidate_package_version"],
+              "candidate_package_license_evidence_included": record[
+                  "candidate_package_license_evidence_included"
+              ],
+              "candidate_package_public_release": record[
+                  "candidate_package_public_release"
+              ],
               "status": "qualified in an actual x86_64 Stata process under Rosetta",
           })
           path.write_text(json.dumps(registry, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -159,6 +218,8 @@ jobs:
           path: |
             .ci/stata/run/
             dist/macos-universal/manifest.json
+            dist/macos-universal/package-manifest.json
+            dist/macos-universal/texpdf-macos-universal-0.1.0-rc.1.zip
             release/macos-intel-runtime.json
           if-no-files-found: warn
           retention-days: 90

@@ -2,9 +2,9 @@
 """Assemble a deterministic Stata installation tree and ZIP for texpdf.
 
 Development packages always include the project license and a third-party notice
-index. Public-release mode is fail-closed: it additionally requires a complete
-source-bound license audit and incorporates the generated inventories and
-collected license texts into the package tree.
+index. Complete source-bound license evidence can be included in a private
+candidate without enabling public-release mode. Both modes fail closed when the
+full notice tree is requested.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 CHUNK_SIZE = 1024 * 1024
 LICENSE_STATUS_PATH = Path("licenses/generated/STATUS.json")
 LICENSE_GENERATED_ROOT = Path("licenses/generated")
-PUBLIC_LICENSE_FILES = (
+LICENSE_EVIDENCE_FILES = (
     "STATUS.json",
     "STATUS.md",
     "tex-resources.json",
@@ -111,10 +111,10 @@ def license_status_complete(status: dict[str, object] | None) -> bool:
     )
 
 
-def install_public_license_tree(output_dir: Path) -> list[str]:
+def install_license_evidence(output_dir: Path) -> list[str]:
     installed: list[str] = []
     destination_root = output_dir / "LICENSES"
-    for name in PUBLIC_LICENSE_FILES:
+    for name in LICENSE_EVIDENCE_FILES:
         source = LICENSE_GENERATED_ROOT / name
         copy_atomic(source, destination_root / name)
         installed.append(f"LICENSES/{name}")
@@ -130,21 +130,75 @@ def install_public_license_tree(output_dir: Path) -> list[str]:
     return installed
 
 
-def append_pkg_files(pkg_path: Path, names: list[str]) -> None:
-    if not names:
-        return
-    text = pkg_path.read_text(encoding="utf-8")
-    existing = {
-        line[2:].strip()
-        for line in text.splitlines()
-        if line.startswith("f ") and line[2:].strip()
-    }
-    additions = [name for name in sorted(names) if name not in existing]
-    if additions:
-        if text and not text.endswith("\n"):
-            text += "\n"
-        text += "".join(f"f {name}\n" for name in additions)
-        pkg_path.write_text(text, encoding="utf-8")
+def valid_sha256(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
+def helper_provenance(
+    plugin: Path,
+    target: str,
+    helper: Path | None,
+    universal_manifest: Path | None,
+) -> tuple[dict[str, dict[str, object]], str | None]:
+    if helper is not None and universal_manifest is not None:
+        raise ValueError(
+            "use either --embedded-helper or --embedded-helper-manifest, not both"
+        )
+    if helper is not None:
+        if not helper.is_file():
+            raise FileNotFoundError(helper)
+        return (
+            {
+                target: {
+                    "sha256": sha256_file(helper),
+                    "size_bytes": helper.stat().st_size,
+                }
+            },
+            str(helper),
+        )
+    if universal_manifest is None:
+        return {}, None
+    data = json.loads(universal_manifest.read_text(encoding="utf-8"))
+    if data.get("schema_version") != 1:
+        raise ValueError("unsupported embedded-helper manifest schema")
+    universal = data.get("universal")
+    if (
+        not isinstance(universal, dict)
+        or universal.get("sha256") != sha256_file(plugin)
+        or universal.get("size_bytes") != plugin.stat().st_size
+    ):
+        raise ValueError("embedded-helper manifest does not match the plugin")
+    slices = data.get("slices")
+    if not isinstance(slices, dict) or not slices:
+        raise ValueError("embedded-helper manifest has no architecture slices")
+    records: dict[str, dict[str, object]] = {}
+    for slice_name, slice_record in sorted(slices.items()):
+        if not isinstance(slice_record, dict):
+            raise ValueError(f"malformed helper slice {slice_name}")
+        embedded = slice_record.get("embedded_helper")
+        if not isinstance(embedded, dict):
+            raise ValueError(f"helper provenance is missing for slice {slice_name}")
+        helper_target = embedded.get("target")
+        helper_sha = embedded.get("sha256")
+        helper_size = embedded.get("size_bytes")
+        if (
+            not isinstance(helper_target, str)
+            or not helper_target
+            or helper_target in records
+            or not valid_sha256(helper_sha)
+            or not isinstance(helper_size, int)
+            or helper_size <= 0
+        ):
+            raise ValueError(f"invalid helper provenance for slice {slice_name}")
+        records[helper_target] = {
+            "sha256": helper_sha,
+            "size_bytes": helper_size,
+        }
+    return records, str(universal_manifest)
 
 
 def main() -> int:
@@ -154,6 +208,11 @@ def main() -> int:
         "--embedded-helper",
         type=Path,
         help="target helper whose exact bytes were embedded in the plugin",
+    )
+    parser.add_argument(
+        "--embedded-helper-manifest",
+        type=Path,
+        help="universal-build manifest binding every slice to its embedded helper",
     )
     parser.add_argument("--bundle-info", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -166,6 +225,11 @@ def main() -> int:
         action="store_true",
         help="require and package complete third-party license evidence",
     )
+    parser.add_argument(
+        "--include-license-evidence",
+        action="store_true",
+        help="package complete notices for a private candidate without publishing it",
+    )
     args = parser.parse_args()
 
     try:
@@ -174,13 +238,18 @@ def main() -> int:
             raise ValueError("unsupported bundle-info schema")
         license_status = read_license_status()
         license_complete = license_status_complete(license_status)
-        if args.public_release and args.embedded_helper is None:
-            raise ValueError("public-release mode requires --embedded-helper provenance")
-        if args.embedded_helper is not None and not args.embedded_helper.is_file():
-            raise FileNotFoundError(args.embedded_helper)
-        if args.public_release and not license_complete:
+        helpers, helper_source = helper_provenance(
+            args.plugin,
+            args.target,
+            args.embedded_helper,
+            args.embedded_helper_manifest,
+        )
+        include_license_evidence = args.public_release or args.include_license_evidence
+        if args.public_release and not helpers:
+            raise ValueError("public-release mode requires embedded-helper provenance")
+        if include_license_evidence and not license_complete:
             raise ValueError(
-                "public-release mode requires licenses/generated/STATUS.json "
+                "license-evidence packaging requires licenses/generated/STATUS.json "
                 "with release_license_complete=true and all fail-closed counts zero"
             )
 
@@ -198,10 +267,11 @@ def main() -> int:
         for name, source in sources.items():
             copy_atomic(source, args.output_dir / name)
 
-        public_license_files: list[str] = []
-        if args.public_release:
-            public_license_files = install_public_license_tree(args.output_dir)
-            append_pkg_files(args.output_dir / "texpdf.pkg", public_license_files)
+        packaged_license_files: list[str] = []
+        if include_license_evidence:
+            packaged_license_files = install_license_evidence(args.output_dir)
+
+        single_helper = next(iter(helpers.values())) if len(helpers) == 1 else None
 
         build_info = {
             "schema_version": 1,
@@ -219,24 +289,25 @@ def main() -> int:
             "plugin_sha256": sha256_file(args.plugin),
             "plugin_size_bytes": args.plugin.stat().st_size,
             "embedded_helper_sha256": (
-                sha256_file(args.embedded_helper)
-                if args.embedded_helper is not None
-                else None
+                single_helper["sha256"] if single_helper is not None else None
             ),
             "embedded_helper_size_bytes": (
-                args.embedded_helper.stat().st_size
-                if args.embedded_helper is not None
-                else None
+                single_helper["size_bytes"] if single_helper is not None else None
             ),
+            "embedded_helper_count": len(helpers),
+            "embedded_helpers": helpers,
+            "embedded_helper_provenance_source": helper_source,
             "standalone": True,
             "runtime_network_required": False,
             "system_tex_required": False,
             "public_release_mode": args.public_release,
+            "license_evidence_included": include_license_evidence,
             "release_license_complete": license_complete,
             "license_audit_source_sha": (
                 license_status.get("source_sha") if license_status else None
             ),
-            "packaged_license_file_count": len(public_license_files),
+            "packaged_license_file_count": len(packaged_license_files),
+            "net_install_license_file_count": 0,
         }
         write_json_atomic(args.output_dir / "BUILD_INFO.json", build_info)
 

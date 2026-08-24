@@ -178,6 +178,7 @@ def render_status(state: dict[str, Any]) -> str:
     tex = licenses.get("tex_resources", {})
     memory_record = state["memory"]
     memory = memory_record.get("memory", {})
+    memory_qualified = memory_record.get("qualified") is True
     required = set(scope.get("required_runtime_targets", []))
 
     lines = [
@@ -276,8 +277,12 @@ def render_status(state: dict[str, Any]) -> str:
             f"The latest preserved attempt requested {memory.get('iterations_requested', 0)} calls. "
             f"Post-warmup Stata RSS growth was {memory.get('post_warmup_growth_kib', 'unknown')} KiB "
             f"against a {memory.get('max_allowed_growth_kib', 'unknown')} KiB gate; "
-            f"growth gate passed: {yes_no(memory.get('growth_gate'))}. This failed attempt is "
-            "retained as evidence and is not described as qualification.",
+            f"growth gate passed: {yes_no(memory.get('growth_gate'))}. "
+            + (
+                "This attempt is a qualified helper-lifecycle result."
+                if memory_qualified
+                else "This failed attempt is retained as evidence and is not described as qualification."
+            ),
             "",
             "## Deferred public-release blockers",
             "",

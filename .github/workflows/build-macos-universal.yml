@@ -13,6 +13,10 @@ on:
       - "stata/**"
       - "tools/prepare_native_deps*.sh"
       - "tools/build_macos_universal.sh"
+      - "tools/package_release.py"
+      - "ci/prepare_release_license_evidence.sh"
+      - "ci/run_license_audit.py"
+      - "licenses/**"
       - ".github/workflows/build-macos-universal.yml"
 
 concurrency:
@@ -57,6 +61,25 @@ jobs:
           dist/macos-universal/_texpdf_plugin.plugin
           dist/macos-universal/manifest.json
 
+      - name: Materialize complete source-bound notice tree
+        shell: bash
+        run: /bin/bash ci/prepare_release_license_evidence.sh
+
+      - name: Assemble private universal candidate with notices
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/package_release.py \
+            --plugin dist/macos-universal/_texpdf_plugin.plugin \
+            --embedded-helper-manifest dist/macos-universal/manifest.json \
+            --bundle-info bundle/generated/bundle-info.json \
+            --output-dir dist/macos-universal/texpdf \
+            --zip dist/macos-universal/texpdf-macos-universal-0.1.0-rc.1.zip \
+            --manifest dist/macos-universal/package-manifest.json \
+            --target universal2-apple-darwin \
+            --package-version 0.1.0-rc.1 \
+            --include-license-evidence
+
       - name: Stage universal plugin for licensed Stata
         shell: bash
         run: |
@@ -66,6 +89,8 @@ jobs:
 
       - name: Test ARM slice in licensed Stata
         shell: bash
+        env:
+          TEXPDF_STATA_PACKAGE_DIR: ${{ github.workspace }}/dist/macos-universal/texpdf
         run: /bin/bash ci/run_stata_ci.sh quick
 
       - name: Combine and validate evidence
@@ -93,6 +118,18 @@ jobs:
           data["arm_runtime_qualified"] = True
           data["arm_stata_profile"] = "quick"
           data["arm_stata_receipt"] = ".ci/stata/run/receipt.json"
+          package = json.loads(
+              Path("dist/macos-universal/package-manifest.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          data["candidate_package"] = {
+              "version": package.get("package_version"),
+              "zip_sha256": package.get("package_zip_sha256"),
+              "zip_size_bytes": package.get("package_zip_size_bytes"),
+              "license_evidence_included": package.get("license_evidence_included"),
+              "public_release": package.get("public_release_mode"),
+          }
           data["intel_runtime_qualified"] = False
           data["qualification_boundary"] = (
               "Both Mach-O slices were built and inspected. The universal plugin "
@@ -125,6 +162,7 @@ jobs:
           intel = manifest["slices"]["x86_64"]
           arm = manifest["slices"]["arm64"]
           universal = manifest["universal"]
+          package = manifest["candidate_package"]
           source_sha = manifest["source_sha"]
 
           arm_record = targets["targets"]["aarch64-apple-darwin"]
@@ -137,6 +175,13 @@ jobs:
                   "embedded_helper_sha256": arm["embedded_helper"]["sha256"],
                   "embedded_helper_size_bytes": arm["embedded_helper"]["size_bytes"],
                   "universal_arm_runtime_qualified": True,
+                  "candidate_package_sha256": package["zip_sha256"],
+                  "candidate_package_size_bytes": package["zip_size_bytes"],
+                  "candidate_package_version": package["version"],
+                  "candidate_package_license_evidence_included": package[
+                      "license_evidence_included"
+                  ],
+                  "candidate_package_public_release": package["public_release"],
               }
           )
 
@@ -156,6 +201,9 @@ jobs:
                   "qualified_source_sha": "",
                   "stata_runtime_qualified": False,
                   "stata_version": "",
+                  "candidate_package_sha256": package["zip_sha256"],
+                  "candidate_package_size_bytes": package["zip_size_bytes"],
+                  "candidate_package_version": package["version"],
                   "status": (
                       "Intel slice built, inspected, and packaged into an ARM-tested "
                       "universal plugin; Intel Stata runtime qualification pending"

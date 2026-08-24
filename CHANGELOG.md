@@ -3,7 +3,7 @@
 All notable changes to `texpdf` are recorded here. Semantic versioning begins
 with the first public release.
 
-## 0.1.0 — unreleased
+## 0.1.0-rc.1 — unreleased private candidate
 
 ### Added
 
@@ -25,9 +25,11 @@ with the first public release.
 - fail-closed dependency, resource, target, and release-readiness tooling.
 - source-bound license and notice collection for both embedded Rust binaries,
   native libraries, and every embedded TeX/font resource.
+- deterministic universal macOS candidate packaging with full archive notices,
+  per-slice embedded-helper provenance, and package checksums.
 
 ### Remaining before public release
 
-- review the high-iteration memory/safety result;
+- complete the high-iteration memory/safety qualification;
 - qualify macOS Intel, Windows x86-64, and Linux x86-64 in actual Stata;
 - pass the clean-machine offline release audit and publish GitHub assets.

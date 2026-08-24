@@ -19,8 +19,8 @@ Rust toolchain, package download, or network connection.
 
 The active release target is a private macOS universal `v0.1.0-rc.1`. Apple
 Silicon is exact-source qualified under licensed Stata/MP 18. Intel runtime
-qualification, the complete redistribution inventory, and the 1,000-call
-memory gate remain required for that candidate. Windows, Linux, public
+qualification and the 1,000-call memory gate remain required for that
+candidate. The redistribution inventory is source-bound and complete. Windows, Linux, public
 distribution, and final `v0.1.0` publication are explicitly deferred.
 
 Exact SHAs, artifact sizes, target support, failed attempts, and live blockers

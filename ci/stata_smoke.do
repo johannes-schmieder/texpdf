@@ -159,7 +159,10 @@ if `full_engine' {
     }
 
     * Exercise the actual installation layout through net install.
-    local package_dir `"`repo'/dist/texpdf-macos-arm64"'
+    local package_dir : environment TEXPDF_STATA_PACKAGE_DIR
+    if `"`package_dir'"' == "" {
+        local package_dir `"`repo'/dist/texpdf-macos-arm64"'
+    }
     confirm file `"`package_dir'/texpdf.pkg"'
     confirm file `"`package_dir'/_texpdf_plugin.plugin"'
     net install texpdf, from(`"`package_dir'"') replace

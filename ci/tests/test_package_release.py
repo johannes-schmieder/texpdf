@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -76,14 +77,14 @@ class PackageReleaseTests(unittest.TestCase):
         plugin: Path,
         bundle_info: Path,
         public: bool = False,
+        include_license_evidence: bool = False,
+        helper_manifest: Path | None = None,
     ) -> subprocess.CompletedProcess[str]:
         command = [
             sys.executable,
             str(SCRIPT),
             "--plugin",
             str(plugin),
-            "--embedded-helper",
-            str(root / "helper.bin"),
             "--bundle-info",
             str(bundle_info),
             "--output-dir",
@@ -95,8 +96,14 @@ class PackageReleaseTests(unittest.TestCase):
             "--target",
             "test-target",
         ]
+        if helper_manifest is None:
+            command.extend(["--embedded-helper", str(root / "helper.bin")])
+        else:
+            command.extend(["--embedded-helper-manifest", str(helper_manifest)])
         if public:
             command.append("--public-release")
+        if include_license_evidence:
+            command.append("--include-license-evidence")
         return subprocess.run(
             command,
             cwd=root,
@@ -104,6 +111,38 @@ class PackageReleaseTests(unittest.TestCase):
             capture_output=True,
             check=False,
         )
+
+    def prepare_complete_license_audit(self, root: Path) -> None:
+        generated = root / "licenses/generated"
+        status = {
+            "source_sha": "3" * 40,
+            "release_license_complete": True,
+            "return_codes": {
+                "tex_inventory": 0,
+                "cargo_inventory": 0,
+                "dependency_inventory": 0,
+                "notice_collection": 0,
+            },
+            "tex_resources": {
+                "resource_count": 10,
+                "mapped": 10,
+                "ambiguous": 0,
+                "unmapped": 0,
+                "missing_license": 0,
+            },
+            "dependency_undeclared_count": 0,
+            "missing_rust_notice_files": 0,
+            "missing_native_notice_files": 0,
+            "tex_notice_complete": True,
+            "tex_notice_file_count": 1,
+        }
+        for name in GENERATED_LICENSE_FILES:
+            if name == "STATUS.json":
+                write_json(generated / name, status)
+            else:
+                write(generated / name)
+        write(generated / "texts/rust/example/LICENSE", "Example license\n")
+        write(generated / "texts/texlive/NOTICE", "TeX notice\n")
 
     def test_development_package_includes_notice_index(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -128,42 +167,13 @@ class PackageReleaseTests(unittest.TestCase):
             plugin, bundle_info = self.prepare_project(root)
             result = self.command(root, plugin, bundle_info, public=True)
             self.assertEqual(result.returncode, 2)
-            self.assertIn("public-release mode requires", result.stderr)
+            self.assertIn("license-evidence packaging requires", result.stderr)
 
     def test_public_release_packages_inventory_and_texts(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             plugin, bundle_info = self.prepare_project(root)
-            generated = root / "licenses/generated"
-            status = {
-                "source_sha": "3" * 40,
-                "release_license_complete": True,
-                "return_codes": {
-                    "tex_inventory": 0,
-                    "cargo_inventory": 0,
-                    "dependency_inventory": 0,
-                    "notice_collection": 0,
-                },
-                "tex_resources": {
-                    "resource_count": 10,
-                    "mapped": 10,
-                    "ambiguous": 0,
-                    "unmapped": 0,
-                    "missing_license": 0,
-                },
-                "dependency_undeclared_count": 0,
-                "missing_rust_notice_files": 0,
-                "missing_native_notice_files": 0,
-                "tex_notice_complete": True,
-                "tex_notice_file_count": 1,
-            }
-            for name in GENERATED_LICENSE_FILES:
-                if name == "STATUS.json":
-                    write_json(generated / name, status)
-                else:
-                    write(generated / name)
-            write(generated / "texts/rust/example/LICENSE", "Example license\n")
-            write(generated / "texts/texlive/NOTICE", "TeX notice\n")
+            self.prepare_complete_license_audit(root)
 
             result = self.command(root, plugin, bundle_info, public=True)
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -176,13 +186,81 @@ class PackageReleaseTests(unittest.TestCase):
             package_text = (root / "dist/package/texpdf.pkg").read_text(
                 encoding="utf-8"
             )
-            self.assertIn("f LICENSES/STATUS.json", package_text)
-            self.assertIn("f LICENSES/texts/rust/example/LICENSE", package_text)
+            self.assertNotIn("f LICENSES/STATUS.json", package_text)
+            self.assertEqual(build["net_install_license_file_count"], 0)
             with zipfile.ZipFile(root / "dist/package.zip") as archive:
                 names = set(archive.namelist())
             self.assertIn("LICENSES/STATUS.json", names)
             self.assertIn("LICENSES/texts/rust/example/LICENSE", names)
             self.assertIn("LICENSES/texts/texlive/NOTICE", names)
+
+    def test_private_candidate_can_include_complete_license_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plugin, bundle_info = self.prepare_project(root)
+            self.prepare_complete_license_audit(root)
+            result = self.command(
+                root,
+                plugin,
+                bundle_info,
+                include_license_evidence=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            build = json.loads(
+                (root / "dist/package/BUILD_INFO.json").read_text(encoding="utf-8")
+            )
+            self.assertFalse(build["public_release_mode"])
+            self.assertTrue(build["license_evidence_included"])
+            self.assertGreater(build["packaged_license_file_count"], 10)
+            self.assertEqual(build["net_install_license_file_count"], 0)
+
+    def test_universal_manifest_binds_both_embedded_helpers(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plugin, bundle_info = self.prepare_project(root)
+            manifest = root / "universal.json"
+            write_json(
+                manifest,
+                {
+                    "schema_version": 1,
+                    "universal": {
+                        "sha256": hashlib.sha256(plugin.read_bytes()).hexdigest(),
+                        "size_bytes": plugin.stat().st_size,
+                    },
+                    "slices": {
+                        "arm64": {
+                            "embedded_helper": {
+                                "target": "aarch64-apple-darwin",
+                                "sha256": "4" * 64,
+                                "size_bytes": 101,
+                            }
+                        },
+                        "x86_64": {
+                            "embedded_helper": {
+                                "target": "x86_64-apple-darwin",
+                                "sha256": "5" * 64,
+                                "size_bytes": 202,
+                            }
+                        },
+                    },
+                },
+            )
+            result = self.command(
+                root,
+                plugin,
+                bundle_info,
+                helper_manifest=manifest,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            build = json.loads(
+                (root / "dist/package/BUILD_INFO.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(build["embedded_helper_count"], 2)
+            self.assertIsNone(build["embedded_helper_sha256"])
+            self.assertEqual(
+                set(build["embedded_helpers"]),
+                {"aarch64-apple-darwin", "x86_64-apple-darwin"},
+            )
 
 
 if __name__ == "__main__":
