@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{lmodern}
+\usepackage{booktabs,array,longtable,tabularx,multirow}
+\usepackage{threeparttable,threeparttablex,dcolumn,siunitx,adjustbox}
+\usepackage{graphicx,xcolor,geometry,float,placeins,rotating,pdflscape}
+\usepackage{caption,subcaption,setspace,enumitem,fancyhdr,titlesec,microtype}
+\usepackage{natbib}
+\usepackage{hyperref,url}
+\pagestyle{fancy}
+\begin{document}
+\section*{texpdf academic bundle corpus}
+\begin{spacing}{1.1}
+\textcolor{blue}{Typeset mathematics:}
+\[
+  \widehat\beta=\operatorname*{arg\,min}_{b}\lVert y-Xb\rVert^2,
+  \qquad \mathbb{E}[u\mid X]=0.
+\]
+\end{spacing}
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Regression output}
+\begin{tabular}{lS[table-format=2.2]D{.}{.}{2}}
+\toprule
+Variable & {Estimate} & \multicolumn{1}{c}{Std. error} \\
+\midrule
+Treatment & 1.25 & 0.31 \\
+\multirow{2}{*}{Controls} & 10.00 & 1.00 \\
+ & 11.00 & 1.10 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}\item Synthetic values.\end{tablenotes}
+\end{threeparttable}
+\end{table}
+\FloatBarrier
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.4\textwidth}\centering\rule{2cm}{1cm}\caption{A}\end{subfigure}
+\begin{subfigure}{.4\textwidth}\centering\adjustbox{frame}{\rule{2cm}{1cm}}\caption{B}\end{subfigure}
+\caption{Synthetic panels}
+\end{figure}
+
+\begin{enumerate}[label=(\alph*)]
+\item A URL: \url{https://example.invalid/texpdf}.
+\item A citation processed by the embedded BibTeX engine \citep{smith2020}.
+\end{enumerate}
+
+\begin{landscape}
+\begin{longtable}{ll}
+\toprule Item & Description \\
+\midrule one & landscape longtable \\
+\bottomrule
+\end{longtable}
+\end{landscape}
+
+\begin{sideways}Rotated text\end{sideways}
+\bibliographystyle{plainnat}
+\bibliography{references}
+\end{document}

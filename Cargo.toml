@@ -1,5 +1,9 @@
 [workspace]
-members = ["crates/texpdf-core", "crates/texpdf-stata"]
+members = [
+    "crates/texpdf-core",
+    "crates/texpdf-stata",
+    "tools/bundle-resolver",
+]
 resolver = "2"
 
 [workspace.package]
@@ -17,5 +21,6 @@ tempfile = "3.20"
 tectonic = { version = "=0.17.0", default-features = false }
 tectonic_bundles = { version = "=0.4.2", default-features = false }
 tectonic_errors = "=0.3.0"
+tectonic_io_base = "=0.6.0"
 tectonic_status_base = "=0.2.2"
 thiserror = "2.0"

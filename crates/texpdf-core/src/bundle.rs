@@ -26,7 +26,7 @@ pub struct BundleInfo {
     pub bundle_version: String,
     /// Transformer version.
     pub transform_version: String,
-    /// SHA-256 of the raw indexed-tar stream.
+    /// SHA-256 of the raw indexed-tar stream, if a full stream was downloaded.
     pub source_sha256: String,
     /// SHA-256 of the compressed index.
     pub index_sha256: String,
@@ -66,7 +66,7 @@ mod tests {
     fn embedded_bundle_opens_and_has_expected_digest() {
         let info = bundle_info().expect("bundle metadata");
         assert_eq!(info.schema_version, 1);
-        assert!(info.file_count > 1_000);
+        assert!(info.file_count > 100);
         assert_eq!(info.tectonic_bundle_digest.len(), 64);
         let mut bundle = open_bundle().expect("open embedded bundle");
         let digest = bundle.get_digest().expect("bundle digest").to_string();
