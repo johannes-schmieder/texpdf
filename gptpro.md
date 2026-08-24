@@ -9,7 +9,7 @@ The workflow is named **Licensed Stata and Rust CI**. A normal push to `main` or
 1. a licensed Stata/MP batch test; and
 2. a Rust quick test.
 
-At bootstrap, the Stata test is an infrastructure smoke test and the Rust test compiles and runs a synthetic program in a temporary directory. No `texpdf` package API or TeX compiler backend has been chosen yet. When a `Cargo.toml` is later added, the Rust lane automatically changes to repository checks: `cargo fmt --check`, strict Clippy, and workspace tests.
+At bootstrap, the Stata test is an infrastructure smoke test and the Rust test compiles and runs a synthetic program in a temporary directory. The project architecture is now specified in `PLAN.md`: the public command/package is `texpdf`, the primary backend is Tectonic, and standalone/offline operation after installation is a core requirement. When a `Cargo.toml` is added, the Rust lane automatically changes to repository checks: `cargo fmt --check`, strict Clippy, and workspace tests.
 
 There is no self-hosted `pull_request` trigger and no redundant GitHub-hosted matrix on ordinary pushes.
 
@@ -30,10 +30,10 @@ Treat those versions as the current runner environment, not as a future public p
 
 ## Development loop
 
-1. Read this file, `STATA_CI_RUNNER.md`, the workflow, and the current branch state.
-2. Create or use a trusted `codex/**` branch.
-3. Make a focused change, record the exact full source commit SHA, and push it using the write-capable GitHub/Codex tools available in the session.
-4. Query workflow runs for that exact commit when the connector exposes commit-bound workflow discovery. Otherwise wait for the immutable receipt below.
+1. Read this file, `PLAN.md`, `STATA_CI_RUNNER.md`, the workflow, and the current `main` state.
+2. **Develop directly on `main` unless the owner explicitly requests otherwise.** Do not create a development branch by default.
+3. Make one focused change, record the exact full source commit SHA, and push it to `main` using the write-capable GitHub/Codex tools available in the session. Push frequently so the repository remains the durable source of truth.
+4. Query workflow runs for that exact commit when the connector exposes commit-bound workflow discovery. Otherwise use the immutable receipt below when it appears.
 5. Read `.ci/stata/results/<full-source-sha>.json`. Do not infer success from the branch head or from an older receipt.
 6. Require all of:
    - `tested_sha` exactly equals the intended source commit;
@@ -41,9 +41,9 @@ Treat those versions as the current runner environment, not as a future public p
    - `stata_status` is `success`;
    - `rust_status` is `success`;
    - `profile` is the intended profile.
-7. Use `.ci/stata/latest.json` only as a convenience pointer and always verify its complete `tested_sha`. Receipt publisher commits advance the branch after the source push and use `[skip ci]`.
-8. On failure, inspect `failure_kind`, `process_rc`, `stata_rc`, `rust_rc`, the workflow jobs, and the artifact named for the source SHA/run. Fix the source, push a new checkpoint, and repeat.
-9. Merge only an exact-SHA green checkpoint. Never merge a deliberate failing checkpoint into `main`.
+7. Use `.ci/stata/latest.json` only as a convenience pointer and always verify its complete `tested_sha`. Receipt publisher commits advance `main` after the source push and use `[skip ci]`.
+8. On failure, inspect `failure_kind`, `process_rc`, `stata_rc`, `rust_rc`, the workflow jobs, and the artifact named for the source SHA/run. Fix the source in another small `main` checkpoint and repeat; do not rewrite history.
+9. Never put a deliberate failing checkpoint on `main`. If failure-reporting infrastructure itself must be tested, use a temporary trusted branch and do not merge its failing tip.
 
 Manual workflow profiles are `version`, `smoke`, and `quick`. Normal pushes use `quick`. More profiles can be added in repository configuration when actual Stata/Mata or plugin tests exist; no machine-level runner changes should be needed.
 
