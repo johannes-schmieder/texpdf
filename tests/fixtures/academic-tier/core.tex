@@ -1,0 +1,44 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{microtype}
+
+\geometry{margin=1in}
+\onehalfspacing
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{texpdf academic core}
+\fancyfoot[C]{\thepage}
+\titleformat{\section}{\large\bfseries\color{blue!60!black}}{}{0pt}{}
+
+\begin{document}
+\section{Mathematics and document formatting}
+The ordinary least-squares coefficient is
+\[
+  \widehat\beta = \left(X'X\right)^{-1}X'y,
+  \qquad
+  \operatorname{Var}(\widehat\beta\mid X)
+  = \sigma^2\left(X'X\right)^{-1}.
+\]
+A paired expression uses \texttt{mathtools}:
+\[
+  \begin{dcases}
+    y_i = x_i'\beta + \varepsilon_i, & i \in \mathcal{I},\\
+    E[\varepsilon_i\mid x_i]=0. &
+  \end{dcases}
+\]
+
+\begin{enumerate}[label=\textcolor{blue!60!black}{\arabic*.},leftmargin=*]
+  \item Hyperlinks are available through \href{https://example.invalid}{a synthetic URL}.
+  \item Literal addresses use \url{https://example.invalid/texpdf}.
+\end{enumerate}
+\end{document}
