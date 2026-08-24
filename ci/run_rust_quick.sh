@@ -10,13 +10,17 @@ if [[ ! -x "$rustup_bin" ]]; then
 fi
 
 cd "$repo_root"
-# The release toolchain remains pinned in rust-toolchain.toml. The Mac runner's
-# installed `stable` alias currently resolves to the same rustc version and is
-# the qualified toolchain that has rustfmt and Clippy components installed.
-toolchain="${RUST_TOOLCHAIN:-stable}"
+# Use the release-pinned compiler. rustfmt and Clippy are rustup components,
+# not intrinsic Cargo commands, so make their presence explicit and idempotent
+# on the dedicated self-hosted runner.
+toolchain="${RUST_TOOLCHAIN:-1.97.1}"
 if ! "$rustup_bin" run "$toolchain" rustc --version >/dev/null 2>&1; then
   echo "Required Rust toolchain $toolchain is not installed" >&2
   exit 127
+fi
+if ! "$rustup_bin" run "$toolchain" cargo fmt --version >/dev/null 2>&1 ||
+   ! "$rustup_bin" run "$toolchain" cargo clippy --version >/dev/null 2>&1; then
+  "$rustup_bin" component add --toolchain "$toolchain" rustfmt clippy
 fi
 
 rustc_version="$($rustup_bin run "$toolchain" rustc --version)"
