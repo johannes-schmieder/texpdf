@@ -26,6 +26,7 @@ python3 tools/generate_license_inventory.py \
   --manifest bundle/curated-manifest.json \
   --tlpdb path/to/pinned-texlive-2022/texlive.tlpdb \
   --overrides bundle/license-overrides.toml \
+  --evidence bundle/license-evidence.json \
   --output licenses/generated/tex-resources.json \
   --markdown licenses/generated/tex-resources.md \
   --strict
@@ -41,8 +42,10 @@ python3 tools/generate_dependency_inventory.py \
   --require-declared
 ```
 
-Then collect all required Rust and native-library texts with
-`tools/collect_dependency_license_texts.py`.
+Then collect all required Rust/native texts with
+`tools/collect_dependency_license_texts.py` and the source-bound TeX/font
+notice tree with `tools/collect_tex_license_notices.py`. The Rust tools audit
+the deduplicated union of `texpdf-stata` and the embedded `texpdf-helper`.
 
 Public packaging requires `licenses/generated/STATUS.json` to report:
 
@@ -51,6 +54,7 @@ Public packaging requires `licenses/generated/STATUS.json` to report:
 - zero resources lacking license metadata;
 - zero undeclared Rust dependency licenses;
 - zero missing Rust or native notice files;
+- a complete exact-resource TeX/font notice tree;
 - successful return codes for every audit phase.
 
 Review ambiguous or standalone resources manually. Reviewed overrides must cite
@@ -70,10 +74,11 @@ x86_64-unknown-linux-gnu
 For each target:
 
 - prepare the exact locked curated resource ZIP;
-- build the release plugin with the documented native-linking policy;
+- build the target helper first and embed it in the release plugin with the
+  documented native-linking policy;
 - verify `pginit` and `stata_call` exports;
 - inspect dynamic dependencies;
-- record plugin bytes, SHA-256, target triple, and build source;
+- record plugin and helper bytes, SHA-256 values, target triple, and build source;
 - assemble the deterministic Stata package;
 - run a local `net install` from that package tree;
 - compile the release corpus offline;
@@ -93,8 +98,8 @@ At minimum:
 - Unicode, spaces, relative-input, PDF, and PNG tests;
 - BibTeX/`natbib` and the academic package corpus;
 - clean local `net install` test;
-- 1,000 or more in-process compile calls with periodic injected errors;
-- RSS/peak-memory sampling and review;
+- 1,000 or more installed-plugin compile calls with periodic injected errors;
+- separate long-lived Stata-parent and transient process-tree RSS/peak sampling;
 - shell-escape denial;
 - offline/no-system-TeX verification;
 - exact embedded-ZIP integrity verification.
@@ -113,6 +118,7 @@ with:
 ```sh
 python3 tools/package_release.py \
   --plugin path/to/_texpdf_plugin.plugin \
+  --embedded-helper path/to/texpdf-helper \
   --bundle-info path/to/bundle-info.json \
   --output-dir dist/texpdf-TARGET \
   --zip dist/texpdf-TARGET.zip \

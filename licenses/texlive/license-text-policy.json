@@ -1,0 +1,58 @@
+{
+  "expressions": {
+    "apache-2.0": [
+      "licenses/canonical/Apache-2.0.txt"
+    ],
+    "cc0-1.0": [
+      "licenses/texlive/CC0-1.0.txt"
+    ],
+    "gfl": [
+      "licenses/texlive/GUST-FONT-LICENSE.txt",
+      "licenses/texlive/LPPL-1.3c.txt"
+    ],
+    "gpl": [
+      "licenses/texlive/GPL-2.0.txt"
+    ],
+    "gpl-2.0-only": [
+      "licenses/texlive/GPL-2.0.txt"
+    ],
+    "knuth": [
+      "licenses/texlive/RESOURCE-SPECIFIC-NOTICES.md"
+    ],
+    "licenseref-amsfonts-unchanged-or-renamed": [
+      "licenses/texlive/RESOURCE-SPECIFIC-NOTICES.md"
+    ],
+    "licenseref-texlive-generated-map": [
+      "licenses/texlive/RESOURCE-SPECIFIC-NOTICES.md"
+    ],
+    "lppl": [
+      "licenses/texlive/LPPL-1.3c.txt"
+    ],
+    "lppl1.3": [
+      "licenses/texlive/LPPL-1.3c.txt"
+    ],
+    "lppl1.3c": [
+      "licenses/texlive/LPPL-1.3c.txt"
+    ],
+    "mit": [
+      "licenses/canonical/MIT.txt"
+    ],
+    "ofl": [
+      "licenses/texlive/OFL-AMSFonts.txt"
+    ],
+    "other-free": [
+      "licenses/texlive/RESOURCE-SPECIFIC-NOTICES.md"
+    ],
+    "pd": [
+      "licenses/texlive/RESOURCE-SPECIFIC-NOTICES.md"
+    ],
+    "unicode-dfs-2016": [
+      "licenses/texlive/Unicode-DFS-2016.txt"
+    ],
+    "x11": [
+      "licenses/texlive/RESOURCE-SPECIFIC-NOTICES.md"
+    ]
+  },
+  "policy": "Every license expression in the exact TeX resource inventory must map to at least one committed full license or resource-specific notice. The generated manifest copies and hashes these files; unknown expressions fail closed.",
+  "schema_version": 1
+}

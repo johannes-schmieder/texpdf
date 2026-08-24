@@ -3,10 +3,10 @@
 Support is evidence-based. A package is not supported merely because a file
 with that name happens to be present in the development bundle.
 
-## Qualified in the comprehensive checkpoint
+## Qualified corpus
 
-Source `5d85840783ad4406a1606e5b3af09a06cca2f657` compiled a real
-document in licensed Stata using:
+The exact source currently qualified by licensed Stata is recorded in
+`../STATUS.md` and `../release/targets.json`. The corpus exercises:
 
 | Capability | Qualified material |
 |---|---|
@@ -19,8 +19,8 @@ document in licensed Stata using:
 | Paths | spaces and Unicode |
 | Fonts | deterministic defaults required by the fixture |
 
-These are the minimum compatibility guarantees of the current macOS Apple
-Silicon development checkpoint.
+These are the minimum compatibility guarantees of the current qualified
+macOS development checkpoint. The private RC's language policy is English-only.
 
 ## Candidate academic v1 packages
 

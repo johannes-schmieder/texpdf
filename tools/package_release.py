@@ -32,6 +32,7 @@ PUBLIC_LICENSE_FILES = (
     "dependencies.json",
     "dependencies.md",
     "license-texts.json",
+    "tex-notices.json",
     "license-sources.lock.json",
 )
 
@@ -105,6 +106,8 @@ def license_status_complete(status: dict[str, object] | None) -> bool:
         and int(status.get("dependency_undeclared_count", -1)) == 0
         and int(status.get("missing_rust_notice_files", -1)) == 0
         and int(status.get("missing_native_notice_files", -1)) == 0
+        and status.get("tex_notice_complete") is True
+        and int(status.get("tex_notice_file_count", 0)) > 0
     )
 
 
@@ -147,6 +150,11 @@ def append_pkg_files(pkg_path: Path, names: list[str]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--plugin", type=Path, required=True)
+    parser.add_argument(
+        "--embedded-helper",
+        type=Path,
+        help="target helper whose exact bytes were embedded in the plugin",
+    )
     parser.add_argument("--bundle-info", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--zip", dest="zip_path", type=Path, required=True)
@@ -166,6 +174,10 @@ def main() -> int:
             raise ValueError("unsupported bundle-info schema")
         license_status = read_license_status()
         license_complete = license_status_complete(license_status)
+        if args.public_release and args.embedded_helper is None:
+            raise ValueError("public-release mode requires --embedded-helper provenance")
+        if args.embedded_helper is not None and not args.embedded_helper.is_file():
+            raise FileNotFoundError(args.embedded_helper)
         if args.public_release and not license_complete:
             raise ValueError(
                 "public-release mode requires licenses/generated/STATUS.json "
@@ -206,6 +218,16 @@ def main() -> int:
             "bundle_file_count": bundle_info["file_count"],
             "plugin_sha256": sha256_file(args.plugin),
             "plugin_size_bytes": args.plugin.stat().st_size,
+            "embedded_helper_sha256": (
+                sha256_file(args.embedded_helper)
+                if args.embedded_helper is not None
+                else None
+            ),
+            "embedded_helper_size_bytes": (
+                args.embedded_helper.stat().st_size
+                if args.embedded_helper is not None
+                else None
+            ),
             "standalone": True,
             "runtime_network_required": False,
             "system_tex_required": False,

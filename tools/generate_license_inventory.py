@@ -203,10 +203,17 @@ def load_overrides(path: Path | None) -> list[dict[str, str]]:
     for number, item in enumerate(values, 1):
         if not isinstance(item, dict):
             raise InventoryError(f"override {number} is not a table")
-        required = (item.get("pattern"), item.get("package"), item.get("license"))
+        required = (
+            item.get("pattern"),
+            item.get("package"),
+            item.get("license"),
+            item.get("reason"),
+            item.get("evidence"),
+        )
         if not all(isinstance(value, str) and value for value in required):
             raise InventoryError(
-                f"override {number} requires pattern, package, and license"
+                f"override {number} requires pattern, package, license, reason, "
+                "and evidence"
             )
         result.append(
             {
@@ -214,10 +221,88 @@ def load_overrides(path: Path | None) -> list[dict[str, str]]:
                 "origin": str(item.get("origin", "")),
                 "package": str(item["package"]),
                 "license": str(item["license"]).lower(),
-                "reason": str(item.get("reason", "")),
+                "reason": str(item["reason"]),
+                "evidence": str(item["evidence"]),
             }
         )
     return result
+
+
+def load_evidence(path: Path | None) -> dict[str, dict[str, Any]]:
+    if path is None or not path.is_file():
+        raise InventoryError("license override evidence file is required")
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise InventoryError(f"cannot read license evidence: {error}") from error
+    if not isinstance(document, dict) or document.get("schema_version") != 1:
+        raise InventoryError("license evidence must use schema_version 1")
+    values = document.get("evidence")
+    if not isinstance(values, dict) or not values:
+        raise InventoryError("license evidence has no evidence records")
+
+    evidence: dict[str, dict[str, Any]] = {}
+    for identifier, item in values.items():
+        if not isinstance(identifier, str) or not identifier:
+            raise InventoryError("license evidence identifier must be a string")
+        if not isinstance(item, dict):
+            raise InventoryError(f"license evidence {identifier!r} is not an object")
+        required_strings = ("license", "source_url", "rationale")
+        if not all(isinstance(item.get(key), str) and item[key] for key in required_strings):
+            raise InventoryError(
+                f"license evidence {identifier!r} requires license, source_url, "
+                "and rationale"
+            )
+        patterns = item.get("resource_patterns")
+        if not isinstance(patterns, list) or not patterns or not all(
+            isinstance(value, str) and value for value in patterns
+        ):
+            raise InventoryError(
+                f"license evidence {identifier!r} requires resource_patterns"
+            )
+        pinned_version = item.get("pinned_version")
+        source_sha256 = item.get("source_sha256")
+        if not (
+            isinstance(pinned_version, str)
+            and pinned_version
+            or isinstance(source_sha256, str)
+            and len(source_sha256) == 64
+            and all(character in "0123456789abcdef" for character in source_sha256.lower())
+        ):
+            raise InventoryError(
+                f"license evidence {identifier!r} requires pinned_version or "
+                "source_sha256"
+            )
+        evidence[identifier] = item
+    return evidence
+
+
+def validate_overrides(
+    overrides: list[dict[str, str]], evidence: dict[str, dict[str, Any]]
+) -> None:
+    for number, override in enumerate(overrides, 1):
+        identifier = override["evidence"]
+        item = evidence.get(identifier)
+        if item is None:
+            raise InventoryError(
+                f"override {number} references missing evidence {identifier!r}"
+            )
+        if str(item["license"]).lower() != override["license"]:
+            raise InventoryError(
+                f"override {number} license does not match evidence {identifier!r}"
+            )
+        patterns = item["resource_patterns"]
+        if override["pattern"] not in patterns:
+            raise InventoryError(
+                f"override {number} pattern is not authorized by evidence "
+                f"{identifier!r}"
+            )
+        origins = item.get("origins", [])
+        if origins and override["origin"] not in origins:
+            raise InventoryError(
+                f"override {number} origin is not authorized by evidence "
+                f"{identifier!r}"
+            )
 
 
 def matching_override(
@@ -264,7 +349,9 @@ def build_inventory(
     resources: list[dict[str, str]],
     packages: dict[str, Package],
     overrides: list[dict[str, str]],
+    evidence: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    evidence = evidence or {}
     exact: dict[str, set[str]] = defaultdict(set)
     basename: dict[str, set[str]] = defaultdict(set)
     for package in packages.values():
@@ -308,12 +395,15 @@ def build_inventory(
             record["selection_reason"] = selection_reason
             record["selected_candidates"] = sorted(candidates)
         if override is not None:
+            evidence_record = evidence.get(override["evidence"], {})
             record.update(
                 {
                     "status": "mapped",
                     "package": override["package"],
                     "license": override["license"],
                     "override_reason": override["reason"],
+                    "evidence_id": override["evidence"],
+                    "evidence": evidence_record,
                 }
             )
         elif len(candidates) == 1:
@@ -400,6 +490,9 @@ def main() -> int:
     parser.add_argument("--tlpdb", type=Path, required=True)
     parser.add_argument("--overrides", type=Path)
     parser.add_argument(
+        "--evidence", type=Path, default=Path("bundle/license-evidence.json")
+    )
+    parser.add_argument(
         "--output", type=Path, default=Path("licenses/generated/tex-resources.json")
     )
     parser.add_argument(
@@ -410,10 +503,14 @@ def main() -> int:
 
     try:
         manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+        overrides = load_overrides(args.overrides)
+        evidence = load_evidence(args.evidence)
+        validate_overrides(overrides, evidence)
         inventory = build_inventory(
             load_resources(manifest),
             parse_tlpdb(args.tlpdb),
-            load_overrides(args.overrides),
+            overrides,
+            evidence,
         )
     except (OSError, ValueError, KeyError, json.JSONDecodeError, InventoryError) as error:
         print(f"TEXPDF_LICENSE_INVENTORY_ERROR {error}", file=sys.stderr)

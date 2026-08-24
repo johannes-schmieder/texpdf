@@ -15,8 +15,10 @@ from typing import Any
 from cargo_release_graph import (
     CargoGraphError,
     cargo_metadata,
-    release_packages,
+    release_packages_for_roots,
 )
+
+DEFAULT_RELEASE_ROOTS = ("texpdf-stata", "texpdf-helper")
 
 NOTICE_PREFIXES = (
     "LICENSE",
@@ -36,6 +38,10 @@ NATIVE_PORTS = (
     "libpng",
     "zlib",
 )
+CANONICAL_SPDX_TEXTS = {
+    "Apache-2.0": Path("licenses/canonical/Apache-2.0.txt"),
+    "MIT": Path("licenses/canonical/MIT.txt"),
+}
 
 
 def sha256(path: Path) -> str:
@@ -84,14 +90,48 @@ def copy_notices(source_root: Path, destination: Path) -> list[dict[str, object]
     return records
 
 
+def canonical_spdx_components(expression: object) -> list[str]:
+    """Accept only simple standard expressions covered by committed texts."""
+
+    if not isinstance(expression, str) or not expression:
+        return []
+    components = [value.strip() for value in expression.split(" OR ")]
+    if not components or any(value not in CANONICAL_SPDX_TEXTS for value in components):
+        return []
+    return sorted(set(components))
+
+
+def copy_canonical_spdx_texts(
+    expression: object, destination: Path
+) -> list[dict[str, object]]:
+    records: list[dict[str, object]] = []
+    for component in canonical_spdx_components(expression):
+        source = CANONICAL_SPDX_TEXTS[component]
+        if not source.is_file():
+            raise OSError(f"canonical SPDX text is missing: {source}")
+        destination.mkdir(parents=True, exist_ok=True)
+        target = destination / source.name
+        shutil.copyfile(source, target)
+        records.append(
+            {
+                "source": str(source),
+                "file": str(target),
+                "sha256": sha256(target),
+                "size_bytes": target.stat().st_size,
+                "spdx_component": component,
+            }
+        )
+    return records
+
+
 def collect_rust(
     output_root: Path,
     metadata: dict[str, Any],
-    package_name: str,
+    package_names: list[str],
 ) -> list[dict[str, object]]:
     workspace_root = Path(metadata["workspace_root"])
     records: list[dict[str, object]] = []
-    for package in release_packages(metadata, package_name):
+    for package in release_packages_for_roots(metadata, package_names):
         manifest = Path(package["manifest_path"])
         package_root = manifest.parent
         destination = output_root / "rust" / safe_component(
@@ -121,6 +161,10 @@ def collect_rust(
         if not notices and package.get("source") is None:
             notices = copy_notices(workspace_root, destination)
             notice_origin = "workspace_root"
+        if not notices:
+            notices = copy_canonical_spdx_texts(package.get("license"), destination)
+            if notices:
+                notice_origin = "canonical_spdx_text"
         records.append(
             {
                 "name": package["name"],
@@ -184,7 +228,12 @@ def collect_native(
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cargo", default="cargo")
-    parser.add_argument("--package", default="texpdf-stata")
+    parser.add_argument(
+        "--package",
+        action="append",
+        dest="packages",
+        help="release root to audit; repeat for multiple installed binaries",
+    )
     parser.add_argument(
         "--target",
         default=os.environ.get("TEXPDF_LICENSE_TARGET", "aarch64-apple-darwin"),
@@ -208,7 +257,8 @@ def main() -> int:
     shutil.rmtree(args.output_root, ignore_errors=True)
     try:
         metadata = cargo_metadata(args.cargo, args.target)
-        rust = collect_rust(args.output_root, metadata, args.package)
+        package_names = args.packages or list(DEFAULT_RELEASE_ROOTS)
+        rust = collect_rust(args.output_root, metadata, package_names)
         native = collect_native(args.output_root, vcpkg_root, triplet)
     except (OSError, CargoGraphError, KeyError, json.JSONDecodeError) as error:
         print(f"TEXPDF_LICENSE_TEXT_ERROR {error}", file=sys.stderr)
@@ -232,8 +282,8 @@ def main() -> int:
         record["name"] for record in native if not record["notice_files"]
     ]
     payload = {
-        "schema_version": 3,
-        "release_root": args.package,
+        "schema_version": 4,
+        "release_roots": package_names,
         "release_target": args.target,
         "rust_packages": rust,
         "native_libraries": native,
@@ -241,6 +291,16 @@ def main() -> int:
         "missing_rust_notice_records": missing_rust_records,
         "missing_native_notice_files": missing_native,
         "complete": not missing_rust and not missing_native,
+        "canonical_spdx_policy": {
+            "allowed_expressions": sorted(CANONICAL_SPDX_TEXTS),
+            "rule": (
+                "When a published crate declares only MIT, Apache-2.0, or an OR "
+                "combination of those identifiers but ships no notice file, the "
+                "release includes committed canonical SPDX texts and retains the "
+                "crate name, version, declared expression, source, and repository "
+                "in this manifest. Other expressions remain fail-closed."
+            ),
+        },
     }
     args.manifest.parent.mkdir(parents=True, exist_ok=True)
     args.manifest.write_text(
@@ -250,7 +310,7 @@ def main() -> int:
         "TEXPDF_LICENSE_TEXTS_READY "
         f"rust={len(rust)} native={len(native)} "
         f"missing_rust={len(missing_rust)} missing_native={len(missing_native)} "
-        f"target={args.target} root={args.package}"
+        f"target={args.target} roots={','.join(package_names)}"
     )
     if missing_rust or (args.require_native and missing_native):
         return 1

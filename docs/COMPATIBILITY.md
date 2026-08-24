@@ -18,6 +18,7 @@ The v1 compatibility target is common academic/econometric material:
 - PDF, PNG, and JPEG figures supported by the engine;
 - cross-references and hyperlinks;
 - BibTeX with natbib;
+- English-language hyphenation and standard English aliases;
 - deterministic bundled fonts required by the supported fixtures.
 
 A package is advertised as supported only after a redistributable fixture using
@@ -37,6 +38,7 @@ The initial public tier excludes:
   external program during compilation;
 - arbitrary system fonts that are not embedded in the release bundle;
 - remote package retrieval.
+- broad language and hyphenation collections.
 
 Some excluded documents may happen to compile with a development bundle. That
 does not make the package part of the supported contract.

@@ -24,7 +24,7 @@ with the recorded code.
 - Large logs are not stored in Stata macros.
 - A Rust panic is converted into `r(710)` if unwinding reaches the Rust ABI
   guard. Native aborts or signals cannot be converted and remain part of the
-  in-process safety gate.
+  helper-backed installed-plugin safety gate.
 
 ## Output guarantees
 

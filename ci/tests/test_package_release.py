@@ -24,6 +24,7 @@ GENERATED_LICENSE_FILES = (
     "dependencies.json",
     "dependencies.md",
     "license-texts.json",
+    "tex-notices.json",
     "license-sources.lock.json",
 )
 
@@ -52,6 +53,8 @@ class PackageReleaseTests(unittest.TestCase):
         write(root / "licenses/THIRD_PARTY_NOTICES.md", "Notice index\n")
         plugin = root / "plugin.bin"
         plugin.write_bytes(b"plugin fixture")
+        helper = root / "helper.bin"
+        helper.write_bytes(b"helper fixture")
         bundle_info = root / "bundle-info.json"
         write_json(
             bundle_info,
@@ -79,6 +82,8 @@ class PackageReleaseTests(unittest.TestCase):
             str(SCRIPT),
             "--plugin",
             str(plugin),
+            "--embedded-helper",
+            str(root / "helper.bin"),
             "--bundle-info",
             str(bundle_info),
             "--output-dir",
@@ -111,6 +116,7 @@ class PackageReleaseTests(unittest.TestCase):
             )
             self.assertFalse(build["public_release_mode"])
             self.assertFalse(build["release_license_complete"])
+            self.assertEqual(build["embedded_helper_size_bytes"], 14)
             self.assertTrue((root / "dist/package/THIRD_PARTY_NOTICES.md").is_file())
             with zipfile.ZipFile(root / "dist/package.zip") as archive:
                 self.assertIn("THIRD_PARTY_NOTICES.md", archive.namelist())
@@ -148,6 +154,8 @@ class PackageReleaseTests(unittest.TestCase):
                 "dependency_undeclared_count": 0,
                 "missing_rust_notice_files": 0,
                 "missing_native_notice_files": 0,
+                "tex_notice_complete": True,
+                "tex_notice_file_count": 1,
             }
             for name in GENERATED_LICENSE_FILES:
                 if name == "STATUS.json":
@@ -155,6 +163,7 @@ class PackageReleaseTests(unittest.TestCase):
                 else:
                     write(generated / name)
             write(generated / "texts/rust/example/LICENSE", "Example license\n")
+            write(generated / "texts/texlive/NOTICE", "TeX notice\n")
 
             result = self.command(root, plugin, bundle_info, public=True)
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -173,6 +182,7 @@ class PackageReleaseTests(unittest.TestCase):
                 names = set(archive.namelist())
             self.assertIn("LICENSES/STATUS.json", names)
             self.assertIn("LICENSES/texts/rust/example/LICENSE", names)
+            self.assertIn("LICENSES/texts/texlive/NOTICE", names)
 
 
 if __name__ == "__main__":

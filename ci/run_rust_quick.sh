@@ -178,6 +178,7 @@ PY
   if [[ "$rust_profile" == engine ]]; then
     /usr/bin/python3 tools/package_release.py \
       --plugin stata/_texpdf_plugin.plugin \
+      --embedded-helper "$TEXPDF_HELPER_PATH" \
       --bundle-info bundle/generated/bundle-info.json \
       --output-dir dist/texpdf-macos-arm64 \
       --zip dist/texpdf-macos-arm64.zip \

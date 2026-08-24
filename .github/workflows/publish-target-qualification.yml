@@ -65,7 +65,9 @@ jobs:
 
           receipt = find("receipt.json")
           plugin = find("plugin-manifest.json")
+          helper = find("helper-manifest.json")
           bundle = find("bundle-info.json")
+          package = find("package-manifest.json")
           required = {
               "tested_sha": source_sha,
               "status": "success",
@@ -85,6 +87,12 @@ jobs:
           plugin_size = plugin.get("size_bytes") or plugin.get("plugin_size_bytes")
           if not isinstance(plugin_size, int) or plugin_size <= 0:
               raise SystemExit("plugin manifest has no valid size")
+          helper_sha = helper.get("sha256")
+          helper_size = helper.get("size_bytes")
+          if not isinstance(helper_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", helper_sha):
+              raise SystemExit("helper manifest has no valid SHA-256")
+          if not isinstance(helper_size, int) or helper_size <= 0:
+              raise SystemExit("helper manifest has no valid size")
 
           targets_path = Path("release/targets.json")
           if targets_path.is_file():
@@ -96,6 +104,8 @@ jobs:
               "artifact": "_texpdf_plugin.plugin",
               "plugin_sha256": plugin_sha,
               "plugin_size_bytes": plugin_size,
+              "embedded_helper_sha256": helper_sha,
+              "embedded_helper_size_bytes": helper_size,
               "bundle_zip_sha256": bundle.get("zip_sha256"),
               "bundle_zip_size_bytes": bundle.get("zip_size_bytes"),
               "qualified_source_sha": source_sha,
@@ -106,6 +116,100 @@ jobs:
               "platform": receipt.get("platform"),
               "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run",
           }
+
+          qualification = {
+              "schema_version": 3,
+              "qualified_source_sha": source_sha,
+              "qualified_at": receipt.get("completed_at"),
+              "ci": {
+                  "profile": receipt.get("profile"),
+                  "run_id": int(os.environ["SOURCE_RUN_ID"]),
+                  "run_attempt": int(os.environ["SOURCE_RUN_ATTEMPT"]),
+                  "overall_status": receipt.get("status"),
+                  "stata_status": receipt.get("stata_status"),
+                  "rust_status": receipt.get("rust_status"),
+                  "rust_mode": receipt.get("rust_mode"),
+                  "required_markers": [
+                      item.get("marker")
+                      for item in receipt.get("required_log_markers", [])
+                      if item.get("present") is True
+                  ],
+                  "receipt": f".ci/stata/results/{source_sha}.json",
+              },
+              "platform": {
+                  "os": "macOS",
+                  "architecture": "Apple Silicon",
+                  "rust_target": "aarch64-apple-darwin",
+                  "stata_version": receipt.get("stata_version"),
+                  "stata_edition": receipt.get("stata_edition"),
+                  "stata_bundle_version": receipt.get("stata_bundle_version"),
+              },
+              "engine": {"name": "tectonic", "version": "0.17.0"},
+              "bundle": {
+                  "name": bundle.get("bundle_name"),
+                  "version": bundle.get("bundle_version"),
+                  "transform_version": bundle.get("transform_version"),
+                  "file_count": bundle.get("file_count"),
+                  "zip_size_bytes": bundle.get("zip_size_bytes"),
+                  "uncompressed_resource_bytes": bundle.get("uncompressed_resource_bytes"),
+                  "zip_sha256": bundle.get("zip_sha256"),
+                  "content_digest": bundle.get("tectonic_bundle_digest"),
+                  "source_sha256": bundle.get("source_sha256"),
+                  "index_sha256": bundle.get("index_sha256"),
+                  "resource_policy_sha256": bundle.get("resource_policy_sha256"),
+                  "excluded_resource_count": bundle.get("excluded_resource_count"),
+                  "selection_manifest": "bundle/curated-manifest.json",
+              },
+              "helper": {
+                  "size_bytes": helper_size,
+                  "sha256": helper_sha,
+                  "materialization": "verified hash-addressed private executable",
+              },
+              "plugin": {
+                  "size_bytes": plugin_size,
+                  "sha256": plugin_sha,
+                  "exports": plugin.get("exports", ["pginit", "stata_call"]),
+                  "dynamic_dependencies": plugin.get("dynamic_dependencies", []),
+                  "dynamic_dependency_policy": "macOS system libraries/frameworks only",
+              },
+              "package": {
+                  "zip_size_bytes": package.get("package_zip_size_bytes"),
+                  "zip_sha256": package.get("package_zip_sha256"),
+                  "net_install_tested": True,
+                  "public_release": package.get("public_release_mode", False),
+              },
+              "tests": {
+                  "academic_package_corpus": True,
+                  "bibtex_natbib": True,
+                  "pdf_figures": True,
+                  "png_figures": True,
+                  "relative_inputs": True,
+                  "spaces_in_paths": True,
+                  "unicode_paths": True,
+                  "overwrite_protection": True,
+                  "failed_compile_recovery": True,
+                  "repeated_plugin_compiles": 100,
+                  "system_tex_required": False,
+                  "runtime_network_provider": False,
+                  "shell_escape": False,
+              },
+              "authoritative_records": {
+                  "platform_support": "release/targets.json",
+                  "artifact_summary": "docs/generated/CURRENT_ARTIFACT.md",
+                  "release_readiness": "release/READINESS.json",
+                  "license_status": "licenses/generated/STATUS.json",
+              },
+              "qualification_boundary": (
+                  "This record qualifies the exact macOS Apple Silicon plugin, "
+                  "embedded helper, curated bundle, and development package under "
+                  "licensed Stata/MP. Other architectures require separate runtime "
+                  "qualification; public redistribution requires a complete audit."
+              ),
+          }
+          Path("bundle/QUALIFICATION.json").write_text(
+              json.dumps(qualification, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
           for target in (
               "x86_64-apple-darwin",
               "x86_64-pc-windows-msvc",
@@ -146,7 +250,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add release/targets.json
+          git add release/targets.json bundle/QUALIFICATION.json
           if git diff --cached --quiet; then
             exit 0
           fi

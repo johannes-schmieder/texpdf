@@ -12,9 +12,9 @@ must be retained with binary releases.
 
 ## Native libraries
 
-The standalone plugin incorporates the following native libraries. Their
-upstream copyright notices and complete license texts must be copied into the
-release notice directory by the release build:
+The embedded compiler helper incorporates the following native libraries. The
+release audit copies their upstream copyright and license texts into the exact
+package notice directory:
 
 | Component | License family |
 |---|---|
@@ -28,16 +28,20 @@ release notice directory by the release build:
 
 ## Rust crates
 
-The exact Rust dependency graph is defined by `Cargo.lock`. Run:
+The exact Rust dependency graphs are defined by `Cargo.lock`. The audit takes
+the deduplicated union rooted at both `texpdf-stata` and `texpdf-helper`; the
+helper is embedded at build time and is not a Cargo dependency of the bridge.
+Run:
 
 ```sh
 python3 tools/generate_dependency_inventory.py --require-declared
 ```
 
-The resulting `licenses/generated/dependencies.json` and `.md` inventory every
-package version and declared license. The release process must additionally
-copy all required license texts; declared SPDX expressions alone are not the
-full notices.
+The resulting inventories record every package version and declared license.
+Upstream notice files are copied when shipped. If a crate declares only MIT or
+Apache-2.0 (or their OR combination) and ships no notice, the explicit
+canonical-SPDX policy copies the standard text and retains complete per-crate
+attribution. Other missing or custom expressions fail closed.
 
 ## Embedded TeX/LaTeX resources and fonts
 
@@ -45,16 +49,18 @@ The embedded ZIP contains a curated subset of a pinned Tectonic/TeX Live
 resource bundle. Each package and font retains its upstream license. There is
 no blanket `texpdf` license for those resources.
 
-The release is not license-complete until
-`licenses/generated/tex-resources.json`:
+The release is license-complete only when the exact-source audit confirms that:
 
 - identifies every embedded logical resource;
 - maps each resource to an upstream package/font or an individually reviewed
   standalone license;
 - reports no unresolved resources;
 - records the exact embedded ZIP SHA-256;
-- is marked `license_complete: true`;
-- is accompanied by all required notices and source/modification information.
+- `tex-notices.json` binds every resource SHA to a committed full license or
+  resource-specific notice;
+- `license-texts.json` covers the union of both Rust binary graphs and every
+  linked native library;
+- `STATUS.json` reports `release_license_complete: true` with every stage zero.
 
-Until then, generated plugin artifacts are development qualification artifacts,
-not public redistributable releases.
+Private-development artifacts remain non-public regardless of audit status;
+public publication is a separate fail-closed release gate.

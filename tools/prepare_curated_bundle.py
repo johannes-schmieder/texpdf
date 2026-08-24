@@ -7,6 +7,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import gzip
 import hashlib
+import fnmatch
 import json
 import os
 from pathlib import Path
@@ -268,6 +269,65 @@ def atomic_json(path: Path, payload: object) -> None:
     os.replace(temporary, path)
 
 
+def load_resource_policy(path: Path) -> dict[str, object]:
+    try:
+        policy = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise BundleError(f"cannot read resource policy {path}: {error}") from error
+    if not isinstance(policy, dict) or policy.get("schema_version") != 1:
+        raise BundleError("resource policy must be a schema-version-1 JSON object")
+    exclusions = policy.get("exclude")
+    replacements = policy.get("replacements")
+    if not isinstance(exclusions, list) or not all(
+        isinstance(value, str) and value for value in exclusions
+    ):
+        raise BundleError("resource policy exclude must be a list of patterns")
+    if not isinstance(replacements, dict):
+        raise BundleError("resource policy replacements must be an object")
+    for name, item in replacements.items():
+        if not isinstance(name, str) or not isinstance(item, dict):
+            raise BundleError("resource policy replacement is malformed")
+        required = (item.get("source"), item.get("origin"), item.get("license"))
+        if not all(isinstance(value, str) and value for value in required):
+            raise BundleError(
+                f"resource policy replacement {name!r} needs source, origin, and license"
+            )
+    return policy
+
+
+def policy_excludes(name: str, policy: dict[str, object]) -> bool:
+    return any(
+        fnmatch.fnmatchcase(name, pattern)
+        for pattern in policy["exclude"]  # type: ignore[index]
+    )
+
+
+def replacement_resources(
+    selected_names: set[str], policy: dict[str, object], repository_root: Path
+) -> dict[str, tuple[bytes, dict[str, str]]]:
+    result: dict[str, tuple[bytes, dict[str, str]]] = {}
+    replacements = policy["replacements"]
+    assert isinstance(replacements, dict)
+    for name, raw in replacements.items():
+        if name not in selected_names:
+            continue
+        assert isinstance(raw, dict)
+        source = (repository_root / str(raw["source"])).resolve()
+        try:
+            source.relative_to(repository_root)
+        except ValueError as error:
+            raise BundleError(f"replacement source escapes repository: {source}") from error
+        if not source.is_file():
+            raise BundleError(f"replacement source is absent: {source}")
+        metadata = {
+            "source": str(raw["source"]),
+            "origin": str(raw["origin"]),
+            "license": str(raw["license"]),
+        }
+        result[name] = (source.read_bytes(), metadata)
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     source = parser.add_mutually_exclusive_group(required=True)
@@ -289,11 +349,18 @@ def main() -> int:
         default=Path(os.environ.get("TEXPDF_BUNDLE_CACHE", tempfile.gettempdir()))
         / "texpdf-curated-bundle-cache",
     )
+    parser.add_argument(
+        "--resource-policy",
+        type=Path,
+        default=Path("bundle/resource-policy.json"),
+    )
     parser.add_argument("--workers", type=int, default=4)
     args = parser.parse_args()
 
     try:
         lock = parse_lock(args.lock)
+        repository_root = Path.cwd().resolve()
+        policy = load_resource_policy(args.resource_policy)
         cache = args.cache_dir.expanduser().resolve()
         resource_dir = (
             args.resource_dir.expanduser().resolve()
@@ -321,6 +388,9 @@ def main() -> int:
         index = parse_index(index_path)
 
         expected: dict[str, str | None] = {}
+        selected_names: set[str] = set()
+        manifest_generated: dict[str, dict[str, object]] = {}
+        excluded_names: list[str] = []
         missing_from_index: list[str] = []
         if args.trace is not None:
             trace_names = sorted(
@@ -333,24 +403,65 @@ def main() -> int:
             for name in trace_names:
                 if name == "SHA256SUM":
                     continue
+                if policy_excludes(name, policy):
+                    excluded_names.append(name)
+                    continue
                 if name in index:
                     expected[name] = None
+                    selected_names.add(name)
                 else:
                     missing_from_index.append(name)
         else:
             manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
             if manifest.get("index_sha256") != index_sha:
                 raise BundleError("selection manifest was generated from a different index")
+            if manifest.get("resource_policy_sha256") != sha256_file(args.resource_policy):
+                raise BundleError("selection manifest was generated from a different resource policy")
+            recorded_exclusions = manifest.get("excluded_resources", [])
+            if not isinstance(recorded_exclusions, list) or not all(
+                isinstance(name, str) and policy_excludes(name, policy)
+                for name in recorded_exclusions
+            ):
+                raise BundleError("selection manifest has invalid policy exclusions")
+            excluded_names.extend(recorded_exclusions)
             for item in manifest.get("resources", []):
                 name = item["name"]
+                if policy_excludes(name, policy):
+                    raise BundleError(f"manifest contains policy-excluded resource: {name}")
+                selected_names.add(name)
+                if item.get("generated") is True:
+                    manifest_generated[name] = item
+                    continue
                 if name not in index:
                     raise BundleError(f"manifest resource is absent from index: {name}")
                 if list(index[name]) != [item["offset"], item["length"]]:
                     raise BundleError(f"manifest range changed for {name}")
                 expected[name] = item["sha256"]
 
-        if not expected:
+        if not selected_names:
             raise BundleError("resource selection is empty")
+
+        replacements = replacement_resources(selected_names, policy, repository_root)
+        if args.manifest is not None and set(manifest_generated) != set(replacements):
+            raise BundleError("manifest generated-resource set differs from resource policy")
+        for name, (data, metadata) in replacements.items():
+            recorded = manifest_generated.get(name)
+            if recorded is None:
+                continue
+            expected_metadata: dict[str, object] = {
+                "source": metadata["source"],
+                "origin": metadata["origin"],
+                "license": metadata["license"],
+                "length": len(data),
+                "sha256": sha256_bytes(data),
+            }
+            for key, expected_value in expected_metadata.items():
+                if recorded.get(key) != expected_value:
+                    raise BundleError(
+                        f"generated manifest metadata changed for {name}: {key}"
+                    )
+        for name in replacements:
+            expected.pop(name, None)
 
         source_sha = lock.get("source_sha256", "")
         if source_sha and not SHA256_RE.fullmatch(source_sha):
@@ -396,6 +507,9 @@ def main() -> int:
                 name, data, digest = future.result()
                 resources[name] = data
                 resource_hashes[name] = digest
+        for name, (data, _) in replacements.items():
+            resources[name] = data
+            resource_hashes[name] = sha256_bytes(data)
 
         digest_computer = hashlib.sha256()
         for name in sorted(resources):
@@ -430,24 +544,36 @@ def main() -> int:
             "source_sha256": source_sha,
             "index_sha256": index_sha,
             "missing_trace_names": missing_from_index,
-            "resources": [
-                {
-                    "name": name,
-                    "offset": index[name][0],
-                    "length": index[name][1],
-                    "sha256": resource_hashes[name],
-                }
-                for name in sorted(resources)
-            ],
+            "resource_policy_sha256": sha256_file(args.resource_policy),
+            "excluded_resources": sorted(excluded_names),
+            "resources": [],
         }
-        if args.write_manifest is not None:
-            atomic_json(args.write_manifest, manifest_payload)
-
+        for name in sorted(resources):
+            if name in replacements:
+                _, metadata = replacements[name]
+                manifest_payload["resources"].append(
+                    {
+                        "name": name,
+                        "generated": True,
+                        "length": len(resources[name]),
+                        "sha256": resource_hashes[name],
+                        **metadata,
+                    }
+                )
+            else:
+                manifest_payload["resources"].append(
+                    {
+                        "name": name,
+                        "offset": index[name][0],
+                        "length": index[name][1],
+                        "sha256": resource_hashes[name],
+                    }
+                )
         info = {
             "schema_version": 1,
             "bundle_name": "texpdf-academic-v1",
             "bundle_version": "33-academic-v1",
-            "transform_version": "range-closure-v1",
+            "transform_version": "range-closure-v2-english-only",
             "source_sha256": source_sha,
             "index_sha256": index_sha,
             "tectonic_bundle_digest": bundle_digest,
@@ -457,7 +583,19 @@ def main() -> int:
             "uncompressed_resource_bytes": sum(len(value) for value in resources.values())
             + len(digest_bytes),
             "missing_trace_names": missing_from_index,
+            "excluded_resource_count": len(excluded_names),
+            "resource_policy_sha256": sha256_file(args.resource_policy),
         }
+        manifest_payload.update(
+            {
+                "file_count": len(resources),
+                "bundle_file_count": info["file_count"],
+                "bundle_zip_sha256": info["zip_sha256"],
+                "bundle_content_digest": info["tectonic_bundle_digest"],
+            }
+        )
+        if args.write_manifest is not None:
+            atomic_json(args.write_manifest, manifest_payload)
         atomic_json(args.info, info)
         print(
             "TEXPDF_CURATED_BUNDLE_READY "

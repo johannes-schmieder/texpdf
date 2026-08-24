@@ -1,0 +1,7 @@
+% texpdf private-RC language configuration.
+% Project-owned source licensed under the repository MIT license.
+% The declared compatibility tier is English-language typesetting only.
+english hyphen.tex
+=usenglish
+=USenglish
+=american

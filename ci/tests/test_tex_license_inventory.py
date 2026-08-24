@@ -6,6 +6,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 
@@ -68,6 +69,77 @@ class TexLicenseInventoryTests(unittest.TestCase):
         selected, reason = module.prefer_stable_candidate(candidates)
         self.assertEqual(selected, candidates)
         self.assertIsNone(reason)
+
+    def test_override_requires_reason_and_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "overrides.toml"
+            path.write_text(
+                """[[override]]
+pattern = "generated.dat"
+package = "project"
+license = "mit"
+reason = "Project-generated input."
+""",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(module.InventoryError, "requires pattern"):
+                module.load_overrides(path)
+
+    def test_override_evidence_is_source_bound(self) -> None:
+        overrides = [
+            {
+                "pattern": "generated.dat",
+                "origin": "project-generated",
+                "package": "project",
+                "license": "mit",
+                "reason": "Project-generated input.",
+                "evidence": "generated-input",
+            }
+        ]
+        evidence = {
+            "generated-input": {
+                "license": "mit",
+                "source_url": "https://example.test/project/LICENSE",
+                "rationale": "The project creates this exact file.",
+                "resource_patterns": ["generated.dat"],
+                "origins": ["project-generated"],
+                "pinned_version": "schema 1",
+            }
+        }
+        module.validate_overrides(overrides, evidence)
+        inventory = module.build_inventory(
+            [{"name": "generated.dat", "origin": "project-generated"}],
+            {},
+            overrides,
+            evidence,
+        )
+        record = inventory["resources"][0]
+        self.assertEqual(record["status"], "mapped")
+        self.assertEqual(record["evidence_id"], "generated-input")
+        self.assertEqual(record["evidence"]["license"], "mit")
+
+    def test_override_rejects_unapproved_pattern(self) -> None:
+        overrides = [
+            {
+                "pattern": "different.dat",
+                "origin": "",
+                "package": "project",
+                "license": "mit",
+                "reason": "Reviewed.",
+                "evidence": "generated-input",
+            }
+        ]
+        evidence = {
+            "generated-input": {
+                "license": "mit",
+                "source_url": "https://example.test/project/LICENSE",
+                "rationale": "The project creates one exact file.",
+                "resource_patterns": ["generated.dat"],
+                "pinned_version": "schema 1",
+            }
+        }
+        with self.assertRaisesRegex(module.InventoryError, "not authorized"):
+            module.validate_overrides(overrides, evidence)
 
 
 if __name__ == "__main__":

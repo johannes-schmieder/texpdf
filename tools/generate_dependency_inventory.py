@@ -13,8 +13,10 @@ from typing import Any
 from cargo_release_graph import (
     CargoGraphError,
     cargo_metadata,
-    release_packages,
+    release_packages_for_roots,
 )
+
+DEFAULT_RELEASE_ROOTS = ("texpdf-stata", "texpdf-helper")
 
 NATIVE_DEPENDENCIES = [
     {
@@ -82,11 +84,12 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
     lines = [
         "# Generated release dependency inventory",
         "",
-        f"Release root: `{payload['release_root']}`  ",
+        f"Release roots: `{', '.join(payload['release_roots'])}`  ",
         f"Release target: `{payload['release_target']}`",
         "",
         "This inventory follows the normal/build dependency closure of the",
-        "released plugin. It excludes dev/test-only and unrelated workspace crates.",
+        "released plugin and embedded helper. It excludes dev/test-only and",
+        "unrelated workspace crates.",
         "It does not replace corresponding license texts or the TeX resource audit.",
         "",
         "## Rust packages",
@@ -124,7 +127,12 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cargo", default="cargo")
-    parser.add_argument("--package", default="texpdf-stata")
+    parser.add_argument(
+        "--package",
+        action="append",
+        dest="packages",
+        help="release root to audit; repeat for multiple installed binaries",
+    )
     parser.add_argument(
         "--target",
         default=os.environ.get("TEXPDF_LICENSE_TARGET", "aarch64-apple-darwin"),
@@ -140,7 +148,10 @@ def main() -> int:
 
     try:
         metadata = cargo_metadata(args.cargo, args.target)
-        packages = rust_inventory(release_packages(metadata, args.package))
+        package_names = args.packages or list(DEFAULT_RELEASE_ROOTS)
+        packages = rust_inventory(
+            release_packages_for_roots(metadata, package_names)
+        )
     except (OSError, CargoGraphError, json.JSONDecodeError) as error:
         print(f"TEXPDF_LICENSE_INVENTORY_ERROR {error}", file=sys.stderr)
         return 2
@@ -151,8 +162,8 @@ def main() -> int:
         if not item.get("license") and not item.get("license_file")
     ]
     payload = {
-        "schema_version": 2,
-        "release_root": args.package,
+        "schema_version": 3,
+        "release_roots": package_names,
         "release_target": args.target,
         "rust_packages": packages,
         "native_libraries": NATIVE_DEPENDENCIES,
@@ -163,7 +174,8 @@ def main() -> int:
     print(
         "TEXPDF_DEPENDENCY_INVENTORY_READY "
         f"rust_packages={len(packages)} native_libraries={len(NATIVE_DEPENDENCIES)} "
-        f"undeclared={len(undeclared)} target={args.target} root={args.package}"
+        f"undeclared={len(undeclared)} target={args.target} "
+        f"roots={','.join(package_names)}"
     )
     if args.require_declared and undeclared:
         print(

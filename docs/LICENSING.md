@@ -7,25 +7,27 @@ in the repository root.
 
 ## Tectonic and Rust dependencies
 
-Tectonic is MIT licensed. Its dependency graph contains packages under several
-permissive and weak-copyleft licenses. The release process must generate a
-locked dependency inventory with:
+Tectonic is MIT licensed. The installed plugin embeds a separately built helper,
+so the release graph is the deduplicated union rooted at `texpdf-stata` and
+`texpdf-helper`, not the bridge graph alone. The release process generates the
+locked inventory with:
 
 ```sh
 python3 tools/generate_dependency_inventory.py --require-declared
 ```
 
 The generated inventory records each package version and its declared SPDX
-license expression or license file. A release must also include the license
-texts required by those dependencies; the inventory by itself is not a
-substitute for notices.
+license expression or license file. Upstream notice files are copied when
+present. Crates that publish only standard MIT/Apache SPDX metadata use the
+committed canonical-text policy; other missing/custom expressions fail closed.
 
 ## Native libraries
 
-The standalone plugin statically incorporates native libraries used by
-Tectonic, including Fontconfig, FreeType, Graphite2, HarfBuzz, ICU, libpng, and
-zlib. Their licenses and notices must accompany every binary release. The build
-must not assume that static linking makes those obligations disappear.
+The helper embedded in the standalone plugin statically incorporates native
+libraries used by Tectonic, including Fontconfig, FreeType, Graphite2,
+HarfBuzz, ICU, libpng, and zlib. Their licenses and notices must accompany every
+binary release. The build must not assume that static linking makes those
+obligations disappear.
 
 ## Embedded TeX resources and fonts
 
@@ -40,10 +42,11 @@ The final release inventory must map every embedded logical path to either:
 1. a TeX Live package and its catalogue license metadata; or
 2. an explicitly reviewed standalone resource/font license.
 
-For every included package/font, the release must retain required notices and
-make source or modification information available where its license requires
-that. The generated resource manifest and the upstream source-bundle digests
-must be shipped alongside the binary checksums.
+Every reviewed override is tied to exact resource bytes and pinned evidence.
+The generated TeX notice tree binds all resource hashes to a committed full
+license or resource-specific notice and preserves AMSFonts Reserved Font Names.
+The resource attribution manifest and upstream source-bundle digests ship with
+the binary checksums.
 
 ## Release gate
 

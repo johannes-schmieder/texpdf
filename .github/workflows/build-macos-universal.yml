@@ -6,6 +6,12 @@ on:
     branches:
       - main
     paths:
+      - "Cargo.lock"
+      - "Cargo.toml"
+      - "bundle/**"
+      - "crates/**"
+      - "stata/**"
+      - "tools/prepare_native_deps*.sh"
       - "tools/build_macos_universal.sh"
       - ".github/workflows/build-macos-universal.yml"
 
@@ -128,6 +134,8 @@ jobs:
                   "universal_plugin_sha256": universal["sha256"],
                   "universal_plugin_size_bytes": universal["size_bytes"],
                   "universal_arm_slice_sha256": arm["sha256"],
+                  "embedded_helper_sha256": arm["embedded_helper"]["sha256"],
+                  "embedded_helper_size_bytes": arm["embedded_helper"]["size_bytes"],
                   "universal_arm_runtime_qualified": True,
               }
           )
@@ -140,6 +148,8 @@ jobs:
                   "build_source_sha": source_sha,
                   "plugin_sha256": intel["sha256"],
                   "plugin_size_bytes": intel["size_bytes"],
+                  "embedded_helper_sha256": intel["embedded_helper"]["sha256"],
+                  "embedded_helper_size_bytes": intel["embedded_helper"]["size_bytes"],
                   "universal_plugin_sha256": universal["sha256"],
                   "universal_plugin_size_bytes": universal["size_bytes"],
                   "qualification_profile": "build + ARM licensed-Stata universal smoke",

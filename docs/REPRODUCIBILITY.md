@@ -11,7 +11,7 @@ A release pins:
 - Rust 1.97.1 and `Cargo.lock`;
 - Tectonic 0.17.0;
 - the v33 source bundle and source index SHA-256 values;
-- the curated logical-resource list;
+- the curated logical-resource list and English-only resource policy;
 - the transformed embedded ZIP SHA-256;
 - vcpkg source revision and custom target triplets;
 - release profile and deployment target;
@@ -47,7 +47,7 @@ two clean builds from the same source and compare:
 - exported symbols;
 - dynamic dependency policy;
 - minimum OS/GLIBC requirements;
-- plugin bytes and SHA-256;
+- target helper and plugin bytes and SHA-256 values;
 - deterministic installation ZIP bytes and SHA-256.
 
 A binary mismatch is not hidden; it is either eliminated or documented as a
@@ -55,7 +55,7 @@ known toolchain source of nondeterminism.
 
 ## Qualification identity
 
-A source SHA, plugin SHA-256, bundle ZIP SHA-256, and target runtime receipt form
-one qualification identity. Rebuilding a plugin changes the binary identity and
-requires a new target runtime qualification even when the Git source SHA is
-unchanged.
+A source SHA, helper SHA-256, plugin SHA-256, bundle ZIP SHA-256, and target
+runtime receipt form one qualification identity. Rebuilding either native
+binary changes the identity and requires a new target runtime qualification
+even when the Git source SHA is unchanged.

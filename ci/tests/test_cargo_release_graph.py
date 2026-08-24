@@ -75,6 +75,29 @@ class CargoReleaseGraphTests(unittest.TestCase):
         with self.assertRaises(graph.CargoGraphError):
             graph.release_package_ids(metadata, "texpdf-stata")
 
+    def test_multiple_release_roots_are_deduplicated(self) -> None:
+        metadata = self.metadata()
+        metadata["workspace_members"].append("helper")
+        metadata["packages"].append(
+            {"id": "helper", "name": "texpdf-helper", "version": "0.1.0"}
+        )
+        metadata["resolve"]["nodes"].append(
+            {
+                "id": "helper",
+                "deps": [
+                    {"pkg": "normal", "dep_kinds": [{"kind": None}]},
+                    {"pkg": "dev", "dep_kinds": [{"kind": "dev"}]},
+                ],
+            }
+        )
+        selected = graph.release_packages_for_roots(
+            metadata, ["texpdf-stata", "texpdf-helper"]
+        )
+        self.assertEqual(
+            [item["name"] for item in selected],
+            ["build", "nested", "normal", "texpdf-helper", "texpdf-stata"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

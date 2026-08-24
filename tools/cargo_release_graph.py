@@ -124,3 +124,35 @@ def release_packages(
         packages,
         key=lambda item: (str(item.get("name")), str(item.get("version"))),
     )
+
+
+def release_packages_for_roots(
+    metadata: dict[str, Any], package_names: list[str]
+) -> list[dict[str, Any]]:
+    """Return the deduplicated release closure for all installed binaries.
+
+    The Stata plugin embeds a separately built helper rather than depending on
+    it as a Cargo crate. A distributable audit must therefore take the union of
+    both roots explicitly.
+    """
+
+    if not package_names:
+        raise CargoGraphError("at least one release root is required")
+    selected: set[str] = set()
+    for package_name in package_names:
+        selected.update(release_package_ids(metadata, package_name))
+    packages = [
+        package
+        for package in metadata.get("packages", [])
+        if isinstance(package, dict) and str(package.get("id")) in selected
+    ]
+    found = {str(package.get("id")) for package in packages}
+    missing = selected.difference(found)
+    if missing:
+        raise CargoGraphError(
+            "selected package IDs missing from metadata: " + ", ".join(sorted(missing))
+        )
+    return sorted(
+        packages,
+        key=lambda item: (str(item.get("name")), str(item.get("version"))),
+    )

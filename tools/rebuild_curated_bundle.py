@@ -89,24 +89,32 @@ def origin_text(value: dict[str, Any]) -> str:
 
 def candidate_record(value: dict[str, Any], fallback_name: str | None) -> dict[str, Any] | None:
     name = first_string(value, NAME_KEYS) or fallback_name
-    offset = first_int(value, OFFSET_KEYS)
     length = first_int(value, LENGTH_KEYS)
+    generated = value.get("generated") is True
+    source = first_string(value, ("source",))
+    offset = first_int(value, OFFSET_KEYS)
     nested_origin = value.get("origin") if isinstance(value.get("origin"), dict) else {}
     if offset is None and isinstance(nested_origin, dict):
         offset = first_int(nested_origin, OFFSET_KEYS)
     if length is None and isinstance(nested_origin, dict):
         length = first_int(nested_origin, LENGTH_KEYS)
-    if not name or offset is None or length is None:
+    if not name or length is None:
+        return None
+    if generated and not source:
+        raise RebuildError(f"generated resource {name!r} has no source")
+    if not generated and offset is None:
         return None
     digest = first_string(value, DIGEST_KEYS)
     if digest is None and isinstance(nested_origin, dict):
         digest = first_string(nested_origin, DIGEST_KEYS)
-    return {
+    record = {
         "name": normalize_name(name),
         "offset": offset,
         "length": length,
         "sha256": (digest or "").lower(),
         "origin": origin_text(value),
+        "generated": generated,
+        "source": normalize_name(source) if source else None,
         "url": first_string(value, ("url", "source_url", "archive_url"))
         or (
             first_string(nested_origin, ("url", "source_url", "archive_url"))
@@ -114,6 +122,9 @@ def candidate_record(value: dict[str, Any], fallback_name: str | None) -> dict[s
             else None
         ),
     }
+    if generated and not SHA256_RE.fullmatch(record["sha256"]):
+        raise RebuildError(f"generated resource {name!r} has no SHA-256")
+    return record
 
 
 def extract_records(manifest: dict[str, Any]) -> list[dict[str, Any]]:
@@ -154,7 +165,7 @@ def extract_records(manifest: dict[str, Any]) -> list[dict[str, Any]]:
     if not collections:
         visit(manifest)
     if not collections:
-        raise RebuildError("no byte-range resource records found in manifest")
+        raise RebuildError("no reconstructable resource records found in manifest")
     selected = max(collections, key=len)
     deduplicated: dict[str, dict[str, Any]] = {}
     for record in selected:
@@ -180,9 +191,39 @@ def flatten_strings(value: Any, prefix: str = "") -> list[tuple[str, str]]:
 
 
 def lock_values(path: Path) -> list[tuple[str, str]]:
-    import tomllib
-
-    return flatten_strings(tomllib.loads(path.read_text(encoding="utf-8")))
+    text = path.read_text(encoding="utf-8")
+    try:
+        import tomllib  # type: ignore[import-not-found]
+    except ModuleNotFoundError:
+        section = ""
+        values: list[tuple[str, str]] = []
+        for line_number, raw in enumerate(text.splitlines(), 1):
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("[") and line.endswith("]"):
+                section = line[1:-1].strip()
+                if not section:
+                    raise RebuildError(f"empty lock section on line {line_number}")
+                continue
+            key, separator, encoded = line.partition("=")
+            if not separator or not section:
+                raise RebuildError(f"malformed lock line {line_number}: {raw!r}")
+            try:
+                value = json.loads(encoded.strip())
+            except json.JSONDecodeError as error:
+                raise RebuildError(
+                    f"lock line {line_number} requires a quoted string value"
+                ) from error
+            if not isinstance(value, str):
+                raise RebuildError(
+                    f"lock line {line_number} value must be a string"
+                )
+            values.append((f"{section}.{key.strip()}", value))
+        if not values:
+            raise RebuildError(f"bundle lock is empty: {path}")
+        return values
+    return flatten_strings(tomllib.loads(text))
 
 
 def url_candidates(values: list[tuple[str, str]]) -> list[tuple[str, str]]:
@@ -279,6 +320,7 @@ def rebuild(
     qualification: dict[str, Any],
     cache: Path,
     output: Path,
+    source_root: Path,
 ) -> None:
     archives: dict[str, Path] = {}
     handles: dict[str, Any] = {}
@@ -287,6 +329,20 @@ def rebuild(
         for record in records:
             name = record["name"]
             if name == "SHA256SUM":
+                continue
+            if record["generated"]:
+                root = source_root.resolve()
+                source = (root / str(record["source"])).resolve()
+                if source != root and root not in source.parents:
+                    raise RebuildError(f"generated resource source escapes root: {name}")
+                if not source.is_file():
+                    raise RebuildError(f"generated resource source is missing: {source}")
+                data = source.read_bytes()
+                if len(data) != record["length"]:
+                    raise RebuildError(f"generated resource length mismatch for {name}")
+                if sha256_bytes(data) != record["sha256"]:
+                    raise RebuildError(f"generated resource checksum mismatch for {name}")
+                data_by_name[name] = data
                 continue
             url, expected_archive_sha = select_url(record, lock)
             if url not in archives:
@@ -321,7 +377,10 @@ def rebuild(
         allowZip64=True,
         strict_timestamps=True,
     ) as archive:
-        for name in sorted(data_by_name):
+        ordered_names = ["SHA256SUM"] + sorted(
+            name for name in data_by_name if name != "SHA256SUM"
+        )
+        for name in ordered_names:
             archive.writestr(zip_info(name), data_by_name[name])
     os.replace(temporary, output)
 
@@ -351,6 +410,12 @@ def main() -> int:
     parser.add_argument("--qualification", type=Path, default=Path("bundle/QUALIFICATION.json"))
     parser.add_argument("--output", type=Path, default=Path("bundle/generated/texpdf-bundle.zip"))
     parser.add_argument(
+        "--source-root",
+        type=Path,
+        default=Path("."),
+        help="repository root used for project-generated manifest resources",
+    )
+    parser.add_argument(
         "--cache-dir",
         type=Path,
         default=Path(
@@ -365,7 +430,14 @@ def main() -> int:
         manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
         qualification = json.loads(args.qualification.read_text(encoding="utf-8"))
         records = extract_records(manifest)
-        rebuild(records, lock_values(args.lock), qualification, args.cache_dir, args.output)
+        rebuild(
+            records,
+            lock_values(args.lock),
+            qualification,
+            args.cache_dir,
+            args.output,
+            args.source_root,
+        )
         info = {
             "schema_version": 1,
             "bundle_name": qualification["bundle"]["name"],

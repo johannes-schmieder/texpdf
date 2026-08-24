@@ -23,7 +23,7 @@ Do not rebuild the plugin between checksum recording and Stata testing.
 This is the connected qualification target. The self-hosted workflow builds the
 real embedded engine before running the `quick` profile under Stata/MP 18. The
 comprehensive checkpoint includes a real PDF compile, local `net install`,
-Unicode/relative paths, recoverable errors, and 100 in-process calls.
+Unicode/relative paths, recoverable errors, and 100 installed-plugin calls.
 
 ## macOS Intel
 

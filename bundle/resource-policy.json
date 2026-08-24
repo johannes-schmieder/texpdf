@@ -1,0 +1,20 @@
+{
+  "description": "The private RC supports English-language typesetting only. TeX Live's generated language.dat otherwise loads every installed hyphenation language during format creation, needlessly expanding the binary and redistribution surface.",
+  "exclude": [
+    "dehyphn-x-*",
+    "dehypht-x-*",
+    "dumyhyph.tex",
+    "hyph-*.tex",
+    "ibyhyph.tex",
+    "loadhyph-*.tex",
+    "zerohyph.tex"
+  ],
+  "replacements": {
+    "language.dat": {
+      "license": "MIT",
+      "origin": "texpdf-project-generated",
+      "source": "bundle/resources/language.dat"
+    }
+  },
+  "schema_version": 1
+}

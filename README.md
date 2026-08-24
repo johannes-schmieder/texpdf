@@ -65,7 +65,9 @@ previously valid PDF.
 
 The qualified academic tier covers LaTeX core, AMS mathematics, common table
 and layout packages, PDF/PNG figures, hyperlinks, Latin Modern and TeX Gyre
-fonts, and BibTeX with `natbib`. The exact fixture-backed contract is documented
+fonts, English-language hyphenation, and BibTeX with `natbib`. Broad language
+and hyphenation collections are deliberately outside this RC. The exact
+fixture-backed contract is documented
 in [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) and
 [`docs/SUPPORTED_PACKAGES.md`](docs/SUPPORTED_PACKAGES.md).
 
@@ -86,4 +88,5 @@ texpdf.ado
 
 Project-owned source is MIT licensed. Embedded TeX resources, fonts, Tectonic,
 and native libraries retain their upstream licenses. Candidate packaging is
-fail-closed until the generated inventories and required notices are complete.
+fail-closed unless the exact plugin/helper graphs, bundle resources, and full
+notice tree pass the source-bound audit.

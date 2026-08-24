@@ -13,8 +13,10 @@ from typing import Any
 from cargo_release_graph import (
     CargoGraphError,
     cargo_metadata,
-    release_packages,
+    release_packages_for_roots,
 )
+
+DEFAULT_RELEASE_ROOTS = ("texpdf-stata", "texpdf-helper")
 
 
 class CargoInventoryError(RuntimeError):
@@ -24,7 +26,7 @@ class CargoInventoryError(RuntimeError):
 def build_inventory(
     metadata: dict[str, Any],
     selected_packages: list[dict[str, Any]],
-    package_name: str,
+    package_names: list[str],
     target: str,
 ) -> dict[str, Any]:
     workspace_members = set(metadata.get("workspace_members", []))
@@ -52,8 +54,8 @@ def build_inventory(
         {str(item["license"]) for item in packages if item.get("license")}
     )
     return {
-        "schema_version": 2,
-        "release_root": package_name,
+        "schema_version": 3,
+        "release_roots": package_names,
         "release_target": target,
         "summary": {
             "package_count": len(packages),
@@ -76,7 +78,7 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines = [
         "# Rust release dependency license inventory",
         "",
-        f"- Release root: `{data['release_root']}`",
+        f"- Release roots: `{', '.join(data['release_roots'])}`",
         f"- Release target: `{data['release_target']}`",
         f"- Packages: {summary['package_count']}",
         f"- Workspace packages: {summary['workspace_package_count']}",
@@ -84,7 +86,8 @@ def render_markdown(data: dict[str, Any]) -> str:
         f"- Packages missing license metadata: {summary['missing_license_metadata']}",
         "",
         "The graph includes normal and build dependencies reachable from the",
-        "release plugin and excludes dev/test-only and unrelated workspace crates.",
+        "release plugin plus embedded helper and excludes dev/test-only and",
+        "unrelated workspace crates.",
         "",
         "| Crate | Version | License | Source |",
         "|---|---:|---|---|",
@@ -109,7 +112,12 @@ def render_markdown(data: dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cargo", default="cargo")
-    parser.add_argument("--package", default="texpdf-stata")
+    parser.add_argument(
+        "--package",
+        action="append",
+        dest="packages",
+        help="release root to audit; repeat for multiple installed binaries",
+    )
     parser.add_argument(
         "--target",
         default=os.environ.get("TEXPDF_LICENSE_TARGET", "aarch64-apple-darwin"),
@@ -125,10 +133,11 @@ def main() -> int:
 
     try:
         metadata = cargo_metadata(args.cargo, args.target)
+        package_names = args.packages or list(DEFAULT_RELEASE_ROOTS)
         data = build_inventory(
             metadata,
-            release_packages(metadata, args.package),
-            args.package,
+            release_packages_for_roots(metadata, package_names),
+            package_names,
             args.target,
         )
     except (OSError, CargoGraphError, CargoInventoryError) as error:
@@ -148,7 +157,7 @@ def main() -> int:
             for key, value in data["summary"].items()
             if key != "license_expressions"
         )
-        + f" target={args.target} root={args.package}"
+        + f" target={args.target} roots={','.join(package_names)}"
     )
     if args.strict and data["summary"]["missing_license_metadata"]:
         return 2

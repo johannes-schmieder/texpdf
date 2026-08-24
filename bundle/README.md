@@ -10,23 +10,15 @@ The qualified bundle is `texpdf-academic-v1`, derived from the pinned
 Tectonic/TeX Live 2022 resources and the `tlextras-2022.0` local-resource
 archive.
 
-Current exact artifact values:
-
-- 557 logical resources;
-- 19,035,195 uncompressed resource bytes;
-- 6,690,289-byte deterministic ZIP (6.38 MiB);
-- ZIP SHA-256
-  `05688ffcca2e82a12143c836708e3dc3b811a30dbe2b74caf951eb7b409792ab`;
-- Tectonic content digest
-  `273502edfafe0a6adcdd19c0659965bcf0ebea26cacc1ad372439b80fd7a2a81`.
-
-The exact bundle/plugin/package qualification is recorded in
-`QUALIFICATION.json`. Platform support is authoritative in
+Exact file counts, sizes, content digests, ZIP hashes, and the source SHA that
+qualified them are recorded in `QUALIFICATION.json`; they are not duplicated
+in this durable description. Platform support is authoritative in
 `../release/targets.json`, and the human-readable current artifact summary is
 `../docs/generated/CURRENT_ARTIFACT.md`.
 
-`curated-manifest.json` records the selected resource names, byte ranges,
-source hashes, and selection reasons. Generated archives themselves are not
+`curated-manifest.json` records selected resource names, byte ranges, source
+hashes, the English-only resource policy, explicit exclusions, and the
+project-generated `language.dat`. Generated archives themselves are not
 committed.
 
 ## Reproducible construction
@@ -61,6 +53,8 @@ The exact user-facing contract is documented in
 
 Large or external-helper-dependent ecosystems—Beamer, TikZ/PGF, PSTricks,
 Biber/`biblatex`, and `minted`/Pygments—are excluded from v1.
+The private RC also supports English-language hyphenation only; broad language
+collections are excluded by `resource-policy.json`.
 
 ## Licensing
 

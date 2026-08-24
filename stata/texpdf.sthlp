@@ -51,7 +51,8 @@ replaced by {cmd:.pdf}; otherwise {cmd:.pdf} is appended.
 Version 1 is a compiler only. Shell escape and arbitrary external helper
 programs are disabled. BibTeX with {cmd:natbib} is supported by the intended v1
 bundle; Biber/{cmd:biblatex}, Beamer, TikZ/PGF, and PSTricks are outside the
-initial compatibility tier.
+initial compatibility tier. The private RC provides English-language
+hyphenation only; broad language and hyphenation collections are unsupported.
 
 {title:Author}
 

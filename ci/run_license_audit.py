@@ -184,6 +184,7 @@ def summary_status(
     cargo = load_json(output_root / "cargo.json")
     dependencies = load_json(output_root / "dependencies.json")
     texts = load_json(output_root / "license-texts.json")
+    tex_notices = load_json(output_root / "tex-notices.json")
     manifest = load_json(manifest_path)
 
     tex_summary = tex.get("summary", {}) if isinstance(tex.get("summary"), dict) else {}
@@ -212,6 +213,8 @@ def summary_status(
         and isinstance(missing_native, list)
         and not missing_native
         and texts.get("complete") is True
+        and tex_notices.get("complete") is True
+        and int(tex_notices.get("resource_count", 0)) == resource_count
     )
     return {
         "schema_version": 2,
@@ -225,6 +228,10 @@ def summary_status(
         "dependency_undeclared_count": len(undeclared) if isinstance(undeclared, list) else -1,
         "missing_rust_notice_files": len(missing_rust) if isinstance(missing_rust, list) else -1,
         "missing_native_notice_files": len(missing_native) if isinstance(missing_native, list) else -1,
+        "tex_notice_complete": tex_notices.get("complete") is True,
+        "tex_notice_file_count": len(tex_notices.get("notice_files", []))
+        if isinstance(tex_notices.get("notice_files"), list)
+        else -1,
         "curated_manifest_file_count": manifest_count,
         "resource_count_matches_manifest": resource_count_matches,
         "tlpdb": {
@@ -258,6 +265,8 @@ def render_markdown(status: dict[str, Any]) -> str:
         f"- Cargo packages missing metadata: {cargo.get('missing_license_metadata', 'unavailable')}",
         f"- Rust packages without collected notice files: {status.get('missing_rust_notice_files')}",
         f"- Native libraries without collected notice files: {status.get('missing_native_notice_files')}",
+        f"- TeX resource notice tree complete: **{str(status.get('tex_notice_complete')).lower()}**",
+        f"- TeX resource notice files: {status.get('tex_notice_file_count')}",
         "",
         "## Pipeline stages",
         "",
@@ -357,6 +366,8 @@ def main() -> int:
                 str(tlpdb_path),
                 "--overrides",
                 "bundle/license-overrides.toml",
+                "--evidence",
+                "bundle/license-evidence.json",
                 "--output",
                 str(args.output_root / "tex-resources.json"),
                 "--markdown",
@@ -407,6 +418,20 @@ def main() -> int:
                 "--require-native",
             ],
             native_stage["return_code"] == 0,
+        ),
+        (
+            "collect_tex_license_notices",
+            [
+                sys.executable,
+                "tools/collect_tex_license_notices.py",
+                "--inventory",
+                str(args.output_root / "tex-resources.json"),
+                "--output-root",
+                str(args.output_root / "texts" / "texlive"),
+                "--manifest",
+                str(args.output_root / "tex-notices.json"),
+            ],
+            tlpdb_stage["return_code"] == 0,
         ),
     ]
     for name, command, enabled in commands:

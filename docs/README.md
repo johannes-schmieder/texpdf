@@ -6,7 +6,7 @@
 - [`COMPATIBILITY.md`](COMPATIBILITY.md) — Tectonic/LaTeX behavior and known exclusions.
 - [`SUPPORTED_PACKAGES.md`](SUPPORTED_PACKAGES.md) — fixture-backed academic package tier.
 - [`ERRORS.md`](ERRORS.md) — Stata return codes and output guarantees.
-- [`../SECURITY.md`](../SECURITY.md) — trust boundary and native in-process risks.
+- [`../SECURITY.md`](../SECURITY.md) — bridge/helper trust boundary and native risks.
 
 ## Qualification and release
 

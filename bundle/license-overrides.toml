@@ -9,3 +9,131 @@ pattern = "SHA256SUM"
 package = "texpdf-generated-bundle-metadata"
 license = "mit"
 reason = "The curated-bundle builder generates this digest record as project-owned metadata."
+evidence = "texpdf-generated-metadata"
+
+[[override]]
+pattern = "language.dat"
+origin = "texpdf-project-generated"
+package = "texpdf-generated-language-config"
+license = "mit"
+reason = "The English-only language configuration is project-owned generated input, replacing the TeX Live aggregate."
+evidence = "texpdf-language-config"
+
+[[override]]
+pattern = "amsfonts.sty"
+package = "amsfonts-support-files"
+license = "licenseref-amsfonts-unchanged-or-renamed"
+reason = "This generated support file carries its own unchanged-copying and rename-on-modification notice; the package-level OFL applies to font software, not this file."
+evidence = "amsfonts-support-notice"
+
+[[override]]
+pattern = "amssymb.sty"
+package = "amsfonts-support-files"
+license = "licenseref-amsfonts-unchanged-or-renamed"
+reason = "This generated support file carries its own unchanged-copying and rename-on-modification notice; the package-level OFL applies to font software, not this file."
+evidence = "amsfonts-support-notice"
+
+[[override]]
+pattern = "umsa.fd"
+package = "amsfonts-support-files"
+license = "licenseref-amsfonts-unchanged-or-renamed"
+reason = "This generated font-definition file carries its own unchanged-copying and rename-on-modification notice."
+evidence = "amsfonts-support-notice"
+
+[[override]]
+pattern = "umsb.fd"
+package = "amsfonts-support-files"
+license = "licenseref-amsfonts-unchanged-or-renamed"
+reason = "This generated font-definition file carries its own unchanged-copying and rename-on-modification notice."
+evidence = "amsfonts-support-notice"
+
+[[override]]
+pattern = "SpecialCasing.txt"
+package = "unicode-character-database-14.0.0"
+license = "unicode-dfs-2016"
+reason = "The exact file header identifies Unicode 14.0.0 and links the Unicode terms of use; basename ownership in tlpdb is ambiguous."
+evidence = "unicode-14-data"
+
+[[override]]
+pattern = "UnicodeData.txt"
+package = "unicode-character-database-14.0.0"
+license = "unicode-dfs-2016"
+reason = "This is the Unicode 14.0.0 companion data file; basename ownership in tlpdb is ambiguous."
+evidence = "unicode-14-data"
+
+[[override]]
+pattern = "color.cfg"
+package = "graphics-cfg"
+license = "cc0-1.0"
+reason = "The exact embedded file begins with the Creative Commons CC0 1.0 URL and tlpdb has several basename candidates."
+evidence = "graphics-cfg-cc0"
+
+[[override]]
+pattern = "graphics.cfg"
+package = "graphics-cfg"
+license = "cc0-1.0"
+reason = "The exact embedded file begins with the Creative Commons CC0 1.0 URL and tlpdb has several basename candidates."
+evidence = "graphics-cfg-cc0"
+
+[[override]]
+pattern = "fonttext.cfg"
+package = "latex"
+license = "lppl1.3c"
+reason = "The exact generated-file header identifies LaTeX base and LPPL 1.3c or later; tlpdb also indexes a development mirror."
+evidence = "latex-fonttext-config"
+
+[[override]]
+pattern = "hyphen.cfg"
+package = "babel"
+license = "lppl1.3"
+reason = "The exact generated-file header identifies Babel, LPPL 1.3 or later, maintained status, and the current maintainer."
+evidence = "babel-hyphen-config"
+
+[[override]]
+pattern = "glyphlist.txt"
+package = "adobe-glyph-list"
+license = "apache-2.0"
+reason = "The exact embedded file contains Adobe's Apache-2.0 notice; the TeX Live package record has no catalogue license."
+evidence = "adobe-glyph-list"
+
+[[override]]
+pattern = "pdfglyphlist.txt"
+package = "adobe-glyph-list-pdf-subset"
+license = "apache-2.0"
+reason = "The file identifies itself as a subset compiled from Adobe Glyph List 2.0; the pinned companion glyph list carries Adobe's Apache-2.0 notice."
+evidence = "adobe-pdf-glyph-list"
+
+[[override]]
+pattern = "hyphen.tex"
+package = "hyphen-base"
+license = "knuth"
+reason = "The exact file carries Knuth's unchanged-file redistribution condition and rename-on-modification condition."
+evidence = "knuth-hyphen-patterns"
+
+[[override]]
+pattern = "texglyphlist.txt"
+package = "lcdf-typetools"
+license = "gpl-2.0-only"
+reason = "The exact file identifies lcdf-typetools 2.95; the pinned upstream distribution supplies GPL version 2 COPYING terms."
+evidence = "lcdf-typetools-2.95"
+
+[[override]]
+pattern = "tectonic-format-latex.tex"
+package = "tectonic"
+license = "mit"
+reason = "The exact resource is maintained in Tectonic's bundle inputs and is covered by the pinned Tectonic MIT license."
+evidence = "tectonic-format-input"
+
+[[override]]
+pattern = "kanjix.map"
+package = "texlive-2022-generated-map"
+license = "licenseref-texlive-generated-map"
+reason = "updmap generated this aggregate from freely redistributable TeX Live map inputs; preserve the component inventory and TeX Live copying notice."
+evidence = "texlive-generated-maps"
+
+[[override]]
+pattern = "pdftex.map"
+package = "texlive-2022-generated-map"
+license = "licenseref-texlive-generated-map"
+reason = "updmap generated this aggregate from freely redistributable TeX Live map inputs; preserve the component inventory and TeX Live copying notice."
+evidence = "texlive-generated-maps"
