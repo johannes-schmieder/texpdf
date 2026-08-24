@@ -1,0 +1,44 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{rotating}
+\usepackage{pdflscape}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\begin{document}
+\section*{Figures and layout}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \fcolorbox{blue!60!black}{blue!5}{\rule{0pt}{25mm}\rule{35mm}{0pt}}
+  \caption{Synthetic panel A}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \rotatebox{8}{\fcolorbox{red!60!black}{red!5}{\rule{0pt}{25mm}\rule{35mm}{0pt}}}
+  \caption{Synthetic panel B}
+\end{subfigure}
+\caption{A two-panel figure without external assets}
+\end{figure}
+\FloatBarrier
+
+\begin{sidewaystable}
+\centering
+\caption{Rotated table}
+\begin{tabular}{lrr}
+Item & First & Second \\
+A & 1 & 2 \\
+B & 3 & 4 \\
+\end{tabular}
+\end{sidewaystable}
+
+\begin{landscape}
+This page exercises landscape PDF rotation metadata.
+\end{landscape}
+\end{document}
