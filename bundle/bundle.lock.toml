@@ -1,9 +1,9 @@
 [bundle]
-name = "tectonic-default-v33-bootstrap"
+name = "tlextras-2022.0r0"
 version = "33"
-source_url = "https://relay.fullyjustified.net/default_bundle_v33.tar"
-index_url = "https://relay.fullyjustified.net/default_bundle_v33.tar.index.gz"
-# Filled after the first trusted CI download, then enforced by the transformer.
+source_url = "https://data1.fullyjustified.net/tlextras-2022.0r0.tar"
+index_url = "https://data1.fullyjustified.net/tlextras-2022.0r0.tar.index.gz"
+# Filled after the first trusted, length-validated CI download and then enforced.
 source_sha256 = ""
 index_sha256 = ""
-transform_version = "1"
+transform_version = "2"

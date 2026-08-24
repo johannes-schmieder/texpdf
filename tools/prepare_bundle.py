@@ -70,11 +70,27 @@ def download(url: str, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_suffix(destination.suffix + ".part")
     temporary.unlink(missing_ok=True)
-    request = urllib.request.Request(url, headers={"User-Agent": "texpdf-bundle-builder/0.1"})
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "texpdf-bundle-builder/0.1",
+            "Accept-Encoding": "identity",
+        },
+    )
     try:
         with contextlib.closing(urllib.request.urlopen(request, timeout=120)) as response:
+            raw_length = response.headers.get("Content-Length")
+            expected_length = int(raw_length) if raw_length is not None else None
             with temporary.open("wb") as output:
                 shutil.copyfileobj(response, output, length=DOWNLOAD_CHUNK)
+                output.flush()
+                os.fsync(output.fileno())
+        actual_length = temporary.stat().st_size
+        if expected_length is not None and actual_length != expected_length:
+            raise BundleError(
+                f"incomplete download for {url}: expected {expected_length} bytes, "
+                f"received {actual_length}"
+            )
         os.replace(temporary, destination)
     except Exception:
         temporary.unlink(missing_ok=True)
@@ -87,9 +103,10 @@ def obtain(url: str, destination: Path, expected_sha256: str) -> str:
 
     if destination.exists():
         actual = sha256_file(destination)
-        if not expected_sha256 or actual == expected_sha256:
+        if expected_sha256 and actual != expected_sha256:
+            destination.unlink()
+        else:
             return actual
-        destination.unlink()
 
     print(f"TEXPDF_BUNDLE_DOWNLOAD url={url}", flush=True)
     download(url, destination)
@@ -120,7 +137,10 @@ def parse_index(path: Path, source_size: int) -> list[tuple[str, int, int]]:
             if any(part in {"", ".", ".."} for part in name.split("/")):
                 raise BundleError(f"unsafe bundle path on line {line_number}: {name!r}")
             if offset < 0 or length < 0 or offset + length > source_size:
-                raise BundleError(f"out-of-range entry on line {line_number}: {name!r}")
+                raise BundleError(
+                    f"out-of-range entry on line {line_number}: {name!r}; "
+                    f"offset={offset} length={length} source_size={source_size}"
+                )
             entries[name] = (offset, length)
     if "SHA256SUM" not in entries:
         raise BundleError("source bundle index has no SHA256SUM entry")
@@ -224,8 +244,9 @@ def main() -> int:
         cache.mkdir(parents=True, exist_ok=True)
         raw_path = cache / f"{lock['name']}.tar"
         index_path = cache / f"{lock['name']}.tar.index.gz"
-        source_sha = obtain(lock["source_url"], raw_path, lock.get("source_sha256", ""))
         index_sha = obtain(lock["index_url"], index_path, lock.get("index_sha256", ""))
+        source_sha = obtain(lock["source_url"], raw_path, lock.get("source_sha256", ""))
+        entries = parse_index(index_path, raw_path.stat().st_size)
         cache_key = f"v{lock['transform_version']}-{source_sha[:16]}-{index_sha[:16]}"
         cached_zip = cache / f"{lock['name']}-{cache_key}.zip"
         cached_info = cache / f"{lock['name']}-{cache_key}.json"
@@ -237,7 +258,6 @@ def main() -> int:
                 cached_info.unlink(missing_ok=True)
 
         if not cached_zip.exists():
-            entries = parse_index(index_path, raw_path.stat().st_size)
             bundle_digest = build_zip(raw_path, entries, cached_zip)
             info = {
                 "schema_version": 1,
@@ -252,6 +272,8 @@ def main() -> int:
                 "zip_sha256": sha256_file(cached_zip),
                 "file_count": len(entries),
                 "zip_size_bytes": cached_zip.stat().st_size,
+                "source_size_bytes": raw_path.stat().st_size,
+                "index_size_bytes": index_path.stat().st_size,
             }
             write_json_atomic(cached_info, info)
         else:
@@ -263,6 +285,7 @@ def main() -> int:
         print(
             "TEXPDF_BUNDLE_READY "
             f"files={info['file_count']} zip_bytes={info['zip_size_bytes']} "
+            f"source_bytes={info.get('source_size_bytes')} "
             f"source_sha256={info['source_sha256']} index_sha256={info['index_sha256']} "
             f"zip_sha256={info['zip_sha256']} locked={str(locked).lower()}",
             flush=True,
