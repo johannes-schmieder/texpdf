@@ -1,0 +1,256 @@
+name: Build Linux and Windows development artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Hosted build target
+        required: true
+        type: choice
+        options:
+          - all
+          - linux
+          - windows
+        default: all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: texpdf-hosted-${{ inputs.platform }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+  TEXPDF_RUST_TOOLCHAIN: "1.97.1"
+
+jobs:
+  linux:
+    if: ${{ inputs.platform == 'all' || inputs.platform == 'linux' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Install build prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake ninja-build pkg-config python3 perl curl git
+          rustup toolchain install "$TEXPDF_RUST_TOOLCHAIN" \
+            --profile minimal --component rustfmt,clippy
+          rustup target add --toolchain "$TEXPDF_RUST_TOOLCHAIN" \
+            x86_64-unknown-linux-gnu
+
+      - name: Rebuild the exact qualified resource ZIP
+        shell: bash
+        run: >-
+          python3 tools/rebuild_curated_bundle.py
+          --cache-dir "$RUNNER_TEMP/texpdf-bundle-cache"
+
+      - name: Prepare pinned static native dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          export RUSTC="$(rustup which --toolchain "$TEXPDF_RUST_TOOLCHAIN" rustc)"
+          export TEXPDF_VCPKG_ROOT="$RUNNER_TEMP/texpdf-vcpkg"
+          export TEXPDF_VCPKG_BINARY_CACHE="$RUNNER_TEMP/texpdf-vcpkg-binary-cache"
+          export TEXPDF_PKGCONF_ROOT="$RUNNER_TEMP/texpdf-pkgconf"
+          source tools/prepare_native_deps_for_target.sh x86_64-unknown-linux-gnu
+          {
+            echo "VCPKG_ROOT=$VCPKG_ROOT"
+            echo "VCPKGRS_TRIPLET=$VCPKGRS_TRIPLET"
+            echo "VCPKG_DEFAULT_BINARY_CACHE=$VCPKG_DEFAULT_BINARY_CACHE"
+            echo "TECTONIC_DEP_BACKEND=$TECTONIC_DEP_BACKEND"
+          } >> "$GITHUB_ENV"
+
+      - name: Test and build Linux plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo="$(rustup which --toolchain "$TEXPDF_RUST_TOOLCHAIN" cargo)"
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/texpdf-target"
+          "$cargo" fmt --all --check
+          "$cargo" clippy --locked --workspace --all-targets --all-features -- -D warnings
+          "$cargo" test --locked --workspace --all-targets --all-features
+          "$cargo" build --locked --release --package texpdf-stata \
+            --target x86_64-unknown-linux-gnu
+          source="$CARGO_TARGET_DIR/x86_64-unknown-linux-gnu/release/libtexpdf_stata.so"
+          mkdir -p dist/linux-x86_64
+          cp "$source" dist/linux-x86_64/_texpdf_plugin.plugin
+          nm -D --defined-only dist/linux-x86_64/_texpdf_plugin.plugin | grep -Eq '(^|[[:space:]])pginit$'
+          nm -D --defined-only dist/linux-x86_64/_texpdf_plugin.plugin | grep -Eq '(^|[[:space:]])stata_call$'
+          ldd dist/linux-x86_64/_texpdf_plugin.plugin | tee dist/linux-x86_64/ldd.txt
+          if grep -Eiq '(fontconfig|freetype|harfbuzz|graphite|icu|libpng|libz\.so|vcpkg)' dist/linux-x86_64/ldd.txt; then
+            echo "unexpected dynamically linked typesetting dependency" >&2
+            exit 2
+          fi
+
+      - name: Write Linux artifact manifest and package
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import os
+          import platform
+          import subprocess
+
+          plugin = Path("dist/linux-x86_64/_texpdf_plugin.plugin")
+          sha = hashlib.sha256(plugin.read_bytes()).hexdigest()
+          payload = {
+              "schema_version": 1,
+              "source_sha": os.environ["GITHUB_SHA"],
+              "target": "x86_64-unknown-linux-gnu",
+              "build_platform": platform.platform(),
+              "plugin_size_bytes": plugin.stat().st_size,
+              "plugin_sha256": sha,
+              "exports": ["pginit", "stata_call"],
+              "dynamic_dependencies": Path("dist/linux-x86_64/ldd.txt").read_text(encoding="utf-8").splitlines(),
+              "rust_tests": "success",
+              "stata_runtime_qualified": False,
+              "qualification_boundary": "Compiler/core tests passed on Linux; actual licensed Linux Stata loading is still required.",
+          }
+          Path("dist/linux-x86_64/manifest.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("TEXPDF_LINUX_BUILD_READY", payload)
+          PY
+          python3 tools/package_release.py \
+            --plugin dist/linux-x86_64/_texpdf_plugin.plugin \
+            --output-dir dist/texpdf-linux-x86_64 \
+            --zip dist/texpdf-linux-x86_64.zip \
+            --target x86_64-unknown-linux-gnu
+
+      - name: Upload Linux development artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-linux-x86_64-${{ github.sha }}
+          path: |
+            dist/linux-x86_64/
+            dist/texpdf-linux-x86_64/
+            dist/texpdf-linux-x86_64.zip
+            bundle/generated/bundle-info.json
+          if-no-files-found: error
+          retention-days: 30
+
+  windows:
+    if: ${{ inputs.platform == 'all' || inputs.platform == 'windows' }}
+    runs-on: windows-latest
+    timeout-minutes: 240
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Install Rust toolchain
+        shell: pwsh
+        run: |
+          rustup toolchain install $env:TEXPDF_RUST_TOOLCHAIN --profile minimal --component rustfmt,clippy
+          rustup target add --toolchain $env:TEXPDF_RUST_TOOLCHAIN x86_64-pc-windows-msvc
+
+      - name: Rebuild the exact qualified resource ZIP
+        shell: pwsh
+        run: |
+          python tools/rebuild_curated_bundle.py --cache-dir "$env:RUNNER_TEMP\texpdf-bundle-cache"
+
+      - name: Prepare pinned static native dependencies
+        shell: pwsh
+        run: |
+          $env:TEXPDF_VCPKG_ROOT = "$env:RUNNER_TEMP\texpdf-vcpkg"
+          $env:TEXPDF_VCPKG_BINARY_CACHE = "$env:RUNNER_TEMP\texpdf-vcpkg-binary-cache"
+          & tools/prepare_native_deps_windows.ps1 -Target x86_64-pc-windows-msvc
+
+      - name: Test and build Windows plugin
+        shell: pwsh
+        run: |
+          $cargo = (rustup which --toolchain $env:TEXPDF_RUST_TOOLCHAIN cargo).Trim()
+          $env:CARGO_TARGET_DIR = "$env:RUNNER_TEMP\texpdf-target"
+          & $cargo fmt --all --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $cargo test --locked --workspace --all-targets --all-features
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $cargo build --locked --release --package texpdf-stata --target x86_64-pc-windows-msvc
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $source = "$env:CARGO_TARGET_DIR\x86_64-pc-windows-msvc\release\texpdf_stata.dll"
+          New-Item -ItemType Directory -Force -Path dist\windows-x86_64 | Out-Null
+          Copy-Item $source dist\windows-x86_64\_texpdf_plugin.plugin
+
+      - name: Audit Windows exports and dependencies
+        shell: pwsh
+        run: |
+          $roots = @(
+              "$env:ProgramFiles\Microsoft Visual Studio\2022",
+              "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022"
+          )
+          $dumpbin = Get-ChildItem -Path $roots -Filter dumpbin.exe -Recurse -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match 'Hostx64\\x64' } |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1
+          if (-not $dumpbin) { throw "dumpbin.exe was not found" }
+          $plugin = "dist\windows-x86_64\_texpdf_plugin.plugin"
+          $exports = & $dumpbin.FullName /exports $plugin
+          $exports | Set-Content -Encoding UTF8 dist\windows-x86_64\exports.txt
+          if (-not ($exports -match '\bpginit\b')) { throw "pginit export is missing" }
+          if (-not ($exports -match '\bstata_call\b')) { throw "stata_call export is missing" }
+          $dependents = & $dumpbin.FullName /dependents $plugin
+          $dependents | Set-Content -Encoding UTF8 dist\windows-x86_64\dependents.txt
+          if ($dependents -match '(?i)(fontconfig|freetype|harfbuzz|graphite|icu|libpng|zlib|vcpkg).*\.dll') {
+              throw "unexpected dynamically linked typesetting dependency"
+          }
+
+      - name: Write Windows artifact manifest and package
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          import hashlib
+          import json
+          import os
+          import platform
+
+          plugin = Path(r"dist/windows-x86_64/_texpdf_plugin.plugin")
+          payload = {
+              "schema_version": 1,
+              "source_sha": os.environ["GITHUB_SHA"],
+              "target": "x86_64-pc-windows-msvc",
+              "build_platform": platform.platform(),
+              "plugin_size_bytes": plugin.stat().st_size,
+              "plugin_sha256": hashlib.sha256(plugin.read_bytes()).hexdigest(),
+              "exports": ["pginit", "stata_call"],
+              "dynamic_dependencies": Path(r"dist/windows-x86_64/dependents.txt").read_text(encoding="utf-8").splitlines(),
+              "rust_tests": "success",
+              "stata_runtime_qualified": False,
+              "qualification_boundary": "Compiler/core tests passed on Windows; actual licensed Windows Stata loading is still required.",
+          }
+          Path(r"dist/windows-x86_64/manifest.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("TEXPDF_WINDOWS_BUILD_READY", payload)
+          '@ | python -
+          python tools/package_release.py `
+            --plugin dist\windows-x86_64\_texpdf_plugin.plugin `
+            --output-dir dist\texpdf-windows-x86_64 `
+            --zip dist\texpdf-windows-x86_64.zip `
+            --target x86_64-pc-windows-msvc
+
+      - name: Upload Windows development artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-windows-x86_64-${{ github.sha }}
+          path: |
+            dist/windows-x86_64/
+            dist/texpdf-windows-x86_64/
+            dist/texpdf-windows-x86_64.zip
+            bundle/generated/bundle-info.json
+          if-no-files-found: error
+          retention-days: 30
