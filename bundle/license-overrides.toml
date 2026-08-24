@@ -1,0 +1,11 @@
+# Reviewed mappings for generated or non-TeX-Live resources.
+#
+# Every override must be narrow, explain why package metadata cannot supply the
+# mapping, and identify the actual upstream/project license. Broad wildcard
+# overrides are not acceptable merely to make the completeness check green.
+
+[[override]]
+pattern = "SHA256SUM"
+package = "texpdf-generated-bundle-metadata"
+license = "mit"
+reason = "The curated-bundle builder generates this digest record as project-owned metadata."
