@@ -7,5 +7,6 @@ f texpdf.ado
 f texpdf.sthlp
 f _texpdf_plugin.plugin
 f LICENSE
+f THIRD_PARTY_NOTICES.md
 f BUILD_INFO.json
 f CHECKSUMS.sha256
