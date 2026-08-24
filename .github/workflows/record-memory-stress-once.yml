@@ -1,0 +1,173 @@
+name: Record macOS ARM64 memory stress once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/record-memory-stress-once.yml"
+
+concurrency:
+  group: texpdf-macos-memory-stress-record
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      TEXPDF_RUST_PROFILE: engine
+      TEXPDF_STRESS_ITERATIONS: "1000"
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Add temporary stress profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          path = Path("ci/stata_profiles.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          profiles = data.get("profiles", data)
+          profile = dict(profiles["quick"])
+          suite_keys = [
+              key for key, value in profile.items()
+              if isinstance(value, str) and value.endswith(".do")
+          ]
+          if len(suite_keys) != 1:
+              raise SystemExit(f"cannot identify suite field: {suite_keys}")
+          profile[suite_keys[0]] = "ci/stata_stress_1000.do"
+          marker_keys = [key for key in profile if "marker" in key.lower()]
+          if marker_keys:
+              profile[marker_keys[0]] = ["TEXPDF STRESS 1000 PASS"]
+          else:
+              profile["required_log_markers"] = ["TEXPDF STRESS 1000 PASS"]
+          timeout_keys = [key for key in profile if "timeout" in key.lower()]
+          if timeout_keys:
+              profile[timeout_keys[0]] = 7200
+          profiles["stress1000"] = profile
+          path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+          git add ci/stata_profiles.json
+
+      - name: Build and test real embedded plugin
+        shell: bash
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/texpdf-memory-rust"
+          mkdir -p "$RUNNER_TEMP/texpdf-memory-rust"
+          cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-memory-rust/"
+
+      - name: Run 1000 licensed-Stata compiles with RSS sampling
+        shell: bash
+        run: /bin/bash ci/run_memory_stress.sh stress1000
+
+      - name: Validate and preserve combined evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -R "$RUNNER_TEMP/texpdf-memory-rust/." .ci/stata/run/
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            .ci/stata/run/receipt.json \
+            .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile stress1000 \
+            --require-success \
+            --require-rust-success
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+
+          measurement_path = Path(".ci/stata/run/memory-stress.json")
+          measurement = json.loads(measurement_path.read_text(encoding="utf-8"))
+          receipt = json.loads(Path(".ci/stata/run/receipt.json").read_text(encoding="utf-8"))
+          if measurement["iterations_requested"] < 1000:
+              raise SystemExit("fewer than 1000 iterations were measured")
+          if measurement["runner_rc"] != 0 or measurement["growth_gate"] is not True:
+              raise SystemExit("memory stress did not pass")
+          measurement.update(
+              {
+                  "qualified_source_sha": os.environ["GITHUB_SHA"],
+                  "platform": receipt.get("platform"),
+                  "stata_version": receipt.get("stata_version"),
+                  "stata_edition": receipt.get("stata_edition"),
+                  "stata_bundle_version": receipt.get("stata_bundle_version"),
+                  "ci_profile": receipt.get("profile"),
+                  "ci_run_id": receipt.get("run_id"),
+                  "rust_status": receipt.get("rust_status"),
+                  "stata_status": receipt.get("stata_status"),
+                  "qualification_boundary": (
+                      "1000 successful compile calls in one licensed Stata/MP 18 process "
+                      "on macOS Apple Silicon, with an ordinary TeX failure injected every "
+                      "25 calls and external RSS sampling."
+                  ),
+              }
+          )
+          Path("platform").mkdir(exist_ok=True)
+          Path("platform/macos-arm64-memory.json").write_text(
+              json.dumps(measurement, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          Path("platform/macos-arm64-memory-stata-receipt.json").write_text(
+              json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("TEXPDF_MEMORY_QUALIFICATION_READY", measurement)
+          PY
+
+      - name: Commit exact memory qualification record
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/record-memory-stress-once.yml
+          git reset -- stata/_texpdf_plugin.plugin ci/stata_profiles.json 2>/dev/null || true
+          rm -rf stata/_texpdf_plugin.plugin .ci/stata/run bundle/generated
+          git checkout -- ci/stata_profiles.json
+          git add platform/macos-arm64-memory.json \
+            platform/macos-arm64-memory-stata-receipt.json
+          git add -u .github/workflows/record-memory-stress-once.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test: record 1000-call macOS memory qualification"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep "$attempt"
+          done
+          echo "failed to publish memory qualification record" >&2
+          exit 1
+
+      - name: Upload full stress evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-memory-qualification-${{ github.sha }}-${{ github.run_id }}
+          path: .ci/stata/run/
+          if-no-files-found: error
+          retention-days: 30
