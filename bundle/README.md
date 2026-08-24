@@ -1,21 +1,62 @@
 # Embedded TeX resource bundle
 
-`texpdf` embeds a deterministic ZIP-format Tectonic bundle in each native plugin. Runtime compilation never downloads packages and never consults a system TeX tree.
+`texpdf` embeds a deterministic ZIP-format Tectonic bundle in each native
+plugin. Runtime compilation never downloads packages and never consults a
+system TeX tree.
 
-## Source and transformation
+## Qualified bundle
 
-The initial implementation uses Tectonic's version-33 indexed-tar resource as a bootstrap source. `tools/prepare_bundle.py` downloads the raw archive and gzip-compressed index into a cache, verifies locked checksums, reconstructs each logical file from the indexed byte range, and writes a deterministic ZIP archive at:
+The current qualified bundle is `texpdf-academic-v1`, derived from Tectonic's
+version-33 indexed-tar resource and the pinned `tlextras-2022.0` local-resource
+archive.
+
+Exact qualified values:
+
+- 477 logical resources;
+- 14,393,356 uncompressed resource bytes;
+- 6,692,142-byte deterministic ZIP;
+- ZIP SHA-256
+  `164a849049ae627d0b15ae28a9b5ad5930121c95b17827b528e1666fd62ca6e6`;
+- Tectonic content digest
+  `675375703bc247518c61902cbefccb2066d9e41c4d613c274f4a97fdf9fcce31`.
+
+The full qualification record is `QUALIFICATION.json`. The file-by-file
+selection, source byte ranges, and hashes are in `curated-manifest.json`.
+
+## Reproducible construction
+
+`tools/prepare_bundle.py` reconstructs the complete pinned source ZIP from the
+indexed tar. `tools/trace_resources.py` and the corpus identify requested
+resources. `tools/prepare_curated_bundle.py` then computes a deterministic
+closure over the source/local resource indices and writes:
 
 ```text
 bundle/generated/texpdf-bundle.zip
+bundle/generated/bundle-info.json
+bundle/generated/curated-manifest.json
 ```
 
-The generated archive is not committed to Git. It is a reproducible build input and is incorporated into the Rust binary with `include_bytes!()`.
+Generated archives are not committed. The Rust core incorporates the selected
+ZIP with `include_bytes!()` and opens it through Tectonic's in-memory
+`ZipBundle` implementation.
 
-The transformed ZIP must contain a valid 64-character `SHA256SUM` entry because Tectonic's `ZipBundle` uses that value as the bundle identity.
+The bundle's `SHA256SUM` entry is recomputed from the selected resources. Source
+archive, index, local archive, and local index checksums are pinned in
+`bundle.lock.toml`.
 
-## Bundle policy
+## Compatibility policy
 
-The first proof may embed the complete source bundle. Before v1, the bundle will be reduced to the package/font dependency closure advertised in `packages.toml`, with one compiling fixture per claimed top-level package. The final bundle manifest, source checksum, transformed checksum, file count, size, and licenses are release artifacts.
+`packages.toml` defines the advertised academic package groups. The integrated
+corpus exercises every current top-level package claim along with BibTeX and
+natbib. A package is not considered supported merely because a similarly named
+file is present; it must compile in the offline corpus.
 
-No generated bundle or license inventory is considered final until the offline corpus and redistribution audit are complete.
+Large or external-helper-dependent ecosystems—Beamer, TikZ/PGF, PSTricks,
+Biber/biblatex, and minted/Pygments—are excluded from the initial tier.
+
+## Licensing
+
+Every resource retains its upstream license. `curated-manifest.json` is the
+file-level provenance inventory. A complete package/font-to-license mapping and
+all required notices remain the final gate before public binary publication;
+see `../THIRD_PARTY_NOTICES.md`.
