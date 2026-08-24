@@ -1,0 +1,138 @@
+name: Wire fail-closed v1 release audit once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/wire-v1-release-audit-once.yml"
+      - "tools/report_v1_readiness.py"
+      - "tools/build_tex_resource_license_inventory.py"
+
+concurrency:
+  group: texpdf-wire-v1-release-audit-once
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  wire:
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Synchronize
+        id: state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if [[ -x tools/report_v1_readiness.py ]] &&
+             [[ -x tools/build_tex_resource_license_inventory.py ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Write permanent fail-closed release audit
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .github/workflows/release-audit.yml <<'YAML'
+          name: Fail-closed v1 release audit
+
+          on:
+            workflow_dispatch:
+
+          concurrency:
+            group: texpdf-v1-release-audit
+            cancel-in-progress: false
+
+          permissions:
+            contents: read
+
+          jobs:
+            audit:
+              runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+              timeout-minutes: 240
+              env:
+                STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+                STATA_PROFILE: quick
+                TEXPDF_RUST_PROFILE: engine
+                CARGO_TERM_COLOR: always
+                RUST_BACKTRACE: "1"
+              steps:
+                - name: Check out exact candidate
+                  uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+                  with:
+                    fetch-depth: 0
+
+                - name: Test Python release tooling
+                  run: /usr/bin/python3 -m unittest discover -s ci/tests -p 'test_*.py'
+
+                - name: Build and test exact embedded plugin
+                  run: /bin/bash ci/record_rust_quick.sh
+
+                - name: Verify Rust result
+                  run: /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+
+                - name: Generate exact embedded-resource inventory
+                  run: >-
+                    /usr/bin/python3 tools/build_tex_resource_license_inventory.py
+                    --require-complete
+
+                - name: Generate and require v1 readiness
+                  run: /usr/bin/python3 tools/report_v1_readiness.py --strict
+
+                - name: Run licensed Stata release candidate profile
+                  run: /bin/bash ci/run_stata_ci.sh quick
+
+                - name: Validate exact candidate receipt
+                  run: >-
+                    /usr/bin/python3 ci/check_stata_receipt.py
+                    .ci/stata/run/receipt.json
+                    --expect-tested-sha "$GITHUB_SHA"
+                    --expect-profile quick
+                    --require-success
+
+                - name: Upload fail-closed audit evidence
+                  if: ${{ always() }}
+                  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+                  with:
+                    name: texpdf-v1-audit-${{ github.sha }}-${{ github.run_id }}
+                    path: |
+                      .ci/stata/run/
+                      bundle/generated/bundle-info.json
+                      licenses/inventory/tex-resources.json
+                      release/V1_READINESS.json
+                      docs/V1_READINESS.md
+                    if-no-files-found: warn
+                    retention-days: 90
+
+          # Release publication is a separate workflow and must depend on a
+          # successful audit for the exact tagged source and every advertised
+          # target. This audit performs no publication itself.
+          YAML
+          rm -f .github/workflows/wire-v1-release-audit-once.yml
+      - name: Validate and commit
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -x ci/check_workflows.sh ]]; then
+            ci/check_workflows.sh
+          fi
+          git add .github/workflows/release-audit.yml
+          git add -u .github/workflows/wire-v1-release-audit-once.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "ci: make the v1 release audit fail closed"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
