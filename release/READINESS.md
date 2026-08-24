@@ -1,6 +1,6 @@
 # texpdf release-readiness audit
 
-macOS ARM64 implementation qualified: **false**
+macOS ARM64 implementation qualified: **true**
 Public cross-platform v1 ready: **false**
 
 | Check | Result | Release blocker | Detail |
@@ -9,7 +9,7 @@ Public cross-platform v1 ready: **false**
 | `package_file_texpdf.sthlp` | PASS | no | stata/texpdf.sthlp |
 | `package_file_texpdf.pkg` | PASS | no | stata/texpdf.pkg |
 | `package_file_stata.toc` | PASS | no | stata/stata.toc |
-| `cargo_lock` | FAIL | yes | Cargo.lock is committed |
+| `cargo_lock` | PASS | no | Cargo.lock is committed |
 | `target_registry` | PASS | no | target count=4 |
 | `macos_arm_runtime` | PASS | no | source=55dc0a564a260a210ce43fd22910af6ef483eb60; plugin_bytes=49997392; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | PASS | no | architectures=['arm64', 'x86_64']; universal_bytes=100051312; arm_runtime=True |
@@ -24,7 +24,6 @@ Public cross-platform v1 ready: **false**
 
 ## Active public-release blockers
 
-- `cargo_lock`
 - `macos_intel_runtime`
 - `x86_64-pc-windows-msvc_runtime`
 - `x86_64-unknown-linux-gnu_runtime`

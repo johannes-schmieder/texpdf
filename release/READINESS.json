@@ -27,8 +27,8 @@
     {
       "detail": "Cargo.lock is committed",
       "key": "cargo_lock",
-      "passed": false,
-      "release_blocker": true
+      "passed": true,
+      "release_blocker": false
     },
     {
       "detail": "target count=4",
@@ -97,10 +97,9 @@
       "release_blocker": true
     }
   ],
-  "implementation_complete_macos_arm64": false,
+  "implementation_complete_macos_arm64": true,
   "public_release_ready": false,
   "release_blockers": [
-    "cargo_lock",
     "macos_intel_runtime",
     "x86_64-pc-windows-msvc_runtime",
     "x86_64-unknown-linux-gnu_runtime",
