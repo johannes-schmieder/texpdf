@@ -1,0 +1,38 @@
+# TeX Live 2022 top-level packages for the intended texpdf v1 academic tier.
+# Dependency closure is resolved from the pinned texlive.tlpdb. Packages are
+# advertised only after their fixtures pass on every supported platform.
+
+latex
+amsmath
+amsfonts
+amscls
+mathtools
+booktabs
+tools
+multirow
+threeparttable
+threeparttablex
+siunitx
+adjustbox
+graphics
+graphics-cfg
+graphics-def
+xcolor
+geometry
+float
+placeins
+rotating
+pdflscape
+caption
+hyperref
+url
+setspace
+enumitem
+fancyhdr
+titlesec
+microtype
+natbib
+lm
+lm-math
+tex-gyre
+tex-gyre-math
