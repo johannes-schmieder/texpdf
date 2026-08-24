@@ -10,9 +10,6 @@ if [[ ! -x "$rustup_bin" ]]; then
 fi
 
 cd "$repo_root"
-# Use the release-pinned compiler. rustfmt and Clippy are rustup components,
-# not intrinsic Cargo commands, so make their presence explicit and idempotent
-# on the dedicated self-hosted runner.
 toolchain="${RUST_TOOLCHAIN:-1.97.1}"
 if ! "$rustup_bin" run "$toolchain" rustc --version >/dev/null 2>&1; then
   echo "Required Rust toolchain $toolchain is not installed" >&2
@@ -22,16 +19,12 @@ fi
 
 toolchain_cargo="$($rustup_bin which --toolchain "$toolchain" cargo)"
 toolchain_bin="$(/usr/bin/dirname "$toolchain_cargo")"
-# Cargo discovers external subcommands such as cargo-fmt and cargo-clippy via
-# PATH. The runner is a LaunchAgent, so add the standard Homebrew prefixes
-# explicitly as well; this does not install or mutate machine dependencies.
 export PATH="$toolchain_bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export RUSTC="$($rustup_bin which --toolchain "$toolchain" rustc)"
 
-rustc_version="$($rustup_bin run "$toolchain" rustc --version)"
+rustc_version="$($RUSTC --version)"
 echo "RUST_TOOLCHAIN=$toolchain"
 echo "RUSTC_VERSION=$rustc_version"
-echo "PKG_CONFIG_PATH_BIN=$(command -v pkg-config || true)"
-echo "PKGCONF_PATH_BIN=$(command -v pkgconf || true)"
 
 if [[ -f Cargo.toml ]]; then
   export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/private/tmp/texpdf-cargo-target}"
@@ -63,14 +56,15 @@ if [[ -f Cargo.toml ]]; then
   /bin/cp bundle/generated/bundle-info.json .ci/stata/run/bundle-info.json
 
   "$toolchain_cargo" fmt --all --check
+  # Tectonic's bridge crates require PNG, FreeType, Graphite2, HarfBuzz, ICU,
+  # Fontconfig, and zlib. Build them statically in a repository-scoped vcpkg
+  # tree so the eventual plugin does not depend on a user's package manager.
+  source tools/prepare_native_deps.sh
   "$toolchain_cargo" clippy --locked --workspace --all-targets --all-features -- -D warnings
   if [[ "$rust_profile" == engine ]]; then
     "$toolchain_cargo" test --locked --workspace --all-targets --all-features
     echo "RUST_QUICK_MODE=repository-engine"
   else
-    # Compile every test target, but execute only the lightweight diagnostics
-    # tests. Runtime engine tests require the real bundle and run in the
-    # explicit engine profile.
     "$toolchain_cargo" test --locked --workspace --all-targets --all-features diagnostics::tests
     echo "RUST_QUICK_MODE=repository-compile"
   fi
@@ -78,7 +72,7 @@ else
   smoke_root="${RUNNER_TEMP:-/private/tmp}/texpdf-rust-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
   /bin/mkdir -p "$smoke_root"
   /usr/bin/printf '%s\n' 'fn main() { println!("TEXPDF_RUST_CI_OK"); }' > "$smoke_root/main.rs"
-  "$rustup_bin" run "$toolchain" rustc "$smoke_root/main.rs" -o "$smoke_root/texpdf-rust-smoke"
+  "$RUSTC" "$smoke_root/main.rs" -o "$smoke_root/texpdf-rust-smoke"
   "$smoke_root/texpdf-rust-smoke"
   echo "RUST_QUICK_MODE=toolchain-smoke"
 fi
