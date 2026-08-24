@@ -97,12 +97,12 @@ runner_rc=$?
 set -e
 completed_epoch="$(/bin/date +%s)"
 
+set +e
 /usr/bin/python3 - "$samples" "$summary" "$iterations" "$runner_rc" "$started_epoch" "$completed_epoch" <<'PY'
 from __future__ import annotations
 
 from pathlib import Path
 import json
-import math
 import statistics
 import sys
 
@@ -143,12 +143,14 @@ iteration_rows = [
     row for row in rows if row["iteration"] > 0 and row["stata_rss_kib"] > 0
 ]
 
+
 def window_values(lower: int, upper: int) -> list[int]:
     return [
         row["stata_rss_kib"]
         for row in iteration_rows
         if lower <= row["iteration"] <= upper
     ]
+
 
 warm_lower = max(1, iterations // 10)
 warm_upper = max(warm_lower, iterations // 5)
@@ -169,7 +171,7 @@ growth_ratio = (
 )
 
 # A deliberately loose automated guard catches severe monotone leaks while
-# leaving the exact measurements available for engineering review.
+# leaving exact measurements available for engineering review.
 max_allowed_growth_kib = 512 * 1024
 growth_gate = growth_kib is not None and growth_kib <= max_allowed_growth_kib
 
@@ -192,12 +194,30 @@ payload = {
     "growth_gate": growth_gate,
 }
 summary_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-print("TEXPDF_MEMORY_STRESS " + " ".join(f"{key}={value}" for key, value in payload.items() if key not in {"schema_version", "warm_window", "late_window"}))
+print(
+    "TEXPDF_MEMORY_STRESS "
+    + " ".join(
+        f"{key}={value}"
+        for key, value in payload.items()
+        if key not in {"schema_version", "warm_window", "late_window"}
+    )
+)
 if runner_rc != 0 or not growth_gate:
     raise SystemExit(2)
 PY
+analyzer_rc=$?
+set -e
 
+# Preserve all available evidence before propagating either the Stata runner or
+# analyzer failure. Previously, `set -e` could terminate here before the summary
+# reached `.ci/stata/run`, making a failed qualification impossible to diagnose.
 mkdir -p .ci/stata/run
 cp "$samples" .ci/stata/run/rss-samples.tsv
-cp "$summary" .ci/stata/run/memory-stress.json
-exit "$runner_rc"
+if [[ -f "$summary" ]]; then
+  cp "$summary" .ci/stata/run/memory-stress.json
+fi
+
+if [[ $runner_rc -ne 0 ]]; then
+  exit "$runner_rc"
+fi
+exit "$analyzer_rc"
