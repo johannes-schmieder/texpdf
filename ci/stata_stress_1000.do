@@ -3,6 +3,8 @@ clear all
 set more off
 set varabbrev off
 
+* This profile is the release-gate probe for post-compile allocator pressure
+* relief and long-lived in-process stability.
 local iterations : environment TEXPDF_STRESS_ITERATIONS
 if `"`iterations'"' == "" local iterations "1000"
 local repetitions = real(`"`iterations'"')
