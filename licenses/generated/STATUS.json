@@ -39,13 +39,13 @@
   "curated_manifest_file_count": 0,
   "dependency_undeclared_count": 0,
   "missing_native_notice_files": 0,
-  "missing_rust_notice_files": 40,
+  "missing_rust_notice_files": 37,
   "pipeline_complete": false,
   "qualification_boundary": "This status records the audit pipeline even when a stage fails. Public binary publication remains blocked unless release_license_complete is true.",
   "release_license_complete": false,
   "resource_count_matches_manifest": false,
   "schema_version": 2,
-  "source_sha": "9d956b07b7577613b70f5f7efa9b322bdd74310f",
+  "source_sha": "53d74f491fc5c6813c2e27fac6f35ffcb3f05919",
   "stage_return_codes": {
     "cargo_inventory": 0,
     "collect_license_texts": 1,
@@ -141,7 +141,7 @@
       "name": "collect_license_texts",
       "return_code": 1,
       "stderr_tail": "",
-      "stdout_tail": "TEXPDF_LICENSE_TEXTS_READY rust=448 native=7 missing_rust=40 missing_native=0"
+      "stdout_tail": "TEXPDF_LICENSE_TEXTS_READY rust=448 native=7 missing_rust=37 missing_native=0"
     },
     {
       "error": "",
