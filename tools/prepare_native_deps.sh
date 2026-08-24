@@ -116,13 +116,15 @@ import sys
 
 path = Path(sys.argv[1])
 text = path.read_text(encoding="utf-8")
-needle = "SRCS=libpkgconf/argvsplit.c"
-replacement = "SRCS=libpkgconf/argvsplit.c libpkgconf/buffer.c"
 if "libpkgconf/buffer.c" not in text:
-    if needle not in text:
+    lines = text.splitlines(keepends=True)
+    for index, line in enumerate(lines):
+        if "libpkgconf/argvsplit.c" in line:
+            lines.insert(index + 1, "\tlibpkgconf/buffer.c\t\t\\\n")
+            break
+    else:
         raise SystemExit("cannot locate Makefile.lite SRCS anchor")
-    text = text.replace(needle, replacement, 1)
-    path.write_text(text, encoding="utf-8")
+    path.write_text("".join(lines), encoding="utf-8")
 PY
 }
 
