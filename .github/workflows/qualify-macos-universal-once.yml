@@ -1,0 +1,168 @@
+name: Qualify macOS universal plugin once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/qualify-macos-universal-once.yml"
+
+concurrency:
+  group: texpdf-macos-universal-once
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 240
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: quick
+      TEXPDF_RUST_PROFILE: engine
+      CARGO_TARGET_DIR: /private/tmp/texpdf-cargo-target-universal-once
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Build and test Apple Silicon plugin
+        shell: bash
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Cross-build Intel slice from the same source and bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup target add x86_64-apple-darwin --toolchain 1.97.1
+          export RUSTC="$(rustup which --toolchain 1.97.1 rustc)"
+          export PATH="$(dirname "$(rustup which --toolchain 1.97.1 cargo)"):/opt/homebrew/bin:/usr/local/bin:$PATH"
+          source tools/prepare_native_deps.sh
+          "$VCPKG_ROOT/vcpkg" install \
+            --triplet x64-osx \
+            fontconfig freetype 'harfbuzz[graphite2]' icu libpng zlib
+          export VCPKGRS_TRIPLET=x64-osx
+          export TECTONIC_DEP_BACKEND=vcpkg
+          cargo build --locked --release --package texpdf-stata \
+            --target x86_64-apple-darwin
+          test -f "$CARGO_TARGET_DIR/x86_64-apple-darwin/release/libtexpdf_stata.dylib"
+
+      - name: Create universal plugin and stage it for Stata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/macos-universal
+          arm64=stata/_texpdf_plugin.plugin
+          x64="$CARGO_TARGET_DIR/x86_64-apple-darwin/release/libtexpdf_stata.dylib"
+          universal=dist/macos-universal/_texpdf_plugin.plugin
+          cp "$x64" dist/macos-universal/_texpdf_plugin.x86_64.plugin
+          /usr/bin/lipo -create "$arm64" "$x64" -output "$universal"
+          /usr/bin/lipo -verify_arch arm64 x86_64 "$universal"
+          /usr/bin/lipo -info "$universal" | tee dist/macos-universal/lipo.txt
+          /usr/bin/nm -arch arm64 -gU "$universal" | /usr/bin/grep -q 'pginit'
+          /usr/bin/nm -arch arm64 -gU "$universal" | /usr/bin/grep -q 'stata_call'
+          /usr/bin/nm -arch x86_64 -gU "$universal" | /usr/bin/grep -q 'pginit'
+          /usr/bin/nm -arch x86_64 -gU "$universal" | /usr/bin/grep -q 'stata_call'
+          cp "$universal" stata/_texpdf_plugin.plugin
+          git add -f stata/_texpdf_plugin.plugin
+
+      - name: Run the full licensed Stata suite against the universal plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/run_stata_ci.sh quick
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success
+
+      - name: Write exact universal artifact record
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import os
+
+          root = Path("dist/macos-universal")
+          paths = {
+              "arm64": Path("stata/_texpdf_plugin.plugin"),
+              "x86_64": root / "_texpdf_plugin.x86_64.plugin",
+              "universal": root / "_texpdf_plugin.plugin",
+          }
+          # The staged Stata path now contains the universal file, so recover
+          # the original ARM measurement from the engine build manifest.
+          plugin_manifest = json.loads(
+              Path(".ci/stata/run/plugin-manifest.json").read_text(encoding="utf-8")
+          ) if Path(".ci/stata/run/plugin-manifest.json").is_file() else {}
+          receipt = json.loads(Path(".ci/stata/run/receipt.json").read_text(encoding="utf-8"))
+
+          def record(path: Path) -> dict[str, object]:
+              data = path.read_bytes()
+              return {"size_bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+
+          payload = {
+              "schema_version": 1,
+              "source_sha": os.environ["GITHUB_SHA"],
+              "architectures": ["arm64", "x86_64"],
+              "universal": record(paths["universal"]),
+              "x86_64_slice": record(paths["x86_64"]),
+              "arm64_original_manifest": plugin_manifest,
+              "arm64_stata_runtime": {
+                  "qualified": True,
+                  "profile": receipt.get("profile"),
+                  "status": receipt.get("status"),
+                  "stata_status": receipt.get("stata_status"),
+                  "stata_version": receipt.get("stata_version"),
+                  "stata_edition": receipt.get("stata_edition"),
+              },
+              "x86_64_stata_runtime": {
+                  "qualified": False,
+                  "reason": "Intel slice was cross-built and symbol-checked but not loaded in Intel Stata."
+              },
+          }
+          root.joinpath("QUALIFICATION.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          Path("release/macos-universal.json").parent.mkdir(parents=True, exist_ok=True)
+          Path("release/macos-universal.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          PY
+          /usr/bin/shasum -a 256 dist/macos-universal/* > dist/macos-universal/CHECKSUMS.sha256
+
+      - name: Upload universal artifact and evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-macos-universal-${{ github.sha }}
+          path: |
+            dist/macos-universal/
+            .ci/stata/run/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit qualification record and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/qualify-macos-universal-once.yml
+          git reset -- stata/_texpdf_plugin.plugin 2>/dev/null || true
+          rm -f stata/_texpdf_plugin.plugin
+          rm -rf bundle/generated .ci/stata/run
+          git add release/macos-universal.json
+          git add -u .github/workflows/qualify-macos-universal-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: record macOS universal development artifact [skip ci]"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
