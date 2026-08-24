@@ -2,6 +2,7 @@ use std::{
     collections::BTreeSet,
     env,
     error::Error,
+    fmt::Arguments,
     fs,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -9,9 +10,44 @@ use std::{
 
 use tectonic::driver::{OutputFormat, ProcessingSessionBuilder};
 use tectonic_bundles::{itar::ItarBundle, Bundle};
-use tectonic_errors::Result as TectonicResult;
+use tectonic_errors::{Error as TectonicError, Result as TectonicResult};
 use tectonic_io_base::{digest::DigestData, InputHandle, IoProvider, OpenResult};
-use tectonic_status_base::{NoopStatusBackend, StatusBackend};
+use tectonic_status_base::{MessageKind, StatusBackend};
+
+const MAX_TEX_LOG_BYTES: usize = 256 * 1024;
+
+#[derive(Default)]
+struct ResolverStatus;
+
+impl StatusBackend for ResolverStatus {
+    fn report(&mut self, kind: MessageKind, args: Arguments<'_>, err: Option<&TectonicError>) {
+        let label = match kind {
+            MessageKind::Note => "NOTE",
+            MessageKind::Warning => "WARNING",
+            MessageKind::Error => "ERROR",
+            _ => "MESSAGE",
+        };
+        eprintln!("TEXPDF_RESOLVER_{label} {args}");
+        if let Some(error) = err {
+            eprintln!("TEXPDF_RESOLVER_CAUSE {error:#}");
+        }
+    }
+
+    fn dump_error_logs(&mut self, output: &[u8]) {
+        let retained = if output.len() > MAX_TEX_LOG_BYTES {
+            &output[output.len() - MAX_TEX_LOG_BYTES..]
+        } else {
+            output
+        };
+        eprintln!(
+            "TEXPDF_RESOLVER_TEX_LOG_BEGIN bytes={} retained={}",
+            output.len(),
+            retained.len()
+        );
+        eprintln!("{}", String::from_utf8_lossy(retained));
+        eprintln!("TEXPDF_RESOLVER_TEX_LOG_END");
+    }
+}
 
 struct RecordingBundle {
     inner: Box<dyn Bundle>,
@@ -63,7 +99,7 @@ fn compile_source(
         inner: Box::new(network_bundle),
         requested,
     };
-    let mut status = NoopStatusBackend {};
+    let mut status = ResolverStatus;
     let mut builder = ProcessingSessionBuilder::default();
     builder
         .primary_input_path(&input)
@@ -80,12 +116,18 @@ fn compile_source(
         .build_date_from_env(true)
         .bundle(Box::new(recording));
 
+    eprintln!("TEXPDF_RESOLVER_COMPILE_BEGIN source={}", input.display());
     let mut session = builder.create(&mut status)?;
     session.run(&mut status)?;
     let pdf = output.path().join(Path::new(input_name).with_extension("pdf"));
     if !pdf.is_file() {
         return Err("Tectonic resolver produced no PDF".into());
     }
+    eprintln!(
+        "TEXPDF_RESOLVER_COMPILE_SUCCESS source={} pdf_bytes={}",
+        input.display(),
+        pdf.metadata()?.len()
+    );
     Ok(())
 }
 
@@ -126,6 +168,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut first_error: Option<Box<dyn Error>> = None;
     for source in &sources {
         if let Err(error) = compile_source(&bundle_url, source, Arc::clone(&requested)) {
+            eprintln!(
+                "TEXPDF_RESOLVER_COMPILE_FAILURE source={} error={error:#}",
+                source.display()
+            );
             first_error = Some(error);
             break;
         }
