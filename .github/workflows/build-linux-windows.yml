@@ -75,6 +75,10 @@ jobs:
           cargo="$(rustup which --toolchain "$TEXPDF_RUST_TOOLCHAIN" cargo)"
           export CARGO_TARGET_DIR="$RUNNER_TEMP/texpdf-target"
           "$cargo" fmt --all --check
+          "$cargo" build --locked --release --package texpdf-helper \
+            --target x86_64-unknown-linux-gnu
+          export TEXPDF_HELPER_PATH="$CARGO_TARGET_DIR/x86_64-unknown-linux-gnu/release/texpdf-helper"
+          test -f "$TEXPDF_HELPER_PATH"
           "$cargo" clippy --locked --workspace --all-targets --all-features -- -D warnings
           "$cargo" test --locked --workspace --all-targets --all-features
           "$cargo" build --locked --release --package texpdf-stata \
@@ -125,8 +129,10 @@ jobs:
           PY
           python3 tools/package_release.py \
             --plugin dist/linux-x86_64/_texpdf_plugin.plugin \
+            --bundle-info bundle/generated/bundle-info.json \
             --output-dir dist/texpdf-linux-x86_64 \
             --zip dist/texpdf-linux-x86_64.zip \
+            --manifest dist/linux-x86_64/package-manifest.json \
             --target x86_64-unknown-linux-gnu
 
       - name: Upload Linux development artifact
@@ -174,6 +180,10 @@ jobs:
           $env:CARGO_TARGET_DIR = "$env:RUNNER_TEMP\texpdf-target"
           & $cargo fmt --all --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $cargo build --locked --release --package texpdf-helper --target x86_64-pc-windows-msvc
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:TEXPDF_HELPER_PATH = "$env:CARGO_TARGET_DIR\x86_64-pc-windows-msvc\release\texpdf-helper.exe"
+          if (-not (Test-Path $env:TEXPDF_HELPER_PATH)) { throw "target-matching helper was not built" }
           & $cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & $cargo test --locked --workspace --all-targets --all-features
@@ -239,8 +249,10 @@ jobs:
           '@ | python -
           python tools/package_release.py `
             --plugin dist\windows-x86_64\_texpdf_plugin.plugin `
+            --bundle-info bundle\generated\bundle-info.json `
             --output-dir dist\texpdf-windows-x86_64 `
             --zip dist\texpdf-windows-x86_64.zip `
+            --manifest dist\windows-x86_64\package-manifest.json `
             --target x86_64-pc-windows-msvc
 
       - name: Upload Windows development artifact

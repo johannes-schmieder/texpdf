@@ -1,110 +1,172 @@
 {
+  "candidate_blockers": [
+    "macos_intel_runtime",
+    "third_party_license_complete",
+    "macos_arm_memory_stress"
+  ],
+  "candidate_ready": false,
+  "candidate_version": "0.1.0-rc.1",
   "checks": [
     {
+      "candidate_release_blocker": false,
       "detail": "stata/texpdf.ado",
       "key": "package_file_texpdf.ado",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
       "detail": "stata/texpdf.sthlp",
       "key": "package_file_texpdf.sthlp",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
       "detail": "stata/texpdf.pkg",
       "key": "package_file_texpdf.pkg",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
       "detail": "stata/stata.toc",
       "key": "package_file_stata.toc",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
       "detail": "Cargo.lock is committed",
       "key": "cargo_lock",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
       "detail": "target count=4",
       "key": "target_registry",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
-      "detail": "source=640ed14c0fe0da09ef9a8cee195805f0ea9b39bf; plugin_bytes=49998208; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
+      "candidate_release_blocker": false,
+      "detail": "source=475f55f48ea3079ee6021e92cdc103eace091450; plugin_bytes=51146384; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
       "detail": "architectures=['arm64', 'x86_64']; universal_bytes=100051312; arm_runtime=True",
       "key": "macos_universal_build",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
       "detail": "source=32bceb84df47a1c955c10cf75cb60a9d0fbb8d96; plugin_bytes=50043664",
       "key": "macos_intel_build",
       "passed": true,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
-      "detail": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending",
+      "candidate_release_blocker": true,
+      "detail": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed",
       "key": "macos_intel_runtime",
       "passed": false,
+      "public_release_blocker": true,
       "release_blocker": true
     },
     {
+      "candidate_release_blocker": false,
       "detail": "native build and Stata runtime qualification pending",
       "key": "x86_64-pc-windows-msvc_build",
       "passed": false,
+      "public_release_blocker": false,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
       "detail": "native build and Stata runtime qualification pending",
       "key": "x86_64-pc-windows-msvc_runtime",
       "passed": false,
-      "release_blocker": true
-    },
-    {
-      "detail": "native build and Stata runtime qualification pending",
-      "key": "x86_64-unknown-linux-gnu_build",
-      "passed": false,
+      "public_release_blocker": true,
       "release_blocker": false
     },
     {
+      "candidate_release_blocker": false,
+      "detail": "native build and Stata runtime qualification pending",
+      "key": "x86_64-unknown-linux-gnu_build",
+      "passed": false,
+      "public_release_blocker": false,
+      "release_blocker": false
+    },
+    {
+      "candidate_release_blocker": false,
       "detail": "native build and Stata runtime qualification pending",
       "key": "x86_64-unknown-linux-gnu_runtime",
       "passed": false,
-      "release_blocker": true
+      "public_release_blocker": true,
+      "release_blocker": false
     },
     {
-      "detail": "source=dc005e728971607a17a181f18ec2a2a06e944c6d; resources=556; mapped=406; ambiguous=8; unmapped=5; missing_license=137; missing_rust_texts=31; missing_native_texts=0",
+      "candidate_release_blocker": true,
+      "detail": "source=475f55f48ea3079ee6021e92cdc103eace091450; resources=556; mapped=406; ambiguous=8; unmapped=5; missing_license=137; missing_rust_texts=0; missing_native_texts=0",
       "key": "third_party_license_complete",
       "passed": false,
+      "public_release_blocker": true,
       "release_blocker": true
     },
     {
+      "candidate_release_blocker": true,
       "detail": "source=2906be9e4628cd44197e5d6310a810b74f2aca7e; iterations=1000; peak_rss_kib=1249968; post_warmup_growth_kib=819480; growth_ratio=3.163449353721382",
       "key": "macos_arm_memory_stress",
       "passed": false,
+      "public_release_blocker": true,
       "release_blocker": true
+    },
+    {
+      "candidate_release_blocker": false,
+      "detail": "kind=private_release_candidate; version=0.1.0-rc.1; required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin']",
+      "key": "release_scope",
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
+    },
+    {
+      "candidate_release_blocker": false,
+      "detail": "public repository and net-install publication are deferred by owner decision",
+      "key": "public_distribution",
+      "passed": false,
+      "public_release_blocker": true,
+      "release_blocker": false
     }
   ],
   "implementation_complete_macos_arm64": true,
-  "public_release_ready": false,
-  "release_blockers": [
+  "public_release_blockers": [
     "macos_intel_runtime",
     "x86_64-pc-windows-msvc_runtime",
     "x86_64-unknown-linux-gnu_runtime",
     "third_party_license_complete",
+    "macos_arm_memory_stress",
+    "public_distribution"
+  ],
+  "public_release_ready": false,
+  "release_blockers": [
+    "macos_intel_runtime",
+    "third_party_license_complete",
     "macos_arm_memory_stress"
   ],
-  "schema_version": 2
+  "release_kind": "private_release_candidate",
+  "schema_version": 3
 }

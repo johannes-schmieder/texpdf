@@ -25,8 +25,10 @@ REQUIRED_PACKAGE_FILES = (
 )
 TARGETS_PATH = Path("release/targets.json")
 UNIVERSAL_PATH = Path("release/macos-universal.json")
+INTEL_RUNTIME_PATH = Path("release/macos-intel-runtime.json")
 MEMORY_PATH = Path("release/memory-stress-macos-arm64.json")
 LICENSE_STATUS_PATH = Path("licenses/generated/STATUS.json")
+SCOPE_PATH = Path("release/scope.json")
 
 
 class AuditError(RuntimeError):
@@ -49,13 +51,19 @@ def add_check(
     passed: bool,
     detail: str,
     release_blocker: bool = True,
+    public_release_blocker: bool | None = None,
 ) -> None:
+    failed = not passed
+    if public_release_blocker is None:
+        public_release_blocker = release_blocker
     checks.append(
         {
             "key": key,
             "passed": bool(passed),
             "detail": detail,
-            "release_blocker": bool(release_blocker and not passed),
+            "release_blocker": bool(release_blocker and failed),
+            "candidate_release_blocker": bool(release_blocker and failed),
+            "public_release_blocker": bool(public_release_blocker and failed),
         }
     )
 
@@ -151,21 +159,23 @@ def validate_arm_target(
 def validate_universal(
     targets: dict[str, dict[str, Any]], checks: list[dict[str, Any]]
 ) -> None:
+    data: dict[str, Any] = {}
     if not UNIVERSAL_PATH.is_file():
         add_check(
             checks,
             "macos_universal_build",
             False,
             f"missing {UNIVERSAL_PATH}",
-            release_blocker=False,
         )
     else:
         data = read_json(UNIVERSAL_PATH)
         architectures = set(data.get("architectures", []))
         universal = data.get("universal", {})
         slices = data.get("slices", {})
+        source_sha = data.get("source_sha")
         build_ok = (
-            architectures == {"arm64", "x86_64"}
+            valid_source_sha(source_sha)
+            and architectures == {"arm64", "x86_64"}
             and isinstance(universal, dict)
             and int(universal.get("size_bytes", 0)) > 0
             and valid_sha256(universal.get("sha256"))
@@ -186,15 +196,22 @@ def validate_universal(
                 f"universal_bytes={universal.get('size_bytes')}; "
                 f"arm_runtime={data.get('arm_runtime_qualified')}"
             ),
-            release_blocker=False,
         )
 
     intel = targets.get("x86_64-apple-darwin", {})
+    slices = data.get("slices", {}) if isinstance(data, dict) else {}
+    intel_slice = slices.get("x86_64", {}) if isinstance(slices, dict) else {}
+    universal = data.get("universal", {}) if isinstance(data, dict) else {}
     intel_build = (
         intel.get("build_qualified") is True
         and valid_source_sha(intel.get("build_source_sha"))
         and int(intel.get("plugin_size_bytes", 0)) > 0
         and valid_sha256(intel.get("plugin_sha256"))
+        and intel.get("build_source_sha") == data.get("source_sha")
+        and intel.get("plugin_size_bytes") == intel_slice.get("size_bytes")
+        and intel.get("plugin_sha256") == intel_slice.get("sha256")
+        and intel.get("universal_plugin_size_bytes") == universal.get("size_bytes")
+        and intel.get("universal_plugin_sha256") == universal.get("sha256")
     )
     add_check(
         checks,
@@ -204,14 +221,42 @@ def validate_universal(
             f"source={intel.get('build_source_sha')}; "
             f"plugin_bytes={intel.get('plugin_size_bytes')}"
         ),
-        release_blocker=False,
+    )
+    intel_source = str(intel.get("qualified_source_sha", ""))
+    intel_receipt_ok, intel_receipt_detail = (
+        successful_receipt(intel_source)
+        if valid_source_sha(intel_source)
+        else (False, "qualified source SHA is missing or malformed")
+    )
+    intel_runtime: dict[str, Any] = {}
+    if INTEL_RUNTIME_PATH.is_file():
+        intel_runtime = read_json(INTEL_RUNTIME_PATH)
+    runtime_record_ok = (
+        intel_runtime.get("qualified") is True
+        and intel_runtime.get("source_sha") == intel_source
+        and intel_runtime.get("universal_plugin_size_bytes")
+        == universal.get("size_bytes")
+        and intel_runtime.get("universal_plugin_sha256") == universal.get("sha256")
+        and intel_runtime.get("intel_slice_size_bytes") == intel_slice.get("size_bytes")
+        and intel_runtime.get("intel_slice_sha256") == intel_slice.get("sha256")
+        and isinstance(intel_runtime.get("receipt"), dict)
+        and intel_runtime["receipt"].get("tested_sha") == intel_source
+        and intel_runtime["receipt"].get("status") == "success"
+        and intel_runtime["receipt"].get("stata_status") == "success"
     )
     add_check(
         checks,
         "macos_intel_runtime",
         intel.get("stata_runtime_qualified") is True
-        and valid_source_sha(intel.get("qualified_source_sha")),
-        str(intel.get("status", "actual Intel Stata runtime qualification is absent")),
+        and valid_source_sha(intel_source)
+        and data.get("intel_runtime_qualified") is True
+        and intel_receipt_ok
+        and runtime_record_ok,
+        (
+            f"{intel.get('status', 'actual Intel Stata runtime qualification is absent')}; "
+            f"runtime_record={'valid' if runtime_record_ok else 'missing/invalid'}; "
+            f"{intel_receipt_detail}"
+        ),
     )
 
 
@@ -235,6 +280,7 @@ def validate_other_targets(
             build_ok,
             str(record.get("status", f"no {label} build record")),
             release_blocker=False,
+            public_release_blocker=False,
         )
         runtime_ok = (
             record.get("stata_runtime_qualified") is True
@@ -245,6 +291,8 @@ def validate_other_targets(
             f"{target}_runtime",
             runtime_ok,
             str(record.get("status", f"no licensed {label} Stata qualification")),
+            release_blocker=False,
+            public_release_blocker=True,
         )
 
 
@@ -259,7 +307,7 @@ def validate_license_status(checks: list[dict[str, Any]]) -> None:
         return
     data = read_json(LICENSE_STATUS_PATH)
     tex = data.get("tex_resources", {})
-    return_codes = data.get("return_codes", {})
+    return_codes = data.get("return_codes") or data.get("stage_return_codes", {})
     complete = (
         data.get("release_license_complete") is True
         and valid_source_sha(data.get("source_sha"))
@@ -323,39 +371,77 @@ def validate_memory(checks: list[dict[str, Any]]) -> None:
     )
 
 
+def validate_scope(checks: list[dict[str, Any]]) -> dict[str, Any]:
+    if not SCOPE_PATH.is_file():
+        add_check(checks, "release_scope", False, f"missing {SCOPE_PATH}")
+        return {}
+    scope = read_json(SCOPE_PATH)
+    required = scope.get("required_runtime_targets")
+    valid = (
+        scope.get("schema_version") == 1
+        and scope.get("release_kind") == "private_release_candidate"
+        and scope.get("candidate_version") == "0.1.0-rc.1"
+        and required == ["aarch64-apple-darwin", "x86_64-apple-darwin"]
+        and scope.get("deferred_runtime_targets")
+        == ["x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu"]
+        and scope.get("public_distribution_enabled") is False
+    )
+    add_check(
+        checks,
+        "release_scope",
+        valid,
+        (
+            f"kind={scope.get('release_kind')}; version={scope.get('candidate_version')}; "
+            f"required_targets={required}"
+        ),
+    )
+    public_enabled = scope.get("public_distribution_enabled") is True
+    add_check(
+        checks,
+        "public_distribution",
+        public_enabled,
+        "public repository and net-install publication are deferred by owner decision",
+        release_blocker=False,
+        public_release_blocker=True,
+    )
+    return scope
+
+
 def render_markdown(result: dict[str, Any]) -> str:
     lines = [
         "# texpdf release-readiness audit",
         "",
         f"macOS ARM64 implementation qualified: **{str(result['implementation_complete_macos_arm64']).lower()}**",
+        f"Private macOS universal candidate ready: **{str(result['candidate_ready']).lower()}**",
         f"Public cross-platform v1 ready: **{str(result['public_release_ready']).lower()}**",
         "",
-        "| Check | Result | Release blocker | Detail |",
-        "|---|---|---|---|",
+        "| Check | Result | Candidate blocker | Public blocker | Detail |",
+        "|---|---|---|---|---|",
     ]
     for check in result["checks"]:
         detail = str(check["detail"]).replace("|", "\\|").replace("\n", " ")
         lines.append(
             f"| `{check['key']}` | {'PASS' if check['passed'] else 'FAIL'} | "
-            f"{'yes' if check['release_blocker'] else 'no'} | {detail} |"
+            f"{'yes' if check['candidate_release_blocker'] else 'no'} | "
+            f"{'yes' if check['public_release_blocker'] else 'no'} | {detail} |"
         )
-    lines.extend(["", "## Active public-release blockers", ""])
-    blockers = result["release_blockers"]
+    lines.extend(["", "## Active private-candidate blockers", ""])
+    blockers = result["candidate_blockers"]
     if blockers:
         lines.extend(f"- `{item}`" for item in blockers)
+    else:
+        lines.append("None.")
+    lines.extend(["", "## Deferred public-release blockers", ""])
+    public_blockers = result["public_release_blockers"]
+    if public_blockers:
+        lines.extend(f"- `{item}`" for item in public_blockers)
     else:
         lines.append("None.")
     lines.append("")
     return "\n".join(lines)
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--json", type=Path, default=Path("release/READINESS.json"))
-    parser.add_argument("--markdown", type=Path, default=Path("release/READINESS.md"))
-    parser.add_argument("--require-public-release-ready", action="store_true")
-    args = parser.parse_args()
-
+def build_result() -> dict[str, Any]:
     checks: list[dict[str, Any]] = []
     for file_name in REQUIRED_PACKAGE_FILES:
         add_check(
@@ -376,6 +462,7 @@ def main() -> int:
     validate_other_targets(targets, checks)
     validate_license_status(checks)
     validate_memory(checks)
+    scope = validate_scope(checks)
 
     mac_required = {
         "package_file_texpdf.ado",
@@ -390,14 +477,39 @@ def main() -> int:
     implementation_complete = all(
         by_key.get(key, {}).get("passed") for key in mac_required
     )
-    blockers = [check["key"] for check in checks if check["release_blocker"]]
+    candidate_blockers = [
+        check["key"] for check in checks if check["candidate_release_blocker"]
+    ]
+    public_blockers = [
+        check["key"] for check in checks if check["public_release_blocker"]
+    ]
     result = {
-        "schema_version": 2,
+        "schema_version": 3,
+        "candidate_version": scope.get("candidate_version", "0.1.0-rc.1"),
+        "release_kind": scope.get("release_kind", "private_release_candidate"),
         "implementation_complete_macos_arm64": implementation_complete,
-        "public_release_ready": not blockers,
-        "release_blockers": blockers,
+        "candidate_ready": not candidate_blockers,
+        "public_release_ready": not public_blockers,
+        "candidate_blockers": candidate_blockers,
+        "public_release_blockers": public_blockers,
+        "release_blockers": candidate_blockers,
         "checks": checks,
     }
+    return result
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--json", type=Path, default=Path("release/READINESS.json"))
+    parser.add_argument("--markdown", type=Path, default=Path("release/READINESS.md"))
+    parser.add_argument("--require-candidate-ready", action="store_true")
+    parser.add_argument("--require-public-release-ready", action="store_true")
+    args = parser.parse_args()
+
+    result = build_result()
+    candidate_blockers = result["candidate_blockers"]
+    public_blockers = result["public_release_blockers"]
+    implementation_complete = result["implementation_complete_macos_arm64"]
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.markdown.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(
@@ -407,9 +519,13 @@ def main() -> int:
     print(
         "TEXPDF_RELEASE_AUDIT "
         f"macos_arm_complete={str(implementation_complete).lower()} "
-        f"public_release_ready={str(not blockers).lower()} blockers={','.join(blockers)}"
+        f"candidate_ready={str(not candidate_blockers).lower()} "
+        f"public_release_ready={str(not public_blockers).lower()} "
+        f"candidate_blockers={','.join(candidate_blockers)}"
     )
-    if args.require_public_release_ready and blockers:
+    if args.require_candidate_ready and candidate_blockers:
+        return 2
+    if args.require_public_release_ready and public_blockers:
         return 2
     return 0
 

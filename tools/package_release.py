@@ -92,7 +92,7 @@ def license_status_complete(status: dict[str, object] | None) -> bool:
     if status is None or status.get("release_license_complete") is not True:
         return False
     tex = status.get("tex_resources")
-    codes = status.get("return_codes")
+    codes = status.get("return_codes") or status.get("stage_return_codes")
     return (
         isinstance(tex, dict)
         and int(tex.get("resource_count", 0)) > 0
@@ -152,6 +152,7 @@ def main() -> int:
     parser.add_argument("--zip", dest="zip_path", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--target", default="aarch64-apple-darwin")
+    parser.add_argument("--package-version", default="0.1.0")
     parser.add_argument(
         "--public-release",
         action="store_true",
@@ -193,7 +194,7 @@ def main() -> int:
         build_info = {
             "schema_version": 1,
             "package": "texpdf",
-            "package_version": "0.1.0",
+            "package_version": args.package_version,
             "target": args.target,
             "engine": "tectonic",
             "engine_version": "0.17.0",

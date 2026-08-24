@@ -1,0 +1,14 @@
+{
+  "candidate_version": "0.1.0-rc.1",
+  "deferred_runtime_targets": [
+    "x86_64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu"
+  ],
+  "public_distribution_enabled": false,
+  "release_kind": "private_release_candidate",
+  "required_runtime_targets": [
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin"
+  ],
+  "schema_version": 1
+}

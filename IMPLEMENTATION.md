@@ -1,117 +1,79 @@
 # texpdf implementation record
 
-Updated: 2026-08-24
-
 ## Product
 
-`texpdf` is implemented as a compiler-only Stata command:
+`texpdf` is a compiler-only Stata command:
 
 ```stata
 texpdf using filename.tex [, saving(filename.pdf) replace]
 texpdf, version
 ```
 
-The native artifact contains the Stata bridge, Tectonic 0.17.0, its native
-engine dependencies, and a deterministic curated resource ZIP. Runtime
-compilation neither invokes nor consults a system TeX installation and does not
-download packages.
+The installed native artifact contains the Stata bridge and a target-matching
+compiler helper. The helper contains Tectonic 0.17.0, its native dependencies,
+and a deterministic curated resource ZIP. Compilation does not consult a
+system TeX installation or download packages.
 
 ## Architecture
 
 ```text
 Stata ado syntax and result handling
   -> SPI 3.0 Rust cdylib (`pginit`, `stata_call`)
+  -> SHA-256-verified embedded helper extraction
+  -> direct child process with bounded timeout
+  -> versioned result-file protocol
   -> texpdf-core request/result/error API
-  -> Tectonic processing session
-  -> embedded in-memory ZIP bundle
-  -> staged PDF
-  -> atomic final-output installation
+  -> Tectonic + embedded in-memory ZIP bundle
+  -> staged PDF + atomic final-output installation
 ```
 
-The Stata-facing layer handles syntax, paths, errors, and `r()` results. The
-Rust core owns compilation, diagnostics, bundle provenance, temporary output,
-and atomic installation. Tectonic types do not cross the public project API.
+The bridge owns ABI safety, helper materialization, child lifecycle, protocol
+validation, and Stata `r()` results. The helper owns compilation, diagnostics,
+bundle provenance, temporary output, and atomic installation. Tectonic types do
+not cross the process protocol or public project API.
 
 ## Implemented guarantees
 
-- one plugin file per platform;
-- no runtime TeX executable, resource download, or remote bundle provider;
-- shell escape disabled;
-- structured and bounded diagnostics;
-- Rust panic containment at the ABI boundary;
+- one installed plugin file per platform, with no separately distributed helper;
+- target architecture and helper digest checked before execution;
+- content-addressed private helper cache with invalid-cache replacement;
+- direct no-shell execution and a configurable bounded timeout;
+- helper identity, operation, protocol version, status, and digest validation;
+- no system TeX executable, resource download, or remote bundle provider;
+- shell escape disabled and diagnostics bounded;
+- panic containment in both ABI bridge and helper dispatch;
+- compiler/native crashes isolated from the Stata process;
 - overwrite protection and atomic final installation;
-- an existing PDF remains intact after an ordinary failed replacement compile;
-- relative project inputs and figures;
-- spaces and Unicode paths;
-- internal BibTeX/`natbib` processing;
-- engine/bundle provenance returned to Stata;
-- deterministic package layout and local `net install` test;
-- exact-source-SHA CI receipts.
+- relative inputs, spaces and Unicode paths, figures, and BibTeX/`natbib`;
+- deterministic package layout, local `net install`, and exact-source receipts.
 
-## Exact qualified macOS ARM64 baseline
+## Evidence boundaries
 
-The current target registry points to source:
-
-```text
-a42f29fbeefd41811475d47e066e1ffea5290bfd
-```
-
-Its immutable `quick` receipt reports overall, Rust, and licensed-Stata success
-in `repository-engine` mode on Stata/MP 18 for Apple Silicon. Required markers
-cover full-engine compilation, package installation, generic smoke tests, and
-100 in-process compile calls with periodic injected TeX failures.
-
-Exact artifacts:
-
-| Artifact | Bytes | SHA-256 |
-|---|---:|---|
-| Curated bundle ZIP | 6,690,289 | `05688ffcca2e82a12143c836708e3dc3b811a30dbe2b74caf951eb7b409792ab` |
-| ARM64 plugin | 49,997,392 | `185e4094c0d9835af199a3602fa8cd6ffa62a0da09c43c7267018b8ecb622298` |
-| Stata package ZIP | 23,475,982 | `efe6db8333ef15a0c2b6f39c31cb6c958c1b19bace7555e686c8e2c935231f3c` |
-
-The embedded bundle contains 557 files and has Tectonic content digest
-`273502edfafe0a6adcdd19c0659965bcf0ebea26cacc1ad372439b80fd7a2a81`.
+The project distinguishes exact green source, exact artifact source, build
+qualification, actual licensed-Stata runtime qualification, and failed stress
+attempts. The current values live only in generated `STATUS.md`,
+`release/READINESS.*`, `release/targets.json`, immutable `.ci` receipts, and
+`docs/generated/CURRENT_ARTIFACT.md`.
 
 ## Compatibility evidence
 
-The qualified fixture set covers:
+The qualified fixture set covers LaTeX core, AMS mathematics, common academic
+tables/layout, PDF and PNG figures, hyperlinks, Latin Modern and TeX Gyre,
+BibTeX/`natbib`, paths, overwrite behavior, missing packages, malformed input,
+and recovery. Embedded resources are not automatically advertised: support is
+fixture- and runtime-evidence-backed.
 
-- LaTeX core, AMS math, and `mathtools`;
-- common academic table and layout packages;
-- PDF and PNG figures;
-- hyperlinks and references;
-- Latin Modern and TeX Gyre fixtures;
-- BibTeX and `natbib`;
-- missing-package, malformed-input, overwrite, path, and recovery behavior.
+## Security boundary
 
-The project deliberately distinguishes “embedded”, “fixture-qualified”, and
-“runtime-supported”. A resource present in the ZIP is not automatically part of
-the public compatibility contract.
+The compiler runs in a short-lived child process, not in Stata. The boundary
+limits compiler crash persistence but is not an OS sandbox; TeX can still read
+locally available inputs and consume resources. Timeout, malformed-input,
+filesystem-boundary, memory-growth, and post-error recovery remain release
+gates. See `SECURITY.md`.
 
-## Security and failure boundary
+## Platform and release boundary
 
-The engine executes in Stata's process. Rust unwinds are contained, but
-`catch_unwind` cannot intercept every process-level abort or native-library
-signal. The release gate therefore includes repeated-call, malformed-input,
-memory-growth, shell-escape, and dependency-policy tests. See `SECURITY.md` for
-the trust boundary.
-
-## Platform boundary
-
-Only `aarch64-apple-darwin` is currently runtime-qualified. macOS Intel,
-Windows x86-64, and Linux x86-64 remain unsupported until native artifacts have
-been loaded and tested in licensed Stata on those targets. Build-only results
-must not be marketed as runtime support.
-
-## Release boundary
-
-The product implementation is substantially complete on macOS ARM64. Public
-binary release remains fail-closed on:
-
-- a complete Rust/native/TeX/font license and notice inventory;
-- the reviewed high-iteration memory/safety gate;
-- actual Stata runtime qualification for every advertised target;
-- clean-machine offline release testing and checksum-bound public assets.
-
-`STATUS.md` records the live branch state; `PLAN.md` is the remaining execution
-roadmap.
+macOS ARM64 is runtime-qualified. The private RC additionally requires macOS
+Intel. Windows and Linux are deferred and unsupported; build-only outputs are
+never marketed as runtime support. Public distribution and final `v0.1.0` are
+separate deferred gates.

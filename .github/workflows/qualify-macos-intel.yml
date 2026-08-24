@@ -1,0 +1,164 @@
+name: Qualify macOS Intel Stata runtime
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Exact already-green source SHA to qualify
+        required: true
+        type: string
+
+concurrency:
+  group: texpdf-macos-intel-runtime
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 300
+    env:
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+
+      - name: Require exact green source and Intel runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          git fetch origin main
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main
+          receipt="$RUNNER_TEMP/texpdf-source-receipt.json"
+          git show "origin/main:.ci/stata/results/$SOURCE_SHA.json" > "$receipt"
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            "$receipt" \
+            --expect-tested-sha "$SOURCE_SHA" \
+            --require-success \
+            --require-rust-success
+          stata_real=/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+          test -x "$stata_real"
+          /usr/bin/lipo -archs "$stata_real" | /usr/bin/grep -qw x86_64
+          /usr/bin/arch -x86_64 /usr/bin/true
+
+      - name: Build universal plugin with target-matching helpers
+        shell: bash
+        run: /bin/bash tools/build_macos_universal.sh
+
+      - name: Run actual x86_64 Stata process
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp dist/macos-universal/_texpdf_plugin.plugin stata/_texpdf_plugin.plugin
+          git add -f stata/_texpdf_plugin.plugin
+          wrapper="$RUNNER_TEMP/texpdf-stata-x86_64"
+          cat > "$wrapper" <<'SH'
+          #!/bin/bash
+          exec /usr/bin/arch -x86_64 /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp "$@"
+          SH
+          chmod +x "$wrapper"
+          export STATA_BIN="$wrapper"
+          /bin/bash ci/run_stata_ci.sh quick
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$SOURCE_SHA" \
+            --expect-profile quick \
+            --require-success
+
+      - name: Build exact Intel runtime record
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+
+          receipt = json.loads(Path(".ci/stata/run/receipt.json").read_text(encoding="utf-8"))
+          manifest = json.loads(Path("dist/macos-universal/manifest.json").read_text(encoding="utf-8"))
+          source = os.environ["SOURCE_SHA"]
+          if receipt.get("tested_sha") != source or receipt.get("status") != "success":
+              raise SystemExit("Intel Stata receipt is not exact and green")
+          record = {
+              "schema_version": 1,
+              "source_sha": source,
+              "runtime": "macOS x86_64 Stata process under Rosetta",
+              "qualified": True,
+              "receipt": receipt,
+              "universal_plugin_size_bytes": manifest["universal"]["size_bytes"],
+              "universal_plugin_sha256": manifest["universal"]["sha256"],
+              "intel_slice_size_bytes": manifest["slices"]["x86_64"]["size_bytes"],
+              "intel_slice_sha256": manifest["slices"]["x86_64"]["sha256"],
+          }
+          Path("release/macos-intel-runtime.json").write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          manifest["intel_runtime_qualified"] = True
+          manifest["intel_runtime_source_sha"] = source
+          manifest["qualification_boundary"] = (
+              "Both slices were built from the exact source. The universal plugin was "
+              "loaded and exercised in licensed ARM64 and x86_64 Stata/MP 18 processes."
+          )
+          Path("release/macos-universal.json").write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          PY
+
+      - name: Publish exact Intel qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          record="$GITHUB_WORKSPACE/release/macos-intel-runtime.json"
+          universal="$GITHUB_WORKSPACE/release/macos-universal.json"
+          publish_tree="$RUNNER_TEMP/texpdf-intel-publish"
+          git fetch origin main
+          git worktree add --detach "$publish_tree" origin/main
+          trap 'git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true' EXIT
+          cp "$record" "$publish_tree/release/macos-intel-runtime.json"
+          cp "$universal" "$publish_tree/release/macos-universal.json"
+          /usr/bin/python3 - "$publish_tree/release/targets.json" "$record" <<'PY'
+          from pathlib import Path
+          import json
+          import sys
+
+          path = Path(sys.argv[1])
+          registry = json.loads(path.read_text(encoding="utf-8"))
+          record = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+          target = registry["targets"]["x86_64-apple-darwin"]
+          target.update({
+              "qualified_source_sha": record["source_sha"],
+              "qualification_profile": "licensed x86_64 Stata quick",
+              "stata_runtime_qualified": True,
+              "stata_version": record["receipt"].get("stata_version"),
+              "stata_edition": record["receipt"].get("stata_edition"),
+              "runtime_plugin_sha256": record["universal_plugin_sha256"],
+              "runtime_plugin_size_bytes": record["universal_plugin_size_bytes"],
+              "status": "qualified in an actual x86_64 Stata process under Rosetta",
+          })
+          path.write_text(json.dumps(registry, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+          git -C "$publish_tree" config user.name "github-actions[bot]"
+          git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$publish_tree" add release/macos-intel-runtime.json release/macos-universal.json release/targets.json
+          git -C "$publish_tree" commit -m "ci(target): qualify macOS Intel Stata runtime [skip ci]"
+          git -C "$publish_tree" push origin HEAD:main
+
+      - name: Upload exact Intel evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-macos-intel-${{ inputs.source_sha }}-${{ github.run_id }}
+          path: |
+            .ci/stata/run/
+            dist/macos-universal/manifest.json
+            release/macos-intel-runtime.json
+          if-no-files-found: warn
+          retention-days: 90

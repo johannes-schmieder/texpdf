@@ -19,7 +19,11 @@ build_slice() {
   local target="$1"
   export TEXPDF_BUILD_TARGET="$target"
   source tools/prepare_native_deps_for_target.sh "$target"
+  "$cargo_bin" build --locked --release --package texpdf-helper --target "$target"
+  export TEXPDF_HELPER_PATH="$CARGO_TARGET_DIR/$target/release/texpdf-helper"
+  test -f "$TEXPDF_HELPER_PATH"
   "$cargo_bin" build --locked --release --package texpdf-stata --target "$target"
+  unset TEXPDF_HELPER_PATH
   unset TEXPDF_BUILD_TARGET
 }
 
@@ -28,8 +32,12 @@ build_slice x86_64-apple-darwin
 
 arm_library="$CARGO_TARGET_DIR/aarch64-apple-darwin/release/libtexpdf_stata.dylib"
 intel_library="$CARGO_TARGET_DIR/x86_64-apple-darwin/release/libtexpdf_stata.dylib"
+arm_helper="$CARGO_TARGET_DIR/aarch64-apple-darwin/release/texpdf-helper"
+intel_helper="$CARGO_TARGET_DIR/x86_64-apple-darwin/release/texpdf-helper"
 test -f "$arm_library"
 test -f "$intel_library"
+test -f "$arm_helper"
+test -f "$intel_helper"
 
 mkdir -p "$(dirname "$output")" "$(dirname "$manifest")"
 temporary="$output.tmp"
@@ -60,7 +68,7 @@ if printf '%s\n' "$runtime_deps" | /usr/bin/grep -Eq '/(opt/homebrew|usr/local|p
 fi
 mv "$temporary" "$output"
 
-/usr/bin/python3 - "$arm_library" "$intel_library" "$output" "$manifest" <<'PY'
+/usr/bin/python3 - "$arm_library" "$intel_library" "$arm_helper" "$intel_helper" "$output" "$manifest" <<'PY'
 from pathlib import Path
 import hashlib
 import json
@@ -69,8 +77,10 @@ import sys
 
 arm = Path(sys.argv[1])
 intel = Path(sys.argv[2])
-universal = Path(sys.argv[3])
-manifest = Path(sys.argv[4])
+arm_helper = Path(sys.argv[3])
+intel_helper = Path(sys.argv[4])
+universal = Path(sys.argv[5])
+manifest = Path(sys.argv[6])
 
 
 def sha256(path: Path) -> str:
@@ -120,8 +130,14 @@ payload = {
     "kind": "macOS universal Stata plugin",
     "architectures": architectures,
     "slices": {
-        "arm64": record(arm, "aarch64-apple-darwin"),
-        "x86_64": record(intel, "x86_64-apple-darwin"),
+        "arm64": {
+            **record(arm, "aarch64-apple-darwin"),
+            "embedded_helper": record(arm_helper, "aarch64-apple-darwin"),
+        },
+        "x86_64": {
+            **record(intel, "x86_64-apple-darwin"),
+            "embedded_helper": record(intel_helper, "x86_64-apple-darwin"),
+        },
     },
     "universal": record(universal, "universal2-apple-darwin"),
     "exports": ["pginit", "stata_call"],

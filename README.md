@@ -8,45 +8,31 @@ texpdf using paper.tex, saving(paper.pdf) replace
 texpdf, version
 ```
 
-The package uses one native Stata plugin containing the Rust bridge, Tectonic
-0.17.0, its native libraries, and a curated academic TeX resource bundle.
-Runtime compilation requires no TeX installation, Tectonic executable, Rust
-toolchain, package download, or network connection.
+The package installs one native Stata plugin. The plugin contains a thin Rust
+SPI bridge plus a target-matching compiler helper that embeds Tectonic 0.17.0,
+its native libraries, and a curated academic TeX resource bundle. The bridge
+verifies and extracts the helper into a private cache and launches it directly.
+Runtime compilation requires no TeX installation, separately installed helper,
+Rust toolchain, package download, or network connection.
 
 ## Project state
 
-The macOS Apple Silicon implementation is a qualified pre-release candidate
-under licensed Stata/MP 18.
+The active release target is a private macOS universal `v0.1.0-rc.1`. Apple
+Silicon is exact-source qualified under licensed Stata/MP 18. Intel runtime
+qualification, the complete redistribution inventory, and the 1,000-call
+memory gate remain required for that candidate. Windows, Linux, public
+distribution, and final `v0.1.0` publication are explicitly deferred.
 
-The current exact green source checkpoint is
-`90101fa26ef06cea0ffa7e241b4230a1d0fe62a9`. The current generated artifact
-record was produced from source `a42f29fbeefd41811475d47e066e1ffea5290bfd`.
-Keeping these identifiers separate prevents a newer green source receipt from
-being mistaken for a byte-for-byte artifact measurement.
-
-Measured artifacts:
-
-| Artifact | Exact size |
-|---|---:|
-| Embedded TeX ZIP | 6,690,289 bytes (6.38 MiB; 557 files) |
-| Standalone ARM64 plugin | 49,997,392 bytes (47.68 MiB) |
-| Stata installation ZIP | 23,475,982 bytes (22.39 MiB) |
-
-The exact green source passed Rust formatting, strict Clippy, workspace tests,
-native plugin construction, licensed Stata compilation, local `net install`,
-the academic package corpus, and 100 in-process compile calls with injected TeX
-failures.
-
-This is not yet a public v1 release. Remaining gates are the complete
-third-party license/notices inventory, high-iteration memory/safety review,
-macOS universal/Intel qualification, and actual Stata runtime qualification on
-Windows and Linux.
+Exact SHAs, artifact sizes, target support, failed attempts, and live blockers
+are generated from repository evidence in [`STATUS.md`](STATUS.md) and
+[`release/READINESS.md`](release/READINESS.md); they are deliberately not copied
+into this durable overview.
 
 See:
 
-- [`STATUS.md`](STATUS.md) — current source, artifact, and release state;
-- [`PLAN.md`](PLAN.md) — remaining v1 work in execution order;
-- [`IMPLEMENTATION.md`](IMPLEMENTATION.md) — durable architecture and evidence;
+- [`STATUS.md`](STATUS.md) — generated current evidence and blockers;
+- [`PLAN.md`](PLAN.md) — remaining work in execution order;
+- [`IMPLEMENTATION.md`](IMPLEMENTATION.md) — durable architecture and guarantees;
 - [`docs/README.md`](docs/README.md) — documentation index;
 - [`docs/generated/CURRENT_ARTIFACT.md`](docs/generated/CURRENT_ARTIFACT.md) — exact artifact measurements;
 - [`release/targets.json`](release/targets.json) — platform qualification registry.
@@ -70,33 +56,34 @@ r(bundle_zip_sha256)
 r(warnings)
 ```
 
-Compilation failures are transported through a versioned native result record.
-Shell escape is disabled, Rust panics are contained at the ABI boundary, and an
-ordinary TeX error does not terminate Stata or replace a previously valid PDF.
+Compilation failures cross a versioned native result protocol. Shell escape is
+disabled, bridge and helper panics are contained, the compiler has a bounded
+timeout, and an ordinary TeX error does not terminate Stata or replace a
+previously valid PDF.
 
 ## Compatibility tier
 
 The qualified academic tier covers LaTeX core, AMS mathematics, common table
 and layout packages, PDF/PNG figures, hyperlinks, Latin Modern and TeX Gyre
-fonts, and BibTeX with `natbib`. The exact contract and fixture-backed package
-list are documented in [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) and
+fonts, and BibTeX with `natbib`. The exact fixture-backed contract is documented
+in [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) and
 [`docs/SUPPORTED_PACKAGES.md`](docs/SUPPORTED_PACKAGES.md).
 
 Beamer, TikZ/PGF, PSTricks, Biber/`biblatex`, `minted`, shell-dependent tools,
-and arbitrary external helpers are outside the v1 tier.
+and arbitrary document-selected external helpers are outside the RC tier.
 
 ## Architecture
 
 ```text
 texpdf.ado
   -> Stata SPI 3.0 Rust bridge
-  -> texpdf-core
-  -> Tectonic 0.17.0
+  -> SHA-256-verified target helper embedded in the plugin
+  -> direct child process + versioned result protocol
+  -> texpdf-core + Tectonic 0.17.0
   -> embedded deterministic ZIP bundle
-  -> PDF
+  -> staged PDF + atomic final installation
 ```
 
 Project-owned source is MIT licensed. Embedded TeX resources, fonts, Tectonic,
-and native libraries retain their upstream licenses. Public binary publication
-is fail-closed until the generated inventories and required notices are
-complete.
+and native libraries retain their upstream licenses. Candidate packaging is
+fail-closed until the generated inventories and required notices are complete.

@@ -2,62 +2,51 @@
 
 ## Supported use
 
-`texpdf` is intended to compile LaTeX source controlled by the Stata user. It
-is not a sandbox for hostile documents.
+`texpdf` compiles LaTeX controlled by the Stata user. It is not a sandbox for
+hostile documents.
 
-The release configuration reduces the most important TeX execution risks:
+The release configuration provides these boundaries:
 
 - shell escape is forcibly disabled;
-- arbitrary external helper programs are unsupported;
-- the engine is given an explicit embedded resource bundle;
+- document-selected external helper programs are unsupported;
 - no remote bundle or runtime package downloader is configured;
-- Rust panics are caught at the native ABI boundary;
-- diagnostics and result records are bounded;
-- output replacement occurs only after successful compilation.
+- Tectonic and its native libraries execute in a short-lived helper process;
+- the embedded helper is architecture-checked and SHA-256-verified before use;
+- the helper is launched directly without a shell and has a bounded timeout;
+- helper identity and versioned results are validated on every operation;
+- Rust panics are caught at the ABI boundary and helper dispatch;
+- diagnostics are bounded and output replacement is atomic.
 
 ## Filesystem trust boundary
 
 TeX documents can request local inputs, images, bibliography databases, and
-fonts. The primary project root is the directory containing the source file,
-but `texpdf` does not currently claim to provide an operating-system security
-sandbox against every absolute path, symlink, or traversal behavior in the
-underlying engine.
+fonts. The primary project root is the source-file directory, but `texpdf` does
+not claim an operating-system sandbox against every absolute path, symlink, or
+traversal behavior in the underlying engine.
 
-Do not compile an untrusted document in a Stata process that can read sensitive
-files. Use an operating-system sandbox, container, or low-privilege account for
-hostile inputs.
-
-Before public v1, tests must characterize and document:
-
-- `..` traversal and absolute input paths;
-- symlinks crossing the source tree;
-- absolute and relative output attempts from TeX primitives;
-- recursive inclusion and capacity exhaustion;
-- malformed fonts and images;
-- oversized diagnostics and logs;
-- cancellation/interrupt behavior.
+Do not compile an untrusted document in an account that can read sensitive
+files. Use an OS sandbox, container, or low-privilege account for hostile input.
+Release tests characterize traversal, absolute inputs, symlinks, malformed
+fonts/images, recursion, oversized diagnostics, resource exhaustion, and
+cancellation behavior.
 
 ## Native process boundary
 
-The one-plugin architecture runs Tectonic and its C/C++ engine components
-inside Stata. `catch_unwind` prevents Rust unwinding through the C ABI, but it
-cannot intercept every native abort, signal, memory-corruption defect, or
-resource-exhaustion failure. The in-process stress and malformed-input gates
-are therefore part of release qualification.
+The one-installed-plugin architecture runs the compiler in an embedded helper
+process. A helper abort, signal, or panic must become a bounded Stata error
+instead of terminating Stata. The bridge verifies cached bytes against the
+build-time digest and rejects an identity-, operation-, protocol-, or
+status-mismatched result.
 
-An ordinary LaTeX error must return a Stata error and leave Stata usable. A
-credible process-fatal engine path that cannot be removed or bounded is a
-release blocker for the required one-plugin design.
+This is process isolation, not an OS sandbox. A hostile document can still
+consume resources or exercise files visible to the helper. Repeated-call,
+malformed-input, timeout, memory-growth, orphan-process, and post-error-recovery
+gates remain part of qualification.
 
 ## Reporting vulnerabilities
 
-Report suspected vulnerabilities privately to the repository owner. Include:
-
-- the exact `texpdf` source/tag and plugin SHA-256;
-- operating system, architecture, and Stata version;
-- a minimal nonconfidential reproducer;
-- whether the outcome is data disclosure, unexpected file write, process crash,
-  code execution, or resource exhaustion.
-
-Do not include credentials, Stata license material, confidential data, or
-unrelated files in an issue or CI artifact.
+Report suspected vulnerabilities privately to the repository owner. Include
+the exact source/tag and plugin SHA-256, OS/architecture/Stata version, a minimal
+nonconfidential reproducer, and the outcome category. Do not include
+credentials, Stata license material, confidential data, or unrelated files in
+an issue or CI artifact.

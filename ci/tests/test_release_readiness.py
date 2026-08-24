@@ -87,6 +87,8 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                         "build_source_sha": SOURCE_SHA,
                         "plugin_sha256": INTEL_SHA,
                         "plugin_size_bytes": 201,
+                        "universal_plugin_sha256": UNIVERSAL_SHA,
+                        "universal_plugin_size_bytes": 401,
                         "qualified_source_sha": "",
                         "stata_runtime_qualified": False,
                         "status": "Intel runtime pending",
@@ -105,6 +107,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         write_json(
             root / "release/macos-universal.json",
             {
+                "source_sha": SOURCE_SHA,
                 "architectures": ["arm64", "x86_64"],
                 "arm_runtime_qualified": True,
                 "intel_runtime_qualified": False,
