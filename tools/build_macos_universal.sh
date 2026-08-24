@@ -18,7 +18,7 @@ test -f bundle/generated/bundle-info.json
 build_slice() {
   local target="$1"
   export TEXPDF_BUILD_TARGET="$target"
-  source tools/prepare_native_deps.sh
+  source tools/prepare_native_deps_for_target.sh "$target"
   "$cargo_bin" build --locked --release --package texpdf-stata --target "$target"
   unset TEXPDF_BUILD_TARGET
 }
