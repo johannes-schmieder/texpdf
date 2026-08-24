@@ -14,18 +14,18 @@ texpdf using document.tex, saving(document.pdf) replace
 texpdf, version
 ```
 
-## Last exact green product checkpoint
+## Current exact green source
 
-Source `a42f29fbeefd41811475d47e066e1ffea5290bfd` passed the `quick`
+Source `90101fa26ef06cea0ffa7e241b4230a1d0fe62a9` passed the `quick`
 profile with:
 
 ```text
-overall       success
-Rust          success
-Rust mode     repository-engine
-licensed Stata success
-platform      macOS Apple Silicon
-Stata         Stata/MP 18, bundle 18.0.130
+overall         success
+Rust            success
+Rust mode       repository-engine
+licensed Stata  success
+platform        macOS Apple Silicon
+Stata           Stata/MP 18, bundle 18.0.130
 ```
 
 The immutable receipt required all of:
@@ -35,7 +35,13 @@ The immutable receipt required all of:
 - `TEXPDF FULL ENGINE STATA PASS`;
 - `TEXPDF STATA MATA SMOKE PASS`.
 
-The qualified artifact measurements are:
+This restores current source to green after the preceding formatting-only CI
+regression.
+
+## Exact artifact baseline
+
+The target registry and generated artifact summary currently record artifacts
+built from source `a42f29fbeefd41811475d47e066e1ffea5290bfd`:
 
 | Component | Bytes | Binary size |
 |---|---:|---:|
@@ -44,25 +50,13 @@ The qualified artifact measurements are:
 | Deterministic Stata ZIP | 23,475,982 | 22.39 MiB |
 
 The bundle contains 557 logical files. Exact hashes are recorded in
-`docs/generated/CURRENT_ARTIFACT.md` and `release/targets.json`.
-
-## Current branch condition
-
-The latest source checkpoint before this documentation cleanup is
-`8a7466dddb8bcda7ac8b748b549aa5bf96666279`. Its CI receipt is red because
-`cargo fmt --check` found formatting differences in three newly added Rust test
-files. The Rust step therefore stopped before staging the plugin, and the
-subsequent Stata lane reported `r(601)` because `_texpdf_plugin.plugin` was not
-present.
-
-This is a CI/source-formatting regression, not evidence that the last qualified
-compiler or embedded bundle stopped working. The immediate engineering task is
-to format those tests and obtain a new exact-SHA green receipt for current
-`main`.
+`docs/generated/CURRENT_ARTIFACT.md` and `release/targets.json`. A newer source
+receipt does not replace those exact artifact measurements until the artifact
+publisher records a matching build.
 
 ## Qualified behavior
 
-The green macOS ARM64 checkpoint covers:
+The green macOS ARM64 qualification covers:
 
 - native plugin loading and `texpdf, version`;
 - real PDF compilation with no system TeX or runtime network bundle;
@@ -79,12 +73,12 @@ The green macOS ARM64 checkpoint covers:
 
 ## v1 release gates still open
 
-1. Restore current `main` to an exact-SHA green Rust/Stata receipt.
-2. Complete the file-to-package/font license mapping and ship all required
+1. Complete the file-to-package/font license mapping and ship all required
    Rust, native-library, TeX, and font notices.
-3. Complete and review the high-iteration memory/safety qualification.
-4. Build and load-test macOS Intel/universal, Windows x86-64, and Linux x86-64
-   plugins in actual licensed Stata runtimes.
+2. Complete and review the high-iteration memory/safety qualification.
+3. Finish macOS universal packaging and obtain Intel Stata runtime evidence.
+4. Build and load-test Windows x86-64 and Linux x86-64 plugins in actual
+   licensed Stata runtimes.
 5. Run the clean-machine, offline, fail-closed release audit and publish signed
    GitHub Release / `net install` assets.
 
