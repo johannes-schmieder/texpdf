@@ -1,0 +1,13 @@
+[package]
+name = "texpdf-helper"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Isolated Tectonic compiler embedded in the texpdf Stata plugin"
+
+[dependencies]
+texpdf-core = { path = "../texpdf-core" }
+texpdf-protocol = { path = "../texpdf-protocol" }
