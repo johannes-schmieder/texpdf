@@ -1,0 +1,303 @@
+name: Normalize permanent workflows once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/normalize-permanent-workflows-once.yml"
+      - "tools/sync_project_state.py"
+      - ".github/workflows/sync-project-state-on-green.yml"
+      - ".github/workflows/generate-license-inventory.yml"
+      - ".github/workflows/release-audit.yml"
+      - ".github/workflows/qualify-macos-intel.yml"
+
+concurrency:
+  group: texpdf-normalize-permanent-workflows-once
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Synchronize and normalize
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if [[ ! -x tools/sync_project_state.py ]]; then
+            exit 0
+          fi
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          expression = "$" + "{{"
+
+          def render(text: str) -> str:
+              return text.replace("__EXPR__", expression)
+
+          def write(path: str, text: str) -> None:
+              target = Path(path)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(render(text).lstrip(), encoding="utf-8")
+
+          write('.github/workflows/sync-project-state-on-green.yml', r'''
+          name: Sync project state after exact green CI
+
+          on:
+            workflow_run:
+              workflows:
+                - Licensed Stata and Rust CI
+              types:
+                - completed
+
+          concurrency:
+            group: texpdf-sync-project-state
+            cancel-in-progress: false
+
+          permissions:
+            contents: write
+
+          jobs:
+            sync:
+              if: __EXPR__ github.event.workflow_run.conclusion == 'success' }}
+              runs-on: [self-hosted, macOS, ARM64, texpdf]
+              timeout-minutes: 20
+              env:
+                TESTED_SHA: __EXPR__ github.event.workflow_run.head_sha }}
+              steps:
+                - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+                  with:
+                    ref: main
+                    fetch-depth: 0
+                - name: Require the exact committed receipt
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    git fetch origin main
+                    git reset --hard origin/main
+                    receipt=".ci/stata/results/$TESTED_SHA.json"
+                    test -f "$receipt"
+                    /usr/bin/python3 ci/check_stata_receipt.py \
+                      "$receipt" \
+                      --expect-tested-sha "$TESTED_SHA" \
+                      --require-success \
+                      --require-rust-success
+                    /usr/bin/python3 tools/sync_project_state.py
+                - name: Commit generated state
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    git add STATUS.md PLAN.md IMPLEMENTATION.md README.md
+                    git add docs/V1_READINESS.md docs/WORKFLOWS.md
+                    git add release/V1_READINESS.json
+                    if git diff --cached --quiet; then exit 0; fi
+                    git diff --cached --check
+                    git config user.name "github-actions[bot]"
+                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                    git commit -m "docs: sync exact-SHA project state [skip ci]"
+                    git fetch origin main
+                    git rebase origin/main
+                    git push origin HEAD:main
+          ''')
+
+          write('.github/workflows/generate-license-inventory.yml', r'''
+          name: Generate exact dependency and embedded-resource inventories
+
+          on:
+            workflow_dispatch:
+            push:
+              branches:
+                - main
+              paths:
+                - Cargo.lock
+                - bundle/curated-manifest.json
+                - bundle/package-resolution.json
+                - bundle/license-overrides.toml
+                - licenses/tex-resource-overrides.json
+                - tools/build_tex_resource_license_inventory.py
+                - tools/resolve_exact_tex_provenance.py
+                - tools/generate_*inventory.py
+                - tools/collect_*notices.py
+
+          concurrency:
+            group: texpdf-license-inventory
+            cancel-in-progress: true
+
+          permissions:
+            contents: write
+
+          jobs:
+            inventory:
+              runs-on: [self-hosted, macOS, ARM64, texpdf]
+              timeout-minutes: 300
+              env:
+                TEXPDF_RUST_PROFILE: engine
+                CARGO_TERM_COLOR: always
+                RUST_BACKTRACE: "1"
+              steps:
+                - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+                  with:
+                    fetch-depth: 0
+                - name: Build and test the exact embedded plugin
+                  run: /bin/bash ci/record_rust_quick.sh
+                - name: Require exact Rust and bundle evidence
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+                    test -f bundle/generated/texpdf-bundle.zip
+                - name: Generate exact resource mapping
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    if [[ -x tools/resolve_exact_tex_provenance.py ]]; then
+                      source_tar="${TEXPDF_BUNDLE_CACHE:-/private/tmp/texpdf-bundle-cache}/tlextras-2022.0r0.tar"
+                      test -f "$source_tar"
+                      /usr/bin/python3 tools/resolve_exact_tex_provenance.py --source-tar "$source_tar"
+                    else
+                      /usr/bin/python3 tools/build_tex_resource_license_inventory.py
+                    fi
+                - name: Refresh dependency inventories when available
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    if [[ -x tools/generate_dependency_inventory.py ]]; then
+                      /usr/bin/python3 tools/generate_dependency_inventory.py --require-declared
+                    fi
+                    if [[ -x tools/generate_cargo_license_inventory.py ]]; then
+                      /usr/bin/python3 tools/generate_cargo_license_inventory.py
+                    fi
+                    if [[ -x tools/collect_vcpkg_notices.py ]]; then
+                      /usr/bin/python3 tools/collect_vcpkg_notices.py || true
+                    fi
+                    if [[ -x tools/collect_dependency_license_texts.py ]]; then
+                      /usr/bin/python3 tools/collect_dependency_license_texts.py || true
+                    fi
+                    /usr/bin/python3 tools/sync_project_state.py
+                - name: Commit generated evidence
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    rm -rf bundle/generated .ci/stata/run dist target
+                    rm -f stata/_texpdf_plugin.plugin
+                    git add licenses/ STATUS.md PLAN.md docs/V1_READINESS.md release/V1_READINESS.json
+                    git add docs/RESOURCE_LICENSE_STATUS.md docs/LICENSE_REVIEW_QUEUE.md 2>/dev/null || true
+                    if git diff --cached --quiet; then exit 0; fi
+                    git diff --cached --check
+                    git config user.name "github-actions[bot]"
+                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                    git commit -m "license: refresh exact v1 inventory [skip ci]"
+                    git fetch origin main
+                    git rebase origin/main
+                    git push origin HEAD:main
+                - name: Upload inventory evidence
+                  if: __EXPR__ always() }}
+                  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+                  with:
+                    name: texpdf-license-inventory-__EXPR__ github.sha }}-__EXPR__ github.run_id }}
+                    path: |
+                      licenses/
+                      release/V1_READINESS.json
+                      docs/V1_READINESS.md
+                      bundle/generated/bundle-info.json
+                    if-no-files-found: warn
+                    retention-days: 90
+          ''')
+
+          write('.github/workflows/release-audit.yml', r'''
+          name: Fail-closed v1 release audit
+
+          on:
+            workflow_dispatch:
+
+          concurrency:
+            group: texpdf-v1-release-audit
+            cancel-in-progress: false
+
+          permissions:
+            contents: read
+
+          jobs:
+            audit:
+              runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+              timeout-minutes: 300
+              env:
+                STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+                STATA_PROFILE: quick
+                TEXPDF_RUST_PROFILE: engine
+                CARGO_TERM_COLOR: always
+                RUST_BACKTRACE: "1"
+              steps:
+                - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+                  with:
+                    fetch-depth: 0
+                - name: Test release tooling
+                  run: /usr/bin/python3 -m unittest discover -s ci/tests -p 'test_*.py'
+                - name: Build and test exact embedded plugin
+                  run: /bin/bash ci/record_rust_quick.sh
+                - name: Require exact resource mapping
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    if [[ -x tools/resolve_exact_tex_provenance.py ]]; then
+                      source_tar="${TEXPDF_BUNDLE_CACHE:-/private/tmp/texpdf-bundle-cache}/tlextras-2022.0r0.tar"
+                      /usr/bin/python3 tools/resolve_exact_tex_provenance.py --source-tar "$source_tar" --require-complete
+                    else
+                      /usr/bin/python3 tools/build_tex_resource_license_inventory.py --require-complete
+                    fi
+                - name: Require every v1 gate
+                  run: /usr/bin/python3 tools/sync_project_state.py --strict
+                - name: Run licensed Stata release candidate profile
+                  run: /bin/bash ci/run_stata_ci.sh quick
+                - name: Validate exact candidate receipt
+                  run: >-
+                    /usr/bin/python3 ci/check_stata_receipt.py
+                    .ci/stata/run/receipt.json
+                    --expect-tested-sha "$GITHUB_SHA"
+                    --expect-profile quick
+                    --require-success
+                - name: Upload fail-closed audit evidence
+                  if: __EXPR__ always() }}
+                  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+                  with:
+                    name: texpdf-v1-audit-__EXPR__ github.sha }}-__EXPR__ github.run_id }}
+                    path: |
+                      .ci/stata/run/
+                      bundle/generated/bundle-info.json
+                      licenses/inventory/tex-resources.json
+                      release/V1_READINESS.json
+                      docs/V1_READINESS.md
+                    if-no-files-found: warn
+                    retention-days: 90
+          ''')
+
+          # Preserve a pre-existing guarded Intel workflow if it was generated by
+          # the dedicated installer; otherwise the manual workflow can be added by
+          # rerunning that installer after convergence.
+          Path('.github/workflows/normalize-permanent-workflows-once.yml').unlink()
+          PY
+          if [[ -x ci/check_workflows.sh ]]; then
+            ci/check_workflows.sh
+          fi
+          git add .github/workflows/sync-project-state-on-green.yml
+          git add .github/workflows/generate-license-inventory.yml
+          git add .github/workflows/release-audit.yml
+          git add -u .github/workflows/normalize-permanent-workflows-once.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "ci: normalize permanent workflow expressions"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
