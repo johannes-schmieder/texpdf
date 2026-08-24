@@ -21,7 +21,7 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `6fc34a9335a2328d0a13729151975811239910c6` |
+| Latest exact green source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
 | Current ARM64 artifact source | `6fc34a9335a2328d0a13729151975811239910c6` |
