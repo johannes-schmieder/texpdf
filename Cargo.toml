@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/texpdf-core"]
+members = ["crates/texpdf-core", "crates/texpdf-stata"]
 resolver = "2"
 
 [workspace.package]

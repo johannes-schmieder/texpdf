@@ -63,11 +63,20 @@ if [[ -f Cargo.toml ]]; then
   "$toolchain_cargo" clippy --locked --workspace --all-targets --all-features -- -D warnings
   if [[ "$rust_profile" == engine ]]; then
     "$toolchain_cargo" test --locked --workspace --all-targets --all-features
-    echo "RUST_QUICK_MODE=repository-engine"
+    rust_mode=repository-engine
   else
     "$toolchain_cargo" test --locked --workspace --all-targets --all-features diagnostics::tests
-    echo "RUST_QUICK_MODE=repository-compile"
+    "$toolchain_cargo" test --locked --package texpdf-stata --all-targets --all-features
+    rust_mode=repository-compile
   fi
+
+  "$toolchain_cargo" build --locked --release --package texpdf-stata
+  /usr/bin/python3 tools/stage_plugin.py --target-dir "$CARGO_TARGET_DIR"
+  # The licensed Stata harness stages files listed in the checkout's index.
+  # Add the generated plugin only to this temporary CI index; it is ignored by
+  # Git and is never committed by this script.
+  git add -f stata/_texpdf_plugin.plugin
+  echo "RUST_QUICK_MODE=$rust_mode"
 else
   smoke_root="${RUNNER_TEMP:-/private/tmp}/texpdf-rust-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
   /bin/mkdir -p "$smoke_root"

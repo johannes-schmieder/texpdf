@@ -8,3 +8,4 @@ __pycache__/
 /.ci/stata/run/
 /bundle/generated/
 /stata/texpdf.plugin
+/stata/_texpdf_plugin.plugin

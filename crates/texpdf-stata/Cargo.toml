@@ -1,0 +1,16 @@
+[package]
+name = "texpdf-stata"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Stata SPI 3.0 bridge for the standalone texpdf compiler"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+tempfile.workspace = true
+texpdf-core = { path = "../texpdf-core" }
