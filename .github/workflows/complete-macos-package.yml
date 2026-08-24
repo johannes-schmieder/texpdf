@@ -1,0 +1,399 @@
+name: Complete qualified macOS Stata package
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - STATUS.md
+      - ".github/workflows/complete-macos-package.yml"
+
+concurrency:
+  group: texpdf-post-qualification-package
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: release
+      TEXPDF_RUST_PROFILE: engine
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify qualification is finalized
+        id: ready
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if [[ -f ci/FULL_ENGINE ]] ||
+             [[ ! -f bundle/QUALIFICATION.json ]] ||
+             ! /usr/bin/grep -q '^## Exact qualified checkpoint' STATUS.md; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Add deterministic package builder and release-profile test
+        if: ${{ steps.ready.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import textwrap
+
+          def write(path: str, text: str) -> None:
+              target = Path(path)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(textwrap.dedent(text).lstrip(), encoding="utf-8")
+
+          write("tools/package_release.py", r'''
+          #!/usr/bin/env python3
+          """Assemble a deterministic Stata installation ZIP for one plugin."""
+
+          from __future__ import annotations
+
+          import argparse
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import shutil
+          import sys
+          import zipfile
+
+          ZIP_TIME = (1980, 1, 1, 0, 0, 0)
+          PACKAGE_FILES = (
+              "texpdf.ado",
+              "texpdf.sthlp",
+              "texpdf.pkg",
+              "stata.toc",
+              "_texpdf_plugin.plugin",
+          )
+
+
+          def sha256(path: Path) -> str:
+              digest = hashlib.sha256()
+              with path.open("rb") as stream:
+                  while chunk := stream.read(1024 * 1024):
+                      digest.update(chunk)
+              return digest.hexdigest()
+
+
+          def copy_atomic(source: Path, destination: Path) -> None:
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              temporary = destination.with_suffix(destination.suffix + ".tmp")
+              shutil.copyfile(source, temporary)
+              os.replace(temporary, destination)
+
+
+          def zip_info(name: str) -> zipfile.ZipInfo:
+              info = zipfile.ZipInfo(name, ZIP_TIME)
+              info.compress_type = zipfile.ZIP_DEFLATED
+              info.create_system = 3
+              info.external_attr = 0o100644 << 16
+              return info
+
+
+          def main() -> int:
+              parser = argparse.ArgumentParser()
+              parser.add_argument("--plugin", type=Path, required=True)
+              parser.add_argument("--output-dir", type=Path, required=True)
+              parser.add_argument("--zip", dest="zip_path", type=Path, required=True)
+              parser.add_argument("--target", default="aarch64-apple-darwin")
+              args = parser.parse_args()
+
+              if not args.plugin.is_file():
+                  print(f"missing plugin: {args.plugin}", file=sys.stderr)
+                  return 2
+              qualification_path = Path("bundle/QUALIFICATION.json")
+              if not qualification_path.is_file():
+                  print("bundle/QUALIFICATION.json is required", file=sys.stderr)
+                  return 2
+
+              if args.output_dir.exists():
+                  shutil.rmtree(args.output_dir)
+              args.output_dir.mkdir(parents=True)
+              sources = {
+                  "texpdf.ado": Path("stata/texpdf.ado"),
+                  "texpdf.sthlp": Path("stata/texpdf.sthlp"),
+                  "texpdf.pkg": Path("stata/texpdf.pkg"),
+                  "stata.toc": Path("stata/stata.toc"),
+                  "_texpdf_plugin.plugin": args.plugin,
+              }
+              for name, source in sources.items():
+                  if not source.is_file():
+                      print(f"missing package source: {source}", file=sys.stderr)
+                      return 2
+                  copy_atomic(source, args.output_dir / name)
+
+              copy_atomic(Path("LICENSE"), args.output_dir / "LICENSE")
+              copy_atomic(qualification_path, args.output_dir / "QUALIFICATION.json")
+              checksums = {
+                  path.name: sha256(path)
+                  for path in sorted(args.output_dir.iterdir())
+                  if path.is_file()
+              }
+              (args.output_dir / "CHECKSUMS.sha256").write_text(
+                  "".join(f"{digest}  {name}\n" for name, digest in sorted(checksums.items())),
+                  encoding="utf-8",
+              )
+              checksums["CHECKSUMS.sha256"] = sha256(args.output_dir / "CHECKSUMS.sha256")
+
+              qualification = json.loads(qualification_path.read_text(encoding="utf-8"))
+              build_info = {
+                  "schema_version": 1,
+                  "package": "texpdf",
+                  "package_version": "0.1.0",
+                  "target": args.target,
+                  "engine": "tectonic",
+                  "engine_version": "0.17.0",
+                  "bundle_zip_sha256": qualification["zip_sha256"],
+                  "plugin_sha256": checksums["_texpdf_plugin.plugin"],
+                  "plugin_size_bytes": (args.output_dir / "_texpdf_plugin.plugin").stat().st_size,
+                  "public_release_ready": False,
+                  "release_blocker": "bundle-level package/font license inventory is incomplete",
+              }
+              (args.output_dir / "BUILD_INFO.json").write_text(
+                  json.dumps(build_info, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+
+              args.zip_path.parent.mkdir(parents=True, exist_ok=True)
+              temporary_zip = args.zip_path.with_suffix(args.zip_path.suffix + ".tmp")
+              temporary_zip.unlink(missing_ok=True)
+              with zipfile.ZipFile(
+                  temporary_zip,
+                  "w",
+                  compression=zipfile.ZIP_DEFLATED,
+                  compresslevel=9,
+                  allowZip64=True,
+                  strict_timestamps=True,
+              ) as archive:
+                  for path in sorted(args.output_dir.iterdir()):
+                      if path.is_file():
+                          archive.writestr(zip_info(path.name), path.read_bytes())
+              os.replace(temporary_zip, args.zip_path)
+              print(
+                  "TEXPDF_PACKAGE_READY "
+                  f"zip={args.zip_path} zip_bytes={args.zip_path.stat().st_size} "
+                  f"zip_sha256={sha256(args.zip_path)} plugin_bytes={build_info['plugin_size_bytes']}"
+              )
+              return 0
+
+
+          if __name__ == "__main__":
+              raise SystemExit(main())
+          ''')
+
+          write("ci/stata_release_smoke.do", r'''
+          version 18.0
+          clear all
+          set more off
+
+          args package_dir
+          if `"`package_dir'"' == "" {
+              display as error "release package directory argument is required"
+              exit 198
+          }
+
+          net install texpdf, from(`"`package_dir'"') replace
+          discard
+          which texpdf
+          texpdf, version
+          assert `"`r(engine)'"' == "tectonic"
+          assert `"`r(engine_version)'"' == "0.17.0"
+          assert strlen(`"`r(bundle_digest)'"') == 64
+
+          local repo `"`c(pwd)'"'
+          tempfile compiled
+          local compiled_pdf `"`compiled'.pdf"'
+          texpdf using `"`repo'/tests/fixtures/full/academic.tex"', saving(`"`compiled_pdf'"') replace
+          confirm file `"`compiled_pdf'"'
+          assert `"`r(engine)'"' == "tectonic"
+          assert r(warnings) >= 0
+
+          display as result "TEXPDF RELEASE PACKAGE PASS"
+          ''')
+
+          profiles_path = Path("ci/stata_profiles.json")
+          profiles = json.loads(profiles_path.read_text(encoding="utf-8"))
+          profiles["release"] = {
+              "suite": "ci/stata_release_smoke.do",
+              "timeout_seconds": 900,
+              "required_log_markers": ["TEXPDF RELEASE PACKAGE PASS"],
+              "arguments": ["dist/texpdf-macos-arm64"],
+          }
+          profiles_path.write_text(
+              json.dumps(profiles, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          write(".github/workflows/build-macos-artifact.yml", r'''
+          name: Build qualified macOS ARM64 development artifact
+
+          on:
+            workflow_dispatch:
+
+          concurrency:
+            group: texpdf-macos-development-artifact
+            cancel-in-progress: false
+
+          permissions:
+            contents: read
+
+          jobs:
+            build-and-test:
+              runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+              timeout-minutes: 180
+              env:
+                STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+                STATA_PROFILE: release
+                TEXPDF_RUST_PROFILE: engine
+                CARGO_TERM_COLOR: always
+                RUST_BACKTRACE: "1"
+              steps:
+                - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+                - name: Build real embedded plugin
+                  run: /bin/bash ci/record_rust_quick.sh
+
+                - name: Assemble deterministic Stata package
+                  run: >-
+                    /usr/bin/python3 tools/package_release.py
+                    --plugin stata/_texpdf_plugin.plugin
+                    --output-dir dist/texpdf-macos-arm64
+                    --zip dist/texpdf-macos-arm64.zip
+                    --target aarch64-apple-darwin
+
+                - name: Stage generated package for isolated Stata test
+                  run: git add -f dist/texpdf-macos-arm64
+
+                - name: Test local net install and real compile
+                  run: /bin/bash ci/run_stata_ci.sh release
+
+                - name: Validate package receipt
+                  run: >-
+                    /usr/bin/python3 ci/check_stata_receipt.py
+                    .ci/stata/run/receipt.json
+                    --expect-tested-sha "$GITHUB_SHA"
+                    --expect-profile release
+                    --require-success
+
+                - name: Upload development artifact and evidence
+                  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+                  with:
+                    name: texpdf-macos-arm64-${{ github.sha }}
+                    path: |
+                      dist/texpdf-macos-arm64.zip
+                      dist/texpdf-macos-arm64/
+                      .ci/stata/run/
+                    if-no-files-found: error
+                    retention-days: 30
+
+          # This intentionally does not create a public GitHub Release. The full
+          # bootstrap bundle's package/font license inventory must be completed
+          # before public binary redistribution is enabled.
+          ''')
+
+          Path(".github/workflows/complete-macos-package.yml").unlink(missing_ok=True)
+          for old in (
+              ".github/workflows/repair-bridge.yml",
+              ".github/workflows/implement-stata-package.yml",
+              ".github/workflows/qualify-full-engine.yml",
+              ".github/workflows/qualify-full-engine-v2.yml",
+              ".github/workflows/finalize-full-engine.yml",
+              ".github/workflows/finalize-full-engine-v2.yml",
+          ):
+              Path(old).unlink(missing_ok=True)
+          PY
+
+          chmod +x tools/package_release.py
+          git add tools/package_release.py ci/stata_release_smoke.do \
+            ci/stata_profiles.json .github/workflows/build-macos-artifact.yml
+          git add -u .github/workflows || true
+
+      - name: Build real plugin and deterministic installation tree
+        if: ${{ steps.ready.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/record_rust_quick.sh
+          /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+          /usr/bin/python3 tools/package_release.py \
+            --plugin stata/_texpdf_plugin.plugin \
+            --output-dir dist/texpdf-macos-arm64 \
+            --zip dist/texpdf-macos-arm64.zip \
+            --target aarch64-apple-darwin
+          git add -f dist/texpdf-macos-arm64
+
+      - name: Test local net install and PDF compile
+        if: ${{ steps.ready.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/run_stata_ci.sh release
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile release \
+            --require-success
+
+      - name: Record package workflow qualification
+        if: ${{ steps.ready.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          status_path = Path("STATUS.md")
+          status = status_path.read_text(encoding="utf-8")
+          heading = "## Development installation artifact"
+          if heading in status:
+              status = status[: status.index(heading)].rstrip() + "\n"
+          status += f'''\n{heading}
+
+A repository workflow now rebuilds the real embedded macOS ARM64 plugin,
+assembles a deterministic Stata package ZIP, performs a local `net install`,
+and compiles the academic/BibTeX fixture in licensed Stata. It uploads a
+private GitHub Actions development artifact only. Public GitHub Release
+publication remains disabled until the bundle-level license inventory is
+complete.
+'''
+          status_path.write_text(status, encoding="utf-8")
+
+          plan_path = Path("PLAN.md")
+          plan = plan_path.read_text(encoding="utf-8")
+          marker = "- [ ] GitHub Release + `net install` layout."
+          replacement = "- [ ] Public GitHub Release pending licenses; deterministic `net install` development artifact is implemented and tested."
+          plan = plan.replace(marker, replacement)
+          plan_path.write_text(plan, encoding="utf-8")
+          PY
+
+          git reset -- stata/_texpdf_plugin.plugin dist 2>/dev/null || true
+          rm -rf stata/_texpdf_plugin.plugin dist .ci/stata/run bundle/generated
+          git add STATUS.md PLAN.md
+          git add -u
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat(release): add qualified macOS Stata package builder"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
