@@ -109,10 +109,27 @@ write_pkgconf_config() {
   mv "$temporary" "$config"
 }
 
+patch_pkgconf_lite_sources() {
+  /usr/bin/python3 - "$pkgconf_root/Makefile.lite" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+needle = "SRCS=libpkgconf/argvsplit.c"
+replacement = "SRCS=libpkgconf/argvsplit.c libpkgconf/buffer.c"
+if "libpkgconf/buffer.c" not in text:
+    if needle not in text:
+        raise SystemExit("cannot locate Makefile.lite SRCS anchor")
+    text = text.replace(needle, replacement, 1)
+    path.write_text(text, encoding="utf-8")
+PY
+}
+
 # vcpkg requires a pkg-config frontend even while it is building the libraries
 # that later supply .pc files. Build pkgconf-lite from a pinned upstream commit.
-# Makefile.lite's stock config target uses obsolete HAVE_* names, so generate
-# the declaration macros from real host compiler probes before invoking make.
+# Makefile.lite's stock config target uses obsolete HAVE_* names and omits the
+# newer buffer module, so patch both defects in the pinned private checkout.
 if [[ ! -x "$pkgconf_root/bin/pkg-config" ]] ||
    [[ ! -f "$pkgconf_root/.texpdf-revision" ]] ||
    [[ "$(cat "$pkgconf_root/.texpdf-revision" 2>/dev/null || true)" != "$pkgconf_rev" ]]; then
@@ -124,6 +141,7 @@ if [[ ! -x "$pkgconf_root/bin/pkg-config" ]] ||
   git -C "$pkgconf_root" checkout --detach FETCH_HEAD
   [[ "$(git -C "$pkgconf_root" rev-parse HEAD)" == "$pkgconf_rev" ]]
   write_pkgconf_config
+  patch_pkgconf_lite_sources
   /usr/bin/make -C "$pkgconf_root" -f Makefile.lite \
     CC="$cc" \
     STRIP=/usr/bin/strip \
