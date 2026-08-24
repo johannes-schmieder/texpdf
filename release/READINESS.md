@@ -12,7 +12,7 @@ Public cross-platform v1 ready: **false**
 | `package_file_stata.toc` | PASS | no | no | stata/stata.toc |
 | `cargo_lock` | PASS | no | no | Cargo.lock is committed |
 | `target_registry` | PASS | no | no | target count=4 |
-| `macos_arm_runtime` | PASS | no | no | source=ddb2c26415520ebd3625467ecdc6b453aaa4fb45; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
+| `macos_arm_runtime` | PASS | no | no | source=01f7f3dfd862de8226f866e15a008b5e325b6fb3; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | FAIL | yes | yes | architectures=['arm64', 'x86_64']; universal_bytes=98532016; arm_runtime=False |
 | `macos_intel_build` | FAIL | yes | yes | source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49098680 |
 | `macos_intel_runtime` | PASS | no | no | qualified in an actual x86_64 Stata process under Rosetta; runtime_record=valid; exact receipt profile=quick rust_mode=repository-engine |
