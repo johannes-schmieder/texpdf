@@ -1,0 +1,306 @@
+name: Finalize cleaned source receipt
+
+on:
+  workflow_run:
+    workflows:
+      - Licensed Stata and Rust CI
+    types:
+      - completed
+
+concurrency:
+  group: texpdf-final-clean-source-receipt
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  finalize:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+      SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+      SOURCE_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Select exact cleaned-source run
+        id: select
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if ! git cat-file -e "$SOURCE_SHA:FINAL_CLEANUP_PENDING" 2>/dev/null; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Download exact-source qualification evidence
+        if: ${{ steps.select.outputs.ready == 'true' }}
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: stata-${{ env.SOURCE_SHA }}-${{ env.SOURCE_RUN_ID }}-${{ env.SOURCE_RUN_ATTEMPT }}
+          path: ${{ runner.temp }}/texpdf-final-evidence
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+
+      - name: Verify receipt and generate exact final records
+        if: ${{ steps.select.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import re
+
+          source_sha = os.environ["SOURCE_SHA"]
+          root = Path(os.environ["RUNNER_TEMP"]) / "texpdf-final-evidence"
+
+          def load(name: str) -> tuple[Path, dict]:
+              matches = sorted(root.rglob(name))
+              if not matches:
+                  raise SystemExit(f"exact evidence is missing {name}")
+              path = matches[0]
+              return path, json.loads(path.read_text(encoding="utf-8"))
+
+          receipt_path, receipt = load("receipt.json")
+          bundle_path, bundle = load("bundle-info.json")
+          plugin_path, plugin = load("plugin-manifest.json")
+          package_matches = sorted(root.rglob("package-manifest.json"))
+          package = (
+              json.loads(package_matches[0].read_text(encoding="utf-8"))
+              if package_matches
+              else None
+          )
+
+          required = {
+              "tested_sha": source_sha,
+              "profile": "quick",
+              "status": "success",
+              "stata_status": "success",
+              "rust_status": "success",
+              "rust_mode": "repository-engine",
+          }
+          problems = [
+              f"{key}: expected {value!r}, got {receipt.get(key)!r}"
+              for key, value in required.items()
+              if receipt.get(key) != value
+          ]
+          markers = {
+              item.get("marker"): item.get("present")
+              for item in receipt.get("required_log_markers", [])
+          }
+          for marker in (
+              "TEXPDF FULL ENGINE STATA PASS",
+              "TEXPDF NET INSTALL PASS",
+              "TEXPDF IN PROCESS STRESS PASS",
+              "TEXPDF STATA MATA SMOKE PASS",
+          ):
+              if markers.get(marker) is not True:
+                  problems.append(f"missing required marker: {marker}")
+          if problems:
+              raise SystemExit("cleaned source receipt rejected: " + "; ".join(problems))
+
+          sha_re = re.compile(r"^[0-9a-f]{64}$")
+          bundle_sha = bundle.get("zip_sha256")
+          plugin_sha = plugin.get("sha256") or plugin.get("plugin_sha256")
+          bundle_bytes = bundle.get("zip_size_bytes")
+          plugin_bytes = plugin.get("size_bytes") or plugin.get("plugin_size_bytes")
+          if not isinstance(bundle_sha, str) or not sha_re.fullmatch(bundle_sha):
+              raise SystemExit("invalid bundle ZIP SHA-256")
+          if not isinstance(plugin_sha, str) or not sha_re.fullmatch(plugin_sha):
+              raise SystemExit("invalid plugin SHA-256")
+          if not isinstance(bundle_bytes, int) or bundle_bytes <= 0:
+              raise SystemExit("invalid bundle ZIP byte count")
+          if not isinstance(plugin_bytes, int) or plugin_bytes <= 0:
+              raise SystemExit("invalid plugin byte count")
+
+          exact = {
+              "schema_version": 1,
+              "source_sha": source_sha,
+              "workflow_run_id": int(os.environ["SOURCE_RUN_ID"]),
+              "workflow_run_attempt": int(os.environ["SOURCE_RUN_ATTEMPT"]),
+              "profile": receipt["profile"],
+              "status": receipt["status"],
+              "stata_status": receipt["stata_status"],
+              "rust_status": receipt["rust_status"],
+              "rust_mode": receipt["rust_mode"],
+              "platform": receipt.get("platform"),
+              "stata_version": receipt.get("stata_version"),
+              "stata_edition": receipt.get("stata_edition"),
+              "bundle": {
+                  "name": bundle.get("bundle_name"),
+                  "version": bundle.get("bundle_version"),
+                  "file_count": bundle.get("file_count"),
+                  "size_bytes": bundle_bytes,
+                  "sha256": bundle_sha,
+                  "tectonic_digest": bundle.get("tectonic_bundle_digest"),
+                  "source_sha256": bundle.get("source_sha256"),
+                  "index_sha256": bundle.get("index_sha256"),
+              },
+              "plugin": {
+                  "target": plugin.get("target") or plugin.get("platform"),
+                  "size_bytes": plugin_bytes,
+                  "sha256": plugin_sha,
+                  "exports": plugin.get("exports"),
+              },
+              "package": package,
+              "evidence": {
+                  "receipt": str(receipt_path.relative_to(root)),
+                  "bundle": str(bundle_path.relative_to(root)),
+                  "plugin": str(plugin_path.relative_to(root)),
+              },
+          }
+          artifact_path = Path(".ci/artifacts") / f"{source_sha}.json"
+          artifact_path.parent.mkdir(parents=True, exist_ok=True)
+          serialized = json.dumps(exact, indent=2, sort_keys=True) + "\n"
+          artifact_path.write_text(serialized, encoding="utf-8")
+          Path(".ci/artifacts/latest.json").write_text(serialized, encoding="utf-8")
+
+          targets_path = Path("release/targets.json")
+          targets = (
+              json.loads(targets_path.read_text(encoding="utf-8"))
+              if targets_path.is_file()
+              else {"schema_version": 1, "targets": {}}
+          )
+          target_records = targets.setdefault("targets", {})
+          target_records["aarch64-apple-darwin"] = {
+              "artifact": "_texpdf_plugin.plugin",
+              "bundle_zip_sha256": bundle_sha,
+              "bundle_zip_size_bytes": bundle_bytes,
+              "plugin_sha256": plugin_sha,
+              "plugin_size_bytes": plugin_bytes,
+              "qualified_source_sha": source_sha,
+              "qualification_profile": receipt["profile"],
+              "stata_runtime_qualified": True,
+              "stata_version": receipt.get("stata_version"),
+              "stata_edition": receipt.get("stata_edition"),
+              "platform": receipt.get("platform"),
+              "status": "qualified by exact-SHA real-engine Rust and licensed Stata run",
+          }
+          for target in (
+              "x86_64-apple-darwin",
+              "x86_64-pc-windows-msvc",
+              "x86_64-unknown-linux-gnu",
+          ):
+              target_records.setdefault(
+                  target,
+                  {
+                      "artifact": "_texpdf_plugin.plugin",
+                      "plugin_sha256": "",
+                      "qualified_source_sha": "",
+                      "qualification_profile": "",
+                      "stata_runtime_qualified": False,
+                      "stata_version": "",
+                      "status": "native build and actual Stata runtime qualification pending",
+                  },
+              )
+          targets_path.parent.mkdir(parents=True, exist_ok=True)
+          targets_path.write_text(
+              json.dumps(targets, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          def mib(value: int) -> str:
+              return f"{value / 1024 / 1024:.2f} MiB"
+
+          summary = f'''# Current exact artifact measurement
+
+- Source SHA: `{source_sha}`
+- CI profile: `{receipt["profile"]}`
+- Overall / Stata / Rust: `{receipt["status"]}` / `{receipt["stata_status"]}` / `{receipt["rust_status"]}`
+- Rust mode: `{receipt["rust_mode"]}`
+- Platform: `{receipt.get("platform")}`
+- Stata: `{receipt.get("stata_edition")} {receipt.get("stata_version")}`
+
+## Embedded resource bundle
+
+- Exact bytes: `{bundle_bytes}`
+- Size: **{mib(bundle_bytes)}**
+- Logical files: `{bundle.get("file_count")}`
+- ZIP SHA-256: `{bundle_sha}`
+- Tectonic digest: `{bundle.get("tectonic_bundle_digest")}`
+
+## Standalone plugin
+
+- Exact bytes: `{plugin_bytes}`
+- Size: **{mib(plugin_bytes)}**
+- SHA-256: `{plugin_sha}`
+- Target/platform: `{plugin.get("target") or plugin.get("platform")}`
+
+These values come only from the exact successful source run. Failed and
+build-only runs do not update this record.
+'''
+          summary_path = Path("docs/generated/CURRENT_ARTIFACT.md")
+          summary_path.parent.mkdir(parents=True, exist_ok=True)
+          summary_path.write_text(summary, encoding="utf-8")
+
+          implementation = Path("IMPLEMENTATION.md")
+          existing = implementation.read_text(encoding="utf-8") if implementation.is_file() else "# Implementation record\n"
+          heading = "## Final cleaned source qualification"
+          if heading in existing:
+              existing = existing[: existing.index(heading)].rstrip() + "\n"
+          existing += f'''\n{heading}
+
+- Source SHA: `{source_sha}`
+- Profile: `{receipt["profile"]}`
+- Overall status: `{receipt["status"]}`
+- Licensed Stata status: `{receipt["stata_status"]}`
+- Rust status: `{receipt["rust_status"]}`
+- Rust mode: `{receipt["rust_mode"]}`
+- Bundle: `{bundle_bytes}` bytes / `{bundle_sha}`
+- Plugin: `{plugin_bytes}` bytes / `{plugin_sha}`
+
+This is the authoritative cleaned macOS Apple Silicon implementation
+checkpoint. Public cross-platform release remains subject to the target and
+third-party license gates documented in `docs/RELEASE.md`.
+'''
+          implementation.write_text(existing, encoding="utf-8")
+
+          status_path = Path("STATUS.md")
+          status = status_path.read_text(encoding="utf-8")
+          final_heading = "## Final cleaned source"
+          if final_heading in status:
+              status = status[: status.index(final_heading)].rstrip() + "\n"
+          status += f'''\n{final_heading}
+
+Source `{source_sha}` is the exact cleaned macOS Apple Silicon checkpoint. Its
+immutable receipt reports overall, licensed Stata, and Rust success in
+`repository-engine` mode. The exact embedded ZIP and plugin measurements are
+recorded in `docs/generated/CURRENT_ARTIFACT.md` and `.ci/artifacts/{source_sha}.json`.
+'''
+          status_path.write_text(status, encoding="utf-8")
+
+          Path("FINAL_CLEANUP_PENDING").unlink()
+          Path(".github/workflows/finalize-clean-source-receipt.yml").unlink()
+          PY
+
+      - name: Commit exact final evidence
+        if: ${{ steps.select.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .ci/artifacts docs/generated/CURRENT_ARTIFACT.md \
+            release/targets.json IMPLEMENTATION.md STATUS.md
+          git add -u FINAL_CLEANUP_PENDING \
+            .github/workflows/finalize-clean-source-receipt.yml
+          git diff --cached --check
+          git commit -m "ci: record final cleaned source ${SOURCE_SHA:0:12} [skip ci]"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
