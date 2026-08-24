@@ -7,26 +7,37 @@
   "arm_stata_profile": "quick",
   "arm_stata_receipt": ".ci/stata/run/receipt.json",
   "dynamic_dependencies": [
-    "/private/tmp/texpdf-cargo-target/x86_64-apple-darwin/release/deps/libtexpdf_stata.dylib (compatibility version 0.0.0, current version 0.0.0)",
-    "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
-    "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
+    "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
     "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
     "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
     "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
-    "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
-    "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
+    "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
-    "dist/macos-universal/_texpdf_plugin.plugin (architecture arm64):",
-    "/private/tmp/texpdf-cargo-target/aarch64-apple-darwin/release/deps/libtexpdf_stata.dylib (compatibility version 0.0.0, current version 0.0.0)",
     "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
-    "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
-    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
-    "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
-    "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
-    "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
-    "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
-    "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)"
+    "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)"
   ],
+  "dynamic_dependencies_by_arch": {
+    "arm64": [
+      "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
+      "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
+      "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
+      "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
+      "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
+      "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
+      "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
+      "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)"
+    ],
+    "x86_64": [
+      "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
+      "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
+      "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
+      "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
+      "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
+      "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
+      "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
+      "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)"
+    ]
+  },
   "exports": [
     "pginit",
     "stata_call"
@@ -47,7 +58,7 @@
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "6867be69e8594b7aa6a775da87217bd648e14486",
+  "source_sha": "32bceb84df47a1c955c10cf75cb60a9d0fbb8d96",
   "universal": {
     "sha256": "dffd41aa5e27cef155c47e21d41b260ec7c938966d86883961dc5ae8e5012cf5",
     "size_bytes": 100051312,
