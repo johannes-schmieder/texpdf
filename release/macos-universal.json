@@ -3,14 +3,15 @@
     "x86_64",
     "arm64"
   ],
-  "arm_runtime_qualified": false,
+  "arm_runtime_qualified": true,
+  "arm_runtime_source_sha": "68d7c8b2f4de569fad5fb583978cd13efb4c5dae",
   "candidate_package": {
     "arm_and_intel_runtime_tested": true,
     "license_evidence_included": true,
     "public_release": false,
     "version": "0.1.0-rc.1",
-    "zip_sha256": "f5d69ac7e500558701da0c6b8900e0c3d6c452007c5f2c63e76917f09524bf3c",
-    "zip_size_bytes": 45982324
+    "zip_sha256": "75a7cfe9feb592002643f934035c64ab7824bb3cb4f9c71595be6a0ff6493de2",
+    "zip_size_bytes": 45982321
   },
   "dynamic_dependencies": [
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
@@ -57,6 +58,7 @@
       "target": "x86_64-apple-darwin"
     }
   },
+  "source_sha": "68d7c8b2f4de569fad5fb583978cd13efb4c5dae",
   "universal": {
     "sha256": "1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f",
     "size_bytes": 98532016,
