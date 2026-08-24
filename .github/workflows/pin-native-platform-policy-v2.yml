@@ -1,0 +1,214 @@
+name: Pin native platform policy v2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/pin-native-platform-policy-v2.yml"
+
+concurrency:
+  group: texpdf-pin-native-platform-policy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  pin:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 240
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: quick
+      TEXPDF_RUST_PROFILE: engine
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply idempotent native-policy edits
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          slash = chr(92)
+
+          native = Path("tools/prepare_native_deps.sh")
+          text = native.read_text(encoding="utf-8")
+          for old, new in (
+              ('triplet="arm64-osx"', 'triplet="arm64-osx-texpdf"'),
+              ('triplet="x64-osx"', 'triplet="x64-osx-texpdf"'),
+              ('triplet="x64-linux"', 'triplet="x64-linux-texpdf"'),
+              ('triplet="x64-windows-static-release"', 'triplet="x64-windows-texpdf"'),
+          ):
+              text = text.replace(old, new)
+          if 'repo_root="$(git rev-parse --show-toplevel)"' not in text:
+              text = text.replace(
+                  "set -euo pipefail\n",
+                  'set -euo pipefail\n\nrepo_root="$(git rev-parse --show-toplevel)"\n',
+                  1,
+              )
+          overlay_export = 'export VCPKG_OVERLAY_TRIPLETS="$repo_root/tools/vcpkg-triplets"'
+          if overlay_export not in text:
+              anchor = 'export VCPKG_ROOT="$vcpkg_root"'
+              if anchor not in text:
+                  raise SystemExit("missing VCPKG_ROOT export")
+              text = text.replace(anchor, anchor + "\n" + overlay_export, 1)
+
+          lines = text.splitlines()
+          if not any("--overlay-triplets" in line for line in lines):
+              for index, line in enumerate(lines):
+                  if '--triplet "$triplet"' in line:
+                      indentation = line[: len(line) - len(line.lstrip())]
+                      lines.insert(
+                          index + 1,
+                          indentation
+                          + '--overlay-triplets "$VCPKG_OVERLAY_TRIPLETS" '
+                          + slash,
+                      )
+                      break
+              else:
+                  raise SystemExit("missing vcpkg install triplet line")
+          native.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+          quick = Path("ci/run_rust_quick.sh")
+          text = quick.read_text(encoding="utf-8")
+          if "MACOSX_DEPLOYMENT_TARGET" not in text:
+              block = (
+                  'if [[ "$(/usr/bin/uname -s)" == "Darwin" ]]; then\n'
+                  '  export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-11.0}"\n'
+                  'fi\n'
+              )
+              text = text.replace("set -euo pipefail\n", "set -euo pipefail\n\n" + block, 1)
+          if "plugin-binary-policy.json" not in text:
+              lines = text.splitlines()
+              for index, line in enumerate(lines):
+                  if "tools/stage_plugin.py" in line and "--target-dir" in line:
+                      indentation = line[: len(line) - len(line.lstrip())]
+                      block = [
+                          indentation + 'if [[ "$(/usr/bin/uname -s)" == "Darwin" ]]; then',
+                          indentation + "  /usr/bin/python3 tools/check_plugin_binary.py " + slash,
+                          indentation + "    stata/_texpdf_plugin.plugin " + slash,
+                          indentation + "    --platform macos " + slash,
+                          indentation + '    --minimum-macos "$MACOSX_DEPLOYMENT_TARGET" ' + slash,
+                          indentation + "    --output .ci/stata/run/plugin-binary-policy.json",
+                          indentation + "fi",
+                      ]
+                      lines[index + 1:index + 1] = block
+                      break
+              else:
+                  raise SystemExit("missing plugin staging line")
+              text = "\n".join(lines) + "\n"
+          quick.write_text(text, encoding="utf-8")
+
+          for workflow in (
+              ".github/workflows/build-macos-universal.yml",
+              ".github/workflows/qualify-macos-universal-once.yml",
+          ):
+              path = Path(workflow)
+              if not path.is_file():
+                  continue
+              text = path.read_text(encoding="utf-8")
+              if "x64-osx-texpdf" not in text:
+                  text = text.replace("x64-osx", "x64-osx-texpdf")
+              if "MACOSX_DEPLOYMENT_TARGET:" not in text:
+                  text = text.replace(
+                      "    env:\n",
+                      '    env:\n      MACOSX_DEPLOYMENT_TARGET: "11.0"\n',
+                      1,
+                  )
+              path.write_text(text, encoding="utf-8")
+
+          cross = Path(".github/workflows/build-cross-platform.yml")
+          if cross.is_file():
+              text = cross.read_text(encoding="utf-8")
+              text = text.replace("triplet: x64-linux\n", "triplet: x64-linux-texpdf\n")
+              text = text.replace(
+                  "triplet: x64-windows-static-md\n",
+                  "triplet: x64-windows-texpdf\n",
+              )
+              if "VCPKG_OVERLAY_TRIPLETS:" not in text:
+                  text = text.replace(
+                      '      CARGO_TARGET_DIR: ${{ github.workspace }}/target\n',
+                      '      CARGO_TARGET_DIR: ${{ github.workspace }}/target\n'
+                      '      VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/tools/vcpkg-triplets\n',
+                      1,
+                  )
+              cross.write_text(text, encoding="utf-8")
+
+          for path in (
+              ".github/workflows/pin-native-platform-policy-once.yml",
+              ".github/workflows/pin-native-platform-policy-v2.yml",
+          ):
+              Path(path).unlink(missing_ok=True)
+          PY
+
+          git add tools/prepare_native_deps.sh tools/vcpkg-triplets \
+            tools/check_plugin_binary.py ci/run_rust_quick.sh
+          git add .github/workflows/build-macos-universal.yml \
+            .github/workflows/build-cross-platform.yml 2>/dev/null || true
+          git add -u .github/workflows/pin-native-platform-policy-once.yml \
+            .github/workflows/pin-native-platform-policy-v2.yml \
+            .github/workflows/qualify-macos-universal-once.yml 2>/dev/null || true
+
+      - name: Build and inspect real plugin
+        shell: bash
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/texpdf-native-policy-evidence"
+          rm -rf "$evidence"
+          mkdir -p "$evidence"
+          cp -R .ci/stata/run/. "$evidence/"
+          cp bundle/generated/bundle-info.json "$evidence/"
+          test -f "$evidence/plugin-binary-policy.json"
+
+      - name: Run licensed Stata profile
+        shell: bash
+        run: /bin/bash ci/run_stata_ci.sh quick
+
+      - name: Restore and validate evidence
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/texpdf-native-policy-evidence"
+          mkdir -p .ci/stata/run
+          if [[ -d "$evidence" ]]; then cp -R "$evidence/." .ci/stata/run/; fi
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            .ci/stata/run/receipt.json .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success \
+            --require-rust-success
+
+      - name: Commit native policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset -- stata/_texpdf_plugin.plugin dist 2>/dev/null || true
+          rm -f stata/_texpdf_plugin.plugin
+          rm -rf dist .ci/stata/run bundle/generated
+          git add -u
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: pin standalone native platform policy"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
