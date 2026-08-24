@@ -14,4 +14,7 @@ mata:
 assert(sum((1, 2, 3)) == 6)
 end
 
+display as error "TEXPDF DELIBERATE CI FAILURE"
+error 9
+
 display as result "TEXPDF STATA MATA SMOKE PASS"
