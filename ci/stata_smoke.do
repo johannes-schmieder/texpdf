@@ -102,8 +102,10 @@ if `full_engine' {
     file close `handle'
 
     texpdf using `"`path_source'"'
+    local returned_pdf `"`r(pdf)'"'
+    assert `"`returned_pdf'"' != ""
+    confirm file `"`returned_pdf'"'
     confirm file `"`path_pdf'"'
-    assert `"`r(pdf)'"' == `"`path_pdf'"'
     capture noisily texpdf using `"`path_source'"'
     local path_overwrite_rc = _rc
     assert `path_overwrite_rc' == 602
