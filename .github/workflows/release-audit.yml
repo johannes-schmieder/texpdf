@@ -22,7 +22,10 @@ jobs:
           fetch-depth: 0
 
       - name: Require synchronized fail-closed release state
-        run: /usr/bin/python3 tools/sync_project_state.py --check
+        run: >-
+          /usr/bin/python3 tools/sync_project_state.py
+          --check
+          --require-candidate-ready
 
       - name: Upload audit report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

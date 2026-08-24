@@ -30,7 +30,7 @@ position and build-only artifacts are never treated as runtime qualification.
 - [x] Permanent fail-closed readiness checks and canonical state generation.
 - [x] Removal of transient source-writing CI workflows.
 
-## Remaining private-candidate work
+## Private-candidate completion
 
 ### 1. License-complete redistribution inventory
 
@@ -46,34 +46,35 @@ Stata's package-index size limit does not truncate the evidence.
 
 ### 2. macOS universal and Intel runtime qualification
 
-- [ ] Rebuild both plugin slices with their target-matching embedded helpers.
-- [ ] Inspect the universal Mach-O exports and dynamic dependencies per slice.
-- [ ] Run version, compile, error/recovery, corpus, and local installation tests
+- [x] Rebuild both plugin slices with their target-matching embedded helpers.
+- [x] Inspect the universal Mach-O exports and dynamic dependencies per slice.
+- [x] Run version, compile, error/recovery, corpus, and local installation tests
       in an actual x86_64 Stata process under Rosetta.
-- [ ] Publish exact Intel runtime evidence without overwriting slice hashes.
+- [x] Publish exact Intel runtime evidence without overwriting slice hashes.
 
-Exit: universal build, Intel build, and Intel runtime checks all pass.
+Exit achieved: universal build, Intel build, and Intel runtime checks all pass.
 
 ### 3. Helper-backed memory and durability gate
 
-- [ ] Run at least 1,000 successful licensed-Stata compile calls with injected
+- [x] Run at least 1,000 successful licensed-Stata compile calls with injected
       errors and helper lifecycle/RSS sampling.
-- [ ] Demonstrate bounded Stata-process memory after warm-up and no retained
+- [x] Demonstrate bounded Stata-process memory after warm-up and no retained
       helper processes.
-- [ ] Exercise malformed input/images, timeout, corrupt cache replacement,
+- [x] Exercise malformed input/images, timeout, corrupt cache replacement,
       repeated failures, post-error recovery, and atomic output preservation.
-- [ ] Preserve failed attempts as attempts, never qualifications.
+- [x] Preserve failed attempts as attempts, never qualifications.
 
-Exit: `macos_arm_memory_stress` passes with a reviewed permanent record.
+Exit achieved: `macos_arm_memory_stress` passes with a reviewed permanent
+1,000-call record.
 
 ### 4. Private RC package
 
-- [ ] Freeze `v0.1.0-rc.1` metadata and release notes.
+- [x] Freeze `v0.1.0-rc.1` metadata and release notes.
 - [x] Implement deterministic macOS universal Stata ZIP assembly with notices,
       checksums, and two-slice helper provenance without public-release mode.
-- [ ] Test install and offline compilation from the exact ZIP on a clean local
+- [x] Test install and offline compilation from the exact ZIP on a clean local
       Stata setup under both architectures.
-- [ ] Run `tools/sync_project_state.py --require-candidate-ready`.
+- [x] Run `tools/sync_project_state.py --require-candidate-ready`.
 - [ ] Create the private RC tag/package only after every candidate blocker is
       clear.
 

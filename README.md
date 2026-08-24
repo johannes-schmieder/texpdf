@@ -17,11 +17,12 @@ Rust toolchain, package download, or network connection.
 
 ## Project state
 
-The active release target is a private macOS universal `v0.1.0-rc.1`. Apple
-Silicon is exact-source qualified under licensed Stata/MP 18. Intel runtime
-qualification and the 1,000-call memory gate remain required for that
-candidate. The redistribution inventory is source-bound and complete. Windows, Linux, public
-distribution, and final `v0.1.0` publication are explicitly deferred.
+The private macOS universal `v0.1.0-rc.1` candidate is release-ready. Its exact
+package bytes are qualified under licensed Stata/MP 18 on Apple Silicon and in
+an x86_64 process under Rosetta; the permanent 1,000-call helper-lifecycle and
+memory gate also passes. The redistribution inventory is source-bound and
+complete. Windows, Linux, public distribution, and final `v0.1.0` publication
+are explicitly deferred.
 
 Exact SHAs, artifact sizes, target support, failed attempts, and live blockers
 are generated from repository evidence in [`STATUS.md`](STATUS.md) and

@@ -3,7 +3,7 @@
 All notable changes to `texpdf` are recorded here. Semantic versioning begins
 with the first public release.
 
-## 0.1.0-rc.1 — unreleased private candidate
+## 0.1.0-rc.1 — 2026-08-24 (private release candidate)
 
 ### Added
 
@@ -20,16 +20,18 @@ with the first public release.
   tests;
 - deterministic Stata package assembly and local `net install` qualification;
 - exact-source-SHA Rust/licensed-Stata receipts;
-- 100-call installed-plugin stress qualification plus helper-aware
-  higher-iteration and parent/process-tree memory tooling;
-- fail-closed dependency, resource, target, and release-readiness tooling.
+- 1,000-call licensed-Stata durability qualification with injected failures,
+  helper-process lifecycle sampling, and bounded post-warm-up RSS growth;
+- fail-closed dependency, resource, target, and release-readiness tooling;
 - source-bound license and notice collection for both embedded Rust binaries,
-  native libraries, and every embedded TeX/font resource.
+  native libraries, and every embedded TeX/font resource;
 - deterministic universal macOS candidate packaging with full archive notices,
-  per-slice embedded-helper provenance, and package checksums.
+  per-slice embedded-helper provenance, and package checksums;
+- exact-byte qualification of the same universal candidate package under
+  Apple Silicon and an x86_64 Stata process under Rosetta.
 
 ### Remaining before public release
 
-- complete the high-iteration memory/safety qualification;
-- qualify macOS Intel, Windows x86-64, and Linux x86-64 in actual Stata;
-- pass the clean-machine offline release audit and publish GitHub assets.
+- qualify Windows x86-64 and Linux x86-64 in actual Stata;
+- authorize public distribution and pass the final public-release audit;
+- publish final `v0.1.0` assets and public installation URLs.
