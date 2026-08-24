@@ -21,6 +21,7 @@ NOTICE_PREFIXES = (
     "NOTICE",
     "AUTHORS",
 )
+NOTICE_DIRECTORIES = ("LICENSES", "LICENCES")
 NATIVE_PORTS = (
     "fontconfig",
     "freetype",
@@ -50,29 +51,38 @@ def metadata() -> dict[str, Any]:
     if result.returncode != 0:
         print(result.stderr, file=sys.stderr)
         raise RuntimeError("cargo metadata failed")
-    return json.loads(result.stdout)
+    value = json.loads(result.stdout)
+    if not isinstance(value, dict):
+        raise RuntimeError("cargo metadata did not return an object")
+    return value
 
 
 def notice_files(root: Path) -> list[Path]:
-    candidates: list[Path] = []
+    candidates: set[Path] = set()
     for path in root.iterdir():
-        if not path.is_file():
-            continue
-        upper = path.name.upper()
-        if any(upper.startswith(prefix) for prefix in NOTICE_PREFIXES):
-            candidates.append(path)
-    return sorted(candidates, key=lambda path: path.name.casefold())
+        if path.is_file():
+            upper = path.name.upper()
+            if any(upper.startswith(prefix) for prefix in NOTICE_PREFIXES):
+                candidates.add(path)
+        elif path.is_dir() and path.name.upper() in NOTICE_DIRECTORIES:
+            candidates.update(child for child in path.rglob("*") if child.is_file())
+    return sorted(candidates, key=lambda path: path.as_posix().casefold())
 
 
 def safe_component(value: str) -> str:
-    return "".join(character if character.isalnum() or character in "._-" else "_" for character in value)
+    return "".join(
+        character if character.isalnum() or character in "._-" else "_"
+        for character in value
+    )
 
 
 def copy_notices(source_root: Path, destination: Path) -> list[dict[str, object]]:
     records: list[dict[str, object]] = []
     destination.mkdir(parents=True, exist_ok=True)
     for source in notice_files(source_root):
-        target = destination / source.name
+        relative = source.relative_to(source_root)
+        target = destination / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
         records.append(
             {
@@ -86,9 +96,11 @@ def copy_notices(source_root: Path, destination: Path) -> list[dict[str, object]
 
 
 def collect_rust(output_root: Path) -> list[dict[str, object]]:
+    cargo_metadata = metadata()
+    workspace_root = Path(cargo_metadata["workspace_root"])
     records: list[dict[str, object]] = []
     for package in sorted(
-        metadata().get("packages", []),
+        cargo_metadata.get("packages", []),
         key=lambda item: (item["name"], item["version"]),
     ):
         manifest = Path(package["manifest_path"])
@@ -97,6 +109,7 @@ def collect_rust(output_root: Path) -> list[dict[str, object]]:
             f"{package['name']}-{package['version']}"
         )
         notices = copy_notices(package_root, destination)
+        notice_origin = "package"
         license_file = package.get("license_file")
         if license_file:
             license_path = Path(license_file)
@@ -116,6 +129,13 @@ def collect_rust(output_root: Path) -> list[dict[str, object]]:
                         "size_bytes": target.stat().st_size,
                     }
                 )
+        # Workspace members commonly inherit the repository-root license but do
+        # not duplicate it in each crate directory. This fallback is restricted
+        # to source=None packages; never search the shared Cargo registry parent,
+        # where neighboring crate directories are unrelated.
+        if not notices and package.get("source") is None:
+            notices = copy_notices(workspace_root, destination)
+            notice_origin = "workspace_root"
         records.append(
             {
                 "name": package["name"],
@@ -124,6 +144,7 @@ def collect_rust(output_root: Path) -> list[dict[str, object]]:
                 "license_file": package.get("license_file"),
                 "source": package.get("source"),
                 "repository": package.get("repository"),
+                "notice_origin": notice_origin if notices else None,
                 "notice_files": notices,
             }
         )
@@ -139,7 +160,9 @@ def find_native_copyright(vcpkg_root: Path, triplet: str, port: str) -> Path | N
     return next((path for path in candidates if path.is_file()), None)
 
 
-def collect_native(output_root: Path, vcpkg_root: Path | None, triplet: str | None) -> list[dict[str, object]]:
+def collect_native(
+    output_root: Path, vcpkg_root: Path | None, triplet: str | None
+) -> list[dict[str, object]]:
     records: list[dict[str, object]] = []
     for port in NATIVE_PORTS:
         source = (
@@ -193,21 +216,33 @@ def main() -> int:
     try:
         rust = collect_rust(args.output_root)
         native = collect_native(args.output_root, vcpkg_root, triplet)
-    except (OSError, RuntimeError, json.JSONDecodeError) as error:
+    except (OSError, RuntimeError, KeyError, json.JSONDecodeError) as error:
         print(f"TEXPDF_LICENSE_TEXT_ERROR {error}", file=sys.stderr)
         return 2
 
-    missing_rust = [
-        f"{record['name']}@{record['version']}"
+    missing_rust_records = [
+        {
+            "name": record["name"],
+            "version": record["version"],
+            "license": record["license"],
+            "repository": record["repository"],
+            "source": record["source"],
+        }
         for record in rust
         if not record["notice_files"]
     ]
-    missing_native = [record["name"] for record in native if not record["notice_files"]]
+    missing_rust = [
+        f"{record['name']}@{record['version']}" for record in missing_rust_records
+    ]
+    missing_native = [
+        record["name"] for record in native if not record["notice_files"]
+    ]
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "rust_packages": rust,
         "native_libraries": native,
         "missing_rust_notice_files": missing_rust,
+        "missing_rust_notice_records": missing_rust_records,
         "missing_native_notice_files": missing_native,
         "complete": not missing_rust and not missing_native,
     }
