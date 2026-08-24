@@ -34,7 +34,9 @@ fn relative_include_spaces_and_unicode_paths_compile() {
 
     let result = compile(&CompileRequest::new(&input, &output))
         .expect("compile source with relative include");
-    assert!(fs::read(result.output).expect("read PDF").starts_with(b"%PDF-"));
+    assert!(fs::read(result.output)
+        .expect("read PDF")
+        .starts_with(b"%PDF-"));
 }
 
 #[test]
@@ -70,6 +72,8 @@ fn repeated_compiles_in_one_process_succeed() {
         let mut request = CompileRequest::new(&input, &output);
         request.replace = iteration > 0;
         let result = compile(&request).expect("repeated compile");
-        assert!(fs::read(result.output).expect("read PDF").starts_with(b"%PDF-"));
+        assert!(fs::read(result.output)
+            .expect("read PDF")
+            .starts_with(b"%PDF-"));
     }
 }
