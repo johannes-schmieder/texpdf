@@ -1,35 +1,56 @@
 {
   "cargo": {
     "license_expressions": [
+      "(Apache-2.0 OR MIT) AND BSD-3-Clause",
+      "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "Apache-2.0",
+      "Apache-2.0 / MIT",
+      "Apache-2.0 AND ISC",
+      "Apache-2.0 OR ISC OR MIT",
       "Apache-2.0 OR MIT",
       "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "BSD-3-Clause",
+      "CC0-1.0",
+      "CC0-1.0 OR MIT-0 OR Apache-2.0",
+      "ISC",
+      "ISC AND (Apache-2.0 OR ISC)",
+      "ISC AND (Apache-2.0 OR ISC) AND Apache-2.0 AND MIT AND BSD-3-Clause AND (Apache-2.0 OR ISC OR MIT) AND (Apache-2.0 OR ISC OR MIT-0)",
       "MIT",
       "MIT OR Apache-2.0",
-      "MIT/Apache-2.0"
+      "MIT OR Apache-2.0 OR Zlib",
+      "MIT/Apache-2.0",
+      "MPL-2.0",
+      "Unicode-3.0",
+      "Unlicense OR MIT",
+      "Unlicense/MIT",
+      "Zlib",
+      "Zlib OR Apache-2.0 OR MIT"
     ],
     "missing_license_metadata": 0,
-    "package_count": 20,
-    "third_party_package_count": 18,
-    "workspace_package_count": 2
+    "package_count": 369,
+    "third_party_package_count": 365,
+    "workspace_package_count": 4
   },
-  "curated_manifest_file_count": 556,
+  "curated_manifest_file_count": 381,
   "dependency_undeclared_count": 0,
   "missing_native_notice_files": 0,
   "missing_rust_notice_files": 0,
-  "pipeline_complete": false,
+  "pipeline_complete": true,
   "qualification_boundary": "This status records the audit pipeline even when a stage fails. Public binary publication remains blocked unless release_license_complete is true.",
-  "release_license_complete": false,
+  "release_license_complete": true,
   "resource_count_matches_manifest": true,
   "schema_version": 2,
-  "source_sha": "475f55f48ea3079ee6021e92cdc103eace091450",
+  "source_sha": "d9be7615bd69b260b5841730d51d9a9ee03958f0",
   "stage_return_codes": {
     "cargo_inventory": 0,
     "collect_license_texts": 0,
+    "collect_tex_license_notices": 0,
     "dependency_inventory": 0,
     "download_tlpdb": 0,
     "prepare_native_dependencies": 0,
     "prepare_rust_toolchain": 0,
-    "tex_inventory": 1
+    "tex_inventory": 0
   },
   "stages": [
     {
@@ -59,6 +80,8 @@
         "/private/tmp/texpdf-license-cache/texlive-2022-final.tlpdb.xz",
         "--overrides",
         "bundle/license-overrides.toml",
+        "--evidence",
+        "bundle/license-evidence.json",
         "--output",
         "licenses/generated/tex-resources.json",
         "--markdown",
@@ -66,9 +89,9 @@
         "--strict"
       ],
       "name": "tex_inventory",
-      "return_code": 1,
+      "return_code": 0,
       "stderr_tail": "",
-      "stdout_tail": "TEXPDF_LICENSE_INVENTORY resources=556 mapped=406 ambiguous=8 unmapped=5 missing_license=137"
+      "stdout_tail": "TEXPDF_LICENSE_INVENTORY resources=381 mapped=381 ambiguous=0 unmapped=0 missing_license=0"
     },
     {
       "command": [
@@ -83,7 +106,7 @@
       "name": "cargo_inventory",
       "return_code": 0,
       "stderr_tail": "",
-      "stdout_tail": "TEXPDF_CARGO_LICENSE_INVENTORY package_count=20 workspace_package_count=2 third_party_package_count=18 missing_license_metadata=0 target=aarch64-apple-darwin root=texpdf-stata"
+      "stdout_tail": "TEXPDF_CARGO_LICENSE_INVENTORY package_count=369 workspace_package_count=4 third_party_package_count=365 missing_license_metadata=0 target=aarch64-apple-darwin roots=texpdf-stata,texpdf-helper"
     },
     {
       "command": [
@@ -98,7 +121,7 @@
       "name": "dependency_inventory",
       "return_code": 0,
       "stderr_tail": "",
-      "stdout_tail": "TEXPDF_DEPENDENCY_INVENTORY_READY rust_packages=20 native_libraries=7 undeclared=0 target=aarch64-apple-darwin root=texpdf-stata"
+      "stdout_tail": "TEXPDF_DEPENDENCY_INVENTORY_READY rust_packages=369 native_libraries=7 undeclared=0 target=aarch64-apple-darwin roots=texpdf-stata,texpdf-helper"
     },
     {
       "command": [
@@ -117,7 +140,23 @@
       "name": "collect_license_texts",
       "return_code": 0,
       "stderr_tail": "",
-      "stdout_tail": "TEXPDF_LICENSE_TEXTS_READY rust=20 native=7 missing_rust=0 missing_native=0 target=aarch64-apple-darwin root=texpdf-stata"
+      "stdout_tail": "TEXPDF_LICENSE_TEXTS_READY rust=369 native=7 missing_rust=0 missing_native=0 target=aarch64-apple-darwin roots=texpdf-stata,texpdf-helper"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "tools/collect_tex_license_notices.py",
+        "--inventory",
+        "licenses/generated/tex-resources.json",
+        "--output-root",
+        "licenses/generated/texts/texlive",
+        "--manifest",
+        "licenses/generated/tex-notices.json"
+      ],
+      "name": "collect_tex_license_notices",
+      "return_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_TEX_NOTICES_READY resources=381 expressions=17 notices=9"
     },
     {
       "error": "",
@@ -129,14 +168,16 @@
       "url": "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb.xz"
     }
   ],
+  "tex_notice_complete": true,
+  "tex_notice_file_count": 9,
   "tex_resources": {
-    "ambiguous": 8,
-    "license_expression_count": 12,
-    "mapped": 406,
-    "missing_license": 137,
-    "package_count": 135,
-    "resource_count": 556,
-    "unmapped": 5
+    "ambiguous": 0,
+    "license_expression_count": 17,
+    "mapped": 381,
+    "missing_license": 0,
+    "package_count": 84,
+    "resource_count": 381,
+    "unmapped": 0
   },
   "tlpdb": {
     "sha256": "be6ec39a41ff875f37a4dfaab75a75c19ea9793d9370c93f69ed27097b02a0cc",

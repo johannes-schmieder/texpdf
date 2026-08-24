@@ -1,17 +1,19 @@
 # Third-party license audit status
 
-- Source SHA: `475f55f48ea3079ee6021e92cdc103eace091450`
-- Pipeline complete: **false**
-- Release-license complete: **false**
-- Embedded resources: 556
-- Mapped resources: 406
-- Ambiguous resources: 8
-- Unmapped resources: 5
-- Resources missing license metadata: 137
-- Cargo packages: 20
+- Source SHA: `d9be7615bd69b260b5841730d51d9a9ee03958f0`
+- Pipeline complete: **true**
+- Release-license complete: **true**
+- Embedded resources: 381
+- Mapped resources: 381
+- Ambiguous resources: 0
+- Unmapped resources: 0
+- Resources missing license metadata: 0
+- Cargo packages: 369
 - Cargo packages missing metadata: 0
 - Rust packages without collected notice files: 0
 - Native libraries without collected notice files: 0
+- TeX resource notice tree complete: **true**
+- TeX resource notice files: 9
 
 ## Pipeline stages
 
@@ -19,10 +21,11 @@
 |---|---:|---|
 | `prepare_rust_toolchain` | 0 |  |
 | `prepare_native_dependencies` | 0 |  |
-| `tex_inventory` | 1 |  |
+| `tex_inventory` | 0 |  |
 | `cargo_inventory` | 0 |  |
 | `dependency_inventory` | 0 |  |
 | `collect_license_texts` | 0 |  |
+| `collect_tex_license_notices` | 0 |  |
 | `download_tlpdb` | 0 |  |
 
 A successful workflow run means the audit produced durable evidence.
