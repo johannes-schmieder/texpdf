@@ -23,7 +23,7 @@
   "ci": {
     "overall_status": "success",
     "profile": "quick",
-    "receipt": ".ci/stata/results/d9be7615bd69b260b5841730d51d9a9ee03958f0.json",
+    "receipt": ".ci/stata/results/6fc34a9335a2328d0a13729151975811239910c6.json",
     "required_markers": [
       "TEXPDF IN PROCESS STRESS PASS",
       "TEXPDF NET INSTALL PASS",
@@ -31,7 +31,7 @@
       "TEXPDF STATA MATA SMOKE PASS"
     ],
     "run_attempt": 1,
-    "run_id": 32777900898,
+    "run_id": 32779284922,
     "rust_mode": "repository-engine",
     "rust_status": "success",
     "stata_status": "success"
@@ -42,14 +42,14 @@
   },
   "helper": {
     "materialization": "verified hash-addressed private executable",
-    "sha256": "77c5578eab96b4d9786e1c1b5bed07c4b9a522ccf7a5fa30d8fb4f50935d6cd1",
-    "size_bytes": 48515456
+    "sha256": "1d1873912ce031669234640678052d5d645b2c5c2bce4df215caccc66c43047c",
+    "size_bytes": 48515440
   },
   "package": {
     "net_install_tested": true,
     "public_release": false,
-    "zip_sha256": "5cd8af4299e24e2f20d17aa797ba4e80c07d5e46575f0fb581ec736e99f704a2",
-    "zip_size_bytes": 22496107
+    "zip_sha256": "fea9b7ed3da0d075188231b2490dce66ff43c60c4356edbbdf9168bb7b8e4927",
+    "zip_size_bytes": 22496072
   },
   "platform": {
     "architecture": "Apple Silicon",
@@ -69,12 +69,12 @@
       "pginit",
       "stata_call"
     ],
-    "sha256": "09d439b8d05ded255ca60481b4a791de83cea210a3ec2b083389af09b8713db7",
+    "sha256": "bc6575fbc0e876734065f9378ca1d4cdc31390f19b3e2b59a4d634953b3e69d7",
     "size_bytes": 49429136
   },
   "qualification_boundary": "This record qualifies the exact macOS Apple Silicon plugin, embedded helper, curated bundle, and development package under licensed Stata/MP. Other architectures require separate runtime qualification; public redistribution requires a complete audit.",
-  "qualified_at": "2026-08-24T21:10:40.913602Z",
-  "qualified_source_sha": "d9be7615bd69b260b5841730d51d9a9ee03958f0",
+  "qualified_at": "2026-08-24T21:37:59.370148Z",
+  "qualified_source_sha": "6fc34a9335a2328d0a13729151975811239910c6",
   "schema_version": 3,
   "tests": {
     "academic_package_corpus": true,
