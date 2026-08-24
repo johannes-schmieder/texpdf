@@ -7399,14 +7399,14 @@
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stderr.log",
-          "sha256": "6f0ed56ee8668572e77f29f0ef6f1dd45ca33f3f977c03a1ecef23ce4141a4a6",
-          "size_bytes": 567,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/logs/tex_inventory.stderr.log"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stdout.log",
-          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "size_bytes": 0,
+          "sha256": "ebf55b85cce4e64546707b2d24ed1e1bbb30b339ee5f657aca0cfefa74068da4",
+          "size_bytes": 94,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/logs/tex_inventory.stdout.log"
         },
         {
@@ -7414,6 +7414,18 @@
           "sha256": "47964767b05badc4b4c0eacb9ad89ec8b2637dc8e64ab6cf7ebfefc5a56154f3",
           "size_bytes": 1515,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/native-environment.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.json",
+          "sha256": "1df5b168817babb8941763285262ef5704c95beb00c766ada876aaabb4513695",
+          "size_bytes": 165028,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/tex-resources.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.md",
+          "sha256": "a57af2ae48b1c577dd5a765883f1903404c62e750fda6a93aedeab52676137c2",
+          "size_bytes": 12148,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/tex-resources.md"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/texts/rust/adler2-2.0.1/LICENSE-0BSD",
@@ -10800,14 +10812,14 @@
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/logs/tex_inventory.stderr.log",
-          "sha256": "6f0ed56ee8668572e77f29f0ef6f1dd45ca33f3f977c03a1ecef23ce4141a4a6",
-          "size_bytes": 567,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/logs/tex_inventory.stderr.log"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/logs/tex_inventory.stdout.log",
-          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "size_bytes": 0,
+          "sha256": "ebf55b85cce4e64546707b2d24ed1e1bbb30b339ee5f657aca0cfefa74068da4",
+          "size_bytes": 94,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/logs/tex_inventory.stdout.log"
         },
         {
@@ -10815,6 +10827,18 @@
           "sha256": "47964767b05badc4b4c0eacb9ad89ec8b2637dc8e64ab6cf7ebfefc5a56154f3",
           "size_bytes": 1515,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/native-environment.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/tex-resources.json",
+          "sha256": "1df5b168817babb8941763285262ef5704c95beb00c766ada876aaabb4513695",
+          "size_bytes": 165028,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/tex-resources.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/tex-resources.md",
+          "sha256": "a57af2ae48b1c577dd5a765883f1903404c62e750fda6a93aedeab52676137c2",
+          "size_bytes": 12148,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/tex-resources.md"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/adler2-2.0.1/LICENSE-0BSD",
@@ -14178,14 +14202,14 @@
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stderr.log",
-          "sha256": "6f0ed56ee8668572e77f29f0ef6f1dd45ca33f3f977c03a1ecef23ce4141a4a6",
-          "size_bytes": 567,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stderr.log"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stdout.log",
-          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "size_bytes": 0,
+          "sha256": "ebf55b85cce4e64546707b2d24ed1e1bbb30b339ee5f657aca0cfefa74068da4",
+          "size_bytes": 94,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stdout.log"
         },
         {
@@ -14193,6 +14217,18 @@
           "sha256": "47964767b05badc4b4c0eacb9ad89ec8b2637dc8e64ab6cf7ebfefc5a56154f3",
           "size_bytes": 1515,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/native-environment.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.json",
+          "sha256": "1df5b168817babb8941763285262ef5704c95beb00c766ada876aaabb4513695",
+          "size_bytes": 165028,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.md",
+          "sha256": "a57af2ae48b1c577dd5a765883f1903404c62e750fda6a93aedeab52676137c2",
+          "size_bytes": 12148,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.md"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/texts/rust/adler2-2.0.1/LICENSE-0BSD",
@@ -17591,14 +17627,14 @@
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/logs/tex_inventory.stderr.log",
-          "sha256": "6f0ed56ee8668572e77f29f0ef6f1dd45ca33f3f977c03a1ecef23ce4141a4a6",
-          "size_bytes": 567,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/logs/tex_inventory.stderr.log"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/logs/tex_inventory.stdout.log",
-          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "size_bytes": 0,
+          "sha256": "ebf55b85cce4e64546707b2d24ed1e1bbb30b339ee5f657aca0cfefa74068da4",
+          "size_bytes": 94,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/logs/tex_inventory.stdout.log"
         },
         {
@@ -17606,6 +17642,18 @@
           "sha256": "47964767b05badc4b4c0eacb9ad89ec8b2637dc8e64ab6cf7ebfefc5a56154f3",
           "size_bytes": 1515,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/native-environment.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/tex-resources.json",
+          "sha256": "1df5b168817babb8941763285262ef5704c95beb00c766ada876aaabb4513695",
+          "size_bytes": 165028,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/tex-resources.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/tex-resources.md",
+          "sha256": "a57af2ae48b1c577dd5a765883f1903404c62e750fda6a93aedeab52676137c2",
+          "size_bytes": 12148,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/tex-resources.md"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/adler2-2.0.1/LICENSE-0BSD",
@@ -20969,14 +21017,14 @@
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stderr.log",
-          "sha256": "6f0ed56ee8668572e77f29f0ef6f1dd45ca33f3f977c03a1ecef23ce4141a4a6",
-          "size_bytes": 567,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stderr.log"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stdout.log",
-          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "size_bytes": 0,
+          "sha256": "ebf55b85cce4e64546707b2d24ed1e1bbb30b339ee5f657aca0cfefa74068da4",
+          "size_bytes": 94,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stdout.log"
         },
         {
@@ -20984,6 +21032,18 @@
           "sha256": "47964767b05badc4b4c0eacb9ad89ec8b2637dc8e64ab6cf7ebfefc5a56154f3",
           "size_bytes": 1515,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/native-environment.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.json",
+          "sha256": "1df5b168817babb8941763285262ef5704c95beb00c766ada876aaabb4513695",
+          "size_bytes": 165028,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.md",
+          "sha256": "a57af2ae48b1c577dd5a765883f1903404c62e750fda6a93aedeab52676137c2",
+          "size_bytes": 12148,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.md"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/texts/rust/adler2-2.0.1/LICENSE-0BSD",
@@ -24359,14 +24419,14 @@
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/logs/tex_inventory.stderr.log",
-          "sha256": "6f0ed56ee8668572e77f29f0ef6f1dd45ca33f3f977c03a1ecef23ce4141a4a6",
-          "size_bytes": 567,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/logs/tex_inventory.stderr.log"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/logs/tex_inventory.stdout.log",
-          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "size_bytes": 0,
+          "sha256": "ebf55b85cce4e64546707b2d24ed1e1bbb30b339ee5f657aca0cfefa74068da4",
+          "size_bytes": 94,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/logs/tex_inventory.stdout.log"
         },
         {
@@ -24374,6 +24434,18 @@
           "sha256": "47964767b05badc4b4c0eacb9ad89ec8b2637dc8e64ab6cf7ebfefc5a56154f3",
           "size_bytes": 1515,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/native-environment.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/tex-resources.json",
+          "sha256": "1df5b168817babb8941763285262ef5704c95beb00c766ada876aaabb4513695",
+          "size_bytes": 165028,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/tex-resources.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/tex-resources.md",
+          "sha256": "a57af2ae48b1c577dd5a765883f1903404c62e750fda6a93aedeab52676137c2",
+          "size_bytes": 12148,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/tex-resources.md"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/adler2-2.0.1/LICENSE-0BSD",
@@ -27737,14 +27809,14 @@
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stderr.log",
-          "sha256": "6f0ed56ee8668572e77f29f0ef6f1dd45ca33f3f977c03a1ecef23ce4141a4a6",
-          "size_bytes": 567,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stderr.log"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stdout.log",
-          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "size_bytes": 0,
+          "sha256": "ebf55b85cce4e64546707b2d24ed1e1bbb30b339ee5f657aca0cfefa74068da4",
+          "size_bytes": 94,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/logs/tex_inventory.stdout.log"
         },
         {
@@ -27752,6 +27824,18 @@
           "sha256": "47964767b05badc4b4c0eacb9ad89ec8b2637dc8e64ab6cf7ebfefc5a56154f3",
           "size_bytes": 1515,
           "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/native-environment.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.json",
+          "sha256": "1df5b168817babb8941763285262ef5704c95beb00c766ada876aaabb4513695",
+          "size_bytes": 165028,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.json"
+        },
+        {
+          "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.md",
+          "sha256": "a57af2ae48b1c577dd5a765883f1903404c62e750fda6a93aedeab52676137c2",
+          "size_bytes": 12148,
+          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/tex-resources.md"
         },
         {
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/licenses/generated/texts/rust/texpdf-core-0.1.0/licenses/generated/texts/rust/texpdf-bundle-resolver-0.1.0/licenses/generated/texts/rust/adler2-2.0.1/LICENSE-0BSD",

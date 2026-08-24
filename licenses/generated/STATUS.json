@@ -43,9 +43,9 @@
   "pipeline_complete": false,
   "qualification_boundary": "This status records the audit pipeline even when a stage fails. Public binary publication remains blocked unless release_license_complete is true.",
   "release_license_complete": false,
-  "resource_count_matches_manifest": false,
+  "resource_count_matches_manifest": true,
   "schema_version": 2,
-  "source_sha": "3dc6fe61fb0ef1380bdf0c90973d123e433cbe23",
+  "source_sha": "471b4ea93d24d664ba82c5ab6c034c2606702ec7",
   "stage_return_codes": {
     "cargo_inventory": 0,
     "collect_license_texts": 1,
@@ -91,8 +91,8 @@
       ],
       "name": "tex_inventory",
       "return_code": 1,
-      "stderr_tail": "Traceback (most recent call last):\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 401, in <module>\n    raise SystemExit(main())\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 382, in main\n    load_overrides(args.overrides),\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 172, in load_overrides\n    import tomllib\nModuleNotFoundError: No module named 'tomllib'",
-      "stdout_tail": ""
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_LICENSE_INVENTORY resources=556 mapped=358 ambiguous=56 unmapped=5 missing_license=137"
     },
     {
       "command": [
@@ -153,7 +153,15 @@
       "url": "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb.xz"
     }
   ],
-  "tex_resources": {},
+  "tex_resources": {
+    "ambiguous": 56,
+    "license_expression_count": 12,
+    "mapped": 358,
+    "missing_license": 137,
+    "package_count": 130,
+    "resource_count": 556,
+    "unmapped": 5
+  },
   "tlpdb": {
     "sha256": "be6ec39a41ff875f37a4dfaab75a75c19ea9793d9370c93f69ed27097b02a0cc",
     "size_bytes": 2451736,

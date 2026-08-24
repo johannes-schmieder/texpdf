@@ -1,0 +1,6700 @@
+{
+  "license_expressions": [
+    "gfl",
+    "gpl",
+    "knuth",
+    "lgpl",
+    "lppl",
+    "lppl1.3",
+    "lppl1.3c",
+    "mit",
+    "ofl",
+    "other-free",
+    "pd",
+    "x11"
+  ],
+  "packages_used": [
+    "00texlive.image",
+    "adjustbox",
+    "amsfonts",
+    "atbegshi",
+    "atveryend",
+    "auxhook",
+    "babel",
+    "bigintcalc",
+    "bitset",
+    "booktabs",
+    "caption",
+    "cm",
+    "collectbox",
+    "dvipdfmx",
+    "enumitem",
+    "environ",
+    "etexcmds",
+    "etoolbox",
+    "fancyhdr",
+    "float",
+    "geometry",
+    "gettitlestring",
+    "glyphlist",
+    "graphics-def",
+    "hycolor",
+    "hyperref",
+    "hyphen-afrikaans",
+    "hyphen-ancientgreek",
+    "hyphen-armenian",
+    "hyphen-base",
+    "hyphen-basque",
+    "hyphen-belarusian",
+    "hyphen-bulgarian",
+    "hyphen-catalan",
+    "hyphen-chinese",
+    "hyphen-churchslavonic",
+    "hyphen-coptic",
+    "hyphen-croatian",
+    "hyphen-czech",
+    "hyphen-danish",
+    "hyphen-dutch",
+    "hyphen-english",
+    "hyphen-esperanto",
+    "hyphen-estonian",
+    "hyphen-ethiopic",
+    "hyphen-finnish",
+    "hyphen-french",
+    "hyphen-friulan",
+    "hyphen-galician",
+    "hyphen-georgian",
+    "hyphen-german",
+    "hyphen-greek",
+    "hyphen-hungarian",
+    "hyphen-icelandic",
+    "hyphen-indic",
+    "hyphen-indonesian",
+    "hyphen-interlingua",
+    "hyphen-irish",
+    "hyphen-italian",
+    "hyphen-kurmanji",
+    "hyphen-latin",
+    "hyphen-latvian",
+    "hyphen-lithuanian",
+    "hyphen-macedonian",
+    "hyphen-mongolian",
+    "hyphen-norwegian",
+    "hyphen-occitan",
+    "hyphen-piedmontese",
+    "hyphen-polish",
+    "hyphen-portuguese",
+    "hyphen-romanian",
+    "hyphen-romansh",
+    "hyphen-russian",
+    "hyphen-sanskrit",
+    "hyphen-serbian",
+    "hyphen-slovak",
+    "hyphen-slovenian",
+    "hyphen-spanish",
+    "hyphen-swedish",
+    "hyphen-thai",
+    "hyphen-turkish",
+    "hyphen-turkmen",
+    "hyphen-ukrainian",
+    "hyphen-uppersorbian",
+    "hyphen-welsh",
+    "ifoddpage",
+    "iftex",
+    "infwarerr",
+    "intcalc",
+    "knuth-lib",
+    "kvdefinekeys",
+    "kvoptions",
+    "kvsetkeys",
+    "l3backend",
+    "l3kernel",
+    "l3packages",
+    "latex-fonts",
+    "letltxmacro",
+    "lm",
+    "ltxcmds",
+    "manfnt-font",
+    "mathtools",
+    "mflogo-font",
+    "microtype",
+    "multirow",
+    "natbib",
+    "pdfescape",
+    "pdflscape",
+    "pdftexcmds",
+    "placeins",
+    "refcount",
+    "rerunfilecheck",
+    "setspace",
+    "siunitx",
+    "stringenc",
+    "symbol",
+    "tex-ini-files",
+    "threeparttable",
+    "threeparttablex",
+    "titlesec",
+    "translations",
+    "trimspaces",
+    "unicode-data",
+    "uniquecounter",
+    "url",
+    "varwidth",
+    "xcolor",
+    "xetex",
+    "xkeyval",
+    "zapfding"
+  ],
+  "resources": [
+    {
+      "candidate_packages": [
+        "unicode-data"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "unicode-data",
+      "resource": "CaseFolding.txt",
+      "shortdesc": "Unicode data and loaders for TeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "00texlive.installer",
+        "tlperl.win32",
+        "unicode-data"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "SpecialCasing.txt",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "bibtexperllibs",
+        "unicode-data"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "UnicodeData.txt",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "adjustbox"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "adjustbox",
+      "resource": "adjcalc.sty",
+      "shortdesc": "Graphics package-alike macros for \"general\" boxes",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "adjustbox"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "adjustbox",
+      "resource": "adjustbox.sty",
+      "shortdesc": "Graphics package-alike macros for \"general\" boxes",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amsbsy.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "amsfonts.sty",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amsgen.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amsmath.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amsopn.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "amssymb.sty",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amstext.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "array.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "article.cls",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "atbegshi-ltx.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "atbegshi"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "atbegshi",
+      "resource": "atbegshi.sty",
+      "shortdesc": "Execute stuff at \\shipout time",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "atveryend-ltx.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "atveryend"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "atveryend",
+      "resource": "atveryend.sty",
+      "shortdesc": "Hooks at the very end of a document",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "auxhook"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "auxhook",
+      "resource": "auxhook.sty",
+      "shortdesc": "Hooks for auxiliary files",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "bigintcalc"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "bigintcalc",
+      "resource": "bigintcalc.sty",
+      "shortdesc": "Integer calculations on very large numbers",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "bitset"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "bitset",
+      "resource": "bitset.sty",
+      "shortdesc": "Handle bit-vector datatype",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "booktabs"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "booktabs",
+      "resource": "booktabs.sty",
+      "shortdesc": "Publication quality tables in LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "calc.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "caption"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "caption",
+      "resource": "caption.sty",
+      "shortdesc": "Customising captions in floating environments",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "caption"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "caption",
+      "resource": "caption3.sty",
+      "shortdesc": "Customising captions in floating environments",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "dvipdfmx"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "dvipdfmx",
+      "resource": "ckx.map",
+      "shortdesc": "An extended version of dvipdfm",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmb10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmb10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbsy10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbsy10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbx10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbx10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbx12.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbx12.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbx5.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbx5.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbx6.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbx6.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbx7.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbx7.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbx8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbx8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbx9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbx9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbxsl10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbxsl10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmbxti10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmbxti10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmcsc10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmcsc10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmdunh10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmdunh10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmex10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmex10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmex7.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmex8.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmex9.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmff10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmff10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmfi10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmfi10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmfib8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmfib8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cminch.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cminch.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmitt10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmitt10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmmi10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmmi10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmmi12.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmmi12.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmmi5.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmmi5.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmmi6.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmmi6.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmmi7.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmmi7.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmmi8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmmi8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmmi9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmmi9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmmib10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmmib10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmr10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmr10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmr12.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmr12.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmr17.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmr17.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmr5.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmr5.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmr6.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmr6.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmr7.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmr7.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmr8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmr8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmr9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmr9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsl10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsl10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsl12.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsl12.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsl8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsl8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsl9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsl9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsltt10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsltt10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmss10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmss10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmss12.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmss12.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmss17.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmss17.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmss8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmss8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmss9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmss9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssbx10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssbx10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssdc10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssdc10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssi10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssi10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssi12.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssi12.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssi17.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssi17.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssi8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssi8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssi9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssi9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssq8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssq8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmssqi8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmssqi8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsy10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsy10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsy5.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsy5.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsy6.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsy6.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsy7.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsy7.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsy8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsy8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmsy9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmsy9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmtcsc10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmtcsc10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmtex10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmtex10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmtex8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmtex8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmtex9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmtex9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmti10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmti10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmti12.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmti12.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmti7.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmti7.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmti8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmti8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmti9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmti9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmtt10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmtt10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmtt12.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmtt12.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmtt8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmtt8.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmtt9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmtt9.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmu10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmu10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "cmvtt10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cm"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cm",
+      "resource": "cmvtt10.tfm",
+      "shortdesc": "Computer Modern fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "collectbox"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "collectbox",
+      "resource": "collectbox.sty",
+      "shortdesc": "Collect and process macro arguments as boxes",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "dviout.win32",
+        "graphics-cfg",
+        "pgf"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "color.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "color.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dcolumn.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dehyphn-x-2022-03-16.pat",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dehyphn-x-2022-03-16.tex",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dehypht-x-2022-03-16.pat",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dehypht-x-2022-03-16.tex",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-base",
+      "resource": "dumyhyph.tex",
+      "shortdesc": "core hyphenation support files",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "enumitem"
+      ],
+      "license": "mit",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "enumitem",
+      "resource": "enumitem.sty",
+      "shortdesc": "Control layout of itemize, enumerate, description",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "environ"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "environ",
+      "resource": "environ.sty",
+      "shortdesc": "A new interface for environments in LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "etexcmds"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "etexcmds",
+      "resource": "etexcmds.sty",
+      "shortdesc": "Avoid name clashes with e-TeX commands",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "etoolbox"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "etoolbox",
+      "resource": "etoolbox.sty",
+      "shortdesc": "e-TeX tools for LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "l3kernel"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "l3kernel",
+      "resource": "expl3-code.tex",
+      "shortdesc": "LaTeX3 programming conventions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "l3kernel"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "l3kernel",
+      "resource": "expl3.ltx",
+      "shortdesc": "LaTeX3 programming conventions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "l3kernel"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "l3kernel",
+      "resource": "expl3.sty",
+      "shortdesc": "LaTeX3 programming conventions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "fancyhdr"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "fancyhdr",
+      "resource": "fancyhdr.sty",
+      "shortdesc": "Extensive control of page headers and footers in LaTeX2e",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "float"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "float",
+      "resource": "float.sty",
+      "shortdesc": "Improved interface for floating objects",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "fontmath.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "fontmath.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "cslatex",
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "fonttext.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "fonttext.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "geometry"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "geometry",
+      "resource": "geometry.sty",
+      "shortdesc": "Flexible and complete interface to document dimensions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "gettitlestring"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "gettitlestring",
+      "resource": "gettitlestring.sty",
+      "shortdesc": "Clean up title references",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "glyphlist"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "glyphlist",
+      "resource": "glyphlist.txt",
+      "shortdesc": "Adobe Glyph List and TeX extensions",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "dviout.win32",
+        "graphics-cfg",
+        "latex-graphics-companion"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "graphics.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "graphics.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "graphicx.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "hyperref"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyperref",
+      "resource": "hxetex.def",
+      "shortdesc": "Extensive support for hypertext in LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hycolor"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hycolor",
+      "resource": "hycolor.sty",
+      "shortdesc": "Implements colour for packages hyperref and bookmark",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyperref"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyperref",
+      "resource": "hyperref.sty",
+      "shortdesc": "Extensive support for hypertext in LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-afrikaans"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-afrikaans",
+      "resource": "hyph-af.tex",
+      "shortdesc": "Afrikaans hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-as.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-belarusian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-belarusian",
+      "resource": "hyph-be.tex",
+      "shortdesc": "Belarusian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-bulgarian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-bulgarian",
+      "resource": "hyph-bg.tex",
+      "shortdesc": "Bulgarian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-bn.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-catalan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-catalan",
+      "resource": "hyph-ca.tex",
+      "shortdesc": "Catalan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-coptic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-coptic",
+      "resource": "hyph-cop.tex",
+      "shortdesc": "Coptic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-czech"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-czech",
+      "resource": "hyph-cs.tex",
+      "shortdesc": "Czech hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-churchslavonic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-churchslavonic",
+      "resource": "hyph-cu.tex",
+      "shortdesc": "Church Slavonic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-welsh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-welsh",
+      "resource": "hyph-cy.tex",
+      "shortdesc": "Welsh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-danish"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-danish",
+      "resource": "hyph-da.tex",
+      "shortdesc": "Danish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "hyph-de-1901.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "hyph-de-1996.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "hyph-de-ch-1901.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-greek"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-greek",
+      "resource": "hyph-el-monoton.tex",
+      "shortdesc": "Modern Greek hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-greek"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-greek",
+      "resource": "hyph-el-polyton.tex",
+      "shortdesc": "Modern Greek hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-english",
+      "resource": "hyph-en-gb.tex",
+      "shortdesc": "English hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-english",
+      "resource": "hyph-en-us.tex",
+      "shortdesc": "English hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-esperanto"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-esperanto",
+      "resource": "hyph-eo.tex",
+      "shortdesc": "Esperanto hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-spanish"
+      ],
+      "license": "mit",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-spanish",
+      "resource": "hyph-es.tex",
+      "shortdesc": "Spanish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-estonian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-estonian",
+      "resource": "hyph-et.tex",
+      "shortdesc": "Estonian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-basque"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-basque",
+      "resource": "hyph-eu.tex",
+      "shortdesc": "Basque hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-finnish"
+      ],
+      "license": "pd",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-finnish",
+      "resource": "hyph-fi-x-school.tex",
+      "shortdesc": "Finnish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-finnish"
+      ],
+      "license": "pd",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-finnish",
+      "resource": "hyph-fi.tex",
+      "shortdesc": "Finnish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-french"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-french",
+      "resource": "hyph-fr.tex",
+      "shortdesc": "French hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-friulan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-friulan",
+      "resource": "hyph-fur.tex",
+      "shortdesc": "Friulan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-irish"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-irish",
+      "resource": "hyph-ga.tex",
+      "shortdesc": "Irish hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-galician"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-galician",
+      "resource": "hyph-gl.tex",
+      "shortdesc": "Galician hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ancientgreek"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ancientgreek",
+      "resource": "hyph-grc.tex",
+      "shortdesc": "Ancient Greek hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-gu.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-hi.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-croatian"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-croatian",
+      "resource": "hyph-hr.tex",
+      "shortdesc": "Croatian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-uppersorbian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-uppersorbian",
+      "resource": "hyph-hsb.tex",
+      "shortdesc": "Upper Sorbian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-hungarian"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-hungarian",
+      "resource": "hyph-hu.tex",
+      "shortdesc": "Hungarian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-armenian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-armenian",
+      "resource": "hyph-hy.tex",
+      "shortdesc": "Armenian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-interlingua"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-interlingua",
+      "resource": "hyph-ia.tex",
+      "shortdesc": "Interlingua hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indonesian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indonesian",
+      "resource": "hyph-id.tex",
+      "shortdesc": "Indonesian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-icelandic"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-icelandic",
+      "resource": "hyph-is.tex",
+      "shortdesc": "Icelandic hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-italian"
+      ],
+      "license": "lgpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-italian",
+      "resource": "hyph-it.tex",
+      "shortdesc": "Italian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-georgian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-georgian",
+      "resource": "hyph-ka.tex",
+      "shortdesc": "Georgian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-kurmanji"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-kurmanji",
+      "resource": "hyph-kmr.tex",
+      "shortdesc": "Kurmanji hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-kn.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latin"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latin",
+      "resource": "hyph-la-x-classic.tex",
+      "shortdesc": "Latin hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latin"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latin",
+      "resource": "hyph-la-x-liturgic.tex",
+      "shortdesc": "Latin hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latin"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latin",
+      "resource": "hyph-la.tex",
+      "shortdesc": "Latin hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-lithuanian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-lithuanian",
+      "resource": "hyph-lt.tex",
+      "shortdesc": "Lithuanian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latvian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latvian",
+      "resource": "hyph-lv.tex",
+      "shortdesc": "Latvian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-macedonian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-macedonian",
+      "resource": "hyph-mk.tex",
+      "shortdesc": "Macedonian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-ml.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-mongolian",
+      "resource": "hyph-mn-cyrl-x-lmc.tex",
+      "shortdesc": "Mongolian hyphenation patterns in Cyrillic script.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-mongolian",
+      "resource": "hyph-mn-cyrl.tex",
+      "shortdesc": "Mongolian hyphenation patterns in Cyrillic script.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-mr.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ethiopic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ethiopic",
+      "resource": "hyph-mul-ethi.tex",
+      "shortdesc": "Hyphenation patterns for Ethiopic scripts.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "hyph-nb.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-dutch"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-dutch",
+      "resource": "hyph-nl.tex",
+      "shortdesc": "Dutch hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "hyph-nn.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "hyph-no.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-occitan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-occitan",
+      "resource": "hyph-oc.tex",
+      "shortdesc": "Occitan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-or.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-pa.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-pi.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-polish"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-polish",
+      "resource": "hyph-pl.tex",
+      "shortdesc": "Polish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-piedmontese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-piedmontese",
+      "resource": "hyph-pms.tex",
+      "shortdesc": "Piedmontese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-portuguese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-portuguese",
+      "resource": "hyph-pt.tex",
+      "shortdesc": "Portuguese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-afrikaans"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-afrikaans",
+      "resource": "hyph-quote-af.tex",
+      "shortdesc": "Afrikaans hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-belarusian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-belarusian",
+      "resource": "hyph-quote-be.tex",
+      "shortdesc": "Belarusian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-french"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-french",
+      "resource": "hyph-quote-fr.tex",
+      "shortdesc": "French hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-friulan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-friulan",
+      "resource": "hyph-quote-fur.tex",
+      "shortdesc": "Friulan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-italian"
+      ],
+      "license": "lgpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-italian",
+      "resource": "hyph-quote-it.tex",
+      "shortdesc": "Italian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-occitan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-occitan",
+      "resource": "hyph-quote-oc.tex",
+      "shortdesc": "Occitan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-piedmontese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-piedmontese",
+      "resource": "hyph-quote-pms.tex",
+      "shortdesc": "Piedmontese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romansh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romansh",
+      "resource": "hyph-quote-rm.tex",
+      "shortdesc": "Romansh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ukrainian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ukrainian",
+      "resource": "hyph-quote-uk.tex",
+      "shortdesc": "Ukrainian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romansh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romansh",
+      "resource": "hyph-rm.tex",
+      "shortdesc": "Romansh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romanian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romanian",
+      "resource": "hyph-ro.tex",
+      "shortdesc": "Romanian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-russian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-russian",
+      "resource": "hyph-ru.tex",
+      "shortdesc": "Russian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-sanskrit"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-sanskrit",
+      "resource": "hyph-sa.tex",
+      "shortdesc": "Sanskrit hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-serbian"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-serbian",
+      "resource": "hyph-sh-cyrl.tex",
+      "shortdesc": "Serbian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-serbian"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-serbian",
+      "resource": "hyph-sh-latn.tex",
+      "shortdesc": "Serbian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovak"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-slovak",
+      "resource": "hyph-sk.tex",
+      "shortdesc": "Slovak hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovenian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-slovenian",
+      "resource": "hyph-sl.tex",
+      "shortdesc": "Slovenian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-swedish"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-swedish",
+      "resource": "hyph-sv.tex",
+      "shortdesc": "Swedish hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-ta.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-te.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-thai"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-thai",
+      "resource": "hyph-th.tex",
+      "shortdesc": "Thai hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-turkmen"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-turkmen",
+      "resource": "hyph-tk.tex",
+      "shortdesc": "Turkmen hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-turkish"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-turkish",
+      "resource": "hyph-tr.tex",
+      "shortdesc": "Turkish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ukrainian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ukrainian",
+      "resource": "hyph-uk.tex",
+      "shortdesc": "Ukrainian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "cjk",
+        "hyphen-chinese"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "hyph-zh-latn-pinyin.tex",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "antomega",
+        "babel",
+        "cslatex"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "hyphen.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-base",
+      "resource": "hyphen.tex",
+      "shortdesc": "core hyphenation support files",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ancientgreek"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ancientgreek",
+      "resource": "ibyhyph.tex",
+      "shortdesc": "Ancient Greek hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "ifoddpage"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "ifoddpage",
+      "resource": "ifoddpage.sty",
+      "shortdesc": "Determine if the current page is odd or even",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "iftex"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "iftex",
+      "resource": "iftex.sty",
+      "shortdesc": "Am I running under pdfTeX, XeTeX or LuaTeX?",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ifthen.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "iftex"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "iftex",
+      "resource": "ifvtex.sty",
+      "shortdesc": "Am I running under pdfTeX, XeTeX or LuaTeX?",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "infwarerr"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "infwarerr",
+      "resource": "infwarerr.sty",
+      "shortdesc": "Complete set of information/warning/error message macros",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "intcalc"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "intcalc",
+      "resource": "intcalc.sty",
+      "shortdesc": "Expandable arithmetic operations with integers",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "00texlive.image"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "00texlive.image",
+      "resource": "kanjix.map",
+      "shortdesc": "TeX Live files only in the source repository",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "keyval.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "kvdefinekeys"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "kvdefinekeys",
+      "resource": "kvdefinekeys.sty",
+      "shortdesc": "Define keys for use in the kvsetkeys package",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "kvoptions"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "kvoptions",
+      "resource": "kvoptions.sty",
+      "shortdesc": "Key value format for package options",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "kvsetkeys"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "kvsetkeys",
+      "resource": "kvsetkeys.sty",
+      "shortdesc": "Key value parser with default handler support",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "l3backend"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "l3backend",
+      "resource": "l3backend-xetex.def",
+      "shortdesc": "LaTeX3 backend drivers",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "l3packages"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "l3packages",
+      "resource": "l3keys2e.sty",
+      "shortdesc": "High-level LaTeX3 concepts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base",
+        "lambda"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "language.dat",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "lasy10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "lasy10.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "lasy5.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "lasy5.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "lasy6.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "lasy6.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "lasy7.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "lasy7.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "lasy8.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "lasy8.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "lasy9.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "lasy9.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "latex.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "firstaid",
+        "latex-firstaid-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "latex2e-first-aid-for-external-files.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "lcircle10.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "lcirclew10.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "letltxmacro"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "letltxmacro",
+      "resource": "letltxmacro.sty",
+      "shortdesc": "Let assignment for LaTeX macros",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "line10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "line10.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-fonts"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex-fonts",
+      "resource": "linew10.tfm",
+      "shortdesc": "A collection of fonts used in LaTeX distributions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lm-mathex.enc",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lm-mathit.enc",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lm-mathsy.enc",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lm-rm.enc",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmex10.pfb",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmex10.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmmi10.pfb",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmmi10.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmmi5.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmmi7.pfb",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmmi7.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmmono10-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmodern.sty",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmr10.pfb",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmr7.pfb",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman10-bold.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman10-italic.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman10-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman12-bold.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman12-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman7-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman9-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmromanslant10-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmsy10.pfb",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmsy10.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmsy5.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmsy7.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "unicode-data"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "unicode-data",
+      "resource": "load-unicode-data.tex",
+      "shortdesc": "Unicode data and loaders for TeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-afrikaans"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-afrikaans",
+      "resource": "loadhyph-af.tex",
+      "shortdesc": "Afrikaans hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-as.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-belarusian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-belarusian",
+      "resource": "loadhyph-be.tex",
+      "shortdesc": "Belarusian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-bulgarian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-bulgarian",
+      "resource": "loadhyph-bg.tex",
+      "shortdesc": "Bulgarian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-bn.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-catalan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-catalan",
+      "resource": "loadhyph-ca.tex",
+      "shortdesc": "Catalan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-coptic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-coptic",
+      "resource": "loadhyph-cop.tex",
+      "shortdesc": "Coptic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-czech"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-czech",
+      "resource": "loadhyph-cs.tex",
+      "shortdesc": "Czech hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-churchslavonic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-churchslavonic",
+      "resource": "loadhyph-cu.tex",
+      "shortdesc": "Church Slavonic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-welsh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-welsh",
+      "resource": "loadhyph-cy.tex",
+      "shortdesc": "Welsh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-danish"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-danish",
+      "resource": "loadhyph-da.tex",
+      "shortdesc": "Danish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "loadhyph-de-1901.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "loadhyph-de-1996.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "loadhyph-de-ch-1901.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-greek"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-greek",
+      "resource": "loadhyph-el-monoton.tex",
+      "shortdesc": "Modern Greek hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-greek"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-greek",
+      "resource": "loadhyph-el-polyton.tex",
+      "shortdesc": "Modern Greek hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-english",
+      "resource": "loadhyph-en-gb.tex",
+      "shortdesc": "English hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-english",
+      "resource": "loadhyph-en-us.tex",
+      "shortdesc": "English hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-esperanto"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-esperanto",
+      "resource": "loadhyph-eo.tex",
+      "shortdesc": "Esperanto hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-spanish"
+      ],
+      "license": "mit",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-spanish",
+      "resource": "loadhyph-es.tex",
+      "shortdesc": "Spanish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-estonian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-estonian",
+      "resource": "loadhyph-et.tex",
+      "shortdesc": "Estonian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-basque"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-basque",
+      "resource": "loadhyph-eu.tex",
+      "shortdesc": "Basque hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-finnish"
+      ],
+      "license": "pd",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-finnish",
+      "resource": "loadhyph-fi-x-school.tex",
+      "shortdesc": "Finnish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-finnish"
+      ],
+      "license": "pd",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-finnish",
+      "resource": "loadhyph-fi.tex",
+      "shortdesc": "Finnish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-french"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-french",
+      "resource": "loadhyph-fr.tex",
+      "shortdesc": "French hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-friulan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-friulan",
+      "resource": "loadhyph-fur.tex",
+      "shortdesc": "Friulan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-irish"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-irish",
+      "resource": "loadhyph-ga.tex",
+      "shortdesc": "Irish hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-galician"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-galician",
+      "resource": "loadhyph-gl.tex",
+      "shortdesc": "Galician hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ancientgreek"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ancientgreek",
+      "resource": "loadhyph-grc.tex",
+      "shortdesc": "Ancient Greek hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-gu.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-hi.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-croatian"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-croatian",
+      "resource": "loadhyph-hr.tex",
+      "shortdesc": "Croatian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-uppersorbian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-uppersorbian",
+      "resource": "loadhyph-hsb.tex",
+      "shortdesc": "Upper Sorbian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-hungarian"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-hungarian",
+      "resource": "loadhyph-hu.tex",
+      "shortdesc": "Hungarian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-armenian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-armenian",
+      "resource": "loadhyph-hy.tex",
+      "shortdesc": "Armenian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-interlingua"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-interlingua",
+      "resource": "loadhyph-ia.tex",
+      "shortdesc": "Interlingua hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indonesian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indonesian",
+      "resource": "loadhyph-id.tex",
+      "shortdesc": "Indonesian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-icelandic"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-icelandic",
+      "resource": "loadhyph-is.tex",
+      "shortdesc": "Icelandic hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-italian"
+      ],
+      "license": "lgpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-italian",
+      "resource": "loadhyph-it.tex",
+      "shortdesc": "Italian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-georgian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-georgian",
+      "resource": "loadhyph-ka.tex",
+      "shortdesc": "Georgian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-kurmanji"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-kurmanji",
+      "resource": "loadhyph-kmr.tex",
+      "shortdesc": "Kurmanji hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-kn.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latin"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latin",
+      "resource": "loadhyph-la-x-classic.tex",
+      "shortdesc": "Latin hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latin"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latin",
+      "resource": "loadhyph-la-x-liturgic.tex",
+      "shortdesc": "Latin hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latin"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latin",
+      "resource": "loadhyph-la.tex",
+      "shortdesc": "Latin hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-lithuanian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-lithuanian",
+      "resource": "loadhyph-lt.tex",
+      "shortdesc": "Lithuanian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latvian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latvian",
+      "resource": "loadhyph-lv.tex",
+      "shortdesc": "Latvian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-macedonian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-macedonian",
+      "resource": "loadhyph-mk.tex",
+      "shortdesc": "Macedonian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-ml.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-mongolian",
+      "resource": "loadhyph-mn-cyrl-x-lmc.tex",
+      "shortdesc": "Mongolian hyphenation patterns in Cyrillic script.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-mongolian",
+      "resource": "loadhyph-mn-cyrl.tex",
+      "shortdesc": "Mongolian hyphenation patterns in Cyrillic script.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-mr.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ethiopic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ethiopic",
+      "resource": "loadhyph-mul-ethi.tex",
+      "shortdesc": "Hyphenation patterns for Ethiopic scripts.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "loadhyph-nb.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-dutch"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-dutch",
+      "resource": "loadhyph-nl.tex",
+      "shortdesc": "Dutch hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "loadhyph-nn.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-occitan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-occitan",
+      "resource": "loadhyph-oc.tex",
+      "shortdesc": "Occitan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-or.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-pa.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-pi.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-polish"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-polish",
+      "resource": "loadhyph-pl.tex",
+      "shortdesc": "Polish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-piedmontese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-piedmontese",
+      "resource": "loadhyph-pms.tex",
+      "shortdesc": "Piedmontese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-portuguese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-portuguese",
+      "resource": "loadhyph-pt.tex",
+      "shortdesc": "Portuguese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romansh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romansh",
+      "resource": "loadhyph-rm.tex",
+      "shortdesc": "Romansh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romanian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romanian",
+      "resource": "loadhyph-ro.tex",
+      "shortdesc": "Romanian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-russian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-russian",
+      "resource": "loadhyph-ru.tex",
+      "shortdesc": "Russian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-sanskrit"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-sanskrit",
+      "resource": "loadhyph-sa.tex",
+      "shortdesc": "Sanskrit hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovak"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-slovak",
+      "resource": "loadhyph-sk.tex",
+      "shortdesc": "Slovak hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovenian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-slovenian",
+      "resource": "loadhyph-sl.tex",
+      "shortdesc": "Slovenian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-serbian"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-serbian",
+      "resource": "loadhyph-sr-cyrl.tex",
+      "shortdesc": "Serbian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-serbian"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-serbian",
+      "resource": "loadhyph-sr-latn.tex",
+      "shortdesc": "Serbian hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-swedish"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-swedish",
+      "resource": "loadhyph-sv.tex",
+      "shortdesc": "Swedish hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-ta.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-te.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-thai"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-thai",
+      "resource": "loadhyph-th.tex",
+      "shortdesc": "Thai hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-turkmen"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-turkmen",
+      "resource": "loadhyph-tk.tex",
+      "shortdesc": "Turkmen hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-turkish"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-turkish",
+      "resource": "loadhyph-tr.tex",
+      "shortdesc": "Turkish hyphenation patterns.",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ukrainian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ukrainian",
+      "resource": "loadhyph-uk.tex",
+      "shortdesc": "Ukrainian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-chinese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-chinese",
+      "resource": "loadhyph-zh-latn-pinyin.tex",
+      "shortdesc": "Chinese pinyin hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "mflogo-font"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "mflogo-font",
+      "resource": "logo10.pfb",
+      "shortdesc": "Metafont logo font",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "knuth-lib"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "knuth-lib",
+      "resource": "logo10.tfm",
+      "shortdesc": "Core TeX and Metafont sources from Knuth",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "mflogo-font"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "mflogo-font",
+      "resource": "logo8.pfb",
+      "shortdesc": "Metafont logo font",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "knuth-lib"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "knuth-lib",
+      "resource": "logo8.tfm",
+      "shortdesc": "Core TeX and Metafont sources from Knuth",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "mflogo-font"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "mflogo-font",
+      "resource": "logo9.pfb",
+      "shortdesc": "Metafont logo font",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "knuth-lib"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "knuth-lib",
+      "resource": "logo9.tfm",
+      "shortdesc": "Core TeX and Metafont sources from Knuth",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "mflogo-font"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "mflogo-font",
+      "resource": "logobf10.pfb",
+      "shortdesc": "Metafont logo font",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "knuth-lib"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "knuth-lib",
+      "resource": "logobf10.tfm",
+      "shortdesc": "Core TeX and Metafont sources from Knuth",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "mflogo-font"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "mflogo-font",
+      "resource": "logosl10.pfb",
+      "shortdesc": "Metafont logo font",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "knuth-lib"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "knuth-lib",
+      "resource": "logosl10.tfm",
+      "shortdesc": "Core TeX and Metafont sources from Knuth",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "longtable.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "lscape.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "caption"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "caption",
+      "resource": "ltcaption.sty",
+      "shortdesc": "Customising captions in floating environments",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "ltxcmds"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "ltxcmds",
+      "resource": "ltxcmds.sty",
+      "shortdesc": "Some LaTeX kernel commands for general use",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "manfnt-font"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "manfnt-font",
+      "resource": "manfnt.pfb",
+      "shortdesc": "Knuth's \"manual\" fonts",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "knuth-lib"
+      ],
+      "license": "knuth",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "knuth-lib",
+      "resource": "manfnt.tfm",
+      "shortdesc": "Core TeX and Metafont sources from Knuth",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "mathtools"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "mathtools",
+      "resource": "mathtools.sty",
+      "shortdesc": "Mathematical tools to use with amsmath",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "mathtools"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "mathtools",
+      "resource": "mhsetup.sty",
+      "shortdesc": "Mathematical tools to use with amsmath",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "microtype"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "microtype",
+      "resource": "microtype-xetex.def",
+      "shortdesc": "Subliminal refinements towards typographical perfection",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "microtype"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "microtype",
+      "resource": "microtype.cfg",
+      "shortdesc": "Subliminal refinements towards typographical perfection",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "microtype"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "microtype",
+      "resource": "microtype.sty",
+      "shortdesc": "Subliminal refinements towards typographical perfection",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msam10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msam10.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msam5.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msam5.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msam7.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msam7.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msbm10.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msbm10.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msbm5.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msbm5.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msbm7.pfb",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "msbm7.tfm",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "microtype"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "microtype",
+      "resource": "mt-LatinModernRoman.cfg",
+      "shortdesc": "Subliminal refinements towards typographical perfection",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "microtype"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "microtype",
+      "resource": "mt-msa.cfg",
+      "shortdesc": "Subliminal refinements towards typographical perfection",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "microtype"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "microtype",
+      "resource": "mt-msb.cfg",
+      "shortdesc": "Subliminal refinements towards typographical perfection",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "multirow"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "multirow",
+      "resource": "multirow.sty",
+      "shortdesc": "Create tabular cells spanning multiple rows",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyperref"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyperref",
+      "resource": "nameref.sty",
+      "shortdesc": "Extensive support for hypertext in LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "natbib"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "natbib",
+      "resource": "natbib.sty",
+      "shortdesc": "Flexible bibliography support",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omlcmm.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omlenc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "omllmm.fd",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omscmsy.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omsenc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "omslmsy.fd",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omxcmex.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "omxlmex.fd",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ot1cmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ot1cmss.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ot1cmtt.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ot1enc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "ot1lmr.fd",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyperref"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyperref",
+      "resource": "pd1enc.def",
+      "shortdesc": "Extensive support for hypertext in LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "pdfescape"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "pdfescape",
+      "resource": "pdfescape.sty",
+      "shortdesc": "Implements pdfTeX's escape features using TeX or e-TeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "glyphlist"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "glyphlist",
+      "resource": "pdfglyphlist.txt",
+      "shortdesc": "Adobe Glyph List and TeX extensions",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "pdflscape"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "pdflscape",
+      "resource": "pdflscape.sty",
+      "shortdesc": "Make landscape pages display as landscape",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "00texlive.image"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "00texlive.image",
+      "resource": "pdftex.map",
+      "shortdesc": "TeX Live files only in the source repository",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "pdftexcmds"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "pdftexcmds",
+      "resource": "pdftexcmds.sty",
+      "shortdesc": "LuaTeX support for pdfTeX utility functions",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "placeins"
+      ],
+      "license": "pd",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "placeins",
+      "resource": "placeins.sty",
+      "shortdesc": "Control float placement",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "natbib"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "natbib",
+      "resource": "plainnat.bst",
+      "shortdesc": "Flexible bibliography support",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "preload.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "preload.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "symbol"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "symbol",
+      "resource": "psyr.tfm",
+      "shortdesc": "URW 'Base 35' font pack for LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyperref"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyperref",
+      "resource": "puenc.def",
+      "shortdesc": "Extensive support for hypertext in LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "zapfding"
+      ],
+      "license": "gpl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "zapfding",
+      "resource": "pzdr.tfm",
+      "shortdesc": "URW 'Base 35' font pack for LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "refcount"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "refcount",
+      "resource": "refcount.sty",
+      "shortdesc": "Counter operations with label references",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "rerunfilecheck"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "rerunfilecheck",
+      "resource": "rerunfilecheck.sty",
+      "shortdesc": "Checksum based rerun checks on auxiliary files",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "rm-lmr10.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "rm-lmr5.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "rm-lmr7.tfm",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "rotating.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "setspace"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "setspace",
+      "resource": "setspace.sty",
+      "shortdesc": "Set space between lines",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "siunitx"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "siunitx",
+      "resource": "siunitx.sty",
+      "shortdesc": "A comprehensive (SI) units package",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "size10.clo",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "stringenc"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "stringenc",
+      "resource": "stringenc.sty",
+      "shortdesc": "Converting a string between different encodings",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "caption"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "caption",
+      "resource": "subcaption.sty",
+      "shortdesc": "Customising captions in floating environments",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "t1cmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "t1enc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tabularx.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "adjustbox"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "adjustbox",
+      "resource": "tc-xetex.def",
+      "shortdesc": "Graphics package-alike macros for \"general\" boxes",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tectonic-format-latex.tex",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [
+        "xetex"
+      ],
+      "license": "x11",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "xetex",
+      "resource": "tex-text.tec",
+      "shortdesc": "An extended variant of TeX for use with Unicode sources",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "glyphlist"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "glyphlist",
+      "resource": "texglyphlist.txt",
+      "shortdesc": "Adobe Glyph List and TeX extensions",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "texsys.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "threeparttable"
+      ],
+      "license": "other-free",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "threeparttable",
+      "resource": "threeparttable.sty",
+      "shortdesc": "Tables with captions and notes all the same width",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "threeparttablex"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "threeparttablex",
+      "resource": "threeparttablex.sty",
+      "shortdesc": "Notes in longtables",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "titlesec"
+      ],
+      "license": "mit",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "titlesec",
+      "resource": "titlesec.sty",
+      "shortdesc": "Select alternative section titles",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "translations"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "translations",
+      "resource": "translations-basic-dictionary-english.trsl",
+      "shortdesc": "Internationalisation of LaTeX2e packages",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "translations"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "translations",
+      "resource": "translations.sty",
+      "shortdesc": "Internationalisation of LaTeX2e packages",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "trig.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "adjustbox"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "adjustbox",
+      "resource": "trimclip.sty",
+      "shortdesc": "Graphics package-alike macros for \"general\" boxes",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "trimspaces"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "trimspaces",
+      "resource": "trimspaces.sty",
+      "shortdesc": "Trim spaces around an argument or within a macro",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ts1cmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ts1enc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "ts1lmr.fd",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tuenc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tulmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tulmss.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tulmtt.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ucmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "umsa.fd",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "amsfonts"
+      ],
+      "license": "ofl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "amsfonts",
+      "resource": "umsb.fd",
+      "shortdesc": "TeX fonts from the American Mathematical Society",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "uniquecounter"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "uniquecounter",
+      "resource": "uniquecounter.sty",
+      "shortdesc": "Provides unlimited unique counter",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "url"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "url",
+      "resource": "url.sty",
+      "shortdesc": "Verbatim with URL-sensitive line breaks",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "varwidth"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "varwidth",
+      "resource": "varwidth.sty",
+      "shortdesc": "A variable-width minipage",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "xcolor"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "xcolor",
+      "resource": "xcolor.sty",
+      "shortdesc": "Driver-independent color extensions for LaTeX and pdfLaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "babel"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "babel",
+      "resource": "xebabel.def",
+      "shortdesc": "Multilingual support for LaTeX, LuaLaTeX, XeLaTeX, and Plain TeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "tex-ini-files"
+      ],
+      "license": "pd",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "tex-ini-files",
+      "resource": "xelatex.ini",
+      "shortdesc": "Model TeX format creation files",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "graphics-def"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "graphics-def",
+      "resource": "xetex.def",
+      "shortdesc": "Colour and graphics option files",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "xkeyval"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "xkeyval",
+      "resource": "xkeyval.sty",
+      "shortdesc": "Extension of the keyval package",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "xkeyval"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "xkeyval",
+      "resource": "xkeyval.tex",
+      "shortdesc": "Extension of the keyval package",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "xkeyval"
+      ],
+      "license": "lppl1.3",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "xkeyval",
+      "resource": "xkvutils.tex",
+      "shortdesc": "Extension of the keyval package",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-base",
+      "resource": "zerohyph.tex",
+      "shortdesc": "core hyphenation support files",
+      "status": "missing_license"
+    }
+  ],
+  "schema_version": 1,
+  "summary": {
+    "ambiguous": 56,
+    "license_expression_count": 12,
+    "mapped": 358,
+    "missing_license": 137,
+    "package_count": 130,
+    "resource_count": 556,
+    "unmapped": 5
+  }
+}

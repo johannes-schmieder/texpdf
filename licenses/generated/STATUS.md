@@ -1,13 +1,13 @@
 # Third-party license audit status
 
-- Source SHA: `3dc6fe61fb0ef1380bdf0c90973d123e433cbe23`
+- Source SHA: `471b4ea93d24d664ba82c5ab6c034c2606702ec7`
 - Pipeline complete: **false**
 - Release-license complete: **false**
-- Embedded resources: unavailable
-- Mapped resources: unavailable
-- Ambiguous resources: unavailable
-- Unmapped resources: unavailable
-- Resources missing license metadata: unavailable
+- Embedded resources: 556
+- Mapped resources: 358
+- Ambiguous resources: 56
+- Unmapped resources: 5
+- Resources missing license metadata: 137
 - Cargo packages: 448
 - Cargo packages missing metadata: 0
 - Rust packages without collected notice files: 37
@@ -19,7 +19,7 @@
 |---|---:|---|
 | `prepare_rust_toolchain` | 0 |  |
 | `prepare_native_dependencies` | 0 |  |
-| `tex_inventory` | 1 | Traceback (most recent call last):   File "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py", line 401, in <module>     raise SystemExit(main())   File "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py", line 382, in main     load_overrides(args.overrides),   File "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py", line 172, in load_overrides     import tomllib ModuleNotFoundError: No module named 'tomllib' |
+| `tex_inventory` | 1 |  |
 | `cargo_inventory` | 0 |  |
 | `dependency_inventory` | 0 |  |
 | `collect_license_texts` | 1 |  |
