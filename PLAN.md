@@ -75,8 +75,12 @@ Exit achieved: `macos_arm_memory_stress` passes with a reviewed permanent
 - [x] Test install and offline compilation from the exact ZIP on a clean local
       Stata setup under both architectures.
 - [x] Run `tools/sync_project_state.py --require-candidate-ready`.
-- [ ] Create the private RC tag/package only after every candidate blocker is
+- [x] Create the private RC tag/package only after every candidate blocker is
       clear.
+
+Exit achieved: annotated tag `v0.1.0-rc.1` points to the audited release commit.
+The private prerelease attaches the exact dual-runtime-qualified package and
+its provenance manifests.
 
 ## Deferred work
 
