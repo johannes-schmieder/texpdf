@@ -6,6 +6,13 @@
   "arm_runtime_qualified": true,
   "arm_stata_profile": "quick",
   "arm_stata_receipt": ".ci/stata/run/receipt.json",
+  "candidate_package": {
+    "license_evidence_included": true,
+    "public_release": false,
+    "version": "0.1.0-rc.1",
+    "zip_sha256": "75a7cfe9feb592002643f934035c64ab7824bb3cb4f9c71595be6a0ff6493de2",
+    "zip_size_bytes": 45982321
+  },
   "dynamic_dependencies": [
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
     "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)"
@@ -50,7 +57,7 @@
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1",
+  "source_sha": "68d7c8b2f4de569fad5fb583978cd13efb4c5dae",
   "universal": {
     "sha256": "1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f",
     "size_bytes": 98532016,
