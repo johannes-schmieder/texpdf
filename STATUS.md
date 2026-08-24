@@ -1,14 +1,12 @@
-# texpdf development status
+# texpdf status
 
 Updated: 2026-08-24
 
-## Current phase
+## Summary
 
-The compiler-only macOS Apple Silicon implementation is functional and
-end-to-end qualified. `texpdf` loads as one native Stata plugin containing
-Tectonic and a curated offline TeX resource bundle.
-
-The qualified public interface is:
+The compiler-only macOS Apple Silicon product is implemented and end-to-end
+qualified. `texpdf` runs as one native Stata plugin containing Tectonic and a
+curated offline TeX bundle.
 
 ```stata
 texpdf using document.tex
@@ -16,64 +14,80 @@ texpdf using document.tex, saving(document.pdf) replace
 texpdf, version
 ```
 
-## Exact qualified checkpoint
+## Last exact green product checkpoint
 
-Source `63b997d290ec3adde0af33dbb49a96972d1e30c9` passed the `quick`
-profile with overall, Rust, and licensed-Stata status all `success`.
+Source `a42f29fbeefd41811475d47e066e1ffea5290bfd` passed the `quick`
+profile with:
 
-Qualification environment:
-
-- macOS Apple Silicon;
-- Stata/MP 18, bundle 18.0.130;
-- Rust 1.97.1;
-- Tectonic 0.17.0;
-- CI run 32724852879.
+```text
+overall       success
+Rust          success
+Rust mode     repository-engine
+licensed Stata success
+platform      macOS Apple Silicon
+Stata         Stata/MP 18, bundle 18.0.130
+```
 
 The immutable receipt required all of:
 
-- `TEXPDF FULL ENGINE STATA PASS`;
+- `TEXPDF IN PROCESS STRESS PASS`;
 - `TEXPDF NET INSTALL PASS`;
-- `TEXPDF STRESS PASS`;
+- `TEXPDF FULL ENGINE STATA PASS`;
 - `TEXPDF STATA MATA SMOKE PASS`.
 
-## Qualified artifact sizes
+The qualified artifact measurements are:
 
-- Curated embedded resource bundle: **6,692,142 bytes** (6.38 MiB), 477 files.
-- Standalone macOS ARM64 plugin: **49,996,816 bytes** (47.68 MiB).
-- Deterministic Stata installation ZIP: **23,480,504 bytes** (22.39 MiB).
-- Installed package tree: **50,007,160 bytes** (47.69 MiB).
+| Component | Bytes | Binary size |
+|---|---:|---:|
+| Curated embedded bundle | 6,690,289 | 6.38 MiB |
+| Standalone ARM64 plugin | 49,997,392 | 47.68 MiB |
+| Deterministic Stata ZIP | 23,475,982 | 22.39 MiB |
 
-Exact hashes and provenance are recorded in `bundle/QUALIFICATION.json` and
-`bundle/curated-manifest.json`.
+The bundle contains 557 logical files. Exact hashes are recorded in
+`docs/generated/CURRENT_ARTIFACT.md` and `release/targets.json`.
+
+## Current branch condition
+
+The latest source checkpoint before this documentation cleanup is
+`8a7466dddb8bcda7ac8b748b549aa5bf96666279`. Its CI receipt is red because
+`cargo fmt --check` found formatting differences in three newly added Rust test
+files. The Rust step therefore stopped before staging the plugin, and the
+subsequent Stata lane reported `r(601)` because `_texpdf_plugin.plugin` was not
+present.
+
+This is a CI/source-formatting regression, not evidence that the last qualified
+compiler or embedded bundle stopped working. The immediate engineering task is
+to format those tests and obtain a new exact-SHA green receipt for current
+`main`.
 
 ## Qualified behavior
 
-The licensed Stata/Rust tests cover:
+The green macOS ARM64 checkpoint covers:
 
-- plugin loading and version reporting;
-- real PDF compilation with no system TeX executable or runtime network bundle;
-- mathematics, tables, figures/layout packages, hyperlinks, natbib, and
-  internal BibTeX processing;
-- the complete declared academic package corpus;
-- relative inputs and graphics;
-- paths containing spaces and Unicode;
-- default output naming, `saving()`, and `replace`;
-- missing inputs, existing outputs, malformed TeX, and post-error recovery;
+- native plugin loading and `texpdf, version`;
+- real PDF compilation with no system TeX or runtime network bundle;
+- the declared academic/econometric package corpus;
+- mathematics, tables, hyperlinks, PDF/PNG figures, Latin Modern/TeX Gyre,
+  `natbib`, and internal BibTeX;
+- relative inputs, spaces, and Unicode paths;
+- default output naming, `saving()`, overwrite protection, and `replace`;
+- malformed TeX, missing inputs/packages, and post-error recovery;
+- atomic preservation of an existing PDF after failed replacement;
 - deterministic package assembly and local `net install`;
-- 100 successful compile calls in one Stata process with periodic injected TeX
-  failures.
+- 100 successful in-process compile calls with periodic injected failures;
+- shell escape disabled and selected dependency/network-policy checks.
 
-## Remaining release gates
+## v1 release gates still open
 
-The implementation is not yet advertised as a public cross-platform v1 release.
-The remaining gates are:
+1. Restore current `main` to an exact-SHA green Rust/Stata receipt.
+2. Complete the file-to-package/font license mapping and ship all required
+   Rust, native-library, TeX, and font notices.
+3. Complete and review the high-iteration memory/safety qualification.
+4. Build and load-test macOS Intel/universal, Windows x86-64, and Linux x86-64
+   plugins in actual licensed Stata runtimes.
+5. Run the clean-machine, offline, fail-closed release audit and publish signed
+   GitHub Release / `net install` assets.
 
-1. complete the package/font-level license inventory and required notices;
-2. build and test macOS Intel/universal, Windows x86-64, and Linux x86-64
-   plugins;
-3. run licensed Stata runtime qualification on each supported platform;
-4. run the final clean-machine/offline release profile and publish GitHub
-   Release assets.
-
-The current macOS ARM64 artifact is a qualified development/release candidate,
-not an unqualified prototype.
+Only macOS Apple Silicon is currently marked runtime-qualified in
+`release/targets.json`. Hosted or cross-compiled binaries must not be described
+as supported until the matching Stata runtime receipt exists.

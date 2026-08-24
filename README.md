@@ -8,39 +8,49 @@ texpdf using paper.tex, saving(paper.pdf) replace
 texpdf, version
 ```
 
-The package uses one native Stata plugin containing the Tectonic engine and an
-embedded, curated academic TeX resource bundle. Runtime use does not require
-TeX Live, MacTeX, MiKTeX, a Tectonic executable, Rust, a compiler, package
-downloads, or a network connection.
+The package uses one native Stata plugin containing the Rust bridge, Tectonic
+0.17.0, its native libraries, and a curated academic TeX resource bundle.
+Runtime compilation requires no TeX installation, Tectonic executable, Rust
+toolchain, package download, or network connection.
 
-## Status
+## Project state
 
-The macOS Apple Silicon implementation is end-to-end qualified under licensed
-Stata/MP 18. The exact qualified source is
-`63b997d290ec3adde0af33dbb49a96972d1e30c9`.
+The macOS Apple Silicon implementation is a qualified pre-release candidate
+under licensed Stata/MP 18. The most recent exact green product checkpoint is
+`a42f29fbeefd41811475d47e066e1ffea5290bfd`.
 
-Current qualified sizes:
+Its measured artifacts are:
 
-- embedded bundle: 6,692,142 bytes (477 resources);
-- standalone plugin: 49,996,816 bytes;
-- deterministic Stata installation ZIP: 23,480,504 bytes.
+| Artifact | Exact size |
+|---|---:|
+| Embedded TeX ZIP | 6,690,289 bytes (6.38 MiB; 557 files) |
+| Standalone ARM64 plugin | 49,997,392 bytes (47.68 MiB) |
+| Stata installation ZIP | 23,475,982 bytes (22.39 MiB) |
 
-The CI qualification compiles real documents, exercises BibTeX/natbib and the
-declared academic package corpus, performs a local `net install`, tests spaces
-and Unicode in paths, verifies recovery after TeX errors, and runs 100 compile
-calls in one Stata process.
+That checkpoint passed Rust formatting, strict Clippy, workspace tests, native
+plugin construction, licensed Stata compilation, local `net install`, the
+academic package corpus, and 100 in-process compile calls with injected TeX
+failures.
 
-See [`STATUS.md`](STATUS.md) for the qualification boundary,
-[`bundle/QUALIFICATION.json`](bundle/QUALIFICATION.json) for exact hashes and
-sizes, and [`PLAN.md`](PLAN.md) for the remaining cross-platform and public
-release gates.
+This is not yet a public v1 release. Remaining gates are the complete
+third-party license/notices inventory, high-iteration memory/safety review, and
+actual Stata runtime qualification on macOS Intel, Windows, and Linux.
+
+See:
+
+- [`STATUS.md`](STATUS.md) — current branch and qualification state;
+- [`PLAN.md`](PLAN.md) — remaining v1 work in execution order;
+- [`IMPLEMENTATION.md`](IMPLEMENTATION.md) — durable architecture and evidence;
+- [`docs/README.md`](docs/README.md) — documentation index;
+- [`docs/generated/CURRENT_ARTIFACT.md`](docs/generated/CURRENT_ARTIFACT.md) — exact current qualified measurements;
+- [`release/targets.json`](release/targets.json) — platform qualification registry.
 
 ## Command behavior
 
 Without `saving()`, a final `.tex` suffix is replaced by `.pdf`; otherwise
-`.pdf` is appended. Existing output is protected unless `replace` is specified.
+`.pdf` is appended. Existing output is protected unless `replace` is supplied.
 Relative `\input`, `\includegraphics`, and bibliography paths are resolved from
-the directory containing the primary source document.
+the primary source directory.
 
 After successful compilation, `texpdf` returns:
 
@@ -54,57 +64,33 @@ r(bundle_zip_sha256)
 r(warnings)
 ```
 
-Compilation errors are reported through a versioned native result record. Rust
-panics are caught at the ABI boundary, shell escape is disabled, and ordinary
-TeX errors do not terminate Stata.
+Compilation failures are transported through a versioned native result record.
+Shell escape is disabled, Rust panics are contained at the ABI boundary, and an
+ordinary TeX error does not terminate Stata or replace a previously valid PDF.
 
-## Embedded compatibility tier
+## Compatibility tier
 
-The qualified bundle covers the project’s academic/econometric corpus,
-including:
+The qualified academic tier covers LaTeX core, AMS mathematics, common table
+and layout packages, PDF/PNG figures, hyperlinks, Latin Modern and TeX Gyre
+fonts, and BibTeX with `natbib`. The exact contract and fixture-backed package
+list are documented in [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) and
+[`docs/SUPPORTED_PACKAGES.md`](docs/SUPPORTED_PACKAGES.md).
 
-- LaTeX core, AMS math, and `mathtools`;
-- `booktabs`, `longtable`, `tabularx`, `multirow`, `threeparttable`, `dcolumn`,
-  `siunitx`, and `adjustbox`;
-- `graphicx`, `xcolor`, `geometry`, `float`, `placeins`, `rotating`,
-  `pdflscape`, `caption`, and `subcaption`;
-- `hyperref`, `url`, `setspace`, `enumitem`, `fancyhdr`, `titlesec`,
-  `microtype`, and `natbib`;
-- BibTeX and the fonts/metrics/maps required by the corpus.
-
-Beamer, TikZ/PGF, PSTricks, Biber/biblatex, minted/Pygments, and arbitrary
-external helper programs are outside the initial v1 tier.
+Beamer, TikZ/PGF, PSTricks, Biber/`biblatex`, `minted`, shell-dependent tools,
+and arbitrary external helpers are outside the v1 tier.
 
 ## Architecture
 
 ```text
 texpdf.ado
-    -> Stata SPI 3.0 Rust bridge
-    -> texpdf-core
-    -> Tectonic 0.17.0
-    -> embedded deterministic ZIP bundle
-    -> PDF
+  -> Stata SPI 3.0 Rust bridge
+  -> texpdf-core
+  -> Tectonic 0.17.0
+  -> embedded deterministic ZIP bundle
+  -> PDF
 ```
 
-Native dependencies are built statically with a pinned vcpkg revision. The
-macOS qualification checks exported plugin symbols and rejects unexpected
-Homebrew or vcpkg runtime-library dependencies.
-
-## Development and CI
-
-Development occurs directly on `main` in small checkpoints. Normal pushes run
-Rust formatting, strict Clippy, tests, the release plugin build, licensed Stata
-compilation tests, package assembly, `net install`, and the configured stress
-profile. Each source checkpoint receives an immutable receipt under
-`.ci/stata/results/<source-sha>.json`.
-
-The generated bundle and plugin are build artifacts and are not committed to
-Git. GitHub Release publication will be enabled after the embedded
-package/font license inventory and the non-ARM platform qualifications are
+Project-owned source is MIT licensed. Embedded TeX resources, fonts, Tectonic,
+and native libraries retain their upstream licenses. Public binary publication
+is fail-closed until the generated inventories and required notices are
 complete.
-
-## License
-
-Project-owned source is MIT licensed. Tectonic, native libraries, TeX/LaTeX
-resources, fonts, and bibliography styles retain their upstream licenses and
-notices. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
