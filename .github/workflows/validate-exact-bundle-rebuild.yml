@@ -1,0 +1,91 @@
+name: Validate exact manifest-driven bundle rebuild once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/validate-exact-bundle-rebuild.yml"
+
+concurrency:
+  group: texpdf-exact-bundle-rebuild
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 45
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Correct URL parsing and rebuild exact bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("tools/rebuild_curated_bundle.py")
+          text = path.read_text(encoding="utf-8")
+          if "import urllib.parse" not in text:
+              text = text.replace("import urllib.request\n", "import urllib.parse\nimport urllib.request\n", 1)
+          text = text.replace("urllib.request.urlparse(url)", "urllib.parse.urlparse(url)")
+          path.write_text(text, encoding="utf-8")
+          PY
+          rm -rf bundle/generated
+          /usr/bin/python3 tools/rebuild_curated_bundle.py \
+            --cache-dir "${TEXPDF_BUNDLE_CACHE:-/private/tmp/texpdf-bundle-cache}"
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import zipfile
+
+          qualification = json.loads(Path("bundle/QUALIFICATION.json").read_text(encoding="utf-8"))
+          bundle = qualification["bundle"]
+          path = Path("bundle/generated/texpdf-bundle.zip")
+          digest = hashlib.sha256(path.read_bytes()).hexdigest()
+          with zipfile.ZipFile(path) as archive:
+              names = archive.namelist()
+              embedded_digest = archive.read("SHA256SUM")[:64].decode("ascii")
+          assert len(names) == bundle["file_count"]
+          assert path.stat().st_size == bundle["zip_size_bytes"]
+          assert digest == bundle["zip_sha256"]
+          assert embedded_digest == bundle["content_digest"]
+          print(
+              "TEXPDF_EXACT_BUNDLE_REBUILD_PASS "
+              f"files={len(names)} bytes={path.stat().st_size} sha256={digest}"
+          )
+          PY
+
+      - name: Commit validated rebuild path
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf bundle/generated
+          rm -f .github/workflows/validate-exact-bundle-rebuild.yml
+          git add tools/rebuild_curated_bundle.py
+          git add -u .github/workflows/validate-exact-bundle-rebuild.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: validate exact cross-platform bundle rebuild"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep "$attempt"
+          done
+          echo "failed to publish exact bundle rebuild validation" >&2
+          exit 1
