@@ -13,10 +13,10 @@ Public cross-platform v1 ready: **false**
 | `cargo_lock` | PASS | no | no | Cargo.lock is committed |
 | `target_registry` | PASS | no | no | target count=4 |
 | `macos_arm_runtime` | PASS | no | no | source=ddb2c26415520ebd3625467ecdc6b453aaa4fb45; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
-| `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=98532016; arm_runtime=True |
-| `macos_intel_build` | PASS | no | no | source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49098680 |
-| `macos_intel_runtime` | FAIL | yes | yes | Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed |
-| `private_candidate_package` | FAIL | yes | yes | version=0.1.0-rc.1; zip_bytes=45982321; license_evidence=True; both_runtimes=None |
+| `macos_universal_build` | FAIL | yes | yes | architectures=['arm64', 'x86_64']; universal_bytes=98532016; arm_runtime=False |
+| `macos_intel_build` | FAIL | yes | yes | source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49098680 |
+| `macos_intel_runtime` | PASS | no | no | qualified in an actual x86_64 Stata process under Rosetta; runtime_record=valid; exact receipt profile=quick rust_mode=repository-engine |
+| `private_candidate_package` | FAIL | yes | yes | version=0.1.0-rc.1; zip_bytes=45982324; license_evidence=True; both_runtimes=True |
 | `x86_64-pc-windows-msvc_build` | FAIL | no | no | native build and Stata runtime qualification pending |
 | `x86_64-pc-windows-msvc_runtime` | FAIL | no | yes | native build and Stata runtime qualification pending |
 | `x86_64-unknown-linux-gnu_build` | FAIL | no | no | native build and Stata runtime qualification pending |
@@ -28,12 +28,14 @@ Public cross-platform v1 ready: **false**
 
 ## Active private-candidate blockers
 
-- `macos_intel_runtime`
+- `macos_universal_build`
+- `macos_intel_build`
 - `private_candidate_package`
 
 ## Deferred public-release blockers
 
-- `macos_intel_runtime`
+- `macos_universal_build`
+- `macos_intel_build`
 - `private_candidate_package`
 - `x86_64-pc-windows-msvc_runtime`
 - `x86_64-unknown-linux-gnu_runtime`
