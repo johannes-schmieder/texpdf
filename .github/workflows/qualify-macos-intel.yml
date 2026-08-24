@@ -91,7 +91,9 @@ jobs:
           chmod +x "$wrapper"
           export STATA_BIN="$wrapper"
           export TEXPDF_STATA_PACKAGE_DIR="$GITHUB_WORKSPACE/dist/macos-universal/texpdf"
-          /bin/bash ci/run_stata_ci.sh quick
+          # workflow_dispatch keeps GITHUB_SHA pinned to the workflow definition,
+          # while this job deliberately checks out and tests SOURCE_SHA.
+          GITHUB_SHA="$SOURCE_SHA" /bin/bash ci/run_stata_ci.sh quick
           /usr/bin/python3 ci/check_stata_receipt.py \
             .ci/stata/run/receipt.json \
             --expect-tested-sha "$SOURCE_SHA" \
