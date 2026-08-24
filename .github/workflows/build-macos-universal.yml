@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -29,6 +29,8 @@ jobs:
     steps:
       - name: Check out exact source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
 
       - name: Build and test the qualified ARM engine
         shell: bash
@@ -93,6 +95,73 @@ jobs:
           )
           path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
           PY
+
+      - name: Publish honest universal build record
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest="$GITHUB_WORKSPACE/dist/macos-universal/manifest.json"
+          publish_tree="$RUNNER_TEMP/texpdf-universal-publish"
+          rm -rf "$publish_tree"
+          git fetch origin main
+          git worktree add --detach "$publish_tree" origin/main
+          trap 'git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true' EXIT
+          mkdir -p "$publish_tree/release"
+          cp "$manifest" "$publish_tree/release/macos-universal.json"
+          /usr/bin/python3 - "$publish_tree/release/targets.json" "$manifest" <<'PY'
+          from pathlib import Path
+          import json
+          import sys
+
+          targets_path = Path(sys.argv[1])
+          manifest = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+          targets = json.loads(targets_path.read_text(encoding="utf-8"))
+          intel = manifest["slices"]["x86_64"]
+          arm = manifest["slices"]["arm64"]
+          universal = manifest["universal"]
+          source_sha = manifest["source_sha"]
+
+          arm_record = targets["targets"]["aarch64-apple-darwin"]
+          arm_record.update(
+              {
+                  "universal_build_source_sha": source_sha,
+                  "universal_plugin_sha256": universal["sha256"],
+                  "universal_plugin_size_bytes": universal["size_bytes"],
+                  "universal_arm_slice_sha256": arm["sha256"],
+                  "universal_arm_runtime_qualified": True,
+              }
+          )
+
+          intel_record = targets["targets"]["x86_64-apple-darwin"]
+          intel_record.update(
+              {
+                  "artifact": "_texpdf_plugin.plugin",
+                  "build_qualified": True,
+                  "build_source_sha": source_sha,
+                  "plugin_sha256": intel["sha256"],
+                  "plugin_size_bytes": intel["size_bytes"],
+                  "universal_plugin_sha256": universal["sha256"],
+                  "universal_plugin_size_bytes": universal["size_bytes"],
+                  "qualification_profile": "build + ARM licensed-Stata universal smoke",
+                  "qualified_source_sha": "",
+                  "stata_runtime_qualified": False,
+                  "stata_version": "",
+                  "status": (
+                      "Intel slice built, inspected, and packaged into an ARM-tested "
+                      "universal plugin; Intel Stata runtime qualification pending"
+                  ),
+              }
+          )
+          targets_path.write_text(
+              json.dumps(targets, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          git -C "$publish_tree" config user.name "github-actions[bot]"
+          git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$publish_tree" add release/macos-universal.json release/targets.json
+          git -C "$publish_tree" commit -m "ci(target): record macOS universal build [skip ci]"
+          git -C "$publish_tree" push origin HEAD:main
 
       - name: Upload universal development artifact
         if: ${{ always() }}
