@@ -2,10 +2,16 @@ name: Build and test macOS universal plugin
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "tools/build_macos_universal.sh"
+      - ".github/workflows/build-macos-universal.yml"
 
 concurrency:
   group: texpdf-macos-universal
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -80,6 +86,11 @@ jobs:
           data["arm_stata_profile"] = "quick"
           data["arm_stata_receipt"] = ".ci/stata/run/receipt.json"
           data["intel_runtime_qualified"] = False
+          data["qualification_boundary"] = (
+              "Both Mach-O slices were built and inspected. The universal plugin "
+              "was loaded and tested only through its ARM64 slice in licensed "
+              "Stata/MP 18. Intel runtime qualification remains pending."
+          )
           path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
           PY
 
