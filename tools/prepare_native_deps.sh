@@ -51,7 +51,11 @@ probe_declaration() {
 #define _DEFAULT_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #include <$header>
+#ifdef $symbol
+int main(void) { return 0; }
+#else
 int main(void) { (void) $symbol; return 0; }
+#endif
 EOF
   if "$cc" -std=c99 -Werror=implicit-function-declaration -c "$source" -o "$object" >/dev/null 2>&1; then
     printf '1'
