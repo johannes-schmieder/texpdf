@@ -1,0 +1,204 @@
+name: Qualify macOS universal plugin once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/qualify-macos-universal-once.yml"
+
+concurrency:
+  group: texpdf-macos-universal-source-qualification
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      TEXPDF_RUST_PROFILE: engine
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Commit target-aware universal build source
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("tools/build_macos_universal.sh")
+          text = path.read_text(encoding="utf-8")
+          old = '  source tools/prepare_native_deps.sh\n'
+          new = '  source tools/prepare_native_deps_for_target.sh "$target"\n'
+          if new not in text:
+              if text.count(old) != 1:
+                  raise SystemExit("cannot locate the universal native-dependency source call")
+              text = text.replace(old, new, 1)
+              path.write_text(text, encoding="utf-8")
+          Path(".github/workflows/qualify-macos-universal-once.yml").unlink(missing_ok=True)
+          PY
+          chmod +x tools/build_macos_universal.sh tools/prepare_native_deps_for_target.sh
+          git add tools/build_macos_universal.sh tools/prepare_native_deps_for_target.sh
+          git add -u .github/workflows/qualify-macos-universal-once.yml
+          if ! git diff --cached --quiet; then
+            git diff --cached --check
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build: fix target-aware macOS universal build"
+          fi
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              break
+            fi
+            git rebase --abort 2>/dev/null || true
+            if [[ "$attempt" == 3 ]]; then
+              echo "failed to publish universal source fix" >&2
+              exit 1
+            fi
+            sleep "$attempt"
+          done
+          source_sha="$(git rev-parse HEAD)"
+          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
+          echo "TEXPDF_UNIVERSAL_SOURCE_SHA=$source_sha"
+
+      - name: Build and test the real ARM engine
+        shell: bash
+        env:
+          GITHUB_SHA: ${{ steps.source.outputs.source_sha }}
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/texpdf-universal-rust"
+          mkdir -p "$RUNNER_TEMP/texpdf-universal-rust"
+          cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-universal-rust/"
+
+      - name: Build universal plugin
+        shell: bash
+        run: >-
+          /bin/bash tools/build_macos_universal.sh
+          dist/macos-universal/_texpdf_plugin.plugin
+          dist/macos-universal/manifest.json
+
+      - name: Test the universal plugin ARM slice in licensed Stata
+        shell: bash
+        env:
+          GITHUB_SHA: ${{ steps.source.outputs.source_sha }}
+          GITHUB_REF: refs/heads/main
+        run: |
+          set -euo pipefail
+          cp dist/macos-universal/_texpdf_plugin.plugin stata/_texpdf_plugin.plugin
+          git add -f stata/_texpdf_plugin.plugin
+          /bin/bash ci/run_stata_ci.sh quick
+          cp -R "$RUNNER_TEMP/texpdf-universal-rust/." .ci/stata/run/
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            .ci/stata/run/receipt.json \
+            .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success \
+            --require-rust-success
+
+      - name: Prepare permanent universal qualification records
+        shell: bash
+        env:
+          QUALIFIED_SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/texpdf-universal-record"
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+
+          manifest = json.loads(Path("dist/macos-universal/manifest.json").read_text(encoding="utf-8"))
+          manifest["qualified_source_sha"] = os.environ["QUALIFIED_SOURCE_SHA"]
+          manifest["arm_runtime_qualified"] = True
+          manifest["arm_stata_version"] = "18"
+          manifest["arm_stata_edition"] = "MP"
+          manifest["arm_stata_profile"] = "quick"
+          manifest["arm_stata_receipt"] = "platform/macos-universal-stata-receipt.json"
+          manifest["intel_runtime_qualified"] = False
+          manifest["qualification_boundary"] = (
+              "Both Mach-O slices were built and audited. The ARM64 slice was loaded and "
+              "qualified in licensed Stata/MP 18. The x86_64 slice remains build-qualified "
+              "but requires an actual Intel Stata runtime test before support is claimed."
+          )
+          destination = Path(os.environ["RUNNER_TEMP"]) / "texpdf-universal-record" / "macos-universal.json"
+          destination.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+          cp .ci/stata/run/receipt.json \
+            "$RUNNER_TEMP/texpdf-universal-record/macos-universal-stata-receipt.json"
+
+      - name: Publish permanent universal qualification records
+        shell: bash
+        run: |
+          set -euo pipefail
+          worktree=""
+          cleanup() {
+            cd "$GITHUB_WORKSPACE"
+            if [[ -n "$worktree" ]]; then
+              git worktree remove --force "$worktree" 2>/dev/null || true
+              git worktree prune
+            fi
+          }
+          trap cleanup EXIT
+          for attempt in 1 2 3; do
+            git fetch origin main
+            worktree="$RUNNER_TEMP/texpdf-universal-record-$attempt"
+            rm -rf "$worktree"
+            git worktree add --detach "$worktree" origin/main
+            cd "$worktree"
+            mkdir -p platform
+            cp "$RUNNER_TEMP/texpdf-universal-record/macos-universal.json" \
+              platform/macos-universal.json
+            cp "$RUNNER_TEMP/texpdf-universal-record/macos-universal-stata-receipt.json" \
+              platform/macos-universal-stata-receipt.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add platform/
+            if git diff --cached --quiet; then
+              exit 0
+            fi
+            git commit -m "test: record macOS universal ARM-slice qualification"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            cd "$GITHUB_WORKSPACE"
+            git worktree remove --force "$worktree" 2>/dev/null || true
+            git worktree prune
+            worktree=""
+            sleep "$attempt"
+          done
+          echo "failed to publish universal qualification record" >&2
+          exit 1
+
+      - name: Upload universal plugin and evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-macos-universal-${{ steps.source.outputs.source_sha }}-${{ github.run_id }}
+          path: |
+            dist/macos-universal/
+            .ci/stata/run/
+          if-no-files-found: error
+          retention-days: 30
