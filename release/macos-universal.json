@@ -1,0 +1,56 @@
+{
+  "architectures": [
+    "x86_64",
+    "arm64"
+  ],
+  "arm_runtime_qualified": true,
+  "arm_stata_profile": "quick",
+  "arm_stata_receipt": ".ci/stata/run/receipt.json",
+  "dynamic_dependencies": [
+    "/private/tmp/texpdf-cargo-target/x86_64-apple-darwin/release/deps/libtexpdf_stata.dylib (compatibility version 0.0.0, current version 0.0.0)",
+    "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
+    "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
+    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
+    "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
+    "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
+    "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
+    "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
+    "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
+    "dist/macos-universal/_texpdf_plugin.plugin (architecture arm64):",
+    "/private/tmp/texpdf-cargo-target/aarch64-apple-darwin/release/deps/libtexpdf_stata.dylib (compatibility version 0.0.0, current version 0.0.0)",
+    "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
+    "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)",
+    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)",
+    "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)",
+    "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText (compatibility version 1.0.0, current version 877.4.0)",
+    "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)",
+    "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
+    "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)"
+  ],
+  "exports": [
+    "pginit",
+    "stata_call"
+  ],
+  "intel_runtime_qualified": false,
+  "kind": "macOS universal Stata plugin",
+  "qualification_boundary": "Both Mach-O slices were built and inspected. The universal plugin was loaded and tested only through its ARM64 slice in licensed Stata/MP 18. Intel runtime qualification remains pending.",
+  "schema_version": 1,
+  "slices": {
+    "arm64": {
+      "sha256": "ff588d40f34bfba810c9f2b36a43dda1dcc2694830db17a542c397849750cb16",
+      "size_bytes": 49998192,
+      "target": "aarch64-apple-darwin"
+    },
+    "x86_64": {
+      "sha256": "632e8ec115408402952ccfaf730ef58b464bcd6e8e81b5c68bfb00fed2462d83",
+      "size_bytes": 50043664,
+      "target": "x86_64-apple-darwin"
+    }
+  },
+  "source_sha": "6867be69e8594b7aa6a775da87217bd648e14486",
+  "universal": {
+    "sha256": "dffd41aa5e27cef155c47e21d41b260ec7c938966d86883961dc5ae8e5012cf5",
+    "size_bytes": 100051312,
+    "target": "universal2-apple-darwin"
+  }
+}

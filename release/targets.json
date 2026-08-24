@@ -13,16 +13,26 @@
       "stata_edition": "MP",
       "stata_runtime_qualified": true,
       "stata_version": "18",
-      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run"
+      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run",
+      "universal_arm_runtime_qualified": true,
+      "universal_arm_slice_sha256": "ff588d40f34bfba810c9f2b36a43dda1dcc2694830db17a542c397849750cb16",
+      "universal_build_source_sha": "6867be69e8594b7aa6a775da87217bd648e14486",
+      "universal_plugin_sha256": "dffd41aa5e27cef155c47e21d41b260ec7c938966d86883961dc5ae8e5012cf5",
+      "universal_plugin_size_bytes": 100051312
     },
     "x86_64-apple-darwin": {
       "artifact": "_texpdf_plugin.plugin",
-      "plugin_sha256": "",
-      "qualification_profile": "",
+      "build_qualified": true,
+      "build_source_sha": "6867be69e8594b7aa6a775da87217bd648e14486",
+      "plugin_sha256": "632e8ec115408402952ccfaf730ef58b464bcd6e8e81b5c68bfb00fed2462d83",
+      "plugin_size_bytes": 50043664,
+      "qualification_profile": "build + ARM licensed-Stata universal smoke",
       "qualified_source_sha": "",
       "stata_runtime_qualified": false,
       "stata_version": "",
-      "status": "native build and Stata runtime qualification pending"
+      "status": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending",
+      "universal_plugin_sha256": "dffd41aa5e27cef155c47e21d41b260ec7c938966d86883961dc5ae8e5012cf5",
+      "universal_plugin_size_bytes": 100051312
     },
     "x86_64-pc-windows-msvc": {
       "artifact": "_texpdf_plugin.plugin",
