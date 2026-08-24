@@ -59,7 +59,7 @@ jobs:
           import json
           from pathlib import Path
           import sys
-          from typing import Any
+          from typing import Any, Optional
           import zipfile
 
 
@@ -79,7 +79,7 @@ jobs:
               return value.replace("\\", "/").lstrip("./")
 
 
-          def load_overrides(path: Path | None) -> dict[str, dict[str, Any]]:
+          def load_overrides(path: Optional[Path]) -> dict[str, dict[str, Any]]:
               if path is None or not path.is_file():
                   return {}
               raw = load(path)
@@ -121,7 +121,7 @@ jobs:
           def build_inventory(
               bundle_path: Path,
               resolution_path: Path,
-              override_path: Path | None,
+              override_path: Optional[Path],
           ) -> dict[str, Any]:
               resolution = load(resolution_path)
               if not isinstance(resolution, dict):
