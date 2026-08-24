@@ -65,7 +65,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "architectures=['arm64', 'x86_64']; universal_bytes=100051312; arm_runtime=True",
+      "detail": "architectures=['arm64', 'x86_64']; universal_bytes=101953216; arm_runtime=True",
       "key": "macos_universal_build",
       "passed": true,
       "public_release_blocker": false,
@@ -73,7 +73,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=32bceb84df47a1c955c10cf75cb60a9d0fbb8d96; plugin_bytes=50043664",
+      "detail": "source=5ba3a83e098dcf7eb47c7b0db92b28ac46a9297b; plugin_bytes=50802624",
       "key": "macos_intel_build",
       "passed": true,
       "public_release_blocker": false,

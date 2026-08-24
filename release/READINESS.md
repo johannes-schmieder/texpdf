@@ -13,8 +13,8 @@ Public cross-platform v1 ready: **false**
 | `cargo_lock` | PASS | no | no | Cargo.lock is committed |
 | `target_registry` | PASS | no | no | target count=4 |
 | `macos_arm_runtime` | PASS | no | no | source=475f55f48ea3079ee6021e92cdc103eace091450; plugin_bytes=51146384; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
-| `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=100051312; arm_runtime=True |
-| `macos_intel_build` | PASS | no | no | source=32bceb84df47a1c955c10cf75cb60a9d0fbb8d96; plugin_bytes=50043664 |
+| `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=101953216; arm_runtime=True |
+| `macos_intel_build` | PASS | no | no | source=5ba3a83e098dcf7eb47c7b0db92b28ac46a9297b; plugin_bytes=50802624 |
 | `macos_intel_runtime` | FAIL | yes | yes | Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed |
 | `x86_64-pc-windows-msvc_build` | FAIL | no | no | native build and Stata runtime qualification pending |
 | `x86_64-pc-windows-msvc_runtime` | FAIL | no | yes | native build and Stata runtime qualification pending |
