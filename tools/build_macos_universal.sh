@@ -36,17 +36,24 @@ temporary="$output.tmp"
 rm -f "$temporary"
 /usr/bin/lipo -create "$arm_library" "$intel_library" -output "$temporary"
 # With Apple's lipo, the input file precedes -verify_arch. Putting the file at
-# the end makes it look like an architecture name and caused the first
-# universal qualification attempt to fail after both slices built successfully.
+# the end makes it look like an architecture name.
 /usr/bin/lipo "$temporary" -verify_arch arm64 x86_64
 /usr/bin/nm -arch arm64 -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_pginit$'
 /usr/bin/nm -arch arm64 -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_stata_call$'
 /usr/bin/nm -arch x86_64 -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_pginit$'
 /usr/bin/nm -arch x86_64 -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_stata_call$'
 
-runtime_deps="$(/usr/bin/otool -L "$temporary")"
-if printf '%s\n' "$runtime_deps" | /usr/bin/grep -Eq '/(opt/homebrew|usr/local|private/tmp/texpdf-vcpkg|Users/[^/]+/\.vcpkg)/'; then
-  echo "TEXPDF_UNIVERSAL_ERROR unexpected package-manager runtime dependency" >&2
+# For a dylib, the first indented otool -L entry is LC_ID_DYLIB (the library's
+# own install name), not a runtime dependency. Inspect each architecture
+# separately and exclude that self-ID before enforcing the standalone policy.
+runtime_deps="$({
+  for arch in arm64 x86_64; do
+    /usr/bin/otool -arch "$arch" -L "$temporary" |
+      /usr/bin/awk 'BEGIN { seen_id = 0 } /^[[:space:]]/ { if (seen_id == 0) { seen_id = 1; next } print }'
+  done
+} | /usr/bin/sort -u)"
+if printf '%s\n' "$runtime_deps" | /usr/bin/grep -Eq '/(opt/homebrew|usr/local|private/tmp/texpdf|Users/[^/]+/\.vcpkg)/'; then
+  echo "TEXPDF_UNIVERSAL_ERROR unexpected package-manager/build-tree runtime dependency" >&2
   printf '%s\n' "$runtime_deps" >&2
   rm -f "$temporary"
   exit 2
@@ -81,6 +88,19 @@ def record(path: Path, target: str) -> dict[str, object]:
         "sha256": sha256(path),
     }
 
+
+def dependencies(architecture: str) -> list[str]:
+    lines = subprocess.run(
+        ["/usr/bin/otool", "-arch", architecture, "-L", str(universal)],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout.splitlines()
+    libraries = [line.strip() for line in lines if line[:1].isspace()]
+    # First entry is the dylib's own LC_ID_DYLIB value.
+    return libraries[1:] if libraries else []
+
+
 architectures = subprocess.run(
     ["/usr/bin/lipo", "-archs", str(universal)],
     check=True,
@@ -89,12 +109,12 @@ architectures = subprocess.run(
 ).stdout.strip().split()
 if set(architectures) != {"arm64", "x86_64"}:
     raise SystemExit(f"unexpected universal architectures: {architectures}")
-dependencies = subprocess.run(
-    ["/usr/bin/otool", "-L", str(universal)],
-    check=True,
-    text=True,
-    capture_output=True,
-).stdout.splitlines()[1:]
+dependencies_by_arch = {
+    architecture: dependencies(architecture) for architecture in ("arm64", "x86_64")
+}
+all_dependencies = sorted(
+    {value for values in dependencies_by_arch.values() for value in values}
+)
 payload = {
     "schema_version": 1,
     "kind": "macOS universal Stata plugin",
@@ -105,7 +125,8 @@ payload = {
     },
     "universal": record(universal, "universal2-apple-darwin"),
     "exports": ["pginit", "stata_call"],
-    "dynamic_dependencies": [line.strip() for line in dependencies if line.strip()],
+    "dynamic_dependencies": all_dependencies,
+    "dynamic_dependencies_by_arch": dependencies_by_arch,
     "intel_runtime_qualified": False,
     "arm_runtime_qualified": False,
 }
