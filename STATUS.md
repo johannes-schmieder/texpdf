@@ -9,7 +9,7 @@ The active target is a **private `0.1.0-rc.1` macOS universal release candidate*
 Windows, Linux, public distribution, and final `v0.1.0` publication are
 explicitly deferred and are not advertised as supported.
 
-Candidate ready: **false**
+Candidate ready: **true**
 
 Public release ready: **false**
 
@@ -21,11 +21,11 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `01f7f3dfd862de8226f866e15a008b5e325b6fb3` |
+| Latest exact green source | `5960a7b476fafe9800a574eede23be7e3ac5c30d` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
 | Current ARM64 artifact source | `01f7f3dfd862de8226f866e15a008b5e325b6fb3` |
-| Current universal build source | `not recorded` |
+| Current universal build source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
 | Current license-audit source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
 | Latest memory-stress attempt | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1`; qualified=yes |
 
@@ -50,9 +50,7 @@ The current ARM64 plugin is 47.14 MiB (`bc6575fbc0e876734065f9378ca1d4cdc31390f1
 
 ## Active private-candidate blockers
 
-- `macos_universal_build`
-- `macos_intel_build`
-- `private_candidate_package`
+None.
 
 ## License evidence
 
@@ -64,9 +62,6 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 ## Deferred public-release blockers
 
-- `macos_universal_build`
-- `macos_intel_build`
-- `private_candidate_package`
 - `x86_64-pc-windows-msvc_runtime`
 - `x86_64-unknown-linux-gnu_runtime`
 - `public_distribution`
