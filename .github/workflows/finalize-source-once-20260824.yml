@@ -1,0 +1,197 @@
+name: Finalize cleaned texpdf source once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/finalize-source-once-20260824.yml"
+
+concurrency:
+  group: texpdf-finalize-cleaned-source
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: quick
+      TEXPDF_RUST_PROFILE: engine
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Synchronize and clean transient workflow sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          durable = {
+              "build-cross-platform.yml",
+              "build-development-artifacts.yml",
+              "build-macos-universal.yml",
+              "generate-license-inventory.yml",
+              "publish-artifact-manifest.yml",
+              "publish-artifact-summary.yml",
+              "publish-target-qualification.yml",
+              "report-implementation-failure.yml",
+              "stata-ci.yml",
+          }
+          workflow_dir = Path(".github/workflows")
+          removed = []
+          for path in workflow_dir.glob("*.yml"):
+              if path.name not in durable:
+                  removed.append(path.name)
+                  path.unlink()
+          for path in workflow_dir.glob("*.yaml"):
+              if path.name not in durable:
+                  removed.append(path.name)
+                  path.unlink()
+
+          lines = [
+              "# Workflow inventory",
+              "",
+              "Reusable workflows retained in the cleaned source tree:",
+              "",
+          ]
+          descriptions = {
+              "stata-ci.yml": "exact-SHA Rust build/test followed by licensed Stata qualification and immutable receipts",
+              "build-development-artifacts.yml": "manual real-engine macOS plugin/package artifact with quick or stress profile",
+              "build-macos-universal.yml": "manual universal Mach-O build; ARM runtime-qualified, Intel build-only until Intel Stata is available",
+              "build-cross-platform.yml": "manual Windows/Linux Rust/native build-only matrix with explicit nonqualification labels",
+              "generate-license-inventory.yml": "pinned TeX Live 2022 and Rust/native license inventory generation",
+              "publish-artifact-manifest.yml": "immutable exact-SHA bundle/plugin/package measurements",
+              "publish-artifact-summary.yml": "human-readable exact artifact size summary",
+              "publish-target-qualification.yml": "exact macOS ARM64 target record from successful evidence",
+              "report-implementation-failure.yml": "sanitized failed implementation-workflow receipts",
+          }
+          for name in sorted(durable):
+              path = workflow_dir / name
+              if path.is_file():
+                  lines.append(f"- `{name}` — {descriptions.get(name, 'reusable project workflow')}.")
+          lines.extend(
+              [
+                  "",
+                  "Removed transient/self-modifying workflows:",
+                  "",
+              ]
+          )
+          if removed:
+              lines.extend(f"- `{name}`" for name in sorted(removed))
+          else:
+              lines.append("- none")
+          lines.extend(
+              [
+                  "",
+                  "Public release creation is intentionally absent. It remains blocked by",
+                  "the fail-closed target and third-party license gates.",
+                  "",
+              ]
+          )
+          destination = Path("docs/WORKFLOWS.md")
+          destination.parent.mkdir(parents=True, exist_ok=True)
+          destination.write_text("\n".join(lines), encoding="utf-8")
+
+          pending = Path("IMPLEMENTATION_PENDING")
+          pending.write_text(
+              "awaiting immutable quick receipt for the cleaned source commit\n",
+              encoding="utf-8",
+          )
+          PY
+
+          git add -u .github/workflows
+          git add docs/WORKFLOWS.md IMPLEMENTATION_PENDING
+
+      - name: Validate Python tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m py_compile \
+            tools/check_release_readiness.py \
+            tools/generate_dependency_inventory.py \
+            tools/generate_tex_resource_inventory.py \
+            tools/package_release.py \
+            tools/prepare_bundle.py \
+            tools/prepare_curated_bundle.py \
+            tools/stage_plugin.py
+
+      - name: Build and test the real embedded engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/record_rust_quick.sh
+          /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+          /usr/bin/python3 tools/generate_dependency_inventory.py \
+            --json .ci/stata/run/dependencies.json \
+            --markdown .ci/stata/run/dependencies.md
+
+      - name: Preserve Rust evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/texpdf-finalize-rust-evidence"
+          rm -rf "$evidence"
+          mkdir -p "$evidence"
+          cp -R .ci/stata/run/. "$evidence/"
+          cp bundle/generated/bundle-info.json "$evidence/"
+          cp bundle/generated/curated-manifest.json "$evidence/"
+
+      - name: Run licensed Stata comprehensive quick profile
+        shell: bash
+        run: /bin/bash ci/run_stata_ci.sh quick
+
+      - name: Restore and combine preflight evidence
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/texpdf-finalize-rust-evidence"
+          mkdir -p .ci/stata/run
+          if [[ -d "$evidence" ]]; then
+            cp -R "$evidence/." .ci/stata/run/
+          fi
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            .ci/stata/run/receipt.json \
+            .ci/stata/run/rust-quick.status
+
+      - name: Validate preflight receipt
+        shell: bash
+        run: >-
+          /usr/bin/python3 ci/check_stata_receipt.py
+          .ci/stata/run/receipt.json
+          --expect-tested-sha "$GITHUB_SHA"
+          --expect-profile quick
+          --require-success
+          --require-rust-success
+
+      - name: Commit the cleaned source checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset -- stata/_texpdf_plugin.plugin dist 2>/dev/null || true
+          rm -f stata/_texpdf_plugin.plugin
+          rm -rf dist .ci/stata/run bundle/generated __pycache__ tools/__pycache__
+          git add Cargo.lock
+          git add -u
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: finalize cleaned macOS compiler implementation"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
