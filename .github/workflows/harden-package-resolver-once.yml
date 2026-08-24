@@ -1,0 +1,128 @@
+name: Harden TeX Live package resolver once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/harden-package-resolver-once.yml"
+
+concurrency:
+  group: texpdf-harden-package-resolver
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  harden:
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Normalize version-qualified dependencies and add tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          source = Path("tools/resolve_texlive_resources.py")
+          text = source.read_text(encoding="utf-8")
+          old = '''            dependency = raw[7:].strip()
+            if dependency and not dependency.startswith("setting_"):
+                current["depends"].append(dependency)
+'''
+          new = '''            dependency_text = raw[7:].strip()
+            dependency = dependency_text.split()[0] if dependency_text else ""
+            if dependency and not dependency.startswith("setting_"):
+                current["depends"].append(dependency)
+'''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif "dependency_text = raw[7:].strip()" not in text:
+              raise SystemExit("cannot locate dependency parser")
+          source.write_text(text, encoding="utf-8")
+
+          test = Path("ci/tests/test_texlive_resolver.py")
+          test.write_text(r'''#!/usr/bin/env python3
+from __future__ import annotations
+
+import gzip
+import importlib.util
+from pathlib import Path
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+SPEC = importlib.util.spec_from_file_location(
+    "texpdf_resolver", ROOT / "tools/resolve_texlive_resources.py"
+)
+if SPEC is None or SPEC.loader is None:
+    raise RuntimeError("cannot load resolver")
+resolver = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(resolver)
+
+
+class ResolverTests(unittest.TestCase):
+    def test_version_constraint_uses_package_name(self) -> None:
+        content = """name parent\ndepend child >= 123\nrunfiles size=1\n texmf-dist/parent.sty\n\nname child\nrunfiles size=1\n texmf-dist/child.sty\n"""
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "texlive.tlpdb"
+            path.write_text(content, encoding="utf-8")
+            packages = resolver.parse_tlpdb(path)
+        closure, unresolved = resolver.dependency_closure(["parent"], packages)
+        self.assertEqual(closure, ["child", "parent"])
+        self.assertEqual(unresolved, [])
+
+    def test_architecture_dependency_normalizes_when_base_exists(self) -> None:
+        packages = {
+            "parent": {"depends": ["binary.x86_64-linux"]},
+            "binary": {"depends": []},
+        }
+        closure, unresolved = resolver.dependency_closure(["parent"], packages)
+        self.assertEqual(closure, ["binary", "parent"])
+        self.assertEqual(unresolved, [])
+
+    def test_unique_basename_matches_flat_bundle(self) -> None:
+        exact, basenames = resolver.build_name_indexes(["article.cls", "cmr10.tfm"])
+        resource, method, candidates = resolver.match_runfile(
+            "texmf-dist/tex/latex/base/article.cls", exact, basenames
+        )
+        self.assertEqual(resource, "article.cls")
+        self.assertEqual(method, "unique_basename")
+        self.assertEqual(candidates, ["article.cls"])
+
+    def test_gzip_bundle_index_parser(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "bundle.index.gz"
+            with gzip.open(path, "wt", encoding="utf-8") as stream:
+                stream.write("b.sty 10 2\n")
+                stream.write("a.sty 0 2\n")
+            self.assertEqual(resolver.read_bundle_names(path), ["a.sty", "b.sty"])
+
+
+if __name__ == "__main__":
+    unittest.main()
+''', encoding="utf-8")
+
+          Path(".github/workflows/harden-package-resolver-once.yml").unlink()
+          PY
+
+          /usr/bin/python3 -m unittest ci.tests.test_texlive_resolver
+          /usr/bin/python3 -m py_compile tools/resolve_texlive_resources.py
+          git add tools/resolve_texlive_resources.py ci/tests/test_texlive_resolver.py
+          git add -u .github/workflows/harden-package-resolver-once.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test(bundle): harden TeX Live dependency resolution [skip ci]"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
