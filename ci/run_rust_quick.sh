@@ -23,12 +23,15 @@ fi
 toolchain_cargo="$($rustup_bin which --toolchain "$toolchain" cargo)"
 toolchain_bin="$(/usr/bin/dirname "$toolchain_cargo")"
 # Cargo discovers external subcommands such as cargo-fmt and cargo-clippy via
-# PATH. `rustup run ... cargo` does not supply that lookup path on this runner.
-export PATH="$toolchain_bin:$PATH"
+# PATH. The runner is a LaunchAgent, so add the standard Homebrew prefixes
+# explicitly as well; this does not install or mutate machine dependencies.
+export PATH="$toolchain_bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 rustc_version="$($rustup_bin run "$toolchain" rustc --version)"
 echo "RUST_TOOLCHAIN=$toolchain"
 echo "RUSTC_VERSION=$rustc_version"
+echo "PKG_CONFIG_PATH_BIN=$(command -v pkg-config || true)"
+echo "PKGCONF_PATH_BIN=$(command -v pkgconf || true)"
 
 if [[ -f Cargo.toml ]]; then
   export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/private/tmp/texpdf-cargo-target}"
