@@ -1,7 +1,7 @@
 *! version 0.1.0 24aug2026
 program define texpdf, rclass
     version 14.1
-    syntax [using/] [, SAVing(string asis) REPLACE VERSION]
+    syntax [using/] [, SAVing(string) REPLACE VERSION]
 
     if "`version'" != "" {
         if `"`using'"' != "" | `"`saving'"' != "" | "`replace'" != "" {
