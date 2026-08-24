@@ -3,24 +3,19 @@
   "targets": {
     "aarch64-apple-darwin": {
       "artifact": "_texpdf_plugin.plugin",
-      "bundle_zip_sha256": "05688ffcca2e82a12143c836708e3dc3b811a30dbe2b74caf951eb7b409792ab",
-      "bundle_zip_size_bytes": 6690289,
-      "embedded_helper_sha256": "182180d7473b37e456ac440d8af0851a6904bda747da88fb1576cfc076945637",
-      "embedded_helper_size_bytes": 48516288,
+      "bundle_zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
+      "bundle_zip_size_bytes": 4984973,
+      "embedded_helper_sha256": "77c5578eab96b4d9786e1c1b5bed07c4b9a522ccf7a5fa30d8fb4f50935d6cd1",
+      "embedded_helper_size_bytes": 48515456,
       "platform": "Unix; Mac (Apple Silicon)",
-      "plugin_sha256": "ee4a0ae513b66ad956c0c52c1d5b76ba2fe75212e055fbd6c7297f4d9826fda0",
-      "plugin_size_bytes": 51146384,
+      "plugin_sha256": "09d439b8d05ded255ca60481b4a791de83cea210a3ec2b083389af09b8713db7",
+      "plugin_size_bytes": 49429136,
       "qualification_profile": "quick",
-      "qualified_source_sha": "5ba3a83e098dcf7eb47c7b0db92b28ac46a9297b",
+      "qualified_source_sha": "d9be7615bd69b260b5841730d51d9a9ee03958f0",
       "stata_edition": "MP",
       "stata_runtime_qualified": true,
       "stata_version": "18",
-      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run",
-      "universal_arm_runtime_qualified": true,
-      "universal_arm_slice_sha256": "74703bb6a8f0f2e3801b0c4462620d68b6e2749fdb1d1fe2f3d51e772397ceac",
-      "universal_build_source_sha": "d9be7615bd69b260b5841730d51d9a9ee03958f0",
-      "universal_plugin_sha256": "a486545968b11647cf726bfecc2159c07e5dc3f00d8e3af4c6c9ab2a394c9964",
-      "universal_plugin_size_bytes": 98532032
+      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run"
     },
     "x86_64-apple-darwin": {
       "artifact": "_texpdf_plugin.plugin",

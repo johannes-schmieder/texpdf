@@ -1,84 +1,94 @@
 {
-  "schema_version": 2,
-  "qualified_source_sha": "2ea4a56ddd01be0880599c2508ef2cbaac444c1e",
-  "qualified_at": "2026-08-24T15:15:18.743210Z",
+  "authoritative_records": {
+    "artifact_summary": "docs/generated/CURRENT_ARTIFACT.md",
+    "license_status": "licenses/generated/STATUS.json",
+    "platform_support": "release/targets.json",
+    "release_readiness": "release/READINESS.json"
+  },
+  "bundle": {
+    "content_digest": "a5b8af5c48f71877bf3ca8296892757cf1868503f151acc6b7b77808b85b2d51",
+    "excluded_resource_count": 175,
+    "file_count": 382,
+    "index_sha256": "979a52178eb353c803dde1f66efe43ff7ae2ab908000323d4fef29e98e382ebd",
+    "name": "texpdf-academic-v1",
+    "resource_policy_sha256": "8a3e2a66a480b3d8ff19b11e53935aa43e43757ceaf0d647a344dbf3ccd4e58f",
+    "selection_manifest": "bundle/curated-manifest.json",
+    "source_sha256": "425685e124746c15ba9bb8e0596bdaad98fce886afa347fbcf9ec0e9acd7fe79",
+    "transform_version": "range-closure-v2-english-only",
+    "uncompressed_resource_bytes": 14948589,
+    "version": "33-academic-v1",
+    "zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
+    "zip_size_bytes": 4984973
+  },
   "ci": {
-    "profile": "quick",
-    "run_id": 32743575857,
-    "run_attempt": 1,
     "overall_status": "success",
-    "stata_status": "success",
-    "rust_status": "success",
-    "rust_mode": "repository-engine",
+    "profile": "quick",
+    "receipt": ".ci/stata/results/d9be7615bd69b260b5841730d51d9a9ee03958f0.json",
     "required_markers": [
       "TEXPDF IN PROCESS STRESS PASS",
       "TEXPDF NET INSTALL PASS",
       "TEXPDF FULL ENGINE STATA PASS",
       "TEXPDF STATA MATA SMOKE PASS"
     ],
-    "receipt": ".ci/stata/results/2ea4a56ddd01be0880599c2508ef2cbaac444c1e.json"
-  },
-  "platform": {
-    "os": "macOS",
-    "architecture": "Apple Silicon",
-    "rust_target": "aarch64-apple-darwin",
-    "stata_version": "18",
-    "stata_edition": "MP",
-    "stata_bundle_version": "18.0.130"
+    "run_attempt": 1,
+    "run_id": 32777900898,
+    "rust_mode": "repository-engine",
+    "rust_status": "success",
+    "stata_status": "success"
   },
   "engine": {
     "name": "tectonic",
     "version": "0.17.0"
   },
-  "bundle": {
-    "name": "texpdf-academic-v1",
-    "version": "33-academic-v1",
-    "transform_version": "range-closure-v1",
-    "file_count": 557,
-    "zip_size_bytes": 6690289,
-    "uncompressed_resource_bytes": 19035195,
-    "zip_sha256": "05688ffcca2e82a12143c836708e3dc3b811a30dbe2b74caf951eb7b409792ab",
-    "content_digest": "273502edfafe0a6adcdd19c0659965bcf0ebea26cacc1ad372439b80fd7a2a81",
-    "source_sha256": "425685e124746c15ba9bb8e0596bdaad98fce886afa347fbcf9ec0e9acd7fe79",
-    "index_sha256": "979a52178eb353c803dde1f66efe43ff7ae2ab908000323d4fef29e98e382ebd",
-    "selection_manifest": "bundle/curated-manifest.json"
+  "helper": {
+    "materialization": "verified hash-addressed private executable",
+    "sha256": "77c5578eab96b4d9786e1c1b5bed07c4b9a522ccf7a5fa30d8fb4f50935d6cd1",
+    "size_bytes": 48515456
+  },
+  "package": {
+    "net_install_tested": true,
+    "public_release": false,
+    "zip_sha256": "5cd8af4299e24e2f20d17aa797ba4e80c07d5e46575f0fb581ec736e99f704a2",
+    "zip_size_bytes": 22496107
+  },
+  "platform": {
+    "architecture": "Apple Silicon",
+    "os": "macOS",
+    "rust_target": "aarch64-apple-darwin",
+    "stata_bundle_version": "18.0.130",
+    "stata_edition": "MP",
+    "stata_version": "18"
   },
   "plugin": {
-    "size_bytes": 49997392,
-    "sha256": "185e4094c0d9835af199a3602fa8cd6ffa62a0da09c43c7267018b8ecb622298",
+    "dynamic_dependencies": [
+      "/usr/lib/libiconv.2.dylib",
+      "/usr/lib/libSystem.B.dylib"
+    ],
+    "dynamic_dependency_policy": "macOS system libraries/frameworks only",
     "exports": [
       "pginit",
       "stata_call"
     ],
-    "dynamic_dependency_policy": "macOS system libraries/frameworks only"
+    "sha256": "09d439b8d05ded255ca60481b4a791de83cea210a3ec2b083389af09b8713db7",
+    "size_bytes": 49429136
   },
-  "package": {
-    "zip_size_bytes": 23475982,
-    "zip_sha256": "efe6db8333ef15a0c2b6f39c31cb6c958c1b19bace7555e686c8e2c935231f3c",
-    "net_install_tested": true,
-    "public_release": false,
-    "qualification_note": "This exact development package predates the final complete third-party notice bundle."
-  },
+  "qualification_boundary": "This record qualifies the exact macOS Apple Silicon plugin, embedded helper, curated bundle, and development package under licensed Stata/MP. Other architectures require separate runtime qualification; public redistribution requires a complete audit.",
+  "qualified_at": "2026-08-24T21:10:40.913602Z",
+  "qualified_source_sha": "d9be7615bd69b260b5841730d51d9a9ee03958f0",
+  "schema_version": 3,
   "tests": {
     "academic_package_corpus": true,
     "bibtex_natbib": true,
+    "failed_compile_recovery": true,
+    "overwrite_protection": true,
     "pdf_figures": true,
     "png_figures": true,
     "relative_inputs": true,
-    "spaces_in_paths": true,
-    "unicode_paths": true,
-    "overwrite_protection": true,
-    "failed_compile_recovery": true,
-    "repeated_in_process_compiles": 100,
-    "system_tex_required": false,
+    "repeated_plugin_compiles": 100,
     "runtime_network_provider": false,
-    "shell_escape": false
-  },
-  "authoritative_records": {
-    "platform_support": "release/targets.json",
-    "artifact_summary": "docs/generated/CURRENT_ARTIFACT.md",
-    "release_readiness": "release/READINESS.json",
-    "license_status": "licenses/generated/STATUS.json"
-  },
-  "qualification_boundary": "This record qualifies the exact macOS Apple Silicon plugin and curated bundle under licensed Stata/MP 18. Newer source commits require their own exact-SHA receipt. macOS Intel, Windows, and Linux require separate runtime qualification. Public redistribution also requires a complete source-bound third-party license audit."
+    "shell_escape": false,
+    "spaces_in_paths": true,
+    "system_tex_required": false,
+    "unicode_paths": true
+  }
 }
