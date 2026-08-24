@@ -15,6 +15,7 @@ import lzma
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
+import sys
 from typing import Any
 
 FILE_SECTIONS = {"runfiles", "docfiles", "srcfiles", "binfiles"}
@@ -137,7 +138,7 @@ def parse_simple_override_toml(text: str) -> dict[str, list[dict[str, str]]]:
     """Parse the deliberately narrow override-file TOML subset.
 
     The connected Stata runner uses the Xcode Python 3.9 interpreter, which has
-    no standard-library ``tomllib``.  Pulling an unpinned parser dependency into
+    no standard-library ``tomllib``. Pulling an unpinned parser dependency into
     a release audit would weaken reproducibility, so the fallback accepts only
     repeated ``[[override]]`` tables and JSON-compatible quoted string values.
     Anything broader fails explicitly rather than being interpreted loosely.
@@ -204,7 +205,9 @@ def load_overrides(path: Path | None) -> list[dict[str, str]]:
             raise InventoryError(f"override {number} is not a table")
         required = (item.get("pattern"), item.get("package"), item.get("license"))
         if not all(isinstance(value, str) and value for value in required):
-            raise InventoryError(f"override {number} requires pattern, package, and license")
+            raise InventoryError(
+                f"override {number} requires pattern, package, and license"
+            )
         result.append(
             {
                 "pattern": str(item["pattern"]),
@@ -229,6 +232,32 @@ def matching_override(
     if len(matches) > 1:
         raise InventoryError(f"multiple overrides match {name}: {matches}")
     return matches[0] if matches else None
+
+
+def development_package(name: str) -> bool:
+    lowered = name.lower()
+    return lowered.endswith("-dev") or "-dev-" in lowered
+
+
+def prefer_stable_candidate(candidates: set[str]) -> tuple[set[str], str | None]:
+    """Resolve stable-package versus development-mirror duplication.
+
+    TeX Live 2022 contains development mirrors such as ``latex-base-dev`` and
+    ``latex-graphics-dev`` whose runfiles duplicate the stable release package.
+    When exactly one candidate is non-development and every alternative is a
+    development package, selecting the stable package is deterministic and does
+    not discard a competing stable ownership claim.
+    """
+
+    if len(candidates) <= 1:
+        return candidates, None
+    stable = {name for name in candidates if not development_package(name)}
+    development = candidates.difference(stable)
+    if len(stable) == 1 and development and all(
+        development_package(name) for name in development
+    ):
+        return stable, "unique_stable_candidate_over_development_mirrors"
+    return candidates, None
 
 
 def build_inventory(
@@ -258,18 +287,26 @@ def build_inventory(
             candidates = {override["package"]}
             method = "reviewed_override"
         elif name in exact:
-            candidates = exact[name]
+            candidates = set(exact[name])
             method = "exact_path"
         else:
-            candidates = basename.get(Path(name).name, set())
+            candidates = set(basename.get(Path(name).name, set()))
             method = "unique_basename"
+
+        original_candidates = set(candidates)
+        selection_reason: str | None = None
+        if override is None:
+            candidates, selection_reason = prefer_stable_candidate(candidates)
 
         record: dict[str, Any] = {
             "resource": name,
             "origin": origin,
             "method": method,
-            "candidate_packages": sorted(candidates),
+            "candidate_packages": sorted(original_candidates),
         }
+        if selection_reason is not None:
+            record["selection_reason"] = selection_reason
+            record["selected_candidates"] = sorted(candidates)
         if override is not None:
             record.update(
                 {
@@ -304,7 +341,7 @@ def build_inventory(
         records.append(record)
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "summary": {
             "resource_count": len(resources),
             **counts,
@@ -340,7 +377,9 @@ def render_markdown(inventory: dict[str, Any]) -> str:
         "| Resource | Status | Candidates |",
         "|---|---|---|",
     ]
-    failures = [item for item in inventory["resources"] if item["status"] != "mapped"]
+    failures = [
+        item for item in inventory["resources"] if item["status"] != "mapped"
+    ]
     if failures:
         for item in failures:
             candidates = ", ".join(item.get("candidate_packages", [])) or "—"
@@ -393,7 +432,9 @@ def main() -> int:
         f"ambiguous={summary['ambiguous']} unmapped={summary['unmapped']} "
         f"missing_license={summary['missing_license']}"
     )
-    failures = summary["ambiguous"] + summary["unmapped"] + summary["missing_license"]
+    failures = (
+        summary["ambiguous"] + summary["unmapped"] + summary["missing_license"]
+    )
     if args.strict and failures:
         return 1
     return 0
