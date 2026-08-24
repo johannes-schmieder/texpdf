@@ -10,11 +10,14 @@ on:
       - "Cargo.lock"
       - "bundle/curated-manifest.json"
       - "bundle/license-overrides.toml"
+      - "bundle/required-resources.txt"
+      - "bundle/resource-trace.txt.gz.b64"
       - "ci/run_license_audit.py"
       - "tools/generate_license_inventory.py"
       - "tools/generate_cargo_license_inventory.py"
       - "tools/generate_dependency_inventory.py"
       - "tools/collect_dependency_license_texts.py"
+      - "tools/prepare_curated_bundle.py"
       - "tools/prepare_native_deps.sh"
 
 concurrency:
@@ -28,6 +31,7 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: "1"
   RUST_TOOLCHAIN: "1.97.1"
+  TEXPDF_BUNDLE_CACHE: /private/tmp/texpdf-bundle-cache
   TLPDB_URL: https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb.xz
 
 jobs:
@@ -40,6 +44,94 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Reconstruct and verify the source-bound curated manifest
+        id: manifest
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          trace="bundle/generated/license-audit-resource-trace.txt"
+          generated_manifest="bundle/generated/curated-manifest.json"
+          source_tar="$TEXPDF_BUNDLE_CACHE/tlextras-2022.0r0.tar"
+          /usr/bin/python3 - "$trace" <<'PY'
+          from pathlib import Path
+          import base64
+          import gzip
+          import sys
+
+          destination = Path(sys.argv[1])
+          source = Path("bundle/resource-trace.txt.gz.b64")
+          compressed = base64.b64decode(source.read_bytes(), validate=True)
+          names = set(gzip.decompress(compressed).decode("utf-8").splitlines())
+          required = Path("bundle/required-resources.txt")
+          if required.is_file():
+              names.update(required.read_text(encoding="utf-8").splitlines())
+          names.discard("")
+          destination.parent.mkdir(parents=True, exist_ok=True)
+          destination.write_text("\n".join(sorted(names)) + "\n", encoding="utf-8")
+          print(f"TEXPDF_LICENSE_TRACE_READY names={len(names)} path={destination}")
+          PY
+
+          args=(
+            --trace "$trace"
+            --write-manifest "$generated_manifest"
+            --cache-dir "$TEXPDF_BUNDLE_CACHE"
+          )
+          if [[ -f "$source_tar" ]]; then
+            args+=(--source-tar "$source_tar")
+          fi
+          /usr/bin/python3 tools/prepare_curated_bundle.py "${args[@]}"
+
+          /usr/bin/python3 - \
+            "$generated_manifest" \
+            "bundle/generated/bundle-info.json" \
+            "bundle/QUALIFICATION.json" \
+            "bundle/curated-manifest.json" <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import sys
+
+          generated_path = Path(sys.argv[1])
+          info = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+          qualification = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
+          destination = Path(sys.argv[4])
+          manifest = json.loads(generated_path.read_text(encoding="utf-8"))
+          expected_zip = qualification["bundle"]["zip_sha256"]
+          if info["zip_sha256"] != expected_zip:
+              raise SystemExit(
+                  f"curated ZIP mismatch: expected {expected_zip}, got {info['zip_sha256']}"
+              )
+          resources = manifest.get("resources", [])
+          if len(resources) + 1 != info["file_count"]:
+              raise SystemExit(
+                  f"manifest/bundle count mismatch: {len(resources)} + 1 != {info['file_count']}"
+              )
+          manifest["file_count"] = len(resources)
+          manifest["bundle_file_count"] = info["file_count"]
+          manifest["bundle_zip_sha256"] = info["zip_sha256"]
+          manifest["bundle_content_digest"] = info["tectonic_bundle_digest"]
+          manifest["generated_metadata_resources"] = [
+              {
+                  "name": "SHA256SUM",
+                  "license": "MIT",
+                  "origin": "texpdf-generated-bundle-metadata",
+              }
+          ]
+          manifest["qualification_source_sha"] = qualification["qualified_source_sha"]
+          temporary = destination.with_suffix(destination.suffix + ".tmp")
+          temporary.write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          os.replace(temporary, destination)
+          print(
+              "TEXPDF_CURATED_MANIFEST_VERIFIED "
+              f"resources={len(resources)} bundle_files={info['file_count']} "
+              f"zip_sha256={info['zip_sha256']}"
+          )
+          PY
+
       - name: Run source-bound fail-closed audit
         shell: bash
         run: /usr/bin/python3 ci/run_license_audit.py
@@ -49,11 +141,13 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: texpdf-license-audit-${{ github.sha }}-${{ github.run_id }}
-          path: licenses/generated/
+          path: |
+            licenses/generated/
+            bundle/curated-manifest.json
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish durable audit summaries
+      - name: Publish durable audit summaries and verified manifest
         if: ${{ always() }}
         shell: bash
         run: |
@@ -75,7 +169,7 @@ jobs:
             publish_tree="$RUNNER_TEMP/texpdf-license-publish-$attempt"
             rm -rf "$publish_tree"
             git worktree add --detach "$publish_tree" origin/main
-            mkdir -p "$publish_tree/licenses/generated"
+            mkdir -p "$publish_tree/licenses/generated" "$publish_tree/bundle"
             for name in \
               STATUS.json STATUS.md \
               tex-resources.json tex-resources.md \
@@ -88,9 +182,13 @@ jobs:
                 rm -f "$publish_tree/licenses/generated/$name"
               fi
             done
+            if [[ -f "$GITHUB_WORKSPACE/bundle/curated-manifest.json" ]]; then
+              cp "$GITHUB_WORKSPACE/bundle/curated-manifest.json" \
+                "$publish_tree/bundle/curated-manifest.json"
+            fi
             git -C "$publish_tree" config user.name "github-actions[bot]"
             git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git -C "$publish_tree" add -A licenses/generated
+            git -C "$publish_tree" add -A licenses/generated bundle/curated-manifest.json
             if git -C "$publish_tree" diff --cached --quiet; then
               exit 0
             fi
