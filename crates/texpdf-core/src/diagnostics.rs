@@ -91,7 +91,7 @@ fn truncate_chars(mut text: String, limit: usize) -> String {
         .map(|(index, _)| index)
         .unwrap_or(text.len());
     text.truncate(byte_index);
-    text.push_str("…");
+    text.push('…');
     text
 }
 
