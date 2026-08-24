@@ -37,7 +37,7 @@
       "release_blocker": false
     },
     {
-      "detail": "source=a644181b33109ea0eb594f2aefa1895e94b7bd11; plugin_bytes=49997392; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
+      "detail": "source=640ed14c0fe0da09ef9a8cee195805f0ea9b39bf; plugin_bytes=49998208; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
       "passed": true,
       "release_blocker": false
@@ -85,13 +85,13 @@
       "release_blocker": true
     },
     {
-      "detail": "missing source-bound audit status licenses/generated/STATUS.json",
+      "detail": "source=dc005e728971607a17a181f18ec2a2a06e944c6d; resources=556; mapped=406; ambiguous=8; unmapped=5; missing_license=137; missing_rust_texts=31; missing_native_texts=0",
       "key": "third_party_license_complete",
       "passed": false,
       "release_blocker": true
     },
     {
-      "detail": "missing permanent qualification record release/memory-stress-macos-arm64.json",
+      "detail": "source=2906be9e4628cd44197e5d6310a810b74f2aca7e; iterations=1000; peak_rss_kib=1249968; post_warmup_growth_kib=819480; growth_ratio=3.163449353721382",
       "key": "macos_arm_memory_stress",
       "passed": false,
       "release_blocker": true
