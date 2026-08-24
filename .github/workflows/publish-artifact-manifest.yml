@@ -1,0 +1,183 @@
+name: Publish exact-SHA artifact manifest
+
+on:
+  workflow_run:
+    workflows:
+      - Licensed Stata and Rust CI
+    types:
+      - completed
+
+concurrency:
+  group: texpdf-artifact-manifest-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 15
+    env:
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+      SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+      SOURCE_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download exact CI evidence
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: stata-${{ env.SOURCE_SHA }}-${{ env.SOURCE_RUN_ID }}-${{ env.SOURCE_RUN_ATTEMPT }}
+          path: ${{ runner.temp }}/texpdf-artifact-evidence
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+
+      - name: Build immutable artifact manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main
+
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import re
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "texpdf-artifact-evidence"
+          source_sha = os.environ["SOURCE_SHA"]
+          run_id = int(os.environ["SOURCE_RUN_ID"])
+          run_attempt = int(os.environ["SOURCE_RUN_ATTEMPT"])
+
+          def find_json(*names: str) -> tuple[Path | None, dict]:
+              for name in names:
+                  matches = sorted(root.rglob(name))
+                  if matches:
+                      path = matches[0]
+                      return path, json.loads(path.read_text(encoding="utf-8"))
+              return None, {}
+
+          receipt_path, receipt = find_json("receipt.json")
+          if not receipt or receipt.get("tested_sha") != source_sha:
+              raise SystemExit("artifact receipt does not identify the exact source SHA")
+          if receipt.get("status") != "success" or receipt.get("rust_status") != "success":
+              raise SystemExit("artifact receipt is not a successful Rust/Stata receipt")
+          if receipt.get("rust_mode") != "repository-engine":
+              print("TEXPDF_ARTIFACT_MANIFEST_SKIP non-engine Rust mode")
+              Path(".ci/artifact-manifest.skip").write_text("non-engine mode\n", encoding="utf-8")
+              raise SystemExit(0)
+
+          bundle_path, bundle = find_json("bundle-info.json")
+          plugin_path, plugin = find_json("plugin-manifest.json")
+          package_path, package = find_json("package-manifest.json", "BUILD_INFO.json")
+          if not bundle:
+              raise SystemExit("bundle-info.json is missing from CI evidence")
+          if not plugin:
+              raise SystemExit("plugin-manifest.json is missing from CI evidence")
+
+          sha_re = re.compile(r"^[0-9a-f]{64}$")
+          bundle_sha = bundle.get("zip_sha256")
+          plugin_sha = plugin.get("sha256") or plugin.get("plugin_sha256")
+          if not isinstance(bundle_sha, str) or not sha_re.fullmatch(bundle_sha):
+              raise SystemExit("bundle ZIP SHA-256 is missing or malformed")
+          if not isinstance(plugin_sha, str) or not sha_re.fullmatch(plugin_sha):
+              raise SystemExit("plugin SHA-256 is missing or malformed")
+
+          manifest = {
+              "schema_version": 1,
+              "source_sha": source_sha,
+              "workflow_run_id": run_id,
+              "workflow_run_attempt": run_attempt,
+              "profile": receipt.get("profile"),
+              "overall_status": receipt.get("status"),
+              "stata_status": receipt.get("stata_status"),
+              "rust_status": receipt.get("rust_status"),
+              "rust_mode": receipt.get("rust_mode"),
+              "platform": receipt.get("platform"),
+              "stata_version": receipt.get("stata_version"),
+              "stata_edition": receipt.get("stata_edition"),
+              "bundle": {
+                  "name": bundle.get("bundle_name"),
+                  "version": bundle.get("bundle_version"),
+                  "file_count": bundle.get("file_count"),
+                  "zip_size_bytes": bundle.get("zip_size_bytes"),
+                  "zip_sha256": bundle_sha,
+                  "tectonic_bundle_digest": bundle.get("tectonic_bundle_digest"),
+                  "source_sha256": bundle.get("source_sha256"),
+                  "index_sha256": bundle.get("index_sha256"),
+              },
+              "plugin": {
+                  "target": plugin.get("target") or plugin.get("platform"),
+                  "size_bytes": plugin.get("size_bytes") or plugin.get("plugin_size_bytes"),
+                  "sha256": plugin_sha,
+                  "exports": plugin.get("exports"),
+              },
+              "package": package or None,
+              "evidence_files": {
+                  "receipt": str(receipt_path.relative_to(root)) if receipt_path else None,
+                  "bundle": str(bundle_path.relative_to(root)) if bundle_path else None,
+                  "plugin": str(plugin_path.relative_to(root)) if plugin_path else None,
+                  "package": str(package_path.relative_to(root)) if package_path else None,
+              },
+          }
+          for label, value in (
+              ("bundle.zip_size_bytes", manifest["bundle"]["zip_size_bytes"]),
+              ("plugin.size_bytes", manifest["plugin"]["size_bytes"]),
+          ):
+              if not isinstance(value, int) or value <= 0:
+                  raise SystemExit(f"{label} is missing or invalid")
+
+          destination = Path(".ci/artifacts") / f"{source_sha}.json"
+          destination.parent.mkdir(parents=True, exist_ok=True)
+          destination.write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          Path(".ci/artifacts/latest.json").write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(
+              "TEXPDF_ARTIFACT_MANIFEST_READY "
+              f"source_sha={source_sha} "
+              f"bundle_bytes={manifest['bundle']['zip_size_bytes']} "
+              f"plugin_bytes={manifest['plugin']['size_bytes']}"
+          )
+          PY
+
+      - name: Commit immutable artifact evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f .ci/artifact-manifest.skip ]]; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ".ci/artifacts/$SOURCE_SHA.json" .ci/artifacts/latest.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "ci(artifacts): record ${SOURCE_SHA:0:12} [skip ci]"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            git reset --hard origin/main
+            git add ".ci/artifacts/$SOURCE_SHA.json" .ci/artifacts/latest.json
+            git commit -m "ci(artifacts): record ${SOURCE_SHA:0:12} [skip ci]"
+          done
+          echo "artifact manifest publication lost three branch races" >&2
+          exit 1
