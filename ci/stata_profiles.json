@@ -28,6 +28,14 @@
         "TEXPDF FULL ENGINE STATA PASS",
         "TEXPDF STATA MATA SMOKE PASS"
       ]
+    },
+    "stress1000": {
+      "suite": "ci/stata_stress_1000.do",
+      "arguments": [],
+      "timeout_seconds": 7200,
+      "required_log_markers": [
+        "TEXPDF STRESS 1000 PASS"
+      ]
     }
   },
   "stata_plus_files": []

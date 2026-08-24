@@ -8,12 +8,18 @@ evidence_dir="${TEXPDF_MEMORY_EVIDENCE_DIR:-${RUNNER_TEMP:-/private/tmp}/texpdf-
 progress="$evidence_dir/progress.txt"
 samples="$evidence_dir/rss-samples.tsv"
 summary="$evidence_dir/memory-stress.json"
+helpers_before="$evidence_dir/helpers-before.txt"
+helpers_after="$evidence_dir/helpers-after.txt"
 
 mkdir -p "$evidence_dir"
 : > "$samples"
 rm -f "$progress"
 export TEXPDF_STRESS_ITERATIONS="$iterations"
 export TEXPDF_STRESS_PROGRESS="$progress"
+
+/bin/ps -axo pid=,comm= | /usr/bin/awk '
+  tolower($0) ~ /texpdf-helper(\.exe)?$/ { print $1 }
+' | /usr/bin/sort -n > "$helpers_before"
 
 cd "$repo_root"
 /bin/bash ci/run_stata_ci.sh "$profile" &
@@ -68,8 +74,8 @@ while stack:
 
 iteration = 0
 try:
-    iteration = int(progress_path.read_text(encoding="utf-8").strip())
-except (OSError, ValueError):
+    iteration = int(progress_path.read_text(encoding="utf-8").split()[0])
+except (OSError, ValueError, IndexError):
     pass
 
 stata_rss = sum(
@@ -77,8 +83,17 @@ stata_rss = sum(
     for pid in selected
     if "stata" in command.get(pid, "").lower()
 )
+helper_pids = [
+    pid
+    for pid in selected
+    if "texpdf-helper" in command.get(pid, "").lower()
+]
+helper_rss = sum(rss[pid] for pid in helper_pids)
 tree_rss = sum(rss[pid] for pid in selected)
-print(f"{iteration}\t{stata_rss}\t{tree_rss}\t{','.join(map(str, selected))}")
+print(
+    f"{iteration}\t{stata_rss}\t{tree_rss}\t{helper_rss}\t"
+    f"{len(helper_pids)}\t{','.join(map(str, selected))}"
+)
 PY
 }
 
@@ -96,13 +111,22 @@ wait "$runner_pid"
 runner_rc=$?
 set -e
 completed_epoch="$(/bin/date +%s)"
+/bin/sleep 1
+/bin/ps -axo pid=,comm= | /usr/bin/awk '
+  tolower($0) ~ /texpdf-helper(\.exe)?$/ { print $1 }
+' | /usr/bin/sort -n > "$helpers_after"
 
 set +e
-/usr/bin/python3 - "$samples" "$summary" "$iterations" "$runner_rc" "$started_epoch" "$completed_epoch" <<'PY'
+/usr/bin/python3 - \
+  "$samples" "$summary" "$iterations" "$runner_rc" \
+  "$started_epoch" "$completed_epoch" "$progress" \
+  "$helpers_before" "$helpers_after" \
+  ".ci/stata/run/stata.log" <<'PY'
 from __future__ import annotations
 
 from pathlib import Path
 import json
+import hashlib
 import statistics
 import sys
 
@@ -112,11 +136,15 @@ iterations = int(sys.argv[3])
 runner_rc = int(sys.argv[4])
 started = int(sys.argv[5])
 completed = int(sys.argv[6])
+progress_path = Path(sys.argv[7])
+helpers_before_path = Path(sys.argv[8])
+helpers_after_path = Path(sys.argv[9])
+stata_log_path = Path(sys.argv[10])
 
 rows = []
 for line in samples_path.read_text(encoding="utf-8").splitlines():
     parts = line.split("\t")
-    if len(parts) < 5:
+    if len(parts) < 7:
         continue
     try:
         rows.append(
@@ -125,7 +153,9 @@ for line in samples_path.read_text(encoding="utf-8").splitlines():
                 "iteration": int(parts[1]),
                 "stata_rss_kib": int(parts[2]),
                 "tree_rss_kib": int(parts[3]),
-                "pids": parts[4],
+                "helper_rss_kib": int(parts[4]),
+                "helper_count": int(parts[5]),
+                "pids": parts[6],
             }
         )
     except ValueError:
@@ -136,6 +166,7 @@ if not rows:
 
 stata_values = [row["stata_rss_kib"] for row in rows if row["stata_rss_kib"] > 0]
 tree_values = [row["tree_rss_kib"] for row in rows if row["tree_rss_kib"] > 0]
+helper_values = [row["helper_rss_kib"] for row in rows if row["helper_rss_kib"] > 0]
 if not tree_values:
     raise SystemExit("memory stress collected no RSS values")
 
@@ -170,10 +201,43 @@ growth_ratio = (
     else None
 )
 
-# A deliberately loose automated guard catches severe monotone leaks while
-# leaving exact measurements available for engineering review.
-max_allowed_growth_kib = 512 * 1024
+# The compiler now exits after every request. A 64 MiB parent-growth allowance
+# is intentionally far below the old 512 MiB in-process guard while leaving
+# room for Stata allocator/cache noise across a two-hour licensed run.
+max_allowed_growth_kib = 64 * 1024
 growth_gate = growth_kib is not None and growth_kib <= max_allowed_growth_kib
+
+progress_parts = (
+    progress_path.read_text(encoding="utf-8").split()
+    if progress_path.is_file()
+    else []
+)
+successful_compiles = int(progress_parts[0]) if progress_parts else 0
+injected_failures = int(progress_parts[1]) if len(progress_parts) > 1 else 0
+expected_failures = iterations // 25 + 2
+post_error_recovery = (
+    runner_rc == 0
+    and successful_compiles == iterations
+    and injected_failures == expected_failures
+)
+
+
+def pid_set(path: Path) -> set[int]:
+    values = set()
+    for value in path.read_text(encoding="utf-8").split():
+        try:
+            values.add(int(value))
+        except ValueError:
+            pass
+    return values
+
+
+retained_helpers = sorted(pid_set(helpers_after_path) - pid_set(helpers_before_path))
+log_sha256 = (
+    hashlib.sha256(stata_log_path.read_bytes()).hexdigest()
+    if stata_log_path.is_file()
+    else None
+)
 
 payload = {
     "schema_version": 1,
@@ -184,6 +248,10 @@ payload = {
     "stata_sample_count": len(stata_values),
     "peak_stata_rss_kib": max(stata_values) if stata_values else None,
     "peak_tree_rss_kib": max(tree_values),
+    "peak_helper_rss_kib": max(helper_values) if helper_values else None,
+    "helper_sample_count": len(helper_values),
+    "max_concurrent_helpers": max(row["helper_count"] for row in rows),
+    "retained_helper_pids": retained_helpers,
     "warm_window": [warm_lower, warm_upper],
     "late_window": [late_lower, iterations],
     "warm_median_stata_rss_kib": warm_median,
@@ -191,7 +259,22 @@ payload = {
     "post_warmup_growth_kib": growth_kib,
     "post_warmup_growth_ratio": growth_ratio,
     "max_allowed_growth_kib": max_allowed_growth_kib,
-    "growth_gate": growth_gate,
+    "growth_threshold_rationale": (
+        "64 MiB is one eighth of the former in-process allowance and is above "
+        "ordinary Stata allocator/cache noise while still detecting retained "
+        "compiler state in the long-lived parent."
+    ),
+    "successful_compile_count": successful_compiles,
+    "injected_failure_count": injected_failures,
+    "expected_injected_failure_count": expected_failures,
+    "post_error_recovery": post_error_recovery,
+    "stata_log_sha256": log_sha256,
+    "growth_gate": (
+        growth_gate
+        and post_error_recovery
+        and bool(helper_values)
+        and not retained_helpers
+    ),
 }
 summary_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 print(
@@ -202,7 +285,7 @@ print(
         if key not in {"schema_version", "warm_window", "late_window"}
     )
 )
-if runner_rc != 0 or not growth_gate:
+if runner_rc != 0 or not payload["growth_gate"]:
     raise SystemExit(2)
 PY
 analyzer_rc=$?

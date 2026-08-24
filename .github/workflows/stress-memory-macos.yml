@@ -14,6 +14,7 @@ on:
       - ".github/workflows/stress-memory-macos.yml"
       - "ci/run_memory_stress.sh"
       - "ci/stata_stress_1000.do"
+      - "ci/stata_profiles.json"
 
 concurrency:
   group: texpdf-macos-memory-stress
@@ -38,7 +39,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate iteration count and add temporary profile
+      - name: Validate iteration count and committed profile
         id: profile
         continue-on-error: true
         shell: bash
@@ -53,31 +54,17 @@ jobs:
           from pathlib import Path
           import json
 
-          path = Path("ci/stata_profiles.json")
-          data = json.loads(path.read_text(encoding="utf-8"))
-          profiles = data.get("profiles", data)
-          if "quick" not in profiles:
-              raise SystemExit("quick Stata profile is missing")
-          profile = dict(profiles["quick"])
-          suite_keys = [
-              key for key, value in profile.items()
-              if isinstance(value, str) and value.endswith(".do")
-          ]
-          if len(suite_keys) != 1:
-              raise SystemExit(f"cannot identify suite key: {suite_keys}")
-          profile[suite_keys[0]] = "ci/stata_stress_1000.do"
-          marker_keys = [key for key in profile if "marker" in key.lower()]
-          if marker_keys:
-              profile[marker_keys[0]] = ["TEXPDF STRESS 1000 PASS"]
-          else:
-              profile["required_log_markers"] = ["TEXPDF STRESS 1000 PASS"]
-          timeout_keys = [key for key in profile if "timeout" in key.lower()]
-          if timeout_keys:
-              profile[timeout_keys[0]] = 7200
-          profiles["stress1000"] = profile
-          path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          profiles = json.loads(
+              Path("ci/stata_profiles.json").read_text(encoding="utf-8")
+          )["profiles"]
+          profile = profiles.get("stress1000", {})
+          if profile.get("suite") != "ci/stata_stress_1000.do":
+              raise SystemExit("committed stress1000 profile has the wrong suite")
+          if int(profile.get("timeout_seconds", 0)) < 7200:
+              raise SystemExit("committed stress1000 profile timeout is too short")
+          if "TEXPDF STRESS 1000 PASS" not in profile.get("required_log_markers", []):
+              raise SystemExit("committed stress1000 profile lacks its success marker")
           PY
-          git add ci/stata_profiles.json
 
       - name: Build and test the real embedded plugin
         id: build
@@ -133,10 +120,25 @@ jobs:
           import json
 
           data = json.loads(Path(".ci/stata/run/memory-stress.json").read_text(encoding="utf-8"))
-          if data["iterations_requested"] < 1000:
-              raise SystemExit("the qualification run used fewer than 1000 iterations")
-          if data["runner_rc"] != 0 or data["growth_gate"] is not True:
-              raise SystemExit("memory stress gate failed")
+          iterations = data.get("iterations_requested")
+          expected_failures = iterations // 25 + 2 if isinstance(iterations, int) else None
+          required = {
+              "minimum_iterations": isinstance(iterations, int) and iterations >= 1000,
+              "runner_success": data.get("runner_rc") == 0,
+              "growth_gate": data.get("growth_gate") is True,
+              "all_successes_recorded": data.get("successful_compile_count") == iterations,
+              "all_failures_recorded": (
+                  data.get("injected_failure_count") == expected_failures
+                  and data.get("expected_injected_failure_count") == expected_failures
+              ),
+              "post_error_recovery": data.get("post_error_recovery") is True,
+              "helper_observed": int(data.get("helper_sample_count", 0)) > 0,
+              "one_helper_at_a_time": data.get("max_concurrent_helpers") == 1,
+              "no_retained_helpers": data.get("retained_helper_pids") == [],
+          }
+          failures = [name for name, passed in required.items() if not passed]
+          if failures:
+              raise SystemExit("memory stress gate failed: " + ", ".join(failures))
           print("TEXPDF_MEMORY_STRESS_GREEN", data)
           PY
 
@@ -156,6 +158,8 @@ jobs:
           from pathlib import Path
           import json
           import os
+          import platform
+          import re
 
           def load(path: str) -> dict:
               try:
@@ -166,25 +170,57 @@ jobs:
 
           memory = load(".ci/stata/run/memory-stress.json")
           receipt = load(".ci/stata/run/receipt.json")
+          plugin = load(".ci/stata/run/plugin-manifest.json")
+          helper = load(".ci/stata/run/helper-manifest.json")
+          bundle = load(".ci/stata/run/bundle-info.json")
+          package = load(".ci/stata/run/package-manifest.json")
           outcomes = {
               "profile": os.environ.get("PROFILE_OUTCOME", "unknown"),
               "build": os.environ.get("BUILD_OUTCOME", "unknown"),
               "stress": os.environ.get("STRESS_OUTCOME", "unknown"),
               "validate": os.environ.get("VALIDATE_OUTCOME", "unknown"),
           }
+          iterations = memory.get("iterations_requested")
+          expected_failures = iterations // 25 + 2 if isinstance(iterations, int) else None
+          sha_pattern = re.compile(r"[0-9a-f]{64}")
+
+          def valid_sha(value: object) -> bool:
+              return isinstance(value, str) and sha_pattern.fullmatch(value) is not None
+
+          plugin_sha = plugin.get("sha256")
+          helper_sha = helper.get("sha256")
+          bundle_sha = bundle.get("zip_sha256")
           qualified = (
               all(value == "success" for value in outcomes.values())
               and receipt.get("tested_sha") == os.environ["GITHUB_SHA"]
               and receipt.get("status") == "success"
               and receipt.get("stata_status") == "success"
               and receipt.get("rust_status") == "success"
+              and receipt.get("rust_mode") == "repository-engine"
               and receipt.get("profile") == "stress1000"
-              and int(memory.get("iterations_requested", 0)) >= 1000
+              and isinstance(iterations, int)
+              and iterations >= 1000
               and memory.get("runner_rc") == 0
               and memory.get("growth_gate") is True
+              and memory.get("successful_compile_count") == iterations
+              and memory.get("injected_failure_count") == expected_failures
+              and memory.get("expected_injected_failure_count") == expected_failures
+              and memory.get("post_error_recovery") is True
+              and int(memory.get("helper_sample_count", 0)) > 0
+              and memory.get("max_concurrent_helpers") == 1
+              and memory.get("retained_helper_pids") == []
+              and valid_sha(memory.get("stata_log_sha256"))
+              and valid_sha(plugin_sha)
+              and int(plugin.get("size_bytes", 0)) > 0
+              and valid_sha(helper_sha)
+              and int(helper.get("size_bytes", 0)) > 0
+              and valid_sha(bundle_sha)
+              and package.get("plugin_sha256") == plugin_sha
+              and package.get("embedded_helper_sha256") == helper_sha
+              and package.get("bundle_zip_sha256") == bundle_sha
           )
           record = {
-              "schema_version": 2,
+              "schema_version": 3,
               "source_sha": os.environ["GITHUB_SHA"],
               "profile": "stress1000",
               "qualified": qualified,
@@ -196,11 +232,37 @@ jobs:
               "platform": receipt.get("platform"),
               "stata_version": receipt.get("stata_version"),
               "stata_edition": receipt.get("stata_edition"),
+              "process_architecture": platform.machine(),
+              "plugin": {
+                  "sha256": plugin_sha,
+                  "size_bytes": plugin.get("size_bytes"),
+                  "exports": plugin.get("exports"),
+                  "external_dynamic_dependencies": plugin.get(
+                      "external_dynamic_dependencies"
+                  ),
+              },
+              "helper": {
+                  "sha256": helper_sha,
+                  "size_bytes": helper.get("size_bytes"),
+                  "target": helper.get("target"),
+              },
+              "bundle": {
+                  "zip_sha256": bundle_sha,
+                  "zip_size_bytes": bundle.get("zip_size_bytes"),
+                  "content_digest": bundle.get("tectonic_bundle_digest"),
+                  "file_count": bundle.get("file_count"),
+              },
+              "development_package": {
+                  "zip_sha256": package.get("package_zip_sha256"),
+                  "zip_size_bytes": package.get("package_zip_size_bytes"),
+              },
               "memory": memory,
               "qualification_boundary": (
-                  "This records one macOS Apple Silicon licensed-Stata in-process "
-                  "stress attempt. It does not qualify other architectures or rule "
-                  "out every native process-fatal failure mode."
+                  "This records one exact-source macOS Apple Silicon licensed-Stata "
+                  "attempt through the installed plugin into one short-lived helper "
+                  "per request, with the Stata parent held for at least 1000 successful "
+                  "compiles and deliberate error recovery. Other architectures require "
+                  "separate runtime qualification."
               ),
           }
           Path(".ci/stata/run/memory-qualification.json").write_text(
@@ -251,9 +313,28 @@ jobs:
                   {
                       "memory_stress_source_sha": record["source_sha"],
                       "memory_stress_iterations": memory["iterations_requested"],
+                      "memory_stress_successful_compiles": memory["successful_compile_count"],
+                      "memory_stress_injected_failures": memory["injected_failure_count"],
                       "memory_stress_peak_stata_rss_kib": memory["peak_stata_rss_kib"],
+                      "memory_stress_peak_tree_rss_kib": memory["peak_tree_rss_kib"],
+                      "memory_stress_peak_helper_rss_kib": memory["peak_helper_rss_kib"],
+                      "memory_stress_helper_samples": memory["helper_sample_count"],
+                      "memory_stress_retained_helper_pids": memory["retained_helper_pids"],
+                      "memory_stress_warm_median_stata_rss_kib": memory[
+                          "warm_median_stata_rss_kib"
+                      ],
+                      "memory_stress_late_median_stata_rss_kib": memory[
+                          "late_median_stata_rss_kib"
+                      ],
                       "memory_stress_post_warmup_growth_kib": memory["post_warmup_growth_kib"],
                       "memory_stress_growth_ratio": memory["post_warmup_growth_ratio"],
+                      "memory_stress_max_allowed_growth_kib": memory[
+                          "max_allowed_growth_kib"
+                      ],
+                      "memory_stress_post_error_recovery": memory["post_error_recovery"],
+                      "memory_stress_stata_log_sha256": memory["stata_log_sha256"],
+                      "memory_stress_plugin_sha256": record["plugin"]["sha256"],
+                      "memory_stress_helper_sha256": record["helper"]["sha256"],
                       "memory_stress_gate": memory["growth_gate"],
                   }
               )

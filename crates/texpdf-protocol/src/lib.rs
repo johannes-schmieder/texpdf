@@ -246,7 +246,18 @@ fn validate_key(key: &str) -> io::Result<()> {
 }
 
 fn sanitize_value(value: &str) -> String {
-    value.replace('\0', "\\0").replace(['\r', '\n'], " | ")
+    // Result values are interpolated into Stata compound-quoted locals by the
+    // ado layer.  ASCII quotes, macro delimiters, and dollar signs would be
+    // reinterpreted as Stata syntax instead of data.  Preserve readability
+    // with their Unicode presentation forms while keeping every record on one
+    // physical line.
+    value
+        .replace('\0', "\\0")
+        .replace(['\r', '\n', '\t'], " | ")
+        .replace('`', "‘")
+        .replace('\'', "’")
+        .replace('"', "”")
+        .replace('$', "＄")
 }
 
 #[cfg(test)]
@@ -285,10 +296,29 @@ mod tests {
         let directory = tempfile::tempdir().expect("tempdir");
         let path = directory.path().join("result.txt");
         write_result_file(&path, &record).expect("write result");
-        let text = fs::read_to_string(path).expect("read text");
+        let text = fs::read_to_string(&path).expect("read text");
         assert!(text.contains("message=failed | cleanly"));
         assert!(text.contains("diagnostic_count=20"));
         assert!(!text.contains("diagnostic_21_message"));
+    }
+
+    #[test]
+    fn result_values_cannot_inject_stata_macro_or_quote_syntax() {
+        let diagnostics = [Diagnostic {
+            kind: DiagnosticKind::Error,
+            message: "bad `macro' \"quote\" and $global\tcontinued".to_owned(),
+        }];
+        let record = ResultRecord::failure(459, "failed `cleanly'", &diagnostics);
+        let directory = tempfile::tempdir().expect("tempdir");
+        let path = directory.path().join("result.txt");
+        write_result_file(&path, &record).expect("write result");
+        let text = fs::read_to_string(&path).expect("read text");
+        assert!(text.contains("message=failed ‘cleanly’"));
+        assert!(text.contains("bad ‘macro’ ”quote” and ＄global | continued"));
+        assert!(!text
+            .chars()
+            .any(|character| { matches!(character, '`' | '\'' | '"' | '$' | '\t') }));
+        read_result_file(&path).expect("sanitized result remains valid");
     }
 
     #[test]
