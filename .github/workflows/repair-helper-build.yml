@@ -1,0 +1,135 @@
+name: Repair and preflight embedded helper build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/repair-helper-build.yml"
+
+concurrency:
+  group: texpdf-repair-helper-build
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 120
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply narrow source repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          manifest = Path("crates/texpdf-helper/Cargo.toml")
+          text = manifest.read_text(encoding="utf-8")
+          if "[dev-dependencies]" not in text:
+              text = text.rstrip() + "\n\n[dev-dependencies]\ntempfile.workspace = true\n"
+          elif "tempfile.workspace" not in text:
+              text = text.replace(
+                  "[dev-dependencies]\n",
+                  "[dev-dependencies]\ntempfile.workspace = true\n",
+                  1,
+              )
+          manifest.write_text(text, encoding="utf-8")
+
+          source = Path("crates/texpdf-helper/src/main.rs")
+          text = source.read_text(encoding="utf-8")
+          text = text.replace(
+              "PathBuf::from(&arguments[1]),\n        PathBuf::from(&arguments[2]),",
+              "PathBuf::from(arguments[1].clone()),\n        PathBuf::from(arguments[2].clone()),",
+          )
+          anchor = "    let diagnostics = convert_diagnostics(&result.diagnostics);\n"
+          if "let warning_count = result.warning_count();" not in text:
+              if anchor not in text:
+                  raise SystemExit("cannot locate helper diagnostic anchor")
+              text = text.replace(
+                  anchor,
+                  anchor + "    let warning_count = result.warning_count();\n",
+                  1,
+              )
+          text = text.replace(
+              '("warnings".to_owned(), result.warning_count().to_string()),',
+              '("warnings".to_owned(), warning_count.to_string()),',
+          )
+          source.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Lock, format, lint, and test the active workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup_bin="${RUSTUP_BIN:-/opt/homebrew/bin/rustup}"
+          cargo_bin="$($rustup_bin which --toolchain 1.97.1 cargo)"
+          export RUSTC="$($rustup_bin which --toolchain 1.97.1 rustc)"
+          export PATH="$(dirname "$cargo_bin"):/opt/homebrew/bin:/usr/local/bin:$PATH"
+          export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/private/tmp/texpdf-cargo-target}"
+          "$cargo_bin" metadata --format-version 1 >/dev/null
+          /usr/bin/python3 tools/prepare_stub_bundle.py
+          source tools/prepare_native_deps.sh
+          "$cargo_bin" fmt --all
+          "$cargo_bin" fmt --all --check
+          "$cargo_bin" clippy --locked --workspace --all-targets --all-features -- -D warnings
+          "$cargo_bin" test --locked --package texpdf-protocol --all-targets
+          "$cargo_bin" test --locked --package texpdf-helper --all-targets
+          "$cargo_bin" test --locked --package texpdf-stata --all-targets
+
+      - name: Build helper and plugin in release mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup_bin="${RUSTUP_BIN:-/opt/homebrew/bin/rustup}"
+          cargo_bin="$($rustup_bin which --toolchain 1.97.1 cargo)"
+          export RUSTC="$($rustup_bin which --toolchain 1.97.1 rustc)"
+          export PATH="$(dirname "$cargo_bin"):/opt/homebrew/bin:/usr/local/bin:$PATH"
+          export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/private/tmp/texpdf-cargo-target}"
+          source tools/prepare_native_deps.sh
+          "$cargo_bin" build --locked --release --package texpdf-helper
+          helper="$CARGO_TARGET_DIR/release/texpdf-helper"
+          test -x "$helper"
+          TEXPDF_HELPER_PATH="$helper" \
+            "$cargo_bin" build --locked --release --package texpdf-stata
+          test -f "$CARGO_TARGET_DIR/release/libtexpdf_stata.dylib"
+
+      - name: Commit green helper source and remove temporary gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/update-helper-lock.yml
+          rm -f .github/workflows/update-helper-lock-v2.yml
+          rm -f .github/workflows/format-helper-source.yml
+          rm -f .github/workflows/repair-helper-build.yml
+          git add Cargo.lock Cargo.toml crates ci/run_rust_quick.sh .github/workflows/stata-ci.yml
+          git add -u .github/workflows/update-helper-lock.yml \
+            .github/workflows/update-helper-lock-v2.yml \
+            .github/workflows/format-helper-source.yml \
+            .github/workflows/repair-helper-build.yml || true
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(helper): preflight isolated compiler build"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep "$attempt"
+          done
+          exit 1
