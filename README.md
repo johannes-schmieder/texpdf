@@ -16,10 +16,15 @@ toolchain, package download, or network connection.
 ## Project state
 
 The macOS Apple Silicon implementation is a qualified pre-release candidate
-under licensed Stata/MP 18. The most recent exact green product checkpoint is
-`a42f29fbeefd41811475d47e066e1ffea5290bfd`.
+under licensed Stata/MP 18.
 
-Its measured artifacts are:
+The current exact green source checkpoint is
+`90101fa26ef06cea0ffa7e241b4230a1d0fe62a9`. The current generated artifact
+record was produced from source `a42f29fbeefd41811475d47e066e1ffea5290bfd`.
+Keeping these identifiers separate prevents a newer green source receipt from
+being mistaken for a byte-for-byte artifact measurement.
+
+Measured artifacts:
 
 | Artifact | Exact size |
 |---|---:|
@@ -27,22 +32,23 @@ Its measured artifacts are:
 | Standalone ARM64 plugin | 49,997,392 bytes (47.68 MiB) |
 | Stata installation ZIP | 23,475,982 bytes (22.39 MiB) |
 
-That checkpoint passed Rust formatting, strict Clippy, workspace tests, native
-plugin construction, licensed Stata compilation, local `net install`, the
-academic package corpus, and 100 in-process compile calls with injected TeX
+The exact green source passed Rust formatting, strict Clippy, workspace tests,
+native plugin construction, licensed Stata compilation, local `net install`,
+the academic package corpus, and 100 in-process compile calls with injected TeX
 failures.
 
 This is not yet a public v1 release. Remaining gates are the complete
-third-party license/notices inventory, high-iteration memory/safety review, and
-actual Stata runtime qualification on macOS Intel, Windows, and Linux.
+third-party license/notices inventory, high-iteration memory/safety review,
+macOS universal/Intel qualification, and actual Stata runtime qualification on
+Windows and Linux.
 
 See:
 
-- [`STATUS.md`](STATUS.md) — current branch and qualification state;
+- [`STATUS.md`](STATUS.md) — current source, artifact, and release state;
 - [`PLAN.md`](PLAN.md) — remaining v1 work in execution order;
 - [`IMPLEMENTATION.md`](IMPLEMENTATION.md) — durable architecture and evidence;
 - [`docs/README.md`](docs/README.md) — documentation index;
-- [`docs/generated/CURRENT_ARTIFACT.md`](docs/generated/CURRENT_ARTIFACT.md) — exact current qualified measurements;
+- [`docs/generated/CURRENT_ARTIFACT.md`](docs/generated/CURRENT_ARTIFACT.md) — exact artifact measurements;
 - [`release/targets.json`](release/targets.json) — platform qualification registry.
 
 ## Command behavior
