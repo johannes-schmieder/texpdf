@@ -1,0 +1,235 @@
+name: Complete macOS implementation milestone
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - STATUS.md
+      - ".github/workflows/complete-implementation.yml"
+
+concurrency:
+  group: texpdf-complete-implementation
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  complete:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 120
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: quick
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Select action
+        id: state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if [[ -f IMPLEMENTATION.md ]] &&
+             ! /usr/bin/grep -q 'Final cleaned source SHA: pending' IMPLEMENTATION.md; then
+            echo "action=cleanup" >> "$GITHUB_OUTPUT"
+          elif /usr/bin/grep -q '^## Exact qualified checkpoint' STATUS.md 2>/dev/null &&
+               /usr/bin/grep -q '^## Development installation artifact' STATUS.md 2>/dev/null &&
+               /usr/bin/grep -q '^## Real-engine path and recovery validation' STATUS.md 2>/dev/null &&
+               [[ ! -f ci/FULL_ENGINE ]]; then
+            echo "action=complete" >> "$GITHUB_OUTPUT"
+          else
+            echo "action=wait" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Remove redundant completion workflow
+        if: ${{ steps.state.outputs.action == 'cleanup' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/complete-implementation.yml
+          git add -u .github/workflows/complete-implementation.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "ci: remove completed implementation gate [skip ci]"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
+
+      - name: Write implementation boundary and clean transient workflows
+        if: ${{ steps.state.outputs.action == 'complete' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          status = Path("STATUS.md").read_text(encoding="utf-8")
+          match = re.search(r"^- Source SHA: `([0-9a-f]{40})`$", status, re.MULTILINE)
+          if not match:
+              raise SystemExit("cannot identify exact full-engine source SHA from STATUS.md")
+          engine_sha = match.group(1)
+          receipt_path = Path(f".ci/stata/results/{engine_sha}.json")
+          if not receipt_path.is_file():
+              raise SystemExit("exact full-engine receipt is missing")
+          receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+          qualification = json.loads(Path("bundle/QUALIFICATION.json").read_text(encoding="utf-8"))
+          required = {
+              "tested_sha": engine_sha,
+              "status": "success",
+              "stata_status": "success",
+              "rust_status": "success",
+              "rust_mode": "repository-engine",
+          }
+          for key, expected in required.items():
+              if receipt.get(key) != expected:
+                  raise SystemExit(
+                      f"full-engine receipt mismatch for {key}: "
+                      f"expected {expected!r}, got {receipt.get(key)!r}"
+                  )
+
+          implementation = f'''# texpdf implementation record
+
+Updated: 2026-08-24
+
+## Implemented product
+
+`texpdf` is a compiler-only Stata package with the public interface:
+
+```stata
+texpdf using filename.tex [, saving(filename.pdf) replace]
+texpdf, version
+```
+
+The macOS Apple Silicon build is one native Stata plugin containing the
+Tectonic engine and its embedded ZIP resource bundle. Runtime compilation does
+not invoke a TeX executable, read a system TeX tree, download packages, or
+require a network connection.
+
+## Exact real-engine qualification
+
+- Full-engine source SHA: `{engine_sha}`
+- Profile: `{receipt["profile"]}`
+- Overall/Stata/Rust: `{receipt["status"]}` / `{receipt["stata_status"]}` / `{receipt["rust_status"]}`
+- Rust mode: `{receipt.get("rust_mode")}`
+- Platform: `{receipt.get("platform", "")}`
+- Tectonic: `0.17.0`
+- Resource bundle: `{qualification["bundle_name"]}` v`{qualification["bundle_version"]}`
+- Embedded ZIP bytes: `{qualification["zip_size_bytes"]}`
+- Plugin bytes: `{qualification.get("plugin_size_bytes", "not recorded")}`
+- Bundle ZIP SHA-256: `{qualification["zip_sha256"]}`
+- Plugin SHA-256: `{qualification.get("plugin_sha256", "not recorded")}`
+
+That receipt required a real licensed-Stata compile with mathematics,
+`booktabs`, `hyperref`, natbib, and internal BibTeX processing.
+
+## Additional qualified behavior
+
+- deterministic Stata installation tree and ZIP assembly;
+- local `net install` followed by a real PDF compile;
+- spaces and Unicode in source/output paths;
+- relative `\\input` resolution;
+- overwrite protection and `replace` behavior;
+- preservation of an existing PDF when a replacement compile fails;
+- recoverable TeX errors without losing the Stata process;
+- repeated in-process compilation;
+- manual 1--10,000-call stress workflow;
+- structured result schema, diagnostics, and panic containment at the ABI boundary.
+
+## Final cleaned repository receipt
+
+Final cleaned source SHA: pending
+Final quick CI status: pending
+Final licensed Stata status: pending
+Final Rust status: pending
+
+The next immutable receipt covers the cleaned development state after temporary
+qualification markers and one-shot workflows are removed.
+
+## Qualification boundary
+
+This is a macOS Apple Silicon / Stata 18 implementation milestone, not a public
+cross-platform v1 release. Public binary distribution remains blocked until the
+embedded package/font license inventory is complete. Windows x86-64, Linux
+x86-64, and macOS Intel/universal plugins still require native builds and Stata
+runtime qualification.
+'''
+          Path("IMPLEMENTATION.md").write_text(implementation, encoding="utf-8")
+          Path("IMPLEMENTATION_PENDING").write_text(
+              "awaiting exact quick receipt for the cleaned source commit\n",
+              encoding="utf-8",
+          )
+
+          status_heading = "## Implementation milestone"
+          if status_heading in status:
+              status = status[: status.index(status_heading)].rstrip() + "\n"
+          status += f'''\n{status_heading}
+
+The compiler-only macOS Apple Silicon milestone is implemented. See
+`IMPLEMENTATION.md` for the exact real-engine qualification, installed-package
+validation, remaining public-release blockers, and the final cleaned-source
+receipt once published.
+'''
+          Path("STATUS.md").write_text(status, encoding="utf-8")
+
+          removable = (
+              ".github/workflows/repair-bridge.yml",
+              ".github/workflows/implement-stata-package.yml",
+              ".github/workflows/qualify-full-engine.yml",
+              ".github/workflows/qualify-full-engine-v2.yml",
+              ".github/workflows/finalize-full-engine.yml",
+              ".github/workflows/finalize-full-engine-v2.yml",
+              ".github/workflows/complete-macos-package.yml",
+              ".github/workflows/complete-macos-package-v2.yml",
+              ".github/workflows/complete-validation.yml",
+              ".github/workflows/complete-validation-v2.yml",
+              ".github/workflows/complete-implementation.yml",
+          )
+          for path in removable:
+              Path(path).unlink(missing_ok=True)
+          PY
+
+          git add IMPLEMENTATION.md IMPLEMENTATION_PENDING STATUS.md
+          git add -u .github/workflows || true
+
+      - name: Run cleaned quick regression preflight
+        if: ${{ steps.state.outputs.action == 'complete' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/record_rust_quick.sh
+          /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+          /bin/bash ci/run_stata_ci.sh quick
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success
+
+      - name: Commit cleaned implementation milestone
+        if: ${{ steps.state.outputs.action == 'complete' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset -- stata/_texpdf_plugin.plugin 2>/dev/null || true
+          rm -f stata/_texpdf_plugin.plugin
+          rm -rf .ci/stata/run bundle/generated
+          git add -u
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: complete macOS compiler implementation milestone"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
