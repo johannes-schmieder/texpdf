@@ -1,0 +1,162 @@
+{
+  "cargo": {
+    "license_expressions": [
+      "(Apache-2.0 OR MIT) AND BSD-3-Clause",
+      "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "0BSD OR MIT OR Apache-2.0",
+      "Apache-2.0",
+      "Apache-2.0 / MIT",
+      "Apache-2.0 AND ISC",
+      "Apache-2.0 OR ISC OR MIT",
+      "Apache-2.0 OR MIT",
+      "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "BSD-3-Clause",
+      "CC0-1.0",
+      "CC0-1.0 OR MIT-0 OR Apache-2.0",
+      "CDLA-Permissive-2.0",
+      "ISC",
+      "ISC AND (Apache-2.0 OR ISC)",
+      "ISC AND (Apache-2.0 OR ISC) AND Apache-2.0 AND MIT AND BSD-3-Clause AND (Apache-2.0 OR ISC OR MIT) AND (Apache-2.0 OR ISC OR MIT-0)",
+      "MIT",
+      "MIT OR Apache-2.0",
+      "MIT OR Apache-2.0 OR LGPL-2.1-or-later",
+      "MIT OR Apache-2.0 OR Zlib",
+      "MIT OR Zlib OR Apache-2.0",
+      "MIT/Apache-2.0",
+      "MPL-2.0",
+      "Unicode-3.0",
+      "Unlicense OR MIT",
+      "Unlicense/MIT",
+      "Zlib",
+      "Zlib OR Apache-2.0 OR MIT"
+    ],
+    "missing_license_metadata": 0,
+    "package_count": 448,
+    "third_party_package_count": 445,
+    "workspace_package_count": 3
+  },
+  "curated_manifest_file_count": 0,
+  "dependency_undeclared_count": 0,
+  "missing_native_notice_files": 0,
+  "missing_rust_notice_files": 40,
+  "pipeline_complete": false,
+  "qualification_boundary": "This status records the audit pipeline even when a stage fails. Public binary publication remains blocked unless release_license_complete is true.",
+  "release_license_complete": false,
+  "resource_count_matches_manifest": false,
+  "schema_version": 2,
+  "source_sha": "9d956b07b7577613b70f5f7efa9b322bdd74310f",
+  "stage_return_codes": {
+    "cargo_inventory": 0,
+    "collect_license_texts": 1,
+    "dependency_inventory": 0,
+    "download_tlpdb": 0,
+    "prepare_native_dependencies": 0,
+    "prepare_rust_toolchain": 0,
+    "tex_inventory": 1
+  },
+  "stages": [
+    {
+      "name": "prepare_rust_toolchain",
+      "return_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "cargo=/Users/johannes/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/cargo\nrustc=/Users/johannes/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "command": [
+        "/bin/bash",
+        "-c",
+        "\nset -euo pipefail\nsource tools/prepare_native_deps.sh\n/usr/bin/python3 - \"$TEXPDF_NATIVE_ENV_PATH\" <<'PYENV'\nfrom pathlib import Path\nimport json\nimport os\nimport sys\nkeys = (\"VCPKG_ROOT\", \"VCPKGRS_TRIPLET\", \"TECTONIC_DEP_BACKEND\", \"PATH\", \"RUSTC\")\nPath(sys.argv[1]).write_text(\n    json.dumps({key: os.environ.get(key, \"\") for key in keys}, indent=2, sort_keys=True) + \"\\n\",\n    encoding=\"utf-8\",\n)\nPYENV\n"
+      ],
+      "name": "prepare_native_dependencies",
+      "return_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_PKGCONF_READY version=2.5.1 path=/private/tmp/texpdf-pkgconf-4fc570f91d9d/bin/pkg-config\nTEXPDF_NATIVE_DEPS_READY host=aarch64-apple-darwin triplet=arm64-osx root=/private/tmp/texpdf-vcpkg-a62ce77d56ee"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "tools/generate_license_inventory.py",
+        "--manifest",
+        "bundle/curated-manifest.json",
+        "--tlpdb",
+        "/private/tmp/texpdf-license-cache/texlive-2022-final.tlpdb.xz",
+        "--overrides",
+        "bundle/license-overrides.toml",
+        "--output",
+        "licenses/generated/tex-resources.json",
+        "--markdown",
+        "licenses/generated/tex-resources.md",
+        "--strict"
+      ],
+      "name": "tex_inventory",
+      "return_code": 1,
+      "stderr_tail": "Traceback (most recent call last):\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 401, in <module>\n    raise SystemExit(main())\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 378, in main\n    manifest = json.loads(args.manifest.read_text(encoding=\"utf-8\"))\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1256, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors) as f:\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1242, in open\n    return io.open(self, mode, buffering, encoding, errors, newline,\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1110, in _opener\n    return self._accessor.open(self, flags, mode)\nFileNotFoundError: [Errno 2] No such file or directory: 'bundle/curated-manifest.json'",
+      "stdout_tail": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "tools/generate_cargo_license_inventory.py",
+        "--output",
+        "licenses/generated/cargo.json",
+        "--markdown",
+        "licenses/generated/cargo.md",
+        "--strict"
+      ],
+      "name": "cargo_inventory",
+      "return_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_CARGO_LICENSE_INVENTORY package_count=448 workspace_package_count=3 third_party_package_count=445 missing_license_metadata=0"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "tools/generate_dependency_inventory.py",
+        "--json",
+        "licenses/generated/dependencies.json",
+        "--markdown",
+        "licenses/generated/dependencies.md",
+        "--require-declared"
+      ],
+      "name": "dependency_inventory",
+      "return_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_DEPENDENCY_INVENTORY_READY rust_packages=448 native_libraries=7 undeclared=0"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "tools/collect_dependency_license_texts.py",
+        "--output-root",
+        "licenses/generated/texts",
+        "--manifest",
+        "licenses/generated/license-texts.json",
+        "--vcpkg-root",
+        "/private/tmp/texpdf-vcpkg-a62ce77d56ee",
+        "--triplet",
+        "arm64-osx",
+        "--require-native"
+      ],
+      "name": "collect_license_texts",
+      "return_code": 1,
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_LICENSE_TEXTS_READY rust=448 native=7 missing_rust=40 missing_native=0"
+    },
+    {
+      "error": "",
+      "name": "download_tlpdb",
+      "path": "/private/tmp/texpdf-license-cache/texlive-2022-final.tlpdb.xz",
+      "return_code": 0,
+      "sha256": "be6ec39a41ff875f37a4dfaab75a75c19ea9793d9370c93f69ed27097b02a0cc",
+      "size_bytes": 2451736,
+      "url": "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb.xz"
+    }
+  ],
+  "tex_resources": {},
+  "tlpdb": {
+    "sha256": "be6ec39a41ff875f37a4dfaab75a75c19ea9793d9370c93f69ed27097b02a0cc",
+    "size_bytes": 2451736,
+    "url": "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb.xz"
+  }
+}
