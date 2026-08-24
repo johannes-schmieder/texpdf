@@ -1,6 +1,6 @@
 # texpdf release-readiness audit
 
-macOS ARM64 implementation qualified: **false**
+macOS ARM64 implementation qualified: **true**
 Private macOS universal candidate ready: **false**
 Public cross-platform v1 ready: **false**
 
@@ -12,7 +12,7 @@ Public cross-platform v1 ready: **false**
 | `package_file_stata.toc` | PASS | no | no | stata/stata.toc |
 | `cargo_lock` | PASS | no | no | Cargo.lock is committed |
 | `target_registry` | PASS | no | no | target count=4 |
-| `macos_arm_runtime` | FAIL | yes | yes | source=6fc34a9335a2328d0a13729151975811239910c6; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
+| `macos_arm_runtime` | PASS | no | no | source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=98532016; arm_runtime=True |
 | `macos_intel_build` | PASS | no | no | source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49098680 |
 | `macos_intel_runtime` | FAIL | yes | yes | Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed |
@@ -22,23 +22,19 @@ Public cross-platform v1 ready: **false**
 | `x86_64-unknown-linux-gnu_build` | FAIL | no | no | native build and Stata runtime qualification pending |
 | `x86_64-unknown-linux-gnu_runtime` | FAIL | no | yes | native build and Stata runtime qualification pending |
 | `third_party_license_complete` | PASS | no | no | source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
-| `macos_arm_memory_stress` | FAIL | yes | yes | source=e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1; iterations=1000; peak_rss_kib=72304; post_warmup_growth_kib=16; growth_ratio=1.0002213368747233 |
+| `macos_arm_memory_stress` | PASS | no | no | source=e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1; iterations=1000; peak_rss_kib=72304; post_warmup_growth_kib=16; growth_ratio=1.0002213368747233 |
 | `release_scope` | PASS | no | no | kind=private_release_candidate; version=0.1.0-rc.1; required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin'] |
 | `public_distribution` | FAIL | no | yes | public repository and net-install publication are deferred by owner decision |
 
 ## Active private-candidate blockers
 
-- `macos_arm_runtime`
 - `macos_intel_runtime`
 - `private_candidate_package`
-- `macos_arm_memory_stress`
 
 ## Deferred public-release blockers
 
-- `macos_arm_runtime`
 - `macos_intel_runtime`
 - `private_candidate_package`
 - `x86_64-pc-windows-msvc_runtime`
 - `x86_64-unknown-linux-gnu_runtime`
-- `macos_arm_memory_stress`
 - `public_distribution`

@@ -1,9 +1,7 @@
 {
   "candidate_blockers": [
-    "macos_arm_runtime",
     "macos_intel_runtime",
-    "private_candidate_package",
-    "macos_arm_memory_stress"
+    "private_candidate_package"
   ],
   "candidate_ready": false,
   "candidate_version": "0.1.0-rc.1",
@@ -57,12 +55,12 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "source=6fc34a9335a2328d0a13729151975811239910c6; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
+      "candidate_release_blocker": false,
+      "detail": "source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": false,
@@ -137,12 +135,12 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
+      "candidate_release_blocker": false,
       "detail": "source=e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1; iterations=1000; peak_rss_kib=72304; post_warmup_growth_kib=16; growth_ratio=1.0002213368747233",
       "key": "macos_arm_memory_stress",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": false,
@@ -161,22 +159,18 @@
       "release_blocker": false
     }
   ],
-  "implementation_complete_macos_arm64": false,
+  "implementation_complete_macos_arm64": true,
   "public_release_blockers": [
-    "macos_arm_runtime",
     "macos_intel_runtime",
     "private_candidate_package",
     "x86_64-pc-windows-msvc_runtime",
     "x86_64-unknown-linux-gnu_runtime",
-    "macos_arm_memory_stress",
     "public_distribution"
   ],
   "public_release_ready": false,
   "release_blockers": [
-    "macos_arm_runtime",
     "macos_intel_runtime",
-    "private_candidate_package",
-    "macos_arm_memory_stress"
+    "private_candidate_package"
   ],
   "release_kind": "private_release_candidate",
   "schema_version": 3
