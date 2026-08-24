@@ -3,18 +3,23 @@
   "targets": {
     "aarch64-apple-darwin": {
       "artifact": "_texpdf_plugin.plugin",
-      "plugin_sha256": "",
-      "qualified_source_sha": "5d85840783ad4406a1606e5b3af09a06cca2f657",
+      "bundle_zip_sha256": "05688ffcca2e82a12143c836708e3dc3b811a30dbe2b74caf951eb7b409792ab",
+      "bundle_zip_size_bytes": 6690289,
+      "platform": "Unix; Mac (Apple Silicon)",
+      "plugin_sha256": "185e4094c0d9835af199a3602fa8cd6ffa62a0da09c43c7267018b8ecb622298",
+      "plugin_size_bytes": 49997392,
       "qualification_profile": "quick",
+      "qualified_source_sha": "b033aeff0f36dd79c4331abe15e0638badf4a9a9",
+      "stata_edition": "MP",
       "stata_runtime_qualified": true,
       "stata_version": "18",
-      "status": "qualified development checkpoint; final cleaned artifact digest pending"
+      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run"
     },
     "x86_64-apple-darwin": {
       "artifact": "_texpdf_plugin.plugin",
       "plugin_sha256": "",
-      "qualified_source_sha": "",
       "qualification_profile": "",
+      "qualified_source_sha": "",
       "stata_runtime_qualified": false,
       "stata_version": "",
       "status": "native build and Stata runtime qualification pending"
@@ -22,8 +27,8 @@
     "x86_64-pc-windows-msvc": {
       "artifact": "_texpdf_plugin.plugin",
       "plugin_sha256": "",
-      "qualified_source_sha": "",
       "qualification_profile": "",
+      "qualified_source_sha": "",
       "stata_runtime_qualified": false,
       "stata_version": "",
       "status": "native build and Stata runtime qualification pending"
@@ -31,8 +36,8 @@
     "x86_64-unknown-linux-gnu": {
       "artifact": "_texpdf_plugin.plugin",
       "plugin_sha256": "",
-      "qualified_source_sha": "",
       "qualification_profile": "",
+      "qualified_source_sha": "",
       "stata_runtime_qualified": false,
       "stata_version": "",
       "status": "native build and Stata runtime qualification pending"
