@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "reviewed_by": "",
+  "reviewed_at": "",
+  "mappings": {},
+  "standalone_resources": {},
+  "notes": "Mappings are applied only after manual review. Each entry must identify an existing unresolved or ambiguous embedded resource and provide an upstream package/license basis."
+}
