@@ -36,7 +36,7 @@
     "third_party_package_count": 445,
     "workspace_package_count": 3
   },
-  "curated_manifest_file_count": 0,
+  "curated_manifest_file_count": 556,
   "dependency_undeclared_count": 0,
   "missing_native_notice_files": 0,
   "missing_rust_notice_files": 37,
@@ -45,7 +45,7 @@
   "release_license_complete": false,
   "resource_count_matches_manifest": false,
   "schema_version": 2,
-  "source_sha": "53d74f491fc5c6813c2e27fac6f35ffcb3f05919",
+  "source_sha": "3dc6fe61fb0ef1380bdf0c90973d123e433cbe23",
   "stage_return_codes": {
     "cargo_inventory": 0,
     "collect_license_texts": 1,
@@ -91,7 +91,7 @@
       ],
       "name": "tex_inventory",
       "return_code": 1,
-      "stderr_tail": "Traceback (most recent call last):\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 401, in <module>\n    raise SystemExit(main())\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 378, in main\n    manifest = json.loads(args.manifest.read_text(encoding=\"utf-8\"))\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1256, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors) as f:\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1242, in open\n    return io.open(self, mode, buffering, encoding, errors, newline,\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1110, in _opener\n    return self._accessor.open(self, flags, mode)\nFileNotFoundError: [Errno 2] No such file or directory: 'bundle/curated-manifest.json'",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 401, in <module>\n    raise SystemExit(main())\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 382, in main\n    load_overrides(args.overrides),\n  File \"/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py\", line 172, in load_overrides\n    import tomllib\nModuleNotFoundError: No module named 'tomllib'",
       "stdout_tail": ""
     },
     {

@@ -1,6 +1,6 @@
 # Third-party license audit status
 
-- Source SHA: `53d74f491fc5c6813c2e27fac6f35ffcb3f05919`
+- Source SHA: `3dc6fe61fb0ef1380bdf0c90973d123e433cbe23`
 - Pipeline complete: **false**
 - Release-license complete: **false**
 - Embedded resources: unavailable
@@ -19,7 +19,7 @@
 |---|---:|---|
 | `prepare_rust_toolchain` | 0 |  |
 | `prepare_native_dependencies` | 0 |  |
-| `tex_inventory` | 1 | rate_license_inventory.py", line 401, in <module>     raise SystemExit(main())   File "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py", line 378, in main     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))   File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1256, in read_text     with self.open(mode='r', encoding=encoding, errors=errors) as f:   File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1242, in open     return io.open(self, mode, buffering, encoding, errors, newline,   File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1110, in _opener     return self._accessor.open(self, flags, mode) FileNotFoundError: [Errno 2] No such file or directory: 'bundle/curated-manifest.json' |
+| `tex_inventory` | 1 | Traceback (most recent call last):   File "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py", line 401, in <module>     raise SystemExit(main())   File "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py", line 382, in main     load_overrides(args.overrides),   File "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/tools/generate_license_inventory.py", line 172, in load_overrides     import tomllib ModuleNotFoundError: No module named 'tomllib' |
 | `cargo_inventory` | 0 |  |
 | `dependency_inventory` | 0 |  |
 | `collect_license_texts` | 1 |  |
