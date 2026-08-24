@@ -74,7 +74,9 @@ fn run() -> Result<(), String> {
         let metadata = fs::metadata(&result.output)
             .map_err(|error| format!("cannot inspect output {:?}: {error}", result.output))?;
         if metadata.len() < 5 {
-            return Err(format!("compile {iteration} produced an implausibly small PDF"));
+            return Err(format!(
+                "compile {iteration} produced an implausibly small PDF"
+            ));
         }
         if iteration % 5 == 0 || iteration == iterations {
             if let Some(path) = &progress {
