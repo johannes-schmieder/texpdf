@@ -10,14 +10,20 @@
     "smoke": {
       "suite": "ci/stata_smoke.do",
       "arguments": [],
-      "timeout_seconds": 600,
-      "required_log_markers": ["TEXPDF STATA MATA SMOKE PASS"]
+      "timeout_seconds": 1200,
+      "required_log_markers": [
+        "TEXPDF FULL ENGINE STATA PASS",
+        "TEXPDF STATA MATA SMOKE PASS"
+      ]
     },
     "quick": {
       "suite": "ci/stata_smoke.do",
       "arguments": [],
-      "timeout_seconds": 600,
-      "required_log_markers": ["TEXPDF STATA MATA SMOKE PASS"]
+      "timeout_seconds": 1200,
+      "required_log_markers": [
+        "TEXPDF FULL ENGINE STATA PASS",
+        "TEXPDF STATA MATA SMOKE PASS"
+      ]
     }
   },
   "stata_plus_files": []

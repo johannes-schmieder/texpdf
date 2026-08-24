@@ -37,8 +37,6 @@ def verify_symbols(path: Path) -> list[str]:
     elif sys.platform.startswith("linux"):
         command = ["nm", "-D", "--defined-only", str(path)]
     else:
-        # The Windows release workflow will perform the equivalent dumpbin
-        # check once the MSVC build lane is introduced.
         return ["pginit", "stata_call"]
 
     result = subprocess.run(command, check=True, text=True, capture_output=True)
@@ -47,6 +45,29 @@ def verify_symbols(path: Path) -> list[str]:
     if missing:
         raise RuntimeError(f"native library is missing exports: {', '.join(missing)}")
     return ["pginit", "stata_call"]
+
+
+def dynamic_dependencies(path: Path) -> tuple[list[str], list[str]]:
+    if sys.platform != "darwin":
+        return [], []
+    result = subprocess.run(
+        ["/usr/bin/otool", "-L", str(path)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    dependencies: list[str] = []
+    for line in result.stdout.splitlines()[1:]:
+        value = line.strip().split(" (compatibility version", 1)[0]
+        if value:
+            dependencies.append(value)
+    external = [
+        value
+        for value in dependencies
+        if not value.startswith("/usr/lib/")
+        and not value.startswith("/System/Library/")
+    ]
+    return dependencies, external
 
 
 def write_json_atomic(path: Path, payload: dict[str, object]) -> None:
@@ -85,6 +106,12 @@ def main() -> int:
     os.replace(temporary, args.output)
     try:
         exports = verify_symbols(args.output)
+        dependencies, external_dependencies = dynamic_dependencies(args.output)
+        if external_dependencies:
+            raise RuntimeError(
+                "plugin has non-system dynamic dependencies: "
+                + ", ".join(external_dependencies)
+            )
     except (OSError, subprocess.CalledProcessError, RuntimeError) as exc:
         args.output.unlink(missing_ok=True)
         print(f"TEXPDF_PLUGIN_STAGE_ERROR {exc}", file=sys.stderr)
@@ -98,11 +125,14 @@ def main() -> int:
         "sha256": sha256_file(args.output),
         "platform": sys.platform,
         "exports": exports,
+        "dynamic_dependencies": dependencies,
+        "external_dynamic_dependencies": external_dependencies,
     }
     write_json_atomic(args.manifest, payload)
     print(
         "TEXPDF_PLUGIN_READY "
-        f"path={args.output} size_bytes={payload['size_bytes']} sha256={payload['sha256']}",
+        f"path={args.output} size_bytes={payload['size_bytes']} sha256={payload['sha256']} "
+        f"dynamic_dependencies={len(dependencies)} external_dynamic_dependencies=0",
         flush=True,
     )
     return 0

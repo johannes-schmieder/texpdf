@@ -44,4 +44,37 @@ capture noisily texpdf using `"`source'"', saving(`"`output'"')
 assert _rc == 602
 
 display as result "TEXPDF STATA COMMAND SMOKE PASS"
+
+capture confirm file `"`repo'/ci/FULL_ENGINE"'
+if !_rc {
+    tempfile compiled
+    local compiled_pdf `"`compiled'.pdf"'
+    texpdf using `"`repo'/tests/fixtures/academic.tex"', saving(`"`compiled_pdf'"') replace
+    confirm file `"`compiled_pdf'"'
+    assert `"`r(engine)'"' == "tectonic"
+    assert `"`r(engine_version)'"' == "0.17.0"
+    assert strlen(`"`r(bundle_digest)'"') == 64
+    assert strlen(`"`r(bundle_zip_sha256)'"') == 64
+    assert r(warnings) >= 0
+
+    tempfile bad badpdf
+    file open `handle' using `"`bad'"', write text replace
+    file write `handle' "\documentclass{article}\begin{document}\undefinedcontrolsequence\end{document}" _n
+    file close `handle'
+    capture noisily texpdf using `"`bad'"', saving(`"`badpdf'.pdf"') replace
+    assert _rc == 459
+    capture confirm file `"`badpdf'.pdf"'
+    assert _rc != 0
+
+    * A recoverable TeX error must not damage the in-process plugin.
+    texpdf, version
+    assert `"`r(engine)'"' == "tectonic"
+    forvalues iteration = 1/3 {
+        texpdf using `"`repo'/tests/fixtures/academic.tex"', saving(`"`compiled_pdf'"') replace
+        confirm file `"`compiled_pdf'"'
+    }
+
+    display as result "TEXPDF FULL ENGINE STATA PASS"
+}
+
 display as result "TEXPDF STATA MATA SMOKE PASS"
