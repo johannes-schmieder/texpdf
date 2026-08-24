@@ -23,7 +23,7 @@
   "ci": {
     "overall_status": "success",
     "profile": "quick",
-    "receipt": ".ci/stata/results/ddb2c26415520ebd3625467ecdc6b453aaa4fb45.json",
+    "receipt": ".ci/stata/results/01f7f3dfd862de8226f866e15a008b5e325b6fb3.json",
     "required_markers": [
       "TEXPDF IN PROCESS STRESS PASS",
       "TEXPDF NET INSTALL PASS",
@@ -31,7 +31,7 @@
       "TEXPDF STATA MATA SMOKE PASS"
     ],
     "run_attempt": 1,
-    "run_id": 32781725805,
+    "run_id": 32782493017,
     "rust_mode": "repository-engine",
     "rust_status": "success",
     "stata_status": "success"
@@ -73,8 +73,8 @@
     "size_bytes": 49429136
   },
   "qualification_boundary": "This record qualifies the exact macOS Apple Silicon plugin, embedded helper, curated bundle, and development package under licensed Stata/MP. Other architectures require separate runtime qualification; public redistribution requires a complete audit.",
-  "qualified_at": "2026-08-24T21:53:13.031648Z",
-  "qualified_source_sha": "ddb2c26415520ebd3625467ecdc6b453aaa4fb45",
+  "qualified_at": "2026-08-24T22:02:04.772299Z",
+  "qualified_source_sha": "01f7f3dfd862de8226f866e15a008b5e325b6fb3",
   "schema_version": 3,
   "tests": {
     "academic_package_corpus": true,
