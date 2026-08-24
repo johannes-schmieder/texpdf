@@ -1,0 +1,2962 @@
+{
+  "candidate_groups": [
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "resource_count": 30,
+      "resources": [
+        "article.cls",
+        "atbegshi-ltx.sty",
+        "atveryend-ltx.sty",
+        "fontmath.cfg",
+        "fontmath.ltx",
+        "fonttext.ltx",
+        "ifthen.sty",
+        "latex.ltx",
+        "omlcmm.fd",
+        "omlenc.def",
+        "omscmsy.fd",
+        "omsenc.def",
+        "omxcmex.fd",
+        "ot1cmr.fd",
+        "ot1cmss.fd",
+        "ot1cmtt.fd",
+        "ot1enc.def",
+        "preload.cfg",
+        "preload.ltx",
+        "size10.clo",
+        "t1cmr.fd",
+        "t1enc.def",
+        "texsys.cfg",
+        "ts1cmr.fd",
+        "ts1enc.def",
+        "tuenc.def",
+        "tulmr.fd",
+        "tulmss.fd",
+        "tulmtt.fd",
+        "ucmr.fd"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "resource_count": 24,
+      "resources": [
+        "hyph-as.tex",
+        "hyph-bn.tex",
+        "hyph-gu.tex",
+        "hyph-hi.tex",
+        "hyph-kn.tex",
+        "hyph-ml.tex",
+        "hyph-mr.tex",
+        "hyph-or.tex",
+        "hyph-pa.tex",
+        "hyph-pi.tex",
+        "hyph-ta.tex",
+        "hyph-te.tex",
+        "loadhyph-as.tex",
+        "loadhyph-bn.tex",
+        "loadhyph-gu.tex",
+        "loadhyph-hi.tex",
+        "loadhyph-kn.tex",
+        "loadhyph-ml.tex",
+        "loadhyph-mr.tex",
+        "loadhyph-or.tex",
+        "loadhyph-pa.tex",
+        "loadhyph-pi.tex",
+        "loadhyph-ta.tex",
+        "loadhyph-te.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "resource_count": 7,
+      "resources": [
+        "color.sty",
+        "graphics.sty",
+        "graphicx.sty",
+        "keyval.sty",
+        "lscape.sty",
+        "rotating.sty",
+        "trig.sty"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "resource_count": 6,
+      "resources": [
+        "hyph-de-1901.tex",
+        "hyph-de-1996.tex",
+        "hyph-de-ch-1901.tex",
+        "loadhyph-de-1901.tex",
+        "loadhyph-de-1996.tex",
+        "loadhyph-de-ch-1901.tex"
+      ]
+    },
+    {
+      "candidate_packages": [],
+      "resource_count": 5,
+      "resources": [
+        "dehyphn-x-2022-03-16.pat",
+        "dehyphn-x-2022-03-16.tex",
+        "dehypht-x-2022-03-16.pat",
+        "dehypht-x-2022-03-16.tex",
+        "tectonic-format-latex.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "resource_count": 5,
+      "resources": [
+        "amsbsy.sty",
+        "amsgen.sty",
+        "amsmath.sty",
+        "amsopn.sty",
+        "amstext.sty"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "resource_count": 5,
+      "resources": [
+        "hyph-nb.tex",
+        "hyph-nn.tex",
+        "hyph-no.tex",
+        "loadhyph-nb.tex",
+        "loadhyph-nn.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "resource_count": 5,
+      "resources": [
+        "array.sty",
+        "calc.sty",
+        "dcolumn.sty",
+        "longtable.sty",
+        "tabularx.sty"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "resource_count": 4,
+      "resources": [
+        "hyph-en-gb.tex",
+        "hyph-en-us.tex",
+        "loadhyph-en-gb.tex",
+        "loadhyph-en-us.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "resource_count": 4,
+      "resources": [
+        "hyph-mn-cyrl-x-lmc.tex",
+        "hyph-mn-cyrl.tex",
+        "loadhyph-mn-cyrl-x-lmc.tex",
+        "loadhyph-mn-cyrl.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "glyphlist"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "glyphlist.txt",
+        "pdfglyphlist.txt",
+        "texglyphlist.txt"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-afrikaans"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-af.tex",
+        "hyph-quote-af.tex",
+        "loadhyph-af.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ancientgreek"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-grc.tex",
+        "ibyhyph.tex",
+        "loadhyph-grc.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "dumyhyph.tex",
+        "hyphen.tex",
+        "zerohyph.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-belarusian"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-be.tex",
+        "hyph-quote-be.tex",
+        "loadhyph-be.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-french"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-fr.tex",
+        "hyph-quote-fr.tex",
+        "loadhyph-fr.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-friulan"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-fur.tex",
+        "hyph-quote-fur.tex",
+        "loadhyph-fur.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-occitan"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-oc.tex",
+        "hyph-quote-oc.tex",
+        "loadhyph-oc.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-piedmontese"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-pms.tex",
+        "hyph-quote-pms.tex",
+        "loadhyph-pms.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romansh"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-quote-rm.tex",
+        "hyph-rm.tex",
+        "loadhyph-rm.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ukrainian"
+      ],
+      "resource_count": 3,
+      "resources": [
+        "hyph-quote-uk.tex",
+        "hyph-uk.tex",
+        "loadhyph-uk.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "00texlive.image"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "kanjix.map",
+        "pdftex.map"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-armenian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-hy.tex",
+        "loadhyph-hy.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-bulgarian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-bg.tex",
+        "loadhyph-bg.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-catalan"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-ca.tex",
+        "loadhyph-ca.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-churchslavonic"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-cu.tex",
+        "loadhyph-cu.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-coptic"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-cop.tex",
+        "loadhyph-cop.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-czech"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-cs.tex",
+        "loadhyph-cs.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-esperanto"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-eo.tex",
+        "loadhyph-eo.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-estonian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-et.tex",
+        "loadhyph-et.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ethiopic"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-mul-ethi.tex",
+        "loadhyph-mul-ethi.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-galician"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-gl.tex",
+        "loadhyph-gl.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-georgian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-ka.tex",
+        "loadhyph-ka.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indonesian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-id.tex",
+        "loadhyph-id.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-interlingua"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-ia.tex",
+        "loadhyph-ia.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-irish"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-ga.tex",
+        "loadhyph-ga.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-kurmanji"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-kmr.tex",
+        "loadhyph-kmr.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latvian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-lv.tex",
+        "loadhyph-lv.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-lithuanian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-lt.tex",
+        "loadhyph-lt.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-macedonian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-mk.tex",
+        "loadhyph-mk.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-portuguese"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-pt.tex",
+        "loadhyph-pt.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romanian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-ro.tex",
+        "loadhyph-ro.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-russian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-ru.tex",
+        "loadhyph-ru.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-sanskrit"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-sa.tex",
+        "loadhyph-sa.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovak"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-sk.tex",
+        "loadhyph-sk.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovenian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-sl.tex",
+        "loadhyph-sl.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-swedish"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-sv.tex",
+        "loadhyph-sv.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-thai"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-th.tex",
+        "loadhyph-th.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-turkmen"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-tk.tex",
+        "loadhyph-tk.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-uppersorbian"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-hsb.tex",
+        "loadhyph-hsb.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-welsh"
+      ],
+      "resource_count": 2,
+      "resources": [
+        "hyph-cy.tex",
+        "loadhyph-cy.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "00texlive.installer",
+        "tlperl.win32",
+        "unicode-data"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "SpecialCasing.txt"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "antomega",
+        "babel",
+        "cslatex"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "hyphen.cfg"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "bibtexperllibs",
+        "unicode-data"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "UnicodeData.txt"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "cjk",
+        "hyphen-chinese"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "hyph-zh-latn-pinyin.tex"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "cslatex",
+        "latex",
+        "latex-base-dev"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "fonttext.cfg"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "dviout.win32",
+        "graphics-cfg",
+        "latex-graphics-companion"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "graphics.cfg"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "dviout.win32",
+        "graphics-cfg",
+        "pgf"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "color.cfg"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "firstaid",
+        "latex-firstaid-dev"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "latex2e-first-aid-for-external-files.ltx"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base",
+        "lambda"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "language.dat"
+      ]
+    },
+    {
+      "candidate_packages": [
+        "hyphen-chinese"
+      ],
+      "resource_count": 1,
+      "resources": [
+        "loadhyph-zh-latn-pinyin.tex"
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "candidate_packages": [
+        "00texlive.installer",
+        "tlperl.win32",
+        "unicode-data"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "SpecialCasing.txt",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "bibtexperllibs",
+        "unicode-data"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "UnicodeData.txt",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amsbsy.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amsgen.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amsmath.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amsopn.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "amsmath",
+        "latex-amsmath-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "amstext.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "array.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "article.cls",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "atbegshi-ltx.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "atveryend-ltx.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "calc.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "dviout.win32",
+        "graphics-cfg",
+        "pgf"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "color.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "color.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dcolumn.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "fontmath.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "fontmath.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "cslatex",
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "fonttext.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "fonttext.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "dviout.win32",
+        "graphics-cfg",
+        "latex-graphics-companion"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "graphics.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "graphics.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "graphicx.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "cjk",
+        "hyphen-chinese"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "hyph-zh-latn-pinyin.tex",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "antomega",
+        "babel",
+        "cslatex"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "hyphen.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ifthen.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "keyval.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base",
+        "lambda"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "language.dat",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "latex.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "firstaid",
+        "latex-firstaid-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "latex2e-first-aid-for-external-files.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "longtable.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "lscape.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omlcmm.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omlenc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omscmsy.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omsenc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "omxcmex.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ot1cmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ot1cmss.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ot1cmtt.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ot1enc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "preload.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "preload.ltx",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "rotating.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "size10.clo",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "t1cmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "t1enc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex-tools-dev",
+        "tools"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tabularx.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "texsys.cfg",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "graphics",
+        "latex-graphics-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "trig.sty",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ts1cmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ts1enc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tuenc.def",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tulmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tulmss.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tulmtt.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "ucmr.fd",
+      "status": "ambiguous"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-base",
+      "resource": "dumyhyph.tex",
+      "shortdesc": "core hyphenation support files",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "glyphlist"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "glyphlist",
+      "resource": "glyphlist.txt",
+      "shortdesc": "Adobe Glyph List and TeX extensions",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-afrikaans"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-afrikaans",
+      "resource": "hyph-af.tex",
+      "shortdesc": "Afrikaans hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-as.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-belarusian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-belarusian",
+      "resource": "hyph-be.tex",
+      "shortdesc": "Belarusian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-bulgarian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-bulgarian",
+      "resource": "hyph-bg.tex",
+      "shortdesc": "Bulgarian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-bn.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-catalan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-catalan",
+      "resource": "hyph-ca.tex",
+      "shortdesc": "Catalan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-coptic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-coptic",
+      "resource": "hyph-cop.tex",
+      "shortdesc": "Coptic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-czech"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-czech",
+      "resource": "hyph-cs.tex",
+      "shortdesc": "Czech hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-churchslavonic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-churchslavonic",
+      "resource": "hyph-cu.tex",
+      "shortdesc": "Church Slavonic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-welsh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-welsh",
+      "resource": "hyph-cy.tex",
+      "shortdesc": "Welsh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "hyph-de-1901.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "hyph-de-1996.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "hyph-de-ch-1901.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-english",
+      "resource": "hyph-en-gb.tex",
+      "shortdesc": "English hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-english",
+      "resource": "hyph-en-us.tex",
+      "shortdesc": "English hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-esperanto"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-esperanto",
+      "resource": "hyph-eo.tex",
+      "shortdesc": "Esperanto hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-estonian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-estonian",
+      "resource": "hyph-et.tex",
+      "shortdesc": "Estonian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-french"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-french",
+      "resource": "hyph-fr.tex",
+      "shortdesc": "French hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-friulan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-friulan",
+      "resource": "hyph-fur.tex",
+      "shortdesc": "Friulan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-irish"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-irish",
+      "resource": "hyph-ga.tex",
+      "shortdesc": "Irish hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-galician"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-galician",
+      "resource": "hyph-gl.tex",
+      "shortdesc": "Galician hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ancientgreek"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ancientgreek",
+      "resource": "hyph-grc.tex",
+      "shortdesc": "Ancient Greek hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-gu.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-hi.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-uppersorbian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-uppersorbian",
+      "resource": "hyph-hsb.tex",
+      "shortdesc": "Upper Sorbian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-armenian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-armenian",
+      "resource": "hyph-hy.tex",
+      "shortdesc": "Armenian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-interlingua"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-interlingua",
+      "resource": "hyph-ia.tex",
+      "shortdesc": "Interlingua hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indonesian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indonesian",
+      "resource": "hyph-id.tex",
+      "shortdesc": "Indonesian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-georgian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-georgian",
+      "resource": "hyph-ka.tex",
+      "shortdesc": "Georgian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-kurmanji"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-kurmanji",
+      "resource": "hyph-kmr.tex",
+      "shortdesc": "Kurmanji hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-kn.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-lithuanian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-lithuanian",
+      "resource": "hyph-lt.tex",
+      "shortdesc": "Lithuanian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latvian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latvian",
+      "resource": "hyph-lv.tex",
+      "shortdesc": "Latvian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-macedonian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-macedonian",
+      "resource": "hyph-mk.tex",
+      "shortdesc": "Macedonian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-ml.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-mongolian",
+      "resource": "hyph-mn-cyrl-x-lmc.tex",
+      "shortdesc": "Mongolian hyphenation patterns in Cyrillic script.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-mongolian",
+      "resource": "hyph-mn-cyrl.tex",
+      "shortdesc": "Mongolian hyphenation patterns in Cyrillic script.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-mr.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ethiopic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ethiopic",
+      "resource": "hyph-mul-ethi.tex",
+      "shortdesc": "Hyphenation patterns for Ethiopic scripts.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "hyph-nb.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "hyph-nn.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "hyph-no.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-occitan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-occitan",
+      "resource": "hyph-oc.tex",
+      "shortdesc": "Occitan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-or.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-pa.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-pi.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-piedmontese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-piedmontese",
+      "resource": "hyph-pms.tex",
+      "shortdesc": "Piedmontese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-portuguese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-portuguese",
+      "resource": "hyph-pt.tex",
+      "shortdesc": "Portuguese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-afrikaans"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-afrikaans",
+      "resource": "hyph-quote-af.tex",
+      "shortdesc": "Afrikaans hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-belarusian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-belarusian",
+      "resource": "hyph-quote-be.tex",
+      "shortdesc": "Belarusian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-french"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-french",
+      "resource": "hyph-quote-fr.tex",
+      "shortdesc": "French hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-friulan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-friulan",
+      "resource": "hyph-quote-fur.tex",
+      "shortdesc": "Friulan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-occitan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-occitan",
+      "resource": "hyph-quote-oc.tex",
+      "shortdesc": "Occitan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-piedmontese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-piedmontese",
+      "resource": "hyph-quote-pms.tex",
+      "shortdesc": "Piedmontese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romansh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romansh",
+      "resource": "hyph-quote-rm.tex",
+      "shortdesc": "Romansh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ukrainian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ukrainian",
+      "resource": "hyph-quote-uk.tex",
+      "shortdesc": "Ukrainian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romansh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romansh",
+      "resource": "hyph-rm.tex",
+      "shortdesc": "Romansh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romanian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romanian",
+      "resource": "hyph-ro.tex",
+      "shortdesc": "Romanian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-russian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-russian",
+      "resource": "hyph-ru.tex",
+      "shortdesc": "Russian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-sanskrit"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-sanskrit",
+      "resource": "hyph-sa.tex",
+      "shortdesc": "Sanskrit hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovak"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-slovak",
+      "resource": "hyph-sk.tex",
+      "shortdesc": "Slovak hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovenian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-slovenian",
+      "resource": "hyph-sl.tex",
+      "shortdesc": "Slovenian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-swedish"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-swedish",
+      "resource": "hyph-sv.tex",
+      "shortdesc": "Swedish hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-ta.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "hyph-te.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-thai"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-thai",
+      "resource": "hyph-th.tex",
+      "shortdesc": "Thai hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-turkmen"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-turkmen",
+      "resource": "hyph-tk.tex",
+      "shortdesc": "Turkmen hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ukrainian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ukrainian",
+      "resource": "hyph-uk.tex",
+      "shortdesc": "Ukrainian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-base",
+      "resource": "hyphen.tex",
+      "shortdesc": "core hyphenation support files",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ancientgreek"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ancientgreek",
+      "resource": "ibyhyph.tex",
+      "shortdesc": "Ancient Greek hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "00texlive.image"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "00texlive.image",
+      "resource": "kanjix.map",
+      "shortdesc": "TeX Live files only in the source repository",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-afrikaans"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-afrikaans",
+      "resource": "loadhyph-af.tex",
+      "shortdesc": "Afrikaans hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-as.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-belarusian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-belarusian",
+      "resource": "loadhyph-be.tex",
+      "shortdesc": "Belarusian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-bulgarian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-bulgarian",
+      "resource": "loadhyph-bg.tex",
+      "shortdesc": "Bulgarian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-bn.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-catalan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-catalan",
+      "resource": "loadhyph-ca.tex",
+      "shortdesc": "Catalan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-coptic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-coptic",
+      "resource": "loadhyph-cop.tex",
+      "shortdesc": "Coptic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-czech"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-czech",
+      "resource": "loadhyph-cs.tex",
+      "shortdesc": "Czech hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-churchslavonic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-churchslavonic",
+      "resource": "loadhyph-cu.tex",
+      "shortdesc": "Church Slavonic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-welsh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-welsh",
+      "resource": "loadhyph-cy.tex",
+      "shortdesc": "Welsh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "loadhyph-de-1901.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "loadhyph-de-1996.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-german"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-german",
+      "resource": "loadhyph-de-ch-1901.tex",
+      "shortdesc": "German hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-english",
+      "resource": "loadhyph-en-gb.tex",
+      "shortdesc": "English hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-english"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-english",
+      "resource": "loadhyph-en-us.tex",
+      "shortdesc": "English hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-esperanto"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-esperanto",
+      "resource": "loadhyph-eo.tex",
+      "shortdesc": "Esperanto hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-estonian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-estonian",
+      "resource": "loadhyph-et.tex",
+      "shortdesc": "Estonian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-french"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-french",
+      "resource": "loadhyph-fr.tex",
+      "shortdesc": "French hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-friulan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-friulan",
+      "resource": "loadhyph-fur.tex",
+      "shortdesc": "Friulan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-irish"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-irish",
+      "resource": "loadhyph-ga.tex",
+      "shortdesc": "Irish hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-galician"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-galician",
+      "resource": "loadhyph-gl.tex",
+      "shortdesc": "Galician hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ancientgreek"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ancientgreek",
+      "resource": "loadhyph-grc.tex",
+      "shortdesc": "Ancient Greek hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-gu.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-hi.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-uppersorbian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-uppersorbian",
+      "resource": "loadhyph-hsb.tex",
+      "shortdesc": "Upper Sorbian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-armenian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-armenian",
+      "resource": "loadhyph-hy.tex",
+      "shortdesc": "Armenian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-interlingua"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-interlingua",
+      "resource": "loadhyph-ia.tex",
+      "shortdesc": "Interlingua hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indonesian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indonesian",
+      "resource": "loadhyph-id.tex",
+      "shortdesc": "Indonesian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-georgian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-georgian",
+      "resource": "loadhyph-ka.tex",
+      "shortdesc": "Georgian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-kurmanji"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-kurmanji",
+      "resource": "loadhyph-kmr.tex",
+      "shortdesc": "Kurmanji hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-kn.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-lithuanian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-lithuanian",
+      "resource": "loadhyph-lt.tex",
+      "shortdesc": "Lithuanian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-latvian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-latvian",
+      "resource": "loadhyph-lv.tex",
+      "shortdesc": "Latvian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-macedonian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-macedonian",
+      "resource": "loadhyph-mk.tex",
+      "shortdesc": "Macedonian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-ml.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-mongolian",
+      "resource": "loadhyph-mn-cyrl-x-lmc.tex",
+      "shortdesc": "Mongolian hyphenation patterns in Cyrillic script.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-mongolian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-mongolian",
+      "resource": "loadhyph-mn-cyrl.tex",
+      "shortdesc": "Mongolian hyphenation patterns in Cyrillic script.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-mr.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ethiopic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ethiopic",
+      "resource": "loadhyph-mul-ethi.tex",
+      "shortdesc": "Hyphenation patterns for Ethiopic scripts.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "loadhyph-nb.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-norwegian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-norwegian",
+      "resource": "loadhyph-nn.tex",
+      "shortdesc": "Norwegian Bokmal and Nynorsk hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-occitan"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-occitan",
+      "resource": "loadhyph-oc.tex",
+      "shortdesc": "Occitan hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-or.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-pa.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-pi.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-piedmontese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-piedmontese",
+      "resource": "loadhyph-pms.tex",
+      "shortdesc": "Piedmontese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-portuguese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-portuguese",
+      "resource": "loadhyph-pt.tex",
+      "shortdesc": "Portuguese hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romansh"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romansh",
+      "resource": "loadhyph-rm.tex",
+      "shortdesc": "Romansh hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-romanian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-romanian",
+      "resource": "loadhyph-ro.tex",
+      "shortdesc": "Romanian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-russian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-russian",
+      "resource": "loadhyph-ru.tex",
+      "shortdesc": "Russian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-sanskrit"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-sanskrit",
+      "resource": "loadhyph-sa.tex",
+      "shortdesc": "Sanskrit hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovak"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-slovak",
+      "resource": "loadhyph-sk.tex",
+      "shortdesc": "Slovak hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-slovenian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-slovenian",
+      "resource": "loadhyph-sl.tex",
+      "shortdesc": "Slovenian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-swedish"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-swedish",
+      "resource": "loadhyph-sv.tex",
+      "shortdesc": "Swedish hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-ta.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-indic"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-indic",
+      "resource": "loadhyph-te.tex",
+      "shortdesc": "Indic hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-thai"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-thai",
+      "resource": "loadhyph-th.tex",
+      "shortdesc": "Thai hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-turkmen"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-turkmen",
+      "resource": "loadhyph-tk.tex",
+      "shortdesc": "Turkmen hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-ukrainian"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-ukrainian",
+      "resource": "loadhyph-uk.tex",
+      "shortdesc": "Ukrainian hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-chinese"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-chinese",
+      "resource": "loadhyph-zh-latn-pinyin.tex",
+      "shortdesc": "Chinese pinyin hyphenation patterns.",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "glyphlist"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "glyphlist",
+      "resource": "pdfglyphlist.txt",
+      "shortdesc": "Adobe Glyph List and TeX extensions",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "00texlive.image"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "00texlive.image",
+      "resource": "pdftex.map",
+      "shortdesc": "TeX Live files only in the source repository",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "glyphlist"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "glyphlist",
+      "resource": "texglyphlist.txt",
+      "shortdesc": "Adobe Glyph List and TeX extensions",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [
+        "hyphen-base"
+      ],
+      "license": "",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "hyphen-base",
+      "resource": "zerohyph.tex",
+      "shortdesc": "core hyphenation support files",
+      "status": "missing_license"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dehyphn-x-2022-03-16.pat",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dehyphn-x-2022-03-16.tex",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dehypht-x-2022-03-16.pat",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "dehypht-x-2022-03-16.tex",
+      "status": "unmapped"
+    },
+    {
+      "candidate_packages": [],
+      "method": "unique_basename",
+      "origin": "",
+      "resource": "tectonic-format-latex.tex",
+      "status": "unmapped"
+    }
+  ],
+  "schema_version": 1,
+  "summary": {
+    "by_status": {
+      "ambiguous": 56,
+      "missing_license": 137,
+      "unmapped": 5
+    },
+    "candidate_group_count": 61,
+    "review_resource_count": 198
+  }
+}
