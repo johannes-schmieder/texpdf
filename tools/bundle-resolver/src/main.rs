@@ -30,7 +30,6 @@ impl StatusBackend for ResolverStatus {
             MessageKind::Note => "NOTE",
             MessageKind::Warning => "WARNING",
             MessageKind::Error => "ERROR",
-            _ => "MESSAGE",
         };
         eprintln!("TEXPDF_RESOLVER_{label} {args}");
         if let Some(error) = err {
