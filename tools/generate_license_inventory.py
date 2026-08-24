@@ -44,87 +44,54 @@ def normalize(name: str) -> str:
     return value
 
 
-def resource_name(entry: dict[str, Any], fallback: str | None = None) -> str | None:
+def resource_name(item: Any) -> str:
+    if isinstance(item, str):
+        return normalize(item)
+    if not isinstance(item, dict):
+        return ""
     for key in NAME_KEYS:
-        value = entry.get(key)
+        value = item.get(key)
         if isinstance(value, str) and value:
             return normalize(value)
-    return normalize(fallback) if fallback else None
+    return ""
 
 
-def resource_origin(entry: dict[str, Any]) -> str:
+def resource_origin(item: Any) -> str:
+    if not isinstance(item, dict):
+        return ""
     for key in ORIGIN_KEYS:
-        value = entry.get(key)
-        if isinstance(value, str):
+        value = item.get(key)
+        if isinstance(value, str) and value:
             return value
-        if isinstance(value, dict):
-            for subkey in ("name", "kind", "archive"):
-                subvalue = value.get(subkey)
-                if isinstance(subvalue, str):
-                    return subvalue
-    return "unknown"
+    return ""
 
 
-def rows_from(value: Any) -> list[dict[str, str]]:
-    rows: list[dict[str, str]] = []
-    if isinstance(value, list):
-        iterable = [(None, item) for item in value]
-    elif isinstance(value, dict):
-        iterable = list(value.items())
-    else:
-        return rows
-    for fallback, item in iterable:
-        if not isinstance(item, dict):
+def load_resources(manifest: dict[str, Any]) -> list[dict[str, str]]:
+    candidates: Any = manifest.get("resources")
+    if candidates is None:
+        candidates = manifest.get("files")
+    if candidates is None:
+        candidates = manifest.get("entries")
+    if not isinstance(candidates, list):
+        raise InventoryError("curated manifest has no resources/files/entries list")
+    resources: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for item in candidates:
+        name = resource_name(item)
+        if not name or name == "SHA256SUM" or name in seen:
             continue
-        name = resource_name(item, str(fallback) if fallback is not None else None)
-        if name and not name.endswith("/"):
-            rows.append({"name": name, "origin": resource_origin(item)})
-    return rows
-
-
-def manifest_resources(manifest: dict[str, Any]) -> list[dict[str, str]]:
-    for key in ("selected", "selected_resources", "resources", "files", "entries"):
-        rows = rows_from(manifest.get(key))
-        if rows:
-            break
-    else:
-        candidates: list[list[dict[str, str]]] = []
-
-        def visit(value: Any) -> None:
-            rows = rows_from(value)
-            if rows:
-                candidates.append(rows)
-            if isinstance(value, dict):
-                for child in value.values():
-                    visit(child)
-            elif isinstance(value, list):
-                for child in value:
-                    visit(child)
-
-        visit(manifest)
-        if not candidates:
-            raise InventoryError("cannot locate resource records in curated manifest")
-        rows = max(candidates, key=len)
-
-    by_name: dict[str, dict[str, str]] = {}
-    for row in rows:
-        name = row["name"]
-        if name not in by_name or by_name[name]["origin"] == "unknown":
-            by_name[name] = row
-    resources = [by_name[name] for name in sorted(by_name)]
-    expected = manifest.get("file_count") or manifest.get("selected_file_count")
-    if expected is not None and int(expected) != len(resources):
-        raise InventoryError(
-            f"manifest reports {expected} files but {len(resources)} resource records were found"
-        )
-    return resources
+        seen.add(name)
+        resources.append({"name": name, "origin": resource_origin(item)})
+    if not resources:
+        raise InventoryError("curated manifest contains no logical resources")
+    return sorted(resources, key=lambda item: item["name"])
 
 
 def read_tlpdb(path: Path) -> str:
-    raw = path.read_bytes()
-    if path.suffix == ".xz":
-        raw = lzma.decompress(raw)
-    return raw.decode("utf-8", errors="replace")
+    data = path.read_bytes()
+    if path.suffix == ".xz" or data.startswith(b"\xfd7zXZ\x00"):
+        data = lzma.decompress(data)
+    return data.decode("utf-8", errors="replace")
 
 
 def parse_tlpdb(path: Path) -> dict[str, Package]:
@@ -166,12 +133,69 @@ def parse_tlpdb(path: Path) -> dict[str, Package]:
     return packages
 
 
+def parse_simple_override_toml(text: str) -> dict[str, list[dict[str, str]]]:
+    """Parse the deliberately narrow override-file TOML subset.
+
+    The connected Stata runner uses the Xcode Python 3.9 interpreter, which has
+    no standard-library ``tomllib``.  Pulling an unpinned parser dependency into
+    a release audit would weaken reproducibility, so the fallback accepts only
+    repeated ``[[override]]`` tables and JSON-compatible quoted string values.
+    Anything broader fails explicitly rather than being interpreted loosely.
+    """
+
+    tables: list[dict[str, str]] = []
+    current: dict[str, str] | None = None
+    for line_number, raw in enumerate(text.splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line == "[[override]]":
+            current = {}
+            tables.append(current)
+            continue
+        if line.startswith("["):
+            raise InventoryError(
+                f"unsupported override TOML table on line {line_number}: {raw!r}"
+            )
+        if current is None:
+            raise InventoryError(
+                f"override value before [[override]] on line {line_number}"
+            )
+        key, separator, encoded = line.partition("=")
+        key = key.strip()
+        encoded = encoded.strip()
+        if not separator or not key:
+            raise InventoryError(f"malformed override line {line_number}: {raw!r}")
+        if key in current:
+            raise InventoryError(
+                f"duplicate override key {key!r} on line {line_number}"
+            )
+        try:
+            value = json.loads(encoded)
+        except json.JSONDecodeError as error:
+            raise InventoryError(
+                f"override line {line_number} requires a quoted string value"
+            ) from error
+        if not isinstance(value, str):
+            raise InventoryError(
+                f"override line {line_number} value must be a string"
+            )
+        current[key] = value
+    return {"override": tables}
+
+
 def load_overrides(path: Path | None) -> list[dict[str, str]]:
     if path is None or not path.exists():
         return []
-    import tomllib
+    text = path.read_text(encoding="utf-8")
+    try:
+        import tomllib  # type: ignore[import-not-found]
+    except ModuleNotFoundError:
+        parsed: dict[str, Any] = parse_simple_override_toml(text)
+    else:
+        parsed = tomllib.loads(text)
 
-    values = tomllib.loads(path.read_text(encoding="utf-8")).get("override", [])
+    values = parsed.get("override", [])
     if not isinstance(values, list):
         raise InventoryError("license overrides must use [[override]] tables")
     result = []
@@ -213,155 +237,121 @@ def build_inventory(
     overrides: list[dict[str, str]],
 ) -> dict[str, Any]:
     exact: dict[str, set[str]] = defaultdict(set)
-    basenames: dict[str, set[str]] = defaultdict(set)
+    basename: dict[str, set[str]] = defaultdict(set)
     for package in packages.values():
-        for name in package.files:
-            exact[name].add(package.name)
-            basenames[Path(name).name].add(package.name)
+        for item in package.files:
+            exact[item].add(package.name)
+            basename[Path(item).name].add(package.name)
 
-    counts: dict[str, int] = defaultdict(int)
-    usage: dict[str, set[str]] = defaultdict(set)
-    resource_rows = []
+    records: list[dict[str, Any]] = []
+    counts = {"mapped": 0, "ambiguous": 0, "unmapped": 0, "missing_license": 0}
+    packages_used: set[str] = set()
+    license_expressions: set[str] = set()
 
     for resource in resources:
         name = resource["name"]
         origin = resource["origin"]
         override = matching_override(name, origin, overrides)
-        note = ""
+        candidates: set[str]
+        method: str
         if override is not None:
-            package_names = [override["package"]]
-            licenses = [override["license"]]
-            method = "override"
-            note = override["reason"]
+            candidates = {override["package"]}
+            method = "reviewed_override"
+        elif name in exact:
+            candidates = exact[name]
+            method = "exact_path"
         else:
-            candidates = set(exact.get(name, set()))
-            method = "exact"
-            if not candidates:
-                candidates = set(basenames.get(Path(name).name, set()))
-                method = "basename"
-            package_names = sorted(candidates)
-            licenses = sorted(
-                {packages[value].license for value in package_names if packages[value].license}
-            )
-            if not package_names:
-                method = "unmapped"
-            elif len(package_names) > 1:
-                method += "-ambiguous"
+            candidates = basename.get(Path(name).name, set())
+            method = "unique_basename"
 
-        if not package_names:
-            status = "unmapped"
-        elif not licenses:
-            status = "missing-license"
-        elif "ambiguous" in method:
-            status = "ambiguous"
-        else:
-            status = "mapped"
-        counts[status] += 1
-        counts[method] += 1
-        for package_name in package_names:
-            usage[package_name].add(name)
-        resource_rows.append(
-            {
-                "name": name,
-                "origin": origin,
-                "status": status,
-                "method": method,
-                "packages": package_names,
-                "licenses": licenses,
-                "note": note,
-            }
-        )
-
-    package_rows = {}
-    for name in sorted(usage):
-        package = packages.get(name)
-        if package is None:
-            license_values = sorted(
+        record: dict[str, Any] = {
+            "resource": name,
+            "origin": origin,
+            "method": method,
+            "candidate_packages": sorted(candidates),
+        }
+        if override is not None:
+            record.update(
                 {
-                    row["licenses"][0]
-                    for row in resource_rows
-                    if name in row["packages"] and row["licenses"]
+                    "status": "mapped",
+                    "package": override["package"],
+                    "license": override["license"],
+                    "override_reason": override["reason"],
                 }
             )
-            package_rows[name] = {
-                "license": ",".join(license_values),
-                "shortdesc": "explicit reviewed override",
-                "resource_count": len(usage[name]),
-            }
+        elif len(candidates) == 1:
+            package_name = next(iter(candidates))
+            package = packages[package_name]
+            record.update(
+                {
+                    "status": "mapped" if package.license else "missing_license",
+                    "package": package_name,
+                    "license": package.license,
+                    "shortdesc": package.shortdesc,
+                }
+            )
+        elif len(candidates) > 1:
+            record["status"] = "ambiguous"
         else:
-            package_rows[name] = {
-                "license": package.license,
-                "shortdesc": package.shortdesc,
-                "resource_count": len(usage[name]),
-            }
+            record["status"] = "unmapped"
+
+        status = record["status"]
+        counts[status] += 1
+        if status in {"mapped", "missing_license"}:
+            packages_used.add(record["package"])
+            if record.get("license"):
+                license_expressions.add(record["license"])
+        records.append(record)
 
     return {
         "schema_version": 1,
         "summary": {
             "resource_count": len(resources),
-            "package_count": len(package_rows),
-            "mapped": counts["mapped"],
-            "ambiguous": counts["ambiguous"],
-            "unmapped": counts["unmapped"],
-            "missing_license": counts["missing-license"],
-            "exact": counts["exact"],
-            "basename": counts["basename"],
-            "override": counts["override"],
+            **counts,
+            "package_count": len(packages_used),
+            "license_expression_count": len(license_expressions),
         },
-        "packages": package_rows,
-        "resources": resource_rows,
+        "packages_used": sorted(packages_used),
+        "license_expressions": sorted(license_expressions),
+        "resources": records,
     }
 
 
-def render_markdown(data: dict[str, Any], metadata_source: str) -> str:
-    summary = data["summary"]
+def render_markdown(inventory: dict[str, Any]) -> str:
+    summary = inventory["summary"]
     lines = [
         "# Embedded TeX resource license inventory",
         "",
-        f"Metadata source: `{metadata_source}`",
+        "This inventory is generated from the exact curated resource manifest and",
+        "a pinned TeX Live package database. Ambiguous and unmapped resources are",
+        "release blockers until reviewed.",
         "",
-        "## Coverage",
+        "## Summary",
         "",
-        f"- Embedded resources: {summary['resource_count']}",
-        f"- Referenced packages/components: {summary['package_count']}",
-        f"- Unambiguous mappings: {summary['mapped']}",
-        f"- Ambiguous conservative mappings: {summary['ambiguous']}",
-        f"- Unmapped resources: {summary['unmapped']}",
-        f"- Mappings without a license code: {summary['missing_license']}",
+        f"- Resources: {summary['resource_count']}",
+        f"- Mapped: {summary['mapped']}",
+        f"- Ambiguous: {summary['ambiguous']}",
+        f"- Unmapped: {summary['unmapped']}",
+        f"- Mapped without license metadata: {summary['missing_license']}",
+        f"- Packages represented: {summary['package_count']}",
         "",
-        "## Packages and components",
+        "## Review failures",
         "",
-        "| Component | License code | Embedded resources |",
-        "|---|---|---:|",
+        "| Resource | Status | Candidates |",
+        "|---|---|---|",
     ]
-    for name, package in data["packages"].items():
-        lines.append(
-            f"| `{name}` | `{package['license'] or 'UNKNOWN'}` | {package['resource_count']} |"
-        )
-    review = [row for row in data["resources"] if row["status"] != "mapped"]
-    lines.extend(["", "## Items requiring review", ""])
-    if not review:
-        lines.append("No unmapped, ambiguous, or missing-license resources remain.")
-    else:
-        lines.extend(
-            [
-                "| Resource | Origin | Status | Candidate component(s) | License code(s) |",
-                "|---|---|---|---|---|",
-            ]
-        )
-        for row in review:
-            packages = ", ".join(f"`{value}`" for value in row["packages"]) or "—"
-            licenses = ", ".join(f"`{value}`" for value in row["licenses"]) or "—"
+    failures = [item for item in inventory["resources"] if item["status"] != "mapped"]
+    if failures:
+        for item in failures:
+            candidates = ", ".join(item.get("candidate_packages", [])) or "—"
             lines.append(
-                f"| `{row['name']}` | `{row['origin']}` | `{row['status']}` | {packages} | {licenses} |"
+                f"| `{item['resource']}` | `{item['status']}` | {candidates} |"
             )
-    lines.extend(
-        [
-            "",
-            "This inventory records package/component metadata. Public release also requires the corresponding license texts and notices in the installation package.",
-            "",
-        ]
-    )
+    else:
+        lines.append("| — | All resources mapped | — |")
+    lines.extend(["", "## License expressions", ""])
+    lines.extend(f"- `{value}`" for value in inventory["license_expressions"])
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -370,30 +360,42 @@ def main() -> int:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--tlpdb", type=Path, required=True)
     parser.add_argument("--overrides", type=Path)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--markdown", type=Path, required=True)
+    parser.add_argument(
+        "--output", type=Path, default=Path("licenses/generated/tex-resources.json")
+    )
+    parser.add_argument(
+        "--markdown", type=Path, default=Path("licenses/generated/tex-resources.md")
+    )
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args()
 
-    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    data = build_inventory(
-        manifest_resources(manifest),
-        parse_tlpdb(args.tlpdb),
-        load_overrides(args.overrides),
-    )
-    data["metadata_source"] = str(args.tlpdb)
+    try:
+        manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+        inventory = build_inventory(
+            load_resources(manifest),
+            parse_tlpdb(args.tlpdb),
+            load_overrides(args.overrides),
+        )
+    except (OSError, ValueError, KeyError, json.JSONDecodeError, InventoryError) as error:
+        print(f"TEXPDF_LICENSE_INVENTORY_ERROR {error}", file=sys.stderr)
+        return 2
+
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     args.markdown.parent.mkdir(parents=True, exist_ok=True)
-    args.markdown.write_text(render_markdown(data, str(args.tlpdb)), encoding="utf-8")
+    args.output.write_text(
+        json.dumps(inventory, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    args.markdown.write_text(render_markdown(inventory), encoding="utf-8")
+    summary = inventory["summary"]
     print(
         "TEXPDF_LICENSE_INVENTORY "
-        + " ".join(f"{key}={value}" for key, value in data["summary"].items())
+        f"resources={summary['resource_count']} mapped={summary['mapped']} "
+        f"ambiguous={summary['ambiguous']} unmapped={summary['unmapped']} "
+        f"missing_license={summary['missing_license']}"
     )
-    if args.strict and any(
-        data["summary"][key] for key in ("unmapped", "ambiguous", "missing_license")
-    ):
-        return 2
+    failures = summary["ambiguous"] + summary["unmapped"] + summary["missing_license"]
+    if args.strict and failures:
+        return 1
     return 0
 
 
