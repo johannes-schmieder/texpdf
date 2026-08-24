@@ -42,14 +42,29 @@ esac
 probe_declaration() {
   local symbol="$1"
   local header="$2"
+
+  # The current Apple SDK exposes these interfaces, with strlcpy/strlcat
+  # potentially wrapped in fortified function-like macros. Feature-test macros
+  # used by generic probes can hide those declarations and incorrectly enable
+  # pkgconf's fallback implementations, which then collide with the SDK.
+  if [[ "$host" == *-apple-darwin ]]; then
+    case "$symbol" in
+      strlcat|strlcpy|strndup|reallocarray)
+        printf '1'
+        return
+        ;;
+      pledge|unveil)
+        printf '0'
+        return
+        ;;
+    esac
+  fi
+
   local probe_dir="$pkgconf_root/.texpdf-probes"
   local source="$probe_dir/$symbol.c"
   local object="$probe_dir/$symbol.o"
   mkdir -p "$probe_dir"
   cat > "$source" <<EOF
-#define _BSD_SOURCE
-#define _DEFAULT_SOURCE
-#define _POSIX_C_SOURCE 200809L
 #include <$header>
 #ifdef $symbol
 int main(void) { return 0; }
