@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "file": "core.tex",
+      "capabilities": [
+        "amsmath",
+        "amssymb",
+        "mathtools",
+        "xcolor",
+        "geometry",
+        "hyperref",
+        "url",
+        "setspace",
+        "enumitem",
+        "fancyhdr",
+        "titlesec",
+        "microtype"
+      ]
+    },
+    {
+      "file": "tables.tex",
+      "capabilities": [
+        "array",
+        "booktabs",
+        "longtable",
+        "tabularx",
+        "multirow",
+        "threeparttable",
+        "threeparttablex",
+        "dcolumn",
+        "siunitx",
+        "adjustbox"
+      ]
+    },
+    {
+      "file": "layout.tex",
+      "capabilities": [
+        "graphicx",
+        "xcolor",
+        "float",
+        "placeins",
+        "rotating",
+        "pdflscape",
+        "caption",
+        "subcaption"
+      ]
+    },
+    {
+      "file": "bibliography.tex",
+      "assets": ["academic-tier.bib"],
+      "capabilities": ["natbib", "BibTeX", "hyperref"]
+    },
+    {
+      "file": "fonts-latin-modern.tex",
+      "capabilities": ["fontenc", "lmodern", "Latin Modern"]
+    },
+    {
+      "file": "fonts-tex-gyre.tex",
+      "capabilities": ["tgtermes", "tgheros", "tgcursor", "TeX Gyre"]
+    }
+  ],
+  "policy": "Every listed fixture must compile with the final embedded bundle on every supported Stata platform before its capabilities are advertised."
+}
