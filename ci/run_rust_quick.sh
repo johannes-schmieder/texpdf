@@ -47,10 +47,16 @@ if [[ -f Cargo.toml ]]; then
     quick)
       ;;
     engine)
+      source_tar="$TEXPDF_BUNDLE_CACHE/tlextras-2022.0r0.tar"
+      common_bundle_args=(--cache-dir "$TEXPDF_BUNDLE_CACHE")
+      if [[ -f "$source_tar" ]]; then
+        common_bundle_args+=(--source-tar "$source_tar")
+      fi
+
       if [[ -f bundle/curated-manifest.json ]]; then
         /usr/bin/python3 tools/prepare_curated_bundle.py \
           --manifest bundle/curated-manifest.json \
-          --cache-dir "$TEXPDF_BUNDLE_CACHE"
+          "${common_bundle_args[@]}"
       else
         source_url="$(/usr/bin/python3 - <<'PY'
 from pathlib import Path
@@ -64,6 +70,7 @@ else:
 PY
 )"
         trace_path="bundle/generated/resource-trace.txt"
+        resource_dir="bundle/generated/resolved-resources"
         set +e
         "$toolchain_cargo" run --locked --package texpdf-bundle-resolver -- \
           "$source_url" "$trace_path" tests/fixtures/bundle_corpus.tex
@@ -78,8 +85,9 @@ PY
         fi
         /usr/bin/python3 tools/prepare_curated_bundle.py \
           --trace "$trace_path" \
+          --resource-dir "$resource_dir" \
           --write-manifest bundle/generated/curated-manifest.json \
-          --cache-dir "$TEXPDF_BUNDLE_CACHE"
+          "${common_bundle_args[@]}"
       fi
       ;;
     *)
