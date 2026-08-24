@@ -1,0 +1,95 @@
+name: Build and test macOS universal plugin
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: texpdf-macos-universal
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+  STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+  TEXPDF_RUST_PROFILE: engine
+
+jobs:
+  universal:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Build and test the qualified ARM engine
+        shell: bash
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/texpdf-universal-rust"
+          mkdir -p "$RUNNER_TEMP/texpdf-universal-rust"
+          cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-universal-rust/"
+
+      - name: Build universal plugin
+        shell: bash
+        run: >-
+          /bin/bash tools/build_macos_universal.sh
+          dist/macos-universal/_texpdf_plugin.plugin
+          dist/macos-universal/manifest.json
+
+      - name: Stage universal plugin for licensed Stata
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp dist/macos-universal/_texpdf_plugin.plugin stata/_texpdf_plugin.plugin
+          git add -f stata/_texpdf_plugin.plugin
+
+      - name: Test ARM slice in licensed Stata
+        shell: bash
+        run: /bin/bash ci/run_stata_ci.sh quick
+
+      - name: Combine and validate evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -R "$RUNNER_TEMP/texpdf-universal-rust/." .ci/stata/run/
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            .ci/stata/run/receipt.json \
+            .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success \
+            --require-rust-success
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+
+          path = Path("dist/macos-universal/manifest.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          data["source_sha"] = os.environ["GITHUB_SHA"]
+          data["arm_runtime_qualified"] = True
+          data["arm_stata_profile"] = "quick"
+          data["arm_stata_receipt"] = ".ci/stata/run/receipt.json"
+          data["intel_runtime_qualified"] = False
+          path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+
+      - name: Upload universal development artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-macos-universal-${{ github.sha }}-${{ github.run_id }}
+          path: |
+            dist/macos-universal/
+            .ci/stata/run/
+          if-no-files-found: error
+          retention-days: 30
