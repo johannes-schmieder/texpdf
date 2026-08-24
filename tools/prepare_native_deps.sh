@@ -65,7 +65,7 @@ EOF
 }
 
 write_pkgconf_config() {
-  local config="$pkgconf_root/libpkgconf/config.h"
+  local config="$pkgconf_root/config.h"
   local temporary="$config.tmp"
   local name header macro declared
   {
