@@ -1,0 +1,9 @@
+[bundle]
+name = "tectonic-default-v33-bootstrap"
+version = "33"
+source_url = "https://relay.fullyjustified.net/default_bundle_v33.tar"
+index_url = "https://relay.fullyjustified.net/default_bundle_v33.tar.index.gz"
+# Filled after the first trusted CI download, then enforced by the transformer.
+source_sha256 = ""
+index_sha256 = ""
+transform_version = "1"

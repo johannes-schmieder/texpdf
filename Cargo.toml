@@ -1,0 +1,21 @@
+[workspace]
+members = ["crates/texpdf-core"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+rust-version = "1.85"
+authors = ["Johannes Schmieder"]
+repository = "https://github.com/johannes-schmieder/texpdf"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tempfile = "3.20"
+tectonic = { version = "=0.17.0", default-features = false }
+tectonic_bundles = { version = "=0.4.2", default-features = false }
+tectonic_errors = "=0.3.0"
+tectonic_status_base = "=0.2.2"
+thiserror = "2.0"

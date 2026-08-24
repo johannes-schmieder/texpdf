@@ -27,13 +27,21 @@ echo "RUST_TOOLCHAIN=$toolchain"
 echo "RUSTC_VERSION=$rustc_version"
 
 if [[ -f Cargo.toml ]]; then
-  locked=()
-  if [[ -f Cargo.lock ]]; then
-    locked=(--locked)
+  export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/private/tmp/texpdf-cargo-target}"
+  export TEXPDF_BUNDLE_CACHE="${TEXPDF_BUNDLE_CACHE:-/private/tmp/texpdf-bundle-cache}"
+  /usr/bin/python3 tools/prepare_bundle.py --cache-dir "$TEXPDF_BUNDLE_CACHE"
+  /bin/cat bundle/generated/bundle-info.json
+
+  if [[ ! -f Cargo.lock ]]; then
+    "$rustup_bin" run "$toolchain" cargo generate-lockfile
   fi
+  /bin/mkdir -p .ci/stata/run
+  /bin/cp Cargo.lock .ci/stata/run/Cargo.lock.generated
+  /bin/cp bundle/generated/bundle-info.json .ci/stata/run/bundle-info.json
+
   "$rustup_bin" run "$toolchain" cargo fmt --all --check
-  "$rustup_bin" run "$toolchain" cargo clippy "${locked[@]}" --workspace --all-targets --all-features -- -D warnings
-  "$rustup_bin" run "$toolchain" cargo test "${locked[@]}" --workspace --all-targets --all-features
+  "$rustup_bin" run "$toolchain" cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+  "$rustup_bin" run "$toolchain" cargo test --locked --workspace --all-targets --all-features
   echo "RUST_QUICK_MODE=repository"
 else
   smoke_root="${RUNNER_TEMP:-/private/tmp}/texpdf-rust-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"

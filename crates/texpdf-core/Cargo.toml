@@ -1,0 +1,19 @@
+[package]
+name = "texpdf-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Standalone Tectonic compilation core for the texpdf Stata package"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true
+tectonic.workspace = true
+tectonic_bundles.workspace = true
+tectonic_errors.workspace = true
+tectonic_status_base.workspace = true
+thiserror.workspace = true
