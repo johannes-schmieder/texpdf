@@ -10,8 +10,9 @@
     "smoke": {
       "suite": "ci/stata_smoke.do",
       "arguments": [],
-      "timeout_seconds": 1200,
+      "timeout_seconds": 1800,
       "required_log_markers": [
+        "TEXPDF IN PROCESS STRESS PASS",
         "TEXPDF NET INSTALL PASS",
         "TEXPDF FULL ENGINE STATA PASS",
         "TEXPDF STATA MATA SMOKE PASS"
@@ -20,8 +21,9 @@
     "quick": {
       "suite": "ci/stata_smoke.do",
       "arguments": [],
-      "timeout_seconds": 1200,
+      "timeout_seconds": 1800,
       "required_log_markers": [
+        "TEXPDF IN PROCESS STRESS PASS",
         "TEXPDF NET INSTALL PASS",
         "TEXPDF FULL ENGINE STATA PASS",
         "TEXPDF STATA MATA SMOKE PASS"

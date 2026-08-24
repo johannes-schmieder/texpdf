@@ -126,6 +126,38 @@ if `full_engine' {
     capture rmdir `"`path_sections'"'
     capture rmdir `"`path_root'"'
 
+    * Bounded in-process stress gate with periodic ordinary TeX failures.
+    capture confirm file `"`repo'/ci/STRESS_ONCE"'
+    local run_stress = (_rc == 0)
+    if `run_stress' {
+        tempfile stress_source stress_pdf stress_bad stress_bad_pdf
+        local stress_output `"`stress_pdf'.pdf"'
+        local stress_bad_output `"`stress_bad_pdf'.pdf"'
+        file open `handle' using `"`stress_source'"', write text replace
+        file write `handle' "\documentclass{article}\begin{document}Stress test.\end{document}" _n
+        file close `handle'
+        file open `handle' using `"`stress_bad'"', write text replace
+        file write `handle' "\documentclass{article}\begin{document}\undefinedstresscommand\end{document}" _n
+        file close `handle'
+
+        forvalues iteration = 1/100 {
+            texpdf using `"`stress_source'"', saving(`"`stress_output'"') replace
+            confirm file `"`stress_output'"'
+            if mod(`iteration', 10) == 0 {
+                capture noisily texpdf using `"`stress_bad'"', saving(`"`stress_bad_output'"') replace
+                local stress_bad_rc = _rc
+                assert `stress_bad_rc' == 459
+                capture confirm file `"`stress_bad_output'"'
+                local stress_bad_file_rc = _rc
+                assert `stress_bad_file_rc' != 0
+                texpdf, version
+                assert `"`r(engine)'"' == "tectonic"
+            }
+        }
+        local stress_marker = "TEXPDF IN PROCESS STRESS " + "PASS"
+        display as result `"`stress_marker'"'
+    }
+
     * Exercise the actual installation layout through net install.
     local package_dir `"`repo'/dist/texpdf-macos-arm64"'
     confirm file `"`package_dir'/texpdf.pkg"'
