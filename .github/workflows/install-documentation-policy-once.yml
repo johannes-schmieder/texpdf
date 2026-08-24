@@ -1,0 +1,199 @@
+name: Install documentation policy once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/install-documentation-policy-once.yml"
+      - "tools/sync_project_state.py"
+
+concurrency:
+  group: texpdf-install-documentation-policy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Install after convergence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if [[ ! -x tools/sync_project_state.py ]]; then
+            exit 0
+          fi
+          mkdir -p docs tools ci/tests
+          cat > docs/README.md <<'MD'
+          # texpdf documentation
+
+          ## Sources of truth
+
+          The project separates generated status evidence from conceptual and
+          user-facing documentation.
+
+          ### Generated from committed evidence
+
+          - [`../STATUS.md`](../STATUS.md): current implementation and release gates.
+          - [`../PLAN.md`](../PLAN.md): completed and remaining v1 milestones.
+          - [`V1_READINESS.md`](V1_READINESS.md): fail-closed v1 gate report.
+          - [`WORKFLOWS.md`](WORKFLOWS.md): retained workflow inventory.
+          - [`../release/V1_READINESS.json`](../release/V1_READINESS.json): machine-readable gate record.
+
+          These files are synchronized by `tools/sync_project_state.py`. Exact SHAs,
+          sizes, and target support must come from receipts and registries, not manual
+          prose edits.
+
+          ### Architecture and behavior
+
+          - [`../IMPLEMENTATION.md`](../IMPLEMENTATION.md): durable architecture and guarantees.
+          - [`COMPATIBILITY.md`](COMPATIBILITY.md): Tectonic/LaTeX compatibility contract.
+          - [`SUPPORTED_PACKAGES.md`](SUPPORTED_PACKAGES.md): curated academic tier.
+          - [`ERRORS.md`](ERRORS.md): error and output behavior.
+          - [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md): deterministic inputs and limits.
+          - [`../SECURITY.md`](../SECURITY.md): in-process trust boundary.
+
+          ### Installation, qualification, licensing, and release
+
+          - [`INSTALLATION.md`](INSTALLATION.md)
+          - [`QUALIFICATION.md`](QUALIFICATION.md)
+          - [`PLATFORM_QUALIFICATION.md`](PLATFORM_QUALIFICATION.md)
+          - [`LICENSING.md`](LICENSING.md)
+          - [`RESOURCE_LICENSE_STATUS.md`](RESOURCE_LICENSE_STATUS.md), when generated
+          - [`LICENSE_REVIEW_QUEUE.md`](LICENSE_REVIEW_QUEUE.md), when generated
+          - [`RELEASE.md`](RELEASE.md)
+
+          ## Editing rule
+
+          Do not hand-update exact qualification SHAs, artifact byte counts, or target
+          support claims in generated files. Update the underlying receipt, manifest,
+          inventory, or target registry and run:
+
+          ```sh
+          python3 tools/sync_project_state.py
+          ```
+
+          Build-only evidence must never be described as Stata runtime support. Public
+          release readiness remains fail-closed until licensing, safety, and every
+          advertised platform gate are explicitly complete.
+          MD
+
+          cat > tools/check_documentation_state.py <<'PY'
+          #!/usr/bin/env python3
+          """Verify that generated documentation matches committed evidence."""
+
+          from __future__ import annotations
+
+          import argparse
+          from pathlib import Path
+          import subprocess
+          import sys
+          import tempfile
+
+          GENERATED = (
+              "STATUS.md",
+              "PLAN.md",
+              "IMPLEMENTATION.md",
+              "README.md",
+              "docs/V1_READINESS.md",
+              "docs/WORKFLOWS.md",
+              "release/V1_READINESS.json",
+          )
+
+
+          def main() -> int:
+              parser = argparse.ArgumentParser()
+              parser.add_argument("--root", type=Path, default=Path("."))
+              args = parser.parse_args()
+              root = args.root.resolve()
+              missing = [path for path in GENERATED if not (root / path).is_file()]
+              if missing:
+                  print(
+                      "TEXPDF_DOC_STATE_ERROR missing generated files: "
+                      + ", ".join(missing),
+                      file=sys.stderr,
+                  )
+                  return 2
+
+              before = {
+                  path: (root / path).read_bytes()
+                  for path in GENERATED
+              }
+              result = subprocess.run(
+                  [sys.executable, str(root / "tools/sync_project_state.py"), "--root", str(root)],
+                  cwd=root,
+                  text=True,
+                  capture_output=True,
+              )
+              if result.returncode != 0:
+                  print(result.stdout, file=sys.stderr)
+                  print(result.stderr, file=sys.stderr)
+                  return result.returncode
+              changed = [
+                  path
+                  for path in GENERATED
+                  if (root / path).read_bytes() != before[path]
+              ]
+              for path, content in before.items():
+                  (root / path).write_bytes(content)
+              if changed:
+                  print(
+                      "TEXPDF_DOC_STATE_ERROR stale generated files: "
+                      + ", ".join(changed),
+                      file=sys.stderr,
+                  )
+                  return 1
+              print("TEXPDF_DOC_STATE_OK")
+              return 0
+
+
+          if __name__ == "__main__":
+              raise SystemExit(main())
+          PY
+          chmod +x tools/check_documentation_state.py
+
+          cat > ci/tests/test_documentation_policy.py <<'PY'
+          from pathlib import Path
+          import unittest
+
+
+          class DocumentationPolicyTests(unittest.TestCase):
+              def test_documentation_index_declares_generated_sources(self) -> None:
+                  root = Path(__file__).resolve().parents[2]
+                  text = (root / "docs/README.md").read_text(encoding="utf-8")
+                  self.assertIn("tools/sync_project_state.py", text)
+                  self.assertIn("Build-only evidence", text)
+                  self.assertIn("STATUS.md", text)
+                  self.assertIn("PLAN.md", text)
+
+
+          if __name__ == "__main__":
+              unittest.main()
+          PY
+
+          /usr/bin/python3 tools/sync_project_state.py
+          /usr/bin/python3 tools/check_documentation_state.py
+          /usr/bin/python3 -m unittest ci.tests.test_documentation_policy
+          rm -f .github/workflows/install-documentation-policy-once.yml
+          git add docs/README.md tools/check_documentation_state.py
+          git add ci/tests/test_documentation_policy.py
+          git add STATUS.md PLAN.md IMPLEMENTATION.md README.md
+          git add docs/V1_READINESS.md docs/WORKFLOWS.md release/V1_READINESS.json
+          git add -u .github/workflows/install-documentation-policy-once.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: define documentation authority and consistency checks"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
