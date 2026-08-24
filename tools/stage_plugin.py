@@ -47,9 +47,9 @@ def verify_symbols(path: Path) -> list[str]:
     return ["pginit", "stata_call"]
 
 
-def dynamic_dependencies(path: Path) -> tuple[list[str], list[str]]:
+def dynamic_dependencies(path: Path) -> tuple[list[str], list[str], str | None]:
     if sys.platform != "darwin":
-        return [], []
+        return [], [], None
     result = subprocess.run(
         ["/usr/bin/otool", "-L", str(path)],
         check=True,
@@ -61,13 +61,22 @@ def dynamic_dependencies(path: Path) -> tuple[list[str], list[str]]:
         value = line.strip().split(" (compatibility version", 1)[0]
         if value:
             dependencies.append(value)
+
+    install_id: str | None = None
+    runtime_dependencies: list[str] = []
+    for value in dependencies:
+        if Path(value).name == native_library_name() and install_id is None:
+            install_id = value
+        else:
+            runtime_dependencies.append(value)
+
     external = [
         value
-        for value in dependencies
+        for value in runtime_dependencies
         if not value.startswith("/usr/lib/")
         and not value.startswith("/System/Library/")
     ]
-    return dependencies, external
+    return runtime_dependencies, external, install_id
 
 
 def write_json_atomic(path: Path, payload: dict[str, object]) -> None:
@@ -106,7 +115,7 @@ def main() -> int:
     os.replace(temporary, args.output)
     try:
         exports = verify_symbols(args.output)
-        dependencies, external_dependencies = dynamic_dependencies(args.output)
+        dependencies, external_dependencies, install_id = dynamic_dependencies(args.output)
         if external_dependencies:
             raise RuntimeError(
                 "plugin has non-system dynamic dependencies: "
@@ -125,6 +134,7 @@ def main() -> int:
         "sha256": sha256_file(args.output),
         "platform": sys.platform,
         "exports": exports,
+        "install_id": install_id,
         "dynamic_dependencies": dependencies,
         "external_dynamic_dependencies": external_dependencies,
     }
