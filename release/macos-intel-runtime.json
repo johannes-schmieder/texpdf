@@ -1,0 +1,68 @@
+{
+  "candidate_package_license_evidence_included": true,
+  "candidate_package_public_release": false,
+  "candidate_package_sha256": "f5d69ac7e500558701da0c6b8900e0c3d6c452007c5f2c63e76917f09524bf3c",
+  "candidate_package_size_bytes": 45982324,
+  "candidate_package_version": "0.1.0-rc.1",
+  "intel_helper_sha256": "16c18263b100ee939d6b4cb4cbd2b0dc2701c7da7eb404d9fd1ef3257119f298",
+  "intel_helper_size_bytes": 48574376,
+  "intel_slice_sha256": "f697476cf74c78c407cf70344dc2b60360a1afebc7a69fa25e78abead2af32bb",
+  "intel_slice_size_bytes": 49098680,
+  "qualified": true,
+  "receipt": {
+    "completed_at": "2026-08-24T22:06:57.408624Z",
+    "duration_seconds": 270.305,
+    "failure_detail": null,
+    "failure_kind": null,
+    "platform": "Unix; Macintosh (Intel 64-bit)",
+    "process_rc": 0,
+    "profile": "quick",
+    "ref": "refs/heads/main",
+    "repository": "johannes-schmieder/texpdf",
+    "required_log_markers": [
+      {
+        "marker": "TEXPDF IN PROCESS STRESS PASS",
+        "present": true
+      },
+      {
+        "marker": "TEXPDF NET INSTALL PASS",
+        "present": true
+      },
+      {
+        "marker": "TEXPDF FULL ENGINE STATA PASS",
+        "present": true
+      },
+      {
+        "marker": "TEXPDF STATA MATA SMOKE PASS",
+        "present": true
+      }
+    ],
+    "run_attempt": "1",
+    "run_id": "32782507207",
+    "runner_name": "macstudio-stata-mp18-texpdf",
+    "rust_mode": null,
+    "rust_rc": null,
+    "rust_status": "not_run",
+    "rust_toolchain": null,
+    "rustc_version": null,
+    "schema_version": 1,
+    "started_at": "2026-08-24T22:02:27.114872Z",
+    "stata_bundle_version": "unknown",
+    "stata_edition": "MP",
+    "stata_executable": "/Users/johannes/actions-runners/texpdf-stata/_work/_temp/texpdf-stata-x86_64",
+    "stata_processors": 8,
+    "stata_rc": 0,
+    "stata_status": "success",
+    "stata_version": "18",
+    "status": "success",
+    "suite": "ci/stata_smoke.do",
+    "tested_sha": "68d7c8b2f4de569fad5fb583978cd13efb4c5dae",
+    "tests_failed": 0,
+    "tests_passed": 1
+  },
+  "runtime": "macOS x86_64 Stata process under Rosetta",
+  "schema_version": 1,
+  "source_sha": "68d7c8b2f4de569fad5fb583978cd13efb4c5dae",
+  "universal_plugin_sha256": "1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f",
+  "universal_plugin_size_bytes": 98532016
+}
