@@ -29,7 +29,23 @@ echo "RUSTC_VERSION=$rustc_version"
 if [[ -f Cargo.toml ]]; then
   export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/private/tmp/texpdf-cargo-target}"
   export TEXPDF_BUNDLE_CACHE="${TEXPDF_BUNDLE_CACHE:-/private/tmp/texpdf-bundle-cache}"
-  /usr/bin/python3 tools/prepare_bundle.py --cache-dir "$TEXPDF_BUNDLE_CACHE"
+  rust_profile="${TEXPDF_RUST_PROFILE:-quick}"
+  if [[ -f ci/FULL_ENGINE ]]; then
+    rust_profile=engine
+  fi
+
+  case "$rust_profile" in
+    quick)
+      /usr/bin/python3 tools/prepare_stub_bundle.py
+      ;;
+    engine)
+      /usr/bin/python3 tools/prepare_bundle.py --cache-dir "$TEXPDF_BUNDLE_CACHE"
+      ;;
+    *)
+      echo "Unknown TEXPDF_RUST_PROFILE: $rust_profile" >&2
+      exit 2
+      ;;
+  esac
   /bin/cat bundle/generated/bundle-info.json
 
   if [[ ! -f Cargo.lock ]]; then
@@ -41,8 +57,16 @@ if [[ -f Cargo.toml ]]; then
 
   "$rustup_bin" run "$toolchain" cargo fmt --all --check
   "$rustup_bin" run "$toolchain" cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
-  "$rustup_bin" run "$toolchain" cargo test --locked --workspace --all-targets --all-features
-  echo "RUST_QUICK_MODE=repository"
+  if [[ "$rust_profile" == engine ]]; then
+    "$rustup_bin" run "$toolchain" cargo test --locked --workspace --all-targets --all-features
+    echo "RUST_QUICK_MODE=repository-engine"
+  else
+    # Compile every test target, but execute only the lightweight diagnostics
+    # tests. Runtime engine tests require the real bundle and run in the
+    # explicit engine profile.
+    "$rustup_bin" run "$toolchain" cargo test --locked --workspace --all-targets --all-features diagnostics::tests
+    echo "RUST_QUICK_MODE=repository-compile"
+  fi
 else
   smoke_root="${RUNNER_TEMP:-/private/tmp}/texpdf-rust-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
   /bin/mkdir -p "$smoke_root"
