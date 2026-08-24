@@ -1,0 +1,200 @@
+name: Run final 1000-call memory qualification once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/run-final-memory-stress-once.yml"
+      - "tools/sync_project_state.py"
+
+concurrency:
+  group: texpdf-final-memory-stress-once
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  stress:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 300
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      TEXPDF_RUST_PROFILE: engine
+      TEXPDF_STRESS_ITERATIONS: "1000"
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Synchronize and check prerequisites
+        id: state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if [[ ! -x tools/sync_project_state.py ]] ||
+             [[ ! -x ci/run_memory_stress.sh ]]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          path=Path('release/macos-arm64-memory-stress.json')
+          if not path.is_file():
+              raise SystemExit(1)
+          record=json.loads(path.read_text(encoding='utf-8'))
+          raise SystemExit(0 if record.get('status') == 'success' and int(record.get('iterations',0)) >= 1000 else 1)
+          PY
+          then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "already_complete=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "already_complete=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Remove redundant trigger if already complete
+        if: ${{ steps.state.outputs.already_complete == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/run-final-memory-stress-once.yml
+          git add -u .github/workflows/run-final-memory-stress-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "ci: remove redundant memory-stress trigger [skip ci]"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
+
+      - name: Build exact embedded plugin
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/record_rust_quick.sh
+          /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+          test -f stata/_texpdf_plugin.plugin
+
+      - name: Run memory stress supervisor
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          log="$RUNNER_TEMP/texpdf-memory-stress.log"
+          set +e
+          /bin/bash ci/run_memory_stress.sh 1000 >"$log" 2>&1
+          rc=$?
+          set -e
+          cat "$log"
+          cp "$log" .ci/stata/run/memory-stress.log
+          if [[ $rc -ne 0 ]]; then
+            echo "Memory stress failed with rc=$rc" >&2
+            exit "$rc"
+          fi
+
+      - name: Build exact memory qualification record
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import os
+          import re
+          import subprocess
+
+          log_path=Path('.ci/stata/run/memory-stress.log')
+          text=log_path.read_text(encoding='utf-8', errors='replace')
+          success_markers=(
+              'TEXPDF STRESS PASS',
+              'TEXPDF STRESS 1000 PASS',
+              'TEXPDF MEMORY STRESS PASS',
+              'TEXPDF IN PROCESS STRESS PASS',
+          )
+          present=[marker for marker in success_markers if marker in text]
+          if not present:
+              raise SystemExit('stress log contains no accepted PASS marker')
+
+          def first_int(patterns):
+              for pattern in patterns:
+                  match=re.search(pattern, text, re.I)
+                  if match:
+                      return int(match.group(1))
+              return None
+
+          maximum_rss=first_int((
+              r'max(?:imum)?[_ ]rss(?:_bytes)?[=: ]+([0-9]+)',
+              r'maximum resident set size[^0-9]+([0-9]+)',
+              r'peak[_ ]rss(?:_bytes)?[=: ]+([0-9]+)',
+          ))
+          initial_rss=first_int((
+              r'initial[_ ]rss(?:_bytes)?[=: ]+([0-9]+)',
+              r'rss[_ ]before(?:_bytes)?[=: ]+([0-9]+)',
+          ))
+          final_rss=first_int((
+              r'final[_ ]rss(?:_bytes)?[=: ]+([0-9]+)',
+              r'rss[_ ]after(?:_bytes)?[=: ]+([0-9]+)',
+          ))
+          growth=None
+          if initial_rss is not None and final_rss is not None:
+              growth=final_rss-initial_rss
+
+          source_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          record={
+              'schema_version':1,
+              'source_sha':source_sha,
+              'status':'success',
+              'platform':'macOS Apple Silicon',
+              'stata':'Stata/MP 18',
+              'iterations':1000,
+              'pass_markers':present,
+              'log_sha256':hashlib.sha256(log_path.read_bytes()).hexdigest(),
+              'maximum_rss_reported':maximum_rss,
+              'initial_rss_reported':initial_rss,
+              'final_rss_reported':final_rss,
+              'reported_growth':growth,
+              'acceptance_boundary':'process completed all iterations, emitted an accepted PASS marker, and returned zero; memory fields are recorded when exposed by the supervisor',
+          }
+          output=Path('release/macos-arm64-memory-stress.json')
+          output.parent.mkdir(parents=True, exist_ok=True)
+          output.write_text(json.dumps(record,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print('TEXPDF_MEMORY_1000_QUALIFIED '+json.dumps(record,sort_keys=True))
+          PY
+          /usr/bin/python3 tools/sync_project_state.py
+          rm -f .github/workflows/run-final-memory-stress-once.yml
+
+      - name: Commit safety evidence
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf target dist bundle/generated .ci/stata/run
+          rm -f stata/_texpdf_plugin.plugin
+          git add release/macos-arm64-memory-stress.json
+          git add STATUS.md PLAN.md docs/V1_READINESS.md release/V1_READINESS.json
+          git add -u .github/workflows/run-final-memory-stress-once.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test: record 1000-call macOS memory qualification [skip ci]"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
+
+      - name: Upload full stress evidence
+        if: ${{ always() && steps.state.outputs.ready == 'true' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-memory-1000-${{ github.sha }}-${{ github.run_id }}
+          path: .ci/stata/run/
+          if-no-files-found: warn
+          retention-days: 90
