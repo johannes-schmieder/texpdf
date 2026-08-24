@@ -58,7 +58,29 @@ if [[ -f Cargo.toml ]]; then
           --manifest bundle/curated-manifest.json \
           "${common_bundle_args[@]}"
       else
-        source_url="$(/usr/bin/python3 - <<'PY'
+        trace_path="bundle/generated/resource-trace.txt"
+        if [[ -f bundle/resource-trace.txt.gz.b64 ]]; then
+          /usr/bin/python3 - <<'PY'
+from pathlib import Path
+import base64
+import gzip
+
+source = Path("bundle/resource-trace.txt.gz.b64")
+destination = Path("bundle/generated/resource-trace.txt")
+destination.parent.mkdir(parents=True, exist_ok=True)
+compressed = base64.b64decode(source.read_bytes(), validate=True)
+destination.write_bytes(gzip.decompress(compressed))
+print(
+    "TEXPDF_COMMITTED_TRACE_READY "
+    f"path={destination} lines={len(destination.read_text(encoding='utf-8').splitlines())}"
+)
+PY
+          /usr/bin/python3 tools/prepare_curated_bundle.py \
+            --trace "$trace_path" \
+            --write-manifest bundle/generated/curated-manifest.json \
+            "${common_bundle_args[@]}"
+        else
+          source_url="$(/usr/bin/python3 - <<'PY'
 from pathlib import Path
 for raw in Path('bundle/bundle.lock.toml').read_text(encoding='utf-8').splitlines():
     line = raw.strip()
@@ -69,25 +91,25 @@ else:
     raise SystemExit('source_url is absent from bundle lock')
 PY
 )"
-        trace_path="bundle/generated/resource-trace.txt"
-        resource_dir="bundle/generated/resolved-resources"
-        set +e
-        "$toolchain_cargo" run --locked --package texpdf-bundle-resolver -- \
-          "$source_url" "$trace_path" tests/fixtures/bundle_corpus.tex
-        resolver_rc=$?
-        set -e
-        if [[ -f "$trace_path" ]]; then
-          /bin/cp "$trace_path" .ci/stata/run/resource-trace.txt
+          resource_dir="bundle/generated/resolved-resources"
+          set +e
+          "$toolchain_cargo" run --locked --package texpdf-bundle-resolver -- \
+            "$source_url" "$trace_path" tests/fixtures/bundle_corpus.tex
+          resolver_rc=$?
+          set -e
+          if [[ -f "$trace_path" ]]; then
+            /bin/cp "$trace_path" .ci/stata/run/resource-trace.txt
+          fi
+          if [[ $resolver_rc -ne 0 ]]; then
+            echo "TEXPDF_BUNDLE_RESOLVER_FAILED rc=$resolver_rc trace=$trace_path" >&2
+            exit "$resolver_rc"
+          fi
+          /usr/bin/python3 tools/prepare_curated_bundle.py \
+            --trace "$trace_path" \
+            --resource-dir "$resource_dir" \
+            --write-manifest bundle/generated/curated-manifest.json \
+            "${common_bundle_args[@]}"
         fi
-        if [[ $resolver_rc -ne 0 ]]; then
-          echo "TEXPDF_BUNDLE_RESOLVER_FAILED rc=$resolver_rc trace=$trace_path" >&2
-          exit "$resolver_rc"
-        fi
-        /usr/bin/python3 tools/prepare_curated_bundle.py \
-          --trace "$trace_path" \
-          --resource-dir "$resource_dir" \
-          --write-manifest bundle/generated/curated-manifest.json \
-          "${common_bundle_args[@]}"
       fi
       ;;
     *)
