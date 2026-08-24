@@ -35,14 +35,17 @@ Project state is determined in this order:
 
 1. `.ci/stata/results/<source-sha>.json` for exact Rust/Stata qualification;
 2. `release/targets.json` for platform support status;
-3. `docs/generated/CURRENT_ARTIFACT.md` for exact current measurements;
+3. `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements;
 4. `STATUS.md` for the live human-readable summary;
 5. this plan for remaining work.
 
 A branch head, successful ancestor, build-only artifact, or receipt-publisher
 commit is not a substitute for an exact green source receipt.
 
-The current qualified macOS ARM64 baseline is
+Current exact green source:
+`90101fa26ef06cea0ffa7e241b4230a1d0fe62a9`.
+
+Current exact macOS ARM64 artifact baseline:
 `a42f29fbeefd41811475d47e066e1ffea5290bfd`.
 
 ## 3. Completed foundations
@@ -97,25 +100,24 @@ The current qualified macOS ARM64 baseline is
 - [x] Standalone binary dependency-policy inspection.
 - [x] Exact plugin/package sizes and SHA-256 values recorded.
 
+### P0 — Restore current source to green — complete
+
+- [x] Apply `cargo fmt` output to the three newly added Rust test files.
+- [x] Run exact-SHA Rust engine checks and licensed Stata `quick` profile.
+- [x] Require `status=success`, `rust_status=success`, and
+      `stata_status=success` for source
+      `90101fa26ef06cea0ffa7e241b4230a1d0fe62a9`.
+- [x] Update the live status to distinguish current source evidence from the
+      earlier exact artifact record.
+
 ## 4. Remaining work in execution order
-
-### P0 — Restore current source to green — immediate
-
-- [ ] Apply `cargo fmt` output to the three newly added Rust test files.
-- [ ] Run exact-SHA Rust engine checks and licensed Stata `quick` profile.
-- [ ] Require `status=success`, `rust_status=success`, and
-      `stata_status=success` for the new source SHA.
-- [ ] Update `STATUS.md` to replace the temporary red-head note with the new
-      exact green checkpoint.
-
-Exit: current `main`, not only an ancestor, has an immutable green receipt.
 
 ### P1 — License-complete redistribution inventory — highest release blocker
 
 - [ ] Generate the locked Rust dependency inventory and collect required texts.
 - [ ] Generate the native vcpkg dependency inventory and collect notices.
-- [ ] Map every one of the embedded TeX/font resources to a TeX Live package or
-      an explicitly reviewed standalone license.
+- [ ] Map every embedded TeX/font resource to a TeX Live package or an
+      explicitly reviewed standalone license.
 - [ ] Resolve every ambiguous/unmapped resource and package lacking license
       metadata; reviewed overrides must record evidence.
 - [ ] Assemble the final release notice tree and bind it to the exact bundle and
@@ -144,7 +146,8 @@ in-process limitations are documented in `SECURITY.md`.
 For each target, use the same curated bundle and public API:
 
 - [x] `aarch64-apple-darwin`: build and Stata runtime qualified.
-- [ ] `x86_64-apple-darwin`: build, universal packaging, and Intel Stata runtime.
+- [ ] `x86_64-apple-darwin`: Intel slice builds; fix universal packaging and
+      obtain Intel Stata runtime qualification.
 - [ ] `x86_64-pc-windows-msvc`: native MSVC build and Windows Stata runtime.
 - [ ] `x86_64-unknown-linux-gnu`: native GNU build and Linux Stata runtime.
 
