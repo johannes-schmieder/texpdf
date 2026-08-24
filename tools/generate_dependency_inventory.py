@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-"""Generate a deterministic Rust/native dependency inventory for texpdf."""
+"""Generate the Rust/native inventory for one texpdf release plugin graph."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
-import subprocess
 import sys
 from typing import Any
+
+from cargo_release_graph import (
+    CargoGraphError,
+    cargo_metadata,
+    release_packages,
+)
 
 NATIVE_DEPENDENCIES = [
     {
@@ -49,23 +55,10 @@ NATIVE_DEPENDENCIES = [
 ]
 
 
-def cargo_metadata() -> dict[str, Any]:
-    result = subprocess.run(
-        ["cargo", "metadata", "--locked", "--format-version", "1"],
-        check=False,
-        text=True,
-        capture_output=True,
-    )
-    if result.returncode != 0:
-        print(result.stderr, file=sys.stderr)
-        raise RuntimeError("cargo metadata failed")
-    return json.loads(result.stdout)
-
-
-def rust_inventory(metadata: dict[str, Any]) -> list[dict[str, Any]]:
-    packages: list[dict[str, Any]] = []
-    for package in metadata.get("packages", []):
-        packages.append(
+def rust_inventory(packages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for package in packages:
+        rows.append(
             {
                 "name": package["name"],
                 "version": package["version"],
@@ -75,20 +68,26 @@ def rust_inventory(metadata: dict[str, Any]) -> list[dict[str, Any]]:
                 "source": package.get("source"),
             }
         )
-    return sorted(packages, key=lambda item: (item["name"], item["version"]))
+    return sorted(rows, key=lambda item: (item["name"], item["version"]))
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 def write_markdown(path: Path, payload: dict[str, Any]) -> None:
     lines = [
-        "# Generated dependency inventory",
+        "# Generated release dependency inventory",
         "",
-        "This file inventories declared dependency licenses. It does not replace",
-        "the corresponding license texts or the separate TeX resource inventory.",
+        f"Release root: `{payload['release_root']}`  ",
+        f"Release target: `{payload['release_target']}`",
+        "",
+        "This inventory follows the normal/build dependency closure of the",
+        "released plugin. It excludes dev/test-only and unrelated workspace crates.",
+        "It does not replace corresponding license texts or the TeX resource audit.",
         "",
         "## Rust packages",
         "",
@@ -97,7 +96,9 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
     ]
     for item in payload["rust_packages"]:
         repository = item.get("repository") or ""
-        license_expression = item.get("license") or item.get("license_file") or "UNDECLARED"
+        license_expression = (
+            item.get("license") or item.get("license_file") or "UNDECLARED"
+        )
         lines.append(
             f"| `{item['name']}` | `{item['version']}` | "
             f"`{license_expression}` | {repository} |"
@@ -112,7 +113,9 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
         ]
     )
     for item in payload["native_libraries"]:
-        lines.append(f"| `{item['name']}` | `{item['license']}` | {item['role']} |")
+        lines.append(
+            f"| `{item['name']}` | `{item['license']}` | {item['role']} |"
+        )
     lines.append("")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -120,6 +123,12 @@ def write_markdown(path: Path, payload: dict[str, Any]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--cargo", default="cargo")
+    parser.add_argument("--package", default="texpdf-stata")
+    parser.add_argument(
+        "--target",
+        default=os.environ.get("TEXPDF_LICENSE_TARGET", "aarch64-apple-darwin"),
+    )
     parser.add_argument(
         "--json", type=Path, default=Path("licenses/generated/dependencies.json")
     )
@@ -130,18 +139,21 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        packages = rust_inventory(cargo_metadata())
-    except (OSError, RuntimeError, json.JSONDecodeError) as error:
+        metadata = cargo_metadata(args.cargo, args.target)
+        packages = rust_inventory(release_packages(metadata, args.package))
+    except (OSError, CargoGraphError, json.JSONDecodeError) as error:
         print(f"TEXPDF_LICENSE_INVENTORY_ERROR {error}", file=sys.stderr)
         return 2
 
     undeclared = [
-        item["name"]
+        f"{item['name']}@{item['version']}"
         for item in packages
         if not item.get("license") and not item.get("license_file")
     ]
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "release_root": args.package,
+        "release_target": args.target,
         "rust_packages": packages,
         "native_libraries": NATIVE_DEPENDENCIES,
         "undeclared_rust_licenses": undeclared,
@@ -151,7 +163,7 @@ def main() -> int:
     print(
         "TEXPDF_DEPENDENCY_INVENTORY_READY "
         f"rust_packages={len(packages)} native_libraries={len(NATIVE_DEPENDENCIES)} "
-        f"undeclared={len(undeclared)}"
+        f"undeclared={len(undeclared)} target={args.target} root={args.package}"
     )
     if args.require_declared and undeclared:
         print(

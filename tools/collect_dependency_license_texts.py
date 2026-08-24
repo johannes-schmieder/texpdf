@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Collect license and notice texts for the locked Rust/native dependencies."""
+"""Collect license/notice texts for one release plugin dependency graph."""
 
 from __future__ import annotations
 
@@ -9,9 +9,14 @@ import json
 import os
 from pathlib import Path
 import shutil
-import subprocess
 import sys
 from typing import Any
+
+from cargo_release_graph import (
+    CargoGraphError,
+    cargo_metadata,
+    release_packages,
+)
 
 NOTICE_PREFIXES = (
     "LICENSE",
@@ -39,22 +44,6 @@ def sha256(path: Path) -> str:
         while chunk := stream.read(1024 * 1024):
             digest.update(chunk)
     return digest.hexdigest()
-
-
-def metadata() -> dict[str, Any]:
-    result = subprocess.run(
-        ["cargo", "metadata", "--locked", "--format-version", "1"],
-        check=False,
-        text=True,
-        capture_output=True,
-    )
-    if result.returncode != 0:
-        print(result.stderr, file=sys.stderr)
-        raise RuntimeError("cargo metadata failed")
-    value = json.loads(result.stdout)
-    if not isinstance(value, dict):
-        raise RuntimeError("cargo metadata did not return an object")
-    return value
 
 
 def notice_files(root: Path) -> list[Path]:
@@ -95,14 +84,14 @@ def copy_notices(source_root: Path, destination: Path) -> list[dict[str, object]
     return records
 
 
-def collect_rust(output_root: Path) -> list[dict[str, object]]:
-    cargo_metadata = metadata()
-    workspace_root = Path(cargo_metadata["workspace_root"])
+def collect_rust(
+    output_root: Path,
+    metadata: dict[str, Any],
+    package_name: str,
+) -> list[dict[str, object]]:
+    workspace_root = Path(metadata["workspace_root"])
     records: list[dict[str, object]] = []
-    for package in sorted(
-        cargo_metadata.get("packages", []),
-        key=lambda item: (item["name"], item["version"]),
-    ):
+    for package in release_packages(metadata, package_name):
         manifest = Path(package["manifest_path"])
         package_root = manifest.parent
         destination = output_root / "rust" / safe_component(
@@ -129,10 +118,6 @@ def collect_rust(output_root: Path) -> list[dict[str, object]]:
                         "size_bytes": target.stat().st_size,
                     }
                 )
-        # Workspace members commonly inherit the repository-root license but do
-        # not duplicate it in each crate directory. This fallback is restricted
-        # to source=None packages; never search the shared Cargo registry parent,
-        # where neighboring crate directories are unrelated.
         if not notices and package.get("source") is None:
             notices = copy_notices(workspace_root, destination)
             notice_origin = "workspace_root"
@@ -151,7 +136,9 @@ def collect_rust(output_root: Path) -> list[dict[str, object]]:
     return records
 
 
-def find_native_copyright(vcpkg_root: Path, triplet: str, port: str) -> Path | None:
+def find_native_copyright(
+    vcpkg_root: Path, triplet: str, port: str
+) -> Path | None:
     candidates = (
         vcpkg_root / "installed" / triplet / "share" / port / "copyright",
         vcpkg_root / "packages" / f"{port}_{triplet}" / "share" / port / "copyright",
@@ -196,6 +183,12 @@ def collect_native(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--cargo", default="cargo")
+    parser.add_argument("--package", default="texpdf-stata")
+    parser.add_argument(
+        "--target",
+        default=os.environ.get("TEXPDF_LICENSE_TARGET", "aarch64-apple-darwin"),
+    )
     parser.add_argument(
         "--output-root", type=Path, default=Path("licenses/generated/texts")
     )
@@ -214,9 +207,10 @@ def main() -> int:
 
     shutil.rmtree(args.output_root, ignore_errors=True)
     try:
-        rust = collect_rust(args.output_root)
+        metadata = cargo_metadata(args.cargo, args.target)
+        rust = collect_rust(args.output_root, metadata, args.package)
         native = collect_native(args.output_root, vcpkg_root, triplet)
-    except (OSError, RuntimeError, KeyError, json.JSONDecodeError) as error:
+    except (OSError, CargoGraphError, KeyError, json.JSONDecodeError) as error:
         print(f"TEXPDF_LICENSE_TEXT_ERROR {error}", file=sys.stderr)
         return 2
 
@@ -238,7 +232,9 @@ def main() -> int:
         record["name"] for record in native if not record["notice_files"]
     ]
     payload = {
-        "schema_version": 2,
+        "schema_version": 3,
+        "release_root": args.package,
+        "release_target": args.target,
         "rust_packages": rust,
         "native_libraries": native,
         "missing_rust_notice_files": missing_rust,
@@ -253,7 +249,8 @@ def main() -> int:
     print(
         "TEXPDF_LICENSE_TEXTS_READY "
         f"rust={len(rust)} native={len(native)} "
-        f"missing_rust={len(missing_rust)} missing_native={len(missing_native)}"
+        f"missing_rust={len(missing_rust)} missing_native={len(missing_native)} "
+        f"target={args.target} root={args.package}"
     )
     if missing_rust or (args.require_native and missing_native):
         return 1
