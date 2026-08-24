@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "targets": {
+    "aarch64-apple-darwin": {
+      "artifact": "_texpdf_plugin.plugin",
+      "plugin_sha256": "",
+      "qualified_source_sha": "5d85840783ad4406a1606e5b3af09a06cca2f657",
+      "qualification_profile": "quick",
+      "stata_runtime_qualified": true,
+      "stata_version": "18",
+      "status": "qualified development checkpoint; final cleaned artifact digest pending"
+    },
+    "x86_64-apple-darwin": {
+      "artifact": "_texpdf_plugin.plugin",
+      "plugin_sha256": "",
+      "qualified_source_sha": "",
+      "qualification_profile": "",
+      "stata_runtime_qualified": false,
+      "stata_version": "",
+      "status": "native build and Stata runtime qualification pending"
+    },
+    "x86_64-pc-windows-msvc": {
+      "artifact": "_texpdf_plugin.plugin",
+      "plugin_sha256": "",
+      "qualified_source_sha": "",
+      "qualification_profile": "",
+      "stata_runtime_qualified": false,
+      "stata_version": "",
+      "status": "native build and Stata runtime qualification pending"
+    },
+    "x86_64-unknown-linux-gnu": {
+      "artifact": "_texpdf_plugin.plugin",
+      "plugin_sha256": "",
+      "qualified_source_sha": "",
+      "qualification_profile": "",
+      "stata_runtime_qualified": false,
+      "stata_version": "",
+      "status": "native build and Stata runtime qualification pending"
+    }
+  }
+}
