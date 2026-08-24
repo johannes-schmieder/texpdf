@@ -1,0 +1,218 @@
+name: Qualify both macOS universal runtime slices once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/qualify-macos-universal-runtime-once.yml"
+
+concurrency:
+  group: texpdf-macos-universal-runtime
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 240
+    env:
+      REAL_STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      TEXPDF_RUST_PROFILE: engine
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify universal Stata and Rosetta availability
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          /usr/bin/lipo -verify_arch arm64 x86_64 "$REAL_STATA_BIN"
+          test "$(/usr/bin/arch -x86_64 /usr/bin/uname -m)" = "x86_64"
+          cat > "$RUNNER_TEMP/stata-mp-x86_64" <<EOF
+          #!/bin/bash
+          set -euo pipefail
+          exec /usr/bin/arch -x86_64 "$REAL_STATA_BIN" "\$@"
+          EOF
+          chmod +x "$RUNNER_TEMP/stata-mp-x86_64"
+          "$RUNNER_TEMP/stata-mp-x86_64" -q -b do ci/stata_version.do
+
+      - name: Ensure target-aware universal build source in workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("tools/build_macos_universal.sh")
+          text = path.read_text(encoding="utf-8")
+          old = '  source tools/prepare_native_deps.sh\n'
+          new = '  source tools/prepare_native_deps_for_target.sh "$target"\n'
+          if new not in text:
+              if text.count(old) != 1:
+                  raise SystemExit("universal builder is not target-aware")
+              path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
+
+      - name: Build and test real embedded engine
+        shell: bash
+        env:
+          STATA_BIN: ${{ env.REAL_STATA_BIN }}
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/texpdf-universal-rust"
+          mkdir -p "$RUNNER_TEMP/texpdf-universal-rust"
+          cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-universal-rust/"
+
+      - name: Build universal plugin
+        shell: bash
+        run: >-
+          /bin/bash tools/build_macos_universal.sh
+          dist/macos-universal/_texpdf_plugin.plugin
+          dist/macos-universal/manifest.json
+
+      - name: Stage universal plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp dist/macos-universal/_texpdf_plugin.plugin stata/_texpdf_plugin.plugin
+          git add -f stata/_texpdf_plugin.plugin
+
+      - name: Qualify ARM64 Stata runtime
+        shell: bash
+        env:
+          STATA_BIN: ${{ env.REAL_STATA_BIN }}
+        run: |
+          set -euo pipefail
+          /bin/bash ci/run_stata_ci.sh quick
+          cp .ci/stata/run/receipt.json "$RUNNER_TEMP/macos-universal-arm64-receipt.json"
+          cp -R "$RUNNER_TEMP/texpdf-universal-rust/." .ci/stata/run/
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            "$RUNNER_TEMP/macos-universal-arm64-receipt.json" \
+            .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            "$RUNNER_TEMP/macos-universal-arm64-receipt.json" \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success \
+            --require-rust-success
+
+      - name: Qualify x86_64 Stata runtime under Rosetta
+        shell: bash
+        env:
+          STATA_BIN: ${{ runner.temp }}/stata-mp-x86_64
+        run: |
+          set -euo pipefail
+          /bin/bash ci/run_stata_ci.sh quick
+          cp .ci/stata/run/receipt.json "$RUNNER_TEMP/macos-universal-x86_64-receipt.json"
+          cp -R "$RUNNER_TEMP/texpdf-universal-rust/." .ci/stata/run/
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            "$RUNNER_TEMP/macos-universal-x86_64-receipt.json" \
+            .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            "$RUNNER_TEMP/macos-universal-x86_64-receipt.json" \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success \
+            --require-rust-success
+
+      - name: Build permanent universal runtime record
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p platform
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+
+          manifest = json.loads(Path("dist/macos-universal/manifest.json").read_text(encoding="utf-8"))
+          arm = json.loads(Path(os.environ["RUNNER_TEMP"] + "/macos-universal-arm64-receipt.json").read_text(encoding="utf-8"))
+          intel = json.loads(Path(os.environ["RUNNER_TEMP"] + "/macos-universal-x86_64-receipt.json").read_text(encoding="utf-8"))
+          manifest.update(
+              {
+                  "qualified_source_sha": os.environ["GITHUB_SHA"],
+                  "arm_runtime_qualified": True,
+                  "arm_runtime_mode": "native arm64",
+                  "arm_stata_version": arm.get("stata_version"),
+                  "arm_stata_edition": arm.get("stata_edition"),
+                  "arm_receipt": "platform/macos-universal-arm64-receipt.json",
+                  "intel_runtime_qualified": True,
+                  "intel_runtime_mode": "x86_64 Stata process under Rosetta 2",
+                  "intel_stata_version": intel.get("stata_version"),
+                  "intel_stata_edition": intel.get("stata_edition"),
+                  "intel_receipt": "platform/macos-universal-x86_64-receipt.json",
+                  "qualification_boundary": (
+                      "Both Mach-O slices loaded and passed the full quick/corpus/net-install/"
+                      "stress profile. The x86_64 slice was exercised by an actual x86_64 "
+                      "Stata process under Rosetta 2 on Apple Silicon rather than Intel hardware."
+                  ),
+              }
+          )
+          Path("platform/macos-universal.json").write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          Path("platform/macos-universal-arm64-receipt.json").write_text(
+              json.dumps(arm, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          Path("platform/macos-universal-x86_64-receipt.json").write_text(
+              json.dumps(intel, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("TEXPDF_MACOS_BOTH_SLICES_QUALIFIED", manifest)
+          PY
+
+      - name: Commit universal runtime qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/qualify-macos-universal-once.yml
+          rm -f .github/workflows/qualify-macos-universal-runtime-once.yml
+          git reset -- stata/_texpdf_plugin.plugin 2>/dev/null || true
+          rm -rf stata/_texpdf_plugin.plugin .ci/stata/run bundle/generated dist
+          git add platform/macos-universal.json \
+            platform/macos-universal-arm64-receipt.json \
+            platform/macos-universal-x86_64-receipt.json
+          git add -u .github/workflows/qualify-macos-universal-once.yml \
+            .github/workflows/qualify-macos-universal-runtime-once.yml || true
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test: qualify both macOS universal Stata slices"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep "$attempt"
+          done
+          echo "failed to publish universal runtime qualification" >&2
+          exit 1
+
+      - name: Upload universal runtime evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-macos-universal-runtime-${{ github.sha }}-${{ github.run_id }}
+          path: |
+            dist/macos-universal/
+            platform/macos-universal*.json
+            .ci/stata/run/
+          if-no-files-found: warn
+          retention-days: 30
