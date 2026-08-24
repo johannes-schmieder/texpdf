@@ -9,16 +9,11 @@
       "plugin_sha256": "185e4094c0d9835af199a3602fa8cd6ffa62a0da09c43c7267018b8ecb622298",
       "plugin_size_bytes": 49997392,
       "qualification_profile": "quick",
-      "qualified_source_sha": "90101fa26ef06cea0ffa7e241b4230a1d0fe62a9",
+      "qualified_source_sha": "55dc0a564a260a210ce43fd22910af6ef483eb60",
       "stata_edition": "MP",
       "stata_runtime_qualified": true,
       "stata_version": "18",
-      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run",
-      "universal_arm_runtime_qualified": true,
-      "universal_arm_slice_sha256": "ff588d40f34bfba810c9f2b36a43dda1dcc2694830db17a542c397849750cb16",
-      "universal_build_source_sha": "32bceb84df47a1c955c10cf75cb60a9d0fbb8d96",
-      "universal_plugin_sha256": "dffd41aa5e27cef155c47e21d41b260ec7c938966d86883961dc5ae8e5012cf5",
-      "universal_plugin_size_bytes": 100051312
+      "status": "qualified by exact-SHA embedded-engine Rust and licensed Stata run"
     },
     "x86_64-apple-darwin": {
       "artifact": "_texpdf_plugin.plugin",
