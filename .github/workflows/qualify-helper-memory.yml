@@ -1,0 +1,264 @@
+name: Qualify embedded-helper memory isolation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/qualify-helper-memory.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: texpdf-qualify-helper-memory
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 180
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      TEXPDF_RUST_PROFILE: engine
+      TEXPDF_STRESS_ITERATIONS: "1000"
+      TEXPDF_HELPER_CACHE_DIR: ${{ runner.temp }}/texpdf-helper-memory-${{ github.sha }}-${{ github.run_id }}
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Add temporary stress profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          path = Path("ci/stata_profiles.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          profiles = data.get("profiles", data)
+          base = dict(profiles["quick"])
+          suite_keys = [
+              key for key, value in base.items()
+              if isinstance(value, str) and value.endswith(".do")
+          ]
+          if len(suite_keys) != 1:
+              raise SystemExit(f"cannot identify suite field: {suite_keys}")
+          base[suite_keys[0]] = "ci/stata_stress_1000.do"
+          marker_keys = [key for key in base if "marker" in key.lower()]
+          if marker_keys:
+              base[marker_keys[0]] = ["TEXPDF STRESS 1000 PASS"]
+          else:
+              base["required_log_markers"] = ["TEXPDF STRESS 1000 PASS"]
+          timeout_keys = [key for key in base if "timeout" in key.lower()]
+          if timeout_keys:
+              base[timeout_keys[0]] = 7200
+          profiles["stress1000"] = base
+          path.write_text(
+              json.dumps(data, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          git add ci/stata_profiles.json
+
+      - name: Build and test the real helper-backed plugin
+        shell: bash
+        run: /bin/bash ci/record_rust_quick.sh
+
+      - name: Preserve Rust and helper evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/texpdf-helper-rust-evidence"
+          mkdir -p "$RUNNER_TEMP/texpdf-helper-rust-evidence"
+          cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-helper-rust-evidence/"
+          test -f "$RUNNER_TEMP/texpdf-helper-rust-evidence/helper-manifest.json"
+          test -f stata/_texpdf_plugin.plugin
+
+      - name: Run 1000 licensed-Stata calls with RSS sampling
+        shell: bash
+        run: /bin/bash ci/run_memory_stress.sh stress1000
+
+      - name: Restore and validate combined evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -R "$RUNNER_TEMP/texpdf-helper-rust-evidence/." .ci/stata/run/
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            .ci/stata/run/receipt.json \
+            .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile stress1000 \
+            --require-success \
+            --require-rust-success
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import os
+
+          memory = json.loads(
+              Path(".ci/stata/run/memory-stress.json").read_text(encoding="utf-8")
+          )
+          receipt = json.loads(
+              Path(".ci/stata/run/receipt.json").read_text(encoding="utf-8")
+          )
+          helper = json.loads(
+              Path(".ci/stata/run/helper-manifest.json").read_text(encoding="utf-8")
+          )
+          if memory.get("iterations_requested") != 1000:
+              raise SystemExit("memory qualification did not use exactly 1000 calls")
+          if memory.get("runner_rc") != 0 or memory.get("growth_gate") is not True:
+              raise SystemExit(f"memory gate failed: {memory}")
+          if receipt.get("rust_mode") != "repository-engine-helper":
+              raise SystemExit(f"wrong Rust execution mode: {receipt.get('rust_mode')}")
+          cache_root = Path(os.environ["TEXPDF_HELPER_CACHE_DIR"])
+          candidates = [path for path in cache_root.rglob("texpdf-helper") if path.is_file()]
+          if len(candidates) != 1:
+              raise SystemExit(f"expected one extracted helper, found {candidates}")
+          actual = hashlib.sha256(candidates[0].read_bytes()).hexdigest()
+          if actual != helper.get("sha256"):
+              raise SystemExit(
+                  f"extracted helper digest mismatch: expected {helper.get('sha256')}, got {actual}"
+              )
+          print(
+              "TEXPDF_HELPER_MEMORY_GREEN "
+              f"growth_kib={memory.get('post_warmup_growth_kib')} "
+              f"ratio={memory.get('post_warmup_growth_ratio')} "
+              f"peak_stata_kib={memory.get('peak_stata_rss_kib')} "
+              f"helper_sha256={actual}"
+          )
+          PY
+
+      - name: Publish exact helper-memory qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          record="$RUNNER_TEMP/helper-memory-qualification.json"
+          /usr/bin/python3 - "$record" <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import sys
+
+          def load(name):
+              return json.loads(Path(name).read_text(encoding="utf-8"))
+
+          memory = load(".ci/stata/run/memory-stress.json")
+          receipt = load(".ci/stata/run/receipt.json")
+          helper = load(".ci/stata/run/helper-manifest.json")
+          plugin = load(".ci/stata/run/plugin-manifest.json")
+          bundle = load(".ci/stata/run/bundle-info.json")
+          package = load(".ci/stata/run/package-manifest.json")
+          payload = {
+              "schema_version": 1,
+              "source_sha": os.environ["GITHUB_SHA"],
+              "qualified": True,
+              "execution_model": "embedded_helper",
+              "profile": receipt["profile"],
+              "overall_status": receipt["status"],
+              "stata_status": receipt["stata_status"],
+              "rust_status": receipt["rust_status"],
+              "rust_mode": receipt["rust_mode"],
+              "platform": receipt.get("platform"),
+              "stata_version": receipt.get("stata_version"),
+              "stata_edition": receipt.get("stata_edition"),
+              "memory": memory,
+              "helper": helper,
+              "plugin": plugin,
+              "bundle": bundle,
+              "package": package,
+              "qualification_boundary": (
+                  "This qualifies 1000 sequential helper-backed compilations in one "
+                  "licensed Stata/MP 18 process on macOS Apple Silicon. Other target "
+                  "runtimes require their own qualification."
+              ),
+          }
+          Path(sys.argv[1]).write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+          publish_tree="$RUNNER_TEMP/texpdf-helper-memory-publish"
+          git fetch origin main
+          rm -rf "$publish_tree"
+          git worktree add --detach "$publish_tree" origin/main
+          trap 'git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true' EXIT
+          mkdir -p "$publish_tree/release"
+          cp "$record" "$publish_tree/release/memory-stress-helper-macos-arm64.json"
+          /usr/bin/python3 - "$record" "$publish_tree/release/targets.json" <<'PY'
+          from pathlib import Path
+          import json
+          import sys
+
+          record = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          targets_path = Path(sys.argv[2])
+          targets = json.loads(targets_path.read_text(encoding="utf-8"))
+          arm = targets["targets"]["aarch64-apple-darwin"]
+          memory = record["memory"]
+          arm.update(
+              {
+                  "execution_model": "embedded_helper",
+                  "helper_memory_source_sha": record["source_sha"],
+                  "helper_memory_iterations": memory["iterations_requested"],
+                  "helper_memory_peak_stata_rss_kib": memory["peak_stata_rss_kib"],
+                  "helper_memory_post_warmup_growth_kib": memory["post_warmup_growth_kib"],
+                  "helper_memory_growth_ratio": memory["post_warmup_growth_ratio"],
+                  "helper_memory_gate": memory["growth_gate"],
+                  "helper_sha256": record["helper"]["sha256"],
+                  "helper_size_bytes": record["helper"]["size_bytes"],
+                  "helper_qualified_source_sha": record["source_sha"],
+                  "qualified_source_sha": record["source_sha"],
+                  "plugin_sha256": record["plugin"]["sha256"],
+                  "plugin_size_bytes": record["plugin"]["size_bytes"],
+                  "bundle_zip_sha256": record["bundle"]["zip_sha256"],
+                  "bundle_zip_size_bytes": record["bundle"]["zip_size_bytes"],
+                  "stata_runtime_qualified": True,
+                  "qualification_profile": "stress1000",
+                  "status": "helper-backed plugin passed 1000-call licensed-Stata memory qualification",
+              }
+          )
+          targets_path.write_text(
+              json.dumps(targets, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          git -C "$publish_tree" config user.name "github-actions[bot]"
+          git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$publish_tree" add release/memory-stress-helper-macos-arm64.json release/targets.json
+          git -C "$publish_tree" commit -m "ci(target): qualify helper-backed macOS memory [skip ci]"
+          git -C "$publish_tree" push origin HEAD:main
+
+      - name: Upload exact evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: texpdf-helper-memory-${{ github.sha }}-${{ github.run_id }}
+          path: .ci/stata/run/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove one-shot workflow after qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          cleanup_tree="$RUNNER_TEMP/texpdf-helper-memory-cleanup"
+          rm -rf "$cleanup_tree"
+          git worktree add --detach "$cleanup_tree" origin/main
+          trap 'git -C "$GITHUB_WORKSPACE" worktree remove --force "$cleanup_tree" 2>/dev/null || true' EXIT
+          rm -f "$cleanup_tree/.github/workflows/qualify-helper-memory.yml"
+          git -C "$cleanup_tree" config user.name "github-actions[bot]"
+          git -C "$cleanup_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$cleanup_tree" add -u .github/workflows/qualify-helper-memory.yml
+          git -C "$cleanup_tree" commit -m "ci: remove completed helper memory gate [skip ci]"
+          git -C "$cleanup_tree" push origin HEAD:main
