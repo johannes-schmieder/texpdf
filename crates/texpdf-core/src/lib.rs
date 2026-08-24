@@ -7,11 +7,11 @@ mod bundle;
 mod compile;
 mod diagnostics;
 mod error;
+mod memory;
 
 use std::path::PathBuf;
 
 pub use bundle::{bundle_info, BundleInfo};
-pub use compile::compile;
 pub use diagnostics::{Diagnostic, DiagnosticKind};
 pub use error::TexPdfError;
 
@@ -68,4 +68,14 @@ impl CompileResult {
             .filter(|item| item.kind == DiagnosticKind::Warning)
             .count()
     }
+}
+
+/// Compile one complete LaTeX document with the embedded offline bundle.
+///
+/// The pressure-relief guard is created before entering the engine so that it
+/// runs after all per-compilation Rust and native wrapper objects have been
+/// dropped, including on recoverable errors.
+pub fn compile(request: &CompileRequest) -> Result<CompileResult, TexPdfError> {
+    let _memory_pressure_relief = memory::MemoryPressureReliefGuard::new();
+    compile::compile(request)
 }
