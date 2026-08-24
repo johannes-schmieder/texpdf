@@ -146,6 +146,18 @@ PY
   "$toolchain_cargo" build --locked --release --package texpdf-stata
   /usr/bin/python3 tools/stage_plugin.py --target-dir "$CARGO_TARGET_DIR"
   git add -f stata/_texpdf_plugin.plugin
+
+  if [[ "$rust_profile" == engine ]]; then
+    /usr/bin/python3 tools/package_release.py \
+      --plugin stata/_texpdf_plugin.plugin \
+      --bundle-info bundle/generated/bundle-info.json \
+      --output-dir dist/texpdf-macos-arm64 \
+      --zip dist/texpdf-macos-arm64.zip \
+      --manifest .ci/stata/run/package-manifest.json \
+      --target aarch64-apple-darwin
+    git add -f dist/texpdf-macos-arm64
+  fi
+
   echo "RUST_QUICK_MODE=$rust_mode"
 else
   smoke_root="${RUNNER_TEMP:-/private/tmp}/texpdf-rust-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"

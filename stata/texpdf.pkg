@@ -6,3 +6,6 @@ d retain their upstream licenses and notices.
 f texpdf.ado
 f texpdf.sthlp
 f _texpdf_plugin.plugin
+f LICENSE
+f BUILD_INFO.json
+f CHECKSUMS.sha256

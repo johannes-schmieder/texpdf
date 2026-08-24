@@ -12,6 +12,7 @@
       "arguments": [],
       "timeout_seconds": 1200,
       "required_log_markers": [
+        "TEXPDF NET INSTALL PASS",
         "TEXPDF FULL ENGINE STATA PASS",
         "TEXPDF STATA MATA SMOKE PASS"
       ]
@@ -21,6 +22,7 @@
       "arguments": [],
       "timeout_seconds": 1200,
       "required_log_markers": [
+        "TEXPDF NET INSTALL PASS",
         "TEXPDF FULL ENGINE STATA PASS",
         "TEXPDF STATA MATA SMOKE PASS"
       ]

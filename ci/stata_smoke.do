@@ -126,6 +126,24 @@ if `full_engine' {
     capture rmdir `"`path_sections'"'
     capture rmdir `"`path_root'"'
 
+    * Exercise the actual installation layout through net install.
+    local package_dir `"`repo'/dist/texpdf-macos-arm64"'
+    confirm file `"`package_dir'/texpdf.pkg"'
+    confirm file `"`package_dir'/_texpdf_plugin.plugin"'
+    net install texpdf, from(`"`package_dir'"') replace
+    discard
+    adopath - `"`repo'/stata"'
+    which texpdf
+    texpdf, version
+    assert `"`r(engine)'"' == "tectonic"
+    assert `"`r(engine_version)'"' == "0.17.0"
+    tempfile installed
+    local installed_pdf `"`installed'.pdf"'
+    texpdf using `"`repo'/tests/fixtures/academic.tex"', saving(`"`installed_pdf'"') replace
+    confirm file `"`installed_pdf'"'
+    local install_marker = "TEXPDF NET INSTALL " + "PASS"
+    display as result `"`install_marker'"'
+
     local full_marker = "TEXPDF FULL ENGINE STATA " + "PASS"
     display as result `"`full_marker'"'
 }

@@ -9,3 +9,4 @@ __pycache__/
 /bundle/generated/
 /stata/texpdf.plugin
 /stata/_texpdf_plugin.plugin
+/dist/
