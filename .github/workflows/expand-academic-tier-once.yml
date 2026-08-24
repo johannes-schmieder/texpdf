@@ -1,0 +1,344 @@
+name: Expand and qualify the academic package tier once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/expand-academic-tier-once.yml"
+
+concurrency:
+  group: texpdf-expand-academic-tier
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 300
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: quick
+      TEXPDF_RUST_PROFILE: engine
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Synchronize
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Download pinned source metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          cache="${TEXPDF_BUNDLE_CACHE:-/private/tmp/texpdf-bundle-cache}"
+          mkdir -p "$cache"
+          /usr/bin/python3 tools/prepare_bundle.py \
+            --cache-dir "$cache" \
+            --output "$RUNNER_TEMP/texpdf-full-v33.zip" \
+            --info "$RUNNER_TEMP/texpdf-full-v33.json"
+          index="$(find "$cache" -maxdepth 1 -name '*.tar.index.gz' -print -quit)"
+          test -s "$index"
+          echo "TEXPDF_SOURCE_INDEX=$index" >> "$GITHUB_ENV"
+
+          tlpdb="$RUNNER_TEMP/texlive-2022.tlpdb"
+          urls=(
+            "https://ftp.tug.org/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb"
+            "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb"
+          )
+          rm -f "$tlpdb"
+          for url in "${urls[@]}"; do
+            if /usr/bin/curl --fail --location --retry 3 --output "$tlpdb" "$url"; then
+              printf '%s\n' "$url" > "$RUNNER_TEMP/texlive-2022.tlpdb.url"
+              break
+            fi
+          done
+          test -s "$tlpdb"
+          echo "TEXPDF_TLPDB=$tlpdb" >> "$GITHUB_ENV"
+          /usr/bin/shasum -a 256 "$tlpdb" > "$RUNNER_TEMP/texlive-2022.tlpdb.sha256"
+
+      - name: Resolve TeX Live packages into Tectonic resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/generated
+          set +e
+          /usr/bin/python3 tools/resolve_texlive_resources.py \
+            --tlpdb "$TEXPDF_TLPDB" \
+            --bundle-index "$TEXPDF_SOURCE_INDEX" \
+            --packages bundle/texlive-packages.txt \
+            --output bundle/generated/package-resources.txt \
+            --report bundle/generated/package-resolution.json \
+            --allow-ambiguous
+          resolver_rc=$?
+          set -e
+          if [[ "$resolver_rc" -gt 1 ]]; then
+            exit "$resolver_rc"
+          fi
+
+          # Conservatively include all source-bundle candidates for an ambiguous
+          # TeX Live basename. The compilation corpus, not a heuristic, decides
+          # whether the expanded definition is accepted.
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          report_path = Path("bundle/generated/package-resolution.json")
+          report = json.loads(report_path.read_text(encoding="utf-8"))
+          resources = {
+              line.strip()
+              for line in Path("bundle/generated/package-resources.txt")
+                  .read_text(encoding="utf-8")
+                  .splitlines()
+              if line.strip() and not line.lstrip().startswith("#")
+          }
+          for record in report.get("ambiguous_runfiles", []):
+              resources.update(record.get("candidates", []))
+          Path("bundle/generated/package-resources.txt").write_text(
+              "".join(f"{name}\n" for name in sorted(resources)),
+              encoding="utf-8",
+          )
+          report["selected_resource_count_after_ambiguous_union"] = len(resources)
+          report["ambiguous_policy"] = "include every matching source-bundle candidate"
+          report_path.write_text(
+              json.dumps(report, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          required_path = Path("bundle/required-resources.txt")
+          existing_lines = required_path.read_text(encoding="utf-8").splitlines()
+          comments = [line for line in existing_lines if line.lstrip().startswith("#")]
+          existing = {
+              line.strip()
+              for line in existing_lines
+              if line.strip() and not line.lstrip().startswith("#")
+          }
+          package_resources = {
+              line.strip()
+              for line in Path("bundle/generated/package-resources.txt")
+                  .read_text(encoding="utf-8")
+                  .splitlines()
+              if line.strip()
+          }
+          combined = sorted(existing | package_resources)
+          header = comments or [
+              "# Explicit resources required by the academic compatibility tier."
+          ]
+          header.extend(
+              [
+                  "#",
+                  "# TeX Live dependency-closure resources are generated by",
+                  "# tools/resolve_texlive_resources.py and accepted only after",
+                  "# the Rust and licensed-Stata academic corpus passes.",
+              ]
+          )
+          required_path.write_text(
+              "\n".join(header) + "\n\n" + "".join(f"{name}\n" for name in combined),
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Add full academic-tier integration tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > crates/texpdf-core/tests/academic_tier.rs <<'RS'
+          use std::{fs, path::PathBuf};
+
+          use serde_json::Value;
+          use texpdf_core::{compile, CompileRequest};
+
+          #[test]
+          fn academic_tier_corpus_compiles_with_embedded_bundle() {
+              let repository = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+              let fixture_root = repository.join("tests/fixtures/academic-tier");
+              let manifest: Value = serde_json::from_slice(
+                  &fs::read(fixture_root.join("manifest.json")).expect("read fixture manifest"),
+              )
+              .expect("parse fixture manifest");
+              let fixtures = manifest["fixtures"].as_array().expect("fixture array");
+              let output_root = tempfile::tempdir().expect("temporary output root");
+
+              for fixture in fixtures {
+                  let name = fixture["file"].as_str().expect("fixture file");
+                  let input = fixture_root.join(name);
+                  let output = output_root.path().join(
+                      PathBuf::from(name)
+                          .with_extension("pdf")
+                          .file_name()
+                          .expect("output name"),
+                  );
+                  let result = compile(&CompileRequest::new(&input, &output))
+                      .unwrap_or_else(|error| panic!("academic fixture {name} failed: {error:#}"));
+                  let bytes = fs::read(result.output).expect("read generated PDF");
+                  assert!(bytes.starts_with(b"%PDF-"), "{name} did not produce a PDF");
+              }
+          }
+          RS
+
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          profiles_path = Path("ci/stata_profiles.json")
+          profiles = json.loads(profiles_path.read_text(encoding="utf-8"))
+          for profile_name in ("quick", "smoke"):
+              profile = profiles[profile_name]
+              marker_key = next(
+                  (key for key in profile if "marker" in key.lower()),
+                  "required_log_markers",
+              )
+              markers = list(profile.get(marker_key, []))
+              marker = "TEXPDF ACADEMIC TIER PASS"
+              if marker not in markers:
+                  markers.insert(0, marker)
+              profile[marker_key] = markers
+          profiles_path.write_text(
+              json.dumps(profiles, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          smoke_path = Path("ci/stata_smoke.do")
+          smoke = smoke_path.read_text(encoding="utf-8")
+          marker = "TEXPDF ACADEMIC TIER PASS"
+          if marker not in smoke:
+              block = r'''
+          local tierdir `"`repo'/tests/fixtures/academic-tier"'
+          local tierfiles "core.tex tables.tex layout.tex bibliography.tex fonts-latin-modern.tex fonts-tex-gyre.tex"
+          tempfile tieroutput
+          local tierpdf `"`tieroutput'.pdf"'
+          foreach tierfile of local tierfiles {
+              texpdf using `"`tierdir'/`tierfile'"', saving(`"`tierpdf'"') replace
+              confirm file `"`tierpdf'"'
+              assert `"`r(engine)'"' == "tectonic"
+          }
+          display as result "TEXPDF ACADEMIC TIER PASS"
+          '''
+              generic = 'display as result "TEXPDF STATA MATA SMOKE PASS"\n'
+              if generic not in smoke:
+                  raise SystemExit("cannot locate generic Stata PASS marker")
+              smoke = smoke.replace(generic, block.strip() + "\n\n" + generic, 1)
+              smoke_path.write_text(smoke, encoding="utf-8")
+          PY
+
+          git add bundle/required-resources.txt \
+            crates/texpdf-core/tests/academic_tier.rs \
+            ci/stata_profiles.json ci/stata_smoke.do \
+            tests/fixtures/academic-tier
+
+      - name: Build the expanded curated bundle and run the Rust corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf bundle/generated/texpdf-bundle.zip bundle/generated/bundle-info.json
+          /bin/bash ci/record_rust_quick.sh
+          /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+
+      - name: Preserve expanded-bundle evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/texpdf-academic-tier-evidence"
+          rm -rf "$evidence"
+          mkdir -p "$evidence"
+          cp -R .ci/stata/run/. "$evidence/"
+          cp bundle/generated/bundle-info.json "$evidence/"
+          cp bundle/generated/curated-manifest.json "$evidence/"
+          cp bundle/generated/package-resolution.json "$evidence/"
+          cp bundle/generated/package-resources.txt "$evidence/"
+
+      - name: Run licensed Stata academic corpus and comprehensive checks
+        shell: bash
+        run: /bin/bash ci/run_stata_ci.sh quick
+
+      - name: Restore and validate combined evidence
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/texpdf-academic-tier-evidence"
+          mkdir -p .ci/stata/run
+          if [[ -d "$evidence" ]]; then
+            cp -R "$evidence/." .ci/stata/run/
+          fi
+          /usr/bin/python3 ci/augment_ci_receipt.py \
+            .ci/stata/run/receipt.json \
+            .ci/stata/run/rust-quick.status
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success \
+            --require-rust-success
+
+      - name: Record package resolution and commit qualified tier definition
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "$RUNNER_TEMP/texpdf-academic-tier-evidence/package-resolution.json" \
+            bundle/package-resolution.json
+          cp "$RUNNER_TEMP/texlive-2022.tlpdb.sha256" bundle/texlive-2022.tlpdb.sha256
+          cp "$RUNNER_TEMP/texlive-2022.tlpdb.url" bundle/texlive-2022.tlpdb.url
+
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          info = json.loads(
+              Path("bundle/generated/bundle-info.json").read_text(encoding="utf-8")
+          )
+          manifest = json.loads(
+              Path("tests/fixtures/academic-tier/manifest.json").read_text(encoding="utf-8")
+          )
+          capabilities = sorted(
+              {
+                  capability
+                  for fixture in manifest["fixtures"]
+                  for capability in fixture.get("capabilities", [])
+              }
+          )
+          record = {
+              "schema_version": 1,
+              "source_preflight_sha": "${GITHUB_SHA}",
+              "bundle_zip_size_bytes": info["zip_size_bytes"],
+              "bundle_zip_sha256": info["zip_sha256"],
+              "bundle_file_count": info["file_count"],
+              "qualified_capabilities": capabilities,
+              "fixtures": [fixture["file"] for fixture in manifest["fixtures"]],
+              "qualification_boundary": (
+                  "Preflight passed in Rust and licensed Stata before commit; "
+                  "the committed source requires its own immutable exact-SHA receipt."
+              ),
+          }
+          Path("bundle/ACADEMIC_TIER.json").write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+          rm -f .github/workflows/expand-academic-tier-once.yml
+          git reset -- stata/_texpdf_plugin.plugin dist 2>/dev/null || true
+          rm -f stata/_texpdf_plugin.plugin
+          rm -rf dist .ci/stata/run bundle/generated
+          git add bundle/ACADEMIC_TIER.json bundle/package-resolution.json \
+            bundle/texlive-2022.tlpdb.sha256 bundle/texlive-2022.tlpdb.url
+          git add -u .github/workflows/expand-academic-tier-once.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "bundle: qualify the academic TeX package tier"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
