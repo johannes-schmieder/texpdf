@@ -1,0 +1,65 @@
+\documentclass{article}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage{dcolumn}
+\usepackage{siunitx}
+\usepackage{adjustbox}
+
+\begin{document}
+\section*{Academic table packages}
+
+\begin{threeparttable}
+\caption{Regression-style table}
+\begin{tabular}{lD{.}{.}{3}S[table-format=4.0]}
+\toprule
+Variable & \multicolumn{1}{c}{Coefficient} & {Observations} \\
+\midrule
+Treatment & 1.250 & 1000 \\
+Control & -0.375 & 1000 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Notes: synthetic values used only to qualify the embedded packages.
+\end{tablenotes}
+\end{threeparttable}
+
+\bigskip
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabularx}{1.2\textwidth}{>{\bfseries}lXrr}
+\toprule
+Group & Description & Mean & Standard error \\
+\midrule
+\multirow{2}{*}{A} & First subgroup & 1.2 & 0.1 \\
+ & Second subgroup & 1.4 & 0.2 \\
+B & A longer description that exercises the stretchable column & 0.9 & 0.1 \\
+\bottomrule
+\end{tabularx}
+\end{adjustbox}
+
+\bigskip
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item Long-table note.
+\end{TableNotes}
+\begin{longtable}{lr}
+\caption{Long table}\label{tab:long}\\
+\toprule
+Statistic & Value \\
+\midrule
+\endfirsthead
+\toprule
+Statistic & Value \\
+\midrule
+\endhead
+One & \num{1.23} \\
+Two & \num{4567.8} \\
+\bottomrule
+\insertTableNotes
+\end{longtable}
+\end{ThreePartTable}
+\end{document}
