@@ -90,6 +90,9 @@ if `full_engine' {
     local path_source `"`path_root'/main file é.tex"'
     local path_part `"`path_sections'/content.tex"'
     local path_pdf `"`path_root'/main file é.pdf"'
+    capture erase `"`path_pdf'"'
+    capture erase `"`path_part'"'
+    capture erase `"`path_source'"'
 
     file open `handle' using `"`path_source'"', write text replace
     file write `handle' "\documentclass{article}" _n
