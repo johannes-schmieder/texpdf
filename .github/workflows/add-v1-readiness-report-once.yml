@@ -1,0 +1,474 @@
+name: Add v1 readiness report once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/add-v1-readiness-report-once.yml"
+      - "STATUS.md"
+      - "PLAN.md"
+
+concurrency:
+  group: texpdf-add-v1-readiness-report-once
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  add-report:
+    runs-on: [self-hosted, macOS, ARM64, texpdf]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Synchronize
+        id: state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          if grep -q '^# texpdf plan to v1' PLAN.md 2>/dev/null; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Add report generator and tests
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p tools ci/tests docs release
+          cat > tools/report_v1_readiness.py <<'PY'
+          #!/usr/bin/env python3
+          """Derive fail-closed texpdf v1 readiness from committed evidence."""
+
+          from __future__ import annotations
+
+          import argparse
+          from dataclasses import dataclass
+          from datetime import datetime, timezone
+          import json
+          from pathlib import Path
+          import re
+          import sys
+          from typing import Any, Iterable
+
+          SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+          REQUIRED_TARGETS = (
+              "aarch64-apple-darwin",
+              "x86_64-apple-darwin",
+              "x86_64-pc-windows-msvc",
+              "x86_64-unknown-linux-gnu",
+          )
+
+
+          def load_json(path: Path) -> dict[str, Any]:
+              return json.loads(path.read_text(encoding="utf-8"))
+
+
+          def exact_green_receipts(root: Path) -> list[dict[str, Any]]:
+              receipts: list[dict[str, Any]] = []
+              for path in (root / ".ci/stata/results").glob("*.json"):
+                  try:
+                      item = load_json(path)
+                  except (OSError, json.JSONDecodeError):
+                      continue
+                  if not (
+                      item.get("status") == "success"
+                      and item.get("stata_status") == "success"
+                      and item.get("rust_status") == "success"
+                  ):
+                      continue
+                  tested_sha = item.get("tested_sha")
+                  if not isinstance(tested_sha, str) or not SHA_RE.fullmatch(tested_sha):
+                      continue
+                  markers = item.get("required_log_markers", [])
+                  if markers and not all(record.get("present") is True for record in markers):
+                      continue
+                  receipts.append(item)
+              receipts.sort(key=lambda item: item.get("completed_at", ""))
+              return receipts
+
+
+          def recursively_collect(record: Any, key: str) -> list[Any]:
+              values: list[Any] = []
+              if isinstance(record, dict):
+                  for current_key, value in record.items():
+                      if current_key == key:
+                          values.append(value)
+                      values.extend(recursively_collect(value, key))
+              elif isinstance(record, list):
+                  for value in record:
+                      values.extend(recursively_collect(value, key))
+              return values
+
+
+          def license_evidence(root: Path) -> dict[str, Any]:
+              candidates: list[Path] = []
+              for base in (root / "licenses", root / "bundle", root / "release"):
+                  if not base.exists():
+                      continue
+                  for path in base.rglob("*.json"):
+                      lowered = path.name.lower()
+                      if "license" in lowered or "resource" in lowered or "notice" in lowered:
+                          candidates.append(path)
+
+              complete_flags: list[bool] = []
+              unresolved: set[str] = set()
+              ambiguous = 0
+              conflicts = 0
+              missing_license_packages: set[str] = set()
+              parsed: list[str] = []
+
+              for path in sorted(set(candidates)):
+                  try:
+                      record = load_json(path)
+                  except (OSError, json.JSONDecodeError):
+                      continue
+                  parsed.append(str(path.relative_to(root)))
+                  for value in recursively_collect(record, "license_complete"):
+                      if isinstance(value, bool):
+                          complete_flags.append(value)
+                  for value in recursively_collect(record, "unresolved_resources"):
+                      if isinstance(value, list):
+                          unresolved.update(str(item) for item in value)
+                  for value in recursively_collect(record, "ambiguous_resources"):
+                      if isinstance(value, list):
+                          ambiguous += len(value)
+                  for value in recursively_collect(record, "conflicts"):
+                      if isinstance(value, list):
+                          conflicts += len(value)
+                  for value in recursively_collect(record, "packages_without_license_metadata"):
+                      if isinstance(value, list):
+                          missing_license_packages.update(str(item) for item in value)
+
+              required_notice_files = (
+                  root / "THIRD_PARTY_NOTICES.md",
+                  root / "licenses/THIRD_PARTY_NOTICES.md",
+              )
+              notice_files_present = all(path.is_file() for path in required_notice_files)
+              complete = bool(complete_flags) and all(complete_flags)
+              complete = complete and not unresolved and ambiguous == 0 and conflicts == 0
+              complete = complete and not missing_license_packages and notice_files_present
+
+              return {
+                  "complete": complete,
+                  "inventory_files": parsed,
+                  "complete_flags": complete_flags,
+                  "unresolved_resource_count": len(unresolved),
+                  "ambiguous_resource_count": ambiguous,
+                  "conflict_count": conflicts,
+                  "packages_without_license_metadata": sorted(missing_license_packages),
+                  "required_notice_files_present": notice_files_present,
+              }
+
+
+          def target_evidence(root: Path) -> dict[str, Any]:
+              path = root / "release/targets.json"
+              targets = load_json(path).get("targets", {}) if path.is_file() else {}
+              status: dict[str, Any] = {}
+              for triple in REQUIRED_TARGETS:
+                  record = targets.get(triple, {})
+                  status[triple] = {
+                      "artifact": record.get("artifact", ""),
+                      "build_status": record.get("status", "missing"),
+                      "stata_runtime_qualified": record.get("stata_runtime_qualified") is True,
+                      "qualified_source_sha": record.get("qualified_source_sha", ""),
+                  }
+              return {
+                  "complete": all(
+                      record["stata_runtime_qualified"] for record in status.values()
+                  ),
+                  "targets": status,
+              }
+
+
+          def safety_evidence(receipts: Iterable[dict[str, Any]]) -> dict[str, Any]:
+              max_repeated_calls = 0
+              stress_receipts: list[str] = []
+              memory_recorded = False
+              for receipt in receipts:
+                  marker_names = [
+                      record.get("marker", "")
+                      for record in receipt.get("required_log_markers", [])
+                      if record.get("present") is True
+                  ]
+                  joined = " ".join(marker_names).lower()
+                  if "stress" in joined:
+                      stress_receipts.append(receipt.get("tested_sha", ""))
+                      if "1000" in joined:
+                          max_repeated_calls = max(max_repeated_calls, 1000)
+                      else:
+                          max_repeated_calls = max(max_repeated_calls, 100)
+                  if "memory" in joined:
+                      memory_recorded = True
+              return {
+                  "complete": max_repeated_calls >= 1000 and memory_recorded,
+                  "maximum_explicit_repeated_calls": max_repeated_calls,
+                  "memory_growth_review_recorded": memory_recorded,
+                  "stress_receipts": stress_receipts,
+              }
+
+
+          def build_report(root: Path) -> dict[str, Any]:
+              receipts = exact_green_receipts(root)
+              latest = receipts[-1] if receipts else None
+              license_status = license_evidence(root)
+              target_status = target_evidence(root)
+              safety_status = safety_evidence(receipts)
+              qualification_present = (root / "bundle/QUALIFICATION.json").is_file()
+              api_files_present = all(
+                  (root / path).is_file()
+                  for path in (
+                      "stata/texpdf.ado",
+                      "stata/texpdf.sthlp",
+                      "stata/texpdf.pkg",
+                      "stata/stata.toc",
+                  )
+              )
+
+              blockers: list[str] = []
+              if latest is None:
+                  blockers.append("no exact-SHA green Rust/Stata receipt")
+              if not qualification_present:
+                  blockers.append("qualified bundle/plugin/package manifest is absent")
+              if not api_files_present:
+                  blockers.append("Stata package interface files are incomplete")
+              if not license_status["complete"]:
+                  blockers.append("dependency/resource license inventory or notices are incomplete")
+              if not safety_status["complete"]:
+                  blockers.append("1,000-call plus memory-growth safety gate is incomplete")
+              if not target_status["complete"]:
+                  pending = [
+                      triple
+                      for triple, record in target_status["targets"].items()
+                      if not record["stata_runtime_qualified"]
+                  ]
+                  blockers.append("Stata runtime qualification pending: " + ", ".join(pending))
+
+              release_ready = not blockers
+              return {
+                  "schema_version": 1,
+                  "generated_at": datetime.now(timezone.utc).isoformat(),
+                  "release_ready": release_ready,
+                  "latest_exact_green": latest,
+                  "qualification_manifest_present": qualification_present,
+                  "stata_package_interface_present": api_files_present,
+                  "licensing": license_status,
+                  "safety": safety_status,
+                  "platforms": target_status,
+                  "blockers": blockers,
+              }
+
+
+          def markdown(report: dict[str, Any]) -> str:
+              latest = report.get("latest_exact_green") or {}
+              platform_rows = []
+              for triple, record in report["platforms"]["targets"].items():
+                  platform_rows.append(
+                      f"| `{triple}` | {str(record['stata_runtime_qualified']).lower()} | "
+                      f"{record['qualified_source_sha'] or '—'} | {record['build_status']} |"
+                  )
+              blocker_lines = "\n".join(
+                  f"- {item}" for item in report["blockers"]
+              ) or "- none"
+              missing_packages = report["licensing"]["packages_without_license_metadata"]
+              missing_text = ", ".join(missing_packages) if missing_packages else "none recorded"
+              return f'''# v1 readiness report
+
+This file is generated from committed machine-readable evidence by
+`tools/report_v1_readiness.py`. It is intentionally fail-closed.
+
+## Overall
+
+- Release ready: **{str(report['release_ready']).lower()}**
+- Latest exact green source: `{latest.get('tested_sha', 'none')}`
+- Latest exact green profile: `{latest.get('profile', '')}`
+- Qualification manifest present: `{str(report['qualification_manifest_present']).lower()}`
+- Stata package interface present: `{str(report['stata_package_interface_present']).lower()}`
+
+## Licensing
+
+- Complete: `{str(report['licensing']['complete']).lower()}`
+- Inventory files examined: `{len(report['licensing']['inventory_files'])}`
+- Unresolved resources: `{report['licensing']['unresolved_resource_count']}`
+- Ambiguous resources: `{report['licensing']['ambiguous_resource_count']}`
+- Conflicts: `{report['licensing']['conflict_count']}`
+- Packages without license metadata: {missing_text}
+- Required notice files present: `{str(report['licensing']['required_notice_files_present']).lower()}`
+
+## Safety
+
+- Complete: `{str(report['safety']['complete']).lower()}`
+- Maximum explicit repeated-call qualification: `{report['safety']['maximum_explicit_repeated_calls']}`
+- Memory-growth review recorded: `{str(report['safety']['memory_growth_review_recorded']).lower()}`
+
+## Platforms
+
+| Target | Stata runtime qualified | Qualified source | Record |
+|---|---|---|---|
+{chr(10).join(platform_rows)}
+
+## Blocking gates
+
+{blocker_lines}
+
+Run:
+
+```sh
+python3 tools/report_v1_readiness.py
+python3 tools/report_v1_readiness.py --strict
+```
+
+The strict form exits nonzero until all recorded v1 gates are closed.
+'''
+
+
+          def write_atomic(path: Path, text: str) -> None:
+              path.parent.mkdir(parents=True, exist_ok=True)
+              temporary = path.with_suffix(path.suffix + ".tmp")
+              temporary.write_text(text, encoding="utf-8")
+              temporary.replace(path)
+
+
+          def main() -> int:
+              parser = argparse.ArgumentParser()
+              parser.add_argument("--root", type=Path, default=Path("."))
+              parser.add_argument(
+                  "--json-output", type=Path, default=Path("release/V1_READINESS.json")
+              )
+              parser.add_argument(
+                  "--markdown-output", type=Path, default=Path("docs/V1_READINESS.md")
+              )
+              parser.add_argument("--strict", action="store_true")
+              args = parser.parse_args()
+
+              root = args.root.resolve()
+              try:
+                  report = build_report(root)
+              except (OSError, json.JSONDecodeError, ValueError) as error:
+                  print(f"TEXPDF_V1_READINESS_ERROR {error}", file=sys.stderr)
+                  return 2
+              json_path = args.json_output
+              markdown_path = args.markdown_output
+              if not json_path.is_absolute():
+                  json_path = root / json_path
+              if not markdown_path.is_absolute():
+                  markdown_path = root / markdown_path
+              write_atomic(
+                  json_path,
+                  json.dumps(report, indent=2, sort_keys=True) + "\n",
+              )
+              write_atomic(markdown_path, markdown(report))
+              print(
+                  "TEXPDF_V1_READINESS "
+                  f"release_ready={str(report['release_ready']).lower()} "
+                  f"blockers={len(report['blockers'])}"
+              )
+              return 1 if args.strict and not report["release_ready"] else 0
+
+
+          if __name__ == "__main__":
+              raise SystemExit(main())
+          PY
+          chmod +x tools/report_v1_readiness.py
+
+          cat > ci/tests/test_v1_readiness.py <<'PY'
+          from __future__ import annotations
+
+          import importlib.util
+          import json
+          from pathlib import Path
+          import tempfile
+          import unittest
+
+          MODULE_PATH = Path(__file__).resolve().parents[2] / "tools/report_v1_readiness.py"
+          SPEC = importlib.util.spec_from_file_location("report_v1_readiness", MODULE_PATH)
+          assert SPEC is not None and SPEC.loader is not None
+          MODULE = importlib.util.module_from_spec(SPEC)
+          SPEC.loader.exec_module(MODULE)
+
+
+          class V1ReadinessTests(unittest.TestCase):
+              def test_fail_closed_without_evidence(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      report = MODULE.build_report(root)
+                      self.assertFalse(report["release_ready"])
+                      self.assertTrue(report["blockers"])
+
+              def test_green_receipt_and_targets_are_parsed(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = Path(directory)
+                      receipts = root / ".ci/stata/results"
+                      receipts.mkdir(parents=True)
+                      receipt = {
+                          "completed_at": "2026-08-24T00:00:00Z",
+                          "tested_sha": "a" * 40,
+                          "profile": "quick",
+                          "status": "success",
+                          "stata_status": "success",
+                          "rust_status": "success",
+                          "required_log_markers": [
+                              {"marker": "TEXPDF STRESS 1000 PASS", "present": True},
+                              {"marker": "TEXPDF MEMORY PASS", "present": True},
+                          ],
+                      }
+                      (receipts / f"{'a' * 40}.json").write_text(
+                          json.dumps(receipt), encoding="utf-8"
+                      )
+                      release = root / "release"
+                      release.mkdir()
+                      targets = {
+                          "targets": {
+                              triple: {
+                                  "stata_runtime_qualified": True,
+                                  "qualified_source_sha": "a" * 40,
+                                  "status": "qualified",
+                              }
+                              for triple in MODULE.REQUIRED_TARGETS
+                          }
+                      }
+                      (release / "targets.json").write_text(
+                          json.dumps(targets), encoding="utf-8"
+                      )
+                      parsed = MODULE.target_evidence(root)
+                      self.assertTrue(parsed["complete"])
+                      safety = MODULE.safety_evidence([receipt])
+                      self.assertTrue(safety["complete"])
+
+              def test_markdown_lists_blockers(self) -> None:
+                  with tempfile.TemporaryDirectory() as directory:
+                      report = MODULE.build_report(Path(directory))
+                      text = MODULE.markdown(report)
+                      self.assertIn("Blocking gates", text)
+                      self.assertIn("Release ready: **false**", text)
+
+
+          if __name__ == "__main__":
+              unittest.main()
+          PY
+
+          /usr/bin/python3 -m unittest ci.tests.test_v1_readiness
+          /usr/bin/python3 tools/report_v1_readiness.py
+          rm -f .github/workflows/add-v1-readiness-report-once.yml
+      - name: Commit readiness infrastructure
+        if: ${{ steps.state.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add tools/report_v1_readiness.py ci/tests/test_v1_readiness.py
+          git add release/V1_READINESS.json docs/V1_READINESS.md
+          git add -u .github/workflows/add-v1-readiness-report-once.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "release: add fail-closed v1 readiness report"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
