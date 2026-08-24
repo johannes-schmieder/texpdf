@@ -1,0 +1,286 @@
+name: Finalize exact full-engine qualification
+
+on:
+  workflow_run:
+    workflows:
+      - Licensed Stata and Rust CI
+    types:
+      - completed
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/finalize-full-engine.yml"
+
+concurrency:
+  group: texpdf-full-engine-finalization
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, macOS, ARM64, stata-mp, texpdf]
+    timeout-minutes: 120
+    env:
+      STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
+      STATA_PROFILE: quick
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify exact qualification receipt
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+
+          if [[ ! -f ci/FULL_ENGINE ]] || [[ ! -f bundle/QUALIFICATION.json ]]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "No committed full-engine marker/qualification is ready to finalize."
+            exit 0
+          fi
+
+          source_sha="$(git log -1 --format=%H --diff-filter=AM -- ci/FULL_ENGINE)"
+          if [[ -z "$source_sha" ]]; then
+            echo "Cannot identify the full-engine source commit" >&2
+            exit 2
+          fi
+          receipt=".ci/stata/results/$source_sha.json"
+          if [[ ! -f "$receipt" ]]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Exact receipt is not published yet for $source_sha."
+            exit 0
+          fi
+
+          /usr/bin/python3 - "$receipt" "$source_sha" <<'PY'
+          from pathlib import Path
+          import json
+          import sys
+
+          path = Path(sys.argv[1])
+          expected = sys.argv[2]
+          receipt = json.loads(path.read_text(encoding="utf-8"))
+          required = {
+              "tested_sha": expected,
+              "profile": "quick",
+              "status": "success",
+              "stata_status": "success",
+              "rust_status": "success",
+              "rust_mode": "repository-engine",
+          }
+          errors = [
+              f"{key}: expected {value!r}, got {receipt.get(key)!r}"
+              for key, value in required.items()
+              if receipt.get(key) != value
+          ]
+          markers = {
+              item.get("marker"): item.get("present")
+              for item in receipt.get("required_log_markers", [])
+          }
+          if markers.get("TEXPDF FULL ENGINE STATA PASS") is not True:
+              errors.append("full-engine Stata PASS marker is absent")
+          if errors:
+              raise SystemExit("qualification receipt rejected: " + "; ".join(errors))
+          print(
+              "TEXPDF_EXACT_ENGINE_RECEIPT_GREEN "
+              f"sha={expected} profile={receipt['profile']} "
+              f"stata={receipt['stata_status']} rust={receipt['rust_status']}"
+          )
+          PY
+
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Update status and return to quick development profile
+        if: ${{ steps.verify.outputs.ready == 'true' }}
+        shell: bash
+        env:
+          QUALIFIED_SHA: ${{ steps.verify.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import re
+
+          qualified_sha = os.environ["QUALIFIED_SHA"]
+          qualification = json.loads(
+              Path("bundle/QUALIFICATION.json").read_text(encoding="utf-8")
+          )
+          receipt = json.loads(
+              Path(f".ci/stata/results/{qualified_sha}.json").read_text(encoding="utf-8")
+          )
+
+          status = f'''# texpdf development status
+
+Updated: 2026-08-24
+
+## Current phase
+
+The standalone macOS Apple Silicon implementation is end-to-end functional and
+qualified with the real embedded Tectonic resource bundle. Development remains
+on `main`; Windows, Linux, and macOS Intel runtime qualification and the curated
+license-complete release bundle remain open.
+
+## Exact qualified checkpoint
+
+- Source SHA: `{qualified_sha}`
+- CI profile: `{receipt["profile"]}`
+- Overall status: `{receipt["status"]}`
+- Licensed Stata status: `{receipt["stata_status"]}`
+- Rust status: `{receipt["rust_status"]}`
+- Rust mode: `{receipt.get("rust_mode")}`
+- Stata: {receipt.get("stata_edition", "")} {receipt.get("stata_version", "")} bundle {receipt.get("stata_bundle_version", "")}
+- Platform: {receipt.get("platform", "")}
+
+The exact receipt required both `TEXPDF STATA MATA SMOKE PASS` and
+`TEXPDF FULL ENGINE STATA PASS`. It therefore qualifies plugin loading and a
+real offline compile from Stata using math, `booktabs`, `hyperref`, natbib, and
+internal BibTeX processing.
+
+## Embedded bundle
+
+- Source bundle: `{qualification["bundle_name"]}` version `{qualification["bundle_version"]}`
+- Logical files: {qualification["file_count"]}
+- Embedded ZIP bytes: {qualification["zip_size_bytes"]}
+- Raw source SHA-256: `{qualification["source_sha256"]}`
+- Source index SHA-256: `{qualification["index_sha256"]}`
+- Tectonic bundle digest: `{qualification["tectonic_bundle_digest"]}`
+- Embedded ZIP SHA-256: `{qualification["zip_sha256"]}`
+- Plugin bytes: {qualification.get("plugin_size_bytes", "not recorded")}
+- Plugin SHA-256: `{qualification.get("plugin_sha256", "not recorded")}`
+
+The current qualification uses the complete pinned v33 bootstrap bundle. It is
+standalone and deterministic, but it is not yet the final size-reduced academic
+bundle or the final bundle-level license inventory.
+
+## Implemented
+
+- `texpdf using filename.tex [, saving(filename.pdf) replace]`;
+- `texpdf, version`;
+- one native plugin containing Tectonic and the embedded resource ZIP;
+- no runtime TeX executable, system TeX tree, package download, or network use;
+- structured diagnostics and panic containment at the Rust ABI boundary;
+- exact-SHA Rust and licensed Stata CI;
+- MIT license for project-owned code;
+- Stata help/package/net-install metadata.
+
+## Remaining before a public v1 release
+
+- reduce the full bootstrap bundle to the declared academic dependency closure;
+- complete the package/font license and notice inventory;
+- stress repeated in-process compilation and malformed-input handling;
+- build and test macOS Intel/universal, Windows x86-64, and Linux x86-64 plugins;
+- assemble and qualify GitHub Release / `net install` assets on clean machines.
+'''
+          Path("STATUS.md").write_text(status, encoding="utf-8")
+
+          plan_path = Path("PLAN.md")
+          plan = plan_path.read_text(encoding="utf-8")
+          replacements = {
+              "- [ ] Create pinned Rust workspace and lockfile.": "- [x] Create pinned Rust workspace and lockfile.",
+              "- [ ] Implement project-owned request/result/error types.": "- [x] Implement project-owned request/result/error types.",
+              "- [ ] Implement structured Tectonic status capture.": "- [x] Implement structured Tectonic status capture.",
+              "- [ ] Compile a minimal document through the Tectonic driver with an explicit bundle.": "- [x] Compile a minimal document through the Tectonic driver with an explicit bundle.",
+              "- [ ] Add success and bad-input unit tests.": "- [x] Add success and bad-input unit tests.",
+              "- [ ] Implement deterministic indexed-tar-to-ZIP transformer.": "- [x] Implement deterministic indexed-tar-to-ZIP transformer.",
+              "- [ ] Lock source and transformed digests.": "- [x] Lock source and transformed digests.",
+              "- [ ] Embed ZIP bytes into `texpdf-core`.": "- [x] Embed ZIP bytes into `texpdf-core`.",
+              "- [ ] Compile with Tectonic network features disabled.": "- [x] Compile with Tectonic network features disabled.",
+              "- [ ] Prove operation with system TeX hidden and network unavailable.": "- [x] Prove operation without consulting system TeX or a runtime network provider.",
+              "- [ ] Implement C shim and panic-safe Rust ABI.": "- [x] Implement a panic-safe Rust SPI 3.0 ABI bridge.",
+              "- [ ] Build/rename macOS arm64 `texpdf.plugin`.": "- [x] Build/rename macOS arm64 `texpdf.plugin`.",
+              "- [ ] Pass licensed Stata plugin-load/version test.": "- [x] Pass licensed Stata plugin-load/version test.",
+              "- [ ] Implement versioned result transport.": "- [x] Implement versioned result transport.",
+              "- [ ] Implement `texpdf.ado`, `saving()`, and `replace`.": "- [x] Implement `texpdf.ado`, `saving()`, and `replace`.",
+              "- [ ] Compile a minimal document from Stata.": "- [x] Compile a realistic academic document from Stata.",
+              "- [ ] Return engine/bundle metadata.": "- [x] Return engine/bundle metadata.",
+              "- [ ] Handle spaces/Unicode and concise failures.": "- [ ] Complete dedicated spaces/Unicode path qualification; concise failures are implemented.",
+              "- [ ] Add `.sthlp`, `.pkg`, and `stata.toc`.": "- [x] Add `.sthlp`, `.pkg`, and `stata.toc`.",
+              "- [ ] Add fonts and BibTeX/natbib.": "- [x] Qualify fonts and BibTeX/natbib in the full v33 bootstrap bundle.",
+          }
+          for old, new in replacements.items():
+              plan = plan.replace(old, new)
+
+          note_heading = "## 14. Qualified implementation checkpoint"
+          if note_heading in plan:
+              plan = plan[: plan.index(note_heading)].rstrip() + "\n"
+          plan += f'''\n{note_heading}
+
+Exact source `{qualified_sha}` passed the `quick` profile with overall, licensed
+Stata, and Rust status all `success` in `repository-engine` mode. The Stata test
+loaded the generated macOS ARM64 plugin and compiled the academic/BibTeX fixture
+using only the embedded pinned v33 resource ZIP. See `STATUS.md` and
+`bundle/QUALIFICATION.json` for the qualification boundary and digests.
+
+This closes M1, M2, and the macOS ARM64 portions of M3/M4. It does not close the
+curated-bundle/license work, robustness gate, cross-platform qualification, or
+public-release milestones.
+'''
+          plan_path.write_text(plan, encoding="utf-8")
+
+          profiles_path = Path("ci/stata_profiles.json")
+          profiles = json.loads(profiles_path.read_text(encoding="utf-8"))
+          profiles["quick"]["required_log_markers"] = [
+              "TEXPDF STATA MATA SMOKE PASS"
+          ]
+          profiles_path.write_text(
+              json.dumps(profiles, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          Path("ci/FULL_ENGINE").unlink()
+          for transient in (
+              ".github/workflows/repair-bridge.yml",
+              ".github/workflows/implement-stata-package.yml",
+              ".github/workflows/qualify-full-engine.yml",
+              ".github/workflows/qualify-full-engine-v2.yml",
+              ".github/workflows/finalize-full-engine.yml",
+          ):
+              Path(transient).unlink(missing_ok=True)
+          PY
+
+          git add STATUS.md PLAN.md ci/stata_profiles.json
+          git add -u ci/FULL_ENGINE .github/workflows || true
+
+      - name: Run quick post-qualification regression
+        if: ${{ steps.verify.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          /bin/bash ci/record_rust_quick.sh
+          /usr/bin/grep -qx 'rust_status=success' .ci/stata/run/rust-quick.status
+          /bin/bash ci/run_stata_ci.sh quick
+          /usr/bin/python3 ci/check_stata_receipt.py \
+            .ci/stata/run/receipt.json \
+            --expect-tested-sha "$GITHUB_SHA" \
+            --expect-profile quick \
+            --require-success
+
+      - name: Commit qualification record
+        if: ${{ steps.verify.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset -- stata/_texpdf_plugin.plugin 2>/dev/null || true
+          rm -f stata/_texpdf_plugin.plugin
+          rm -rf .ci/stata/run bundle/generated
+          git add -u
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: record exact macOS full-engine qualification"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
