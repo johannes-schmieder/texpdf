@@ -15,10 +15,10 @@ on:
 
 concurrency:
   group: texpdf-macos-memory-stress
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   stress:
@@ -33,6 +33,8 @@ jobs:
     steps:
       - name: Check out tested source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
 
       - name: Validate iteration count and add temporary profile
         shell: bash
@@ -114,6 +116,72 @@ jobs:
               raise SystemExit("memory stress gate failed")
           print("TEXPDF_MEMORY_STRESS_GREEN", data)
           PY
+
+      - name: Publish source-bound memory qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_summary="$GITHUB_WORKSPACE/.ci/stata/run/memory-stress.json"
+          source_receipt="$GITHUB_WORKSPACE/.ci/stata/run/receipt.json"
+          publish_tree="$RUNNER_TEMP/texpdf-memory-publish"
+          rm -rf "$publish_tree"
+          git fetch origin main
+          git worktree add --detach "$publish_tree" origin/main
+          trap 'git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true' EXIT
+          /usr/bin/python3 - \
+            "$source_summary" \
+            "$source_receipt" \
+            "$publish_tree/release/memory-stress-macos-arm64.json" \
+            "$publish_tree/release/targets.json" <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import sys
+
+          summary = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          receipt = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+          output = Path(sys.argv[3])
+          targets_path = Path(sys.argv[4])
+          record = {
+              "schema_version": 1,
+              "source_sha": os.environ["GITHUB_SHA"],
+              "profile": "stress1000",
+              "overall_status": receipt["status"],
+              "stata_status": receipt["stata_status"],
+              "rust_status": receipt["rust_status"],
+              "rust_mode": receipt.get("rust_mode"),
+              "platform": receipt.get("platform"),
+              "stata_version": receipt.get("stata_version"),
+              "stata_edition": receipt.get("stata_edition"),
+              "memory": summary,
+              "qualification_boundary": (
+                  "This records the macOS Apple Silicon licensed-Stata in-process "
+                  "stress result. It does not qualify other architectures or rule "
+                  "out every native process-fatal failure mode."
+              ),
+          }
+          output.parent.mkdir(parents=True, exist_ok=True)
+          output.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+          targets = json.loads(targets_path.read_text(encoding="utf-8"))
+          arm = targets["targets"]["aarch64-apple-darwin"]
+          arm.update(
+              {
+                  "memory_stress_source_sha": record["source_sha"],
+                  "memory_stress_iterations": summary["iterations_requested"],
+                  "memory_stress_peak_stata_rss_kib": summary["peak_stata_rss_kib"],
+                  "memory_stress_post_warmup_growth_kib": summary["post_warmup_growth_kib"],
+                  "memory_stress_growth_ratio": summary["post_warmup_growth_ratio"],
+                  "memory_stress_gate": summary["growth_gate"],
+              }
+          )
+          targets_path.write_text(json.dumps(targets, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+          git -C "$publish_tree" config user.name "github-actions[bot]"
+          git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$publish_tree" add release/memory-stress-macos-arm64.json release/targets.json
+          git -C "$publish_tree" commit -m "ci(target): record 1000-call memory stress [skip ci]"
+          git -C "$publish_tree" push origin HEAD:main
 
       - name: Upload exact-source stress evidence
         if: ${{ always() }}
