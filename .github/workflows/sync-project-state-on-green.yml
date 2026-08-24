@@ -5,6 +5,11 @@ on:
   workflow_run:
     workflows:
       - Licensed Stata and Rust CI
+      - Build and test macOS universal plugin
+      - Publish macOS ARM64 target qualification
+      - Audit third-party licenses and notices
+      - macOS ARM64 1000-call memory stress
+      - Qualify macOS Intel Stata runtime
     types:
       - completed
   push:
@@ -21,6 +26,7 @@ on:
       - "release/targets.json"
       - "tools/check_release_readiness.py"
       - "tools/sync_project_state.py"
+      - ".github/workflows/sync-project-state-on-green.yml"
 
 concurrency:
   group: texpdf-sync-project-state
@@ -41,7 +47,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Generate and publish canonical state
+      - name: Generate, audit, and publish canonical state
         shell: bash
         run: |
           set -euo pipefail

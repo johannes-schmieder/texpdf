@@ -2,19 +2,6 @@ name: Release readiness audit
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "Cargo.lock"
-      - "stata/**"
-      - "bundle/**"
-      - "release/targets.json"
-      - "release/macos-universal.json"
-      - "release/memory-stress-macos-arm64.json"
-      - "licenses/generated/STATUS.json"
-      - "tools/check_release_readiness.py"
-      - ".github/workflows/release-audit.yml"
 
 concurrency:
   group: texpdf-release-audit
@@ -31,6 +18,7 @@ jobs:
       - name: Check out exact source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Require synchronized fail-closed release state
