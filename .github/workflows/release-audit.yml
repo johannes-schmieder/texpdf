@@ -9,7 +9,10 @@ on:
       - "Cargo.lock"
       - "stata/**"
       - "bundle/**"
-      - "platform/**"
+      - "release/targets.json"
+      - "release/macos-universal.json"
+      - "release/memory-stress-macos-arm64.json"
+      - "licenses/generated/STATUS.json"
       - "tools/check_release_readiness.py"
       - ".github/workflows/release-audit.yml"
 
@@ -18,25 +21,66 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   audit:
     runs-on: [self-hosted, macOS, ARM64, texpdf]
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Check out exact source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
 
-      - name: Generate release-readiness report
+      - name: Generate fail-closed release-readiness report
         run: /usr/bin/python3 tools/check_release_readiness.py
 
       - name: Upload audit report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: texpdf-release-audit-${{ github.sha }}
+          name: texpdf-release-audit-${{ github.sha }}-${{ github.run_id }}
           path: |
-            RELEASE_READINESS.json
-            RELEASE_READINESS.md
+            release/READINESS.json
+            release/READINESS.md
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish current readiness summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          json_source="$GITHUB_WORKSPACE/release/READINESS.json"
+          markdown_source="$GITHUB_WORKSPACE/release/READINESS.md"
+          publish_tree=""
+          cleanup() {
+            if [[ -n "$publish_tree" ]]; then
+              git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true
+              publish_tree=""
+            fi
+          }
+          trap cleanup EXIT
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            publish_tree="$RUNNER_TEMP/texpdf-readiness-publish-$attempt"
+            rm -rf "$publish_tree"
+            git worktree add --detach "$publish_tree" origin/main
+            mkdir -p "$publish_tree/release"
+            cp "$json_source" "$publish_tree/release/READINESS.json"
+            cp "$markdown_source" "$publish_tree/release/READINESS.md"
+            git -C "$publish_tree" config user.name "github-actions[bot]"
+            git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git -C "$publish_tree" add release/READINESS.json release/READINESS.md
+            if git -C "$publish_tree" diff --cached --quiet; then
+              exit 0
+            fi
+            git -C "$publish_tree" commit -m "release: publish readiness audit [skip ci]"
+            if git -C "$publish_tree" push origin HEAD:main; then
+              exit 0
+            fi
+            cleanup
+            sleep "$attempt"
+          done
+          echo "failed to publish release readiness after three attempts" >&2
+          exit 1
