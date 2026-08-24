@@ -1,9 +1,10 @@
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeSet, HashMap},
     env,
     error::Error,
     fmt::Arguments,
     fs,
+    io::{Cursor, Read},
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
 };
@@ -11,7 +12,9 @@ use std::{
 use tectonic::driver::{OutputFormat, ProcessingSessionBuilder};
 use tectonic_bundles::{itar::ItarBundle, Bundle};
 use tectonic_errors::{Error as TectonicError, Result as TectonicResult};
-use tectonic_io_base::{digest::DigestData, InputHandle, IoProvider, OpenResult};
+use tectonic_io_base::{
+    digest::DigestData, InputHandle, InputOrigin, IoProvider, OpenResult,
+};
 use tectonic_status_base::{MessageKind, StatusBackend};
 
 const MAX_TEX_LOG_BYTES: usize = 256 * 1024;
@@ -52,6 +55,13 @@ impl StatusBackend for ResolverStatus {
 struct RecordingBundle {
     inner: Box<dyn Bundle>,
     requested: Arc<Mutex<BTreeSet<String>>>,
+    cache: HashMap<String, Vec<u8>>,
+}
+
+impl RecordingBundle {
+    fn cached_handle(name: &str, data: Vec<u8>) -> InputHandle {
+        InputHandle::new_read_only(name, Cursor::new(data), InputOrigin::Other)
+    }
 }
 
 impl IoProvider for RecordingBundle {
@@ -63,7 +73,23 @@ impl IoProvider for RecordingBundle {
         if let Ok(mut requested) = self.requested.lock() {
             requested.insert(name.to_owned());
         }
-        self.inner.input_open_name(name, status)
+
+        if let Some(data) = self.cache.get(name) {
+            return OpenResult::Ok(Self::cached_handle(name, data.clone()));
+        }
+
+        match self.inner.input_open_name(name, status) {
+            OpenResult::Ok(mut handle) => {
+                let mut data = Vec::new();
+                if let Err(error) = handle.read_to_end(&mut data) {
+                    return OpenResult::Err(error.into());
+                }
+                self.cache.insert(name.to_owned(), data.clone());
+                OpenResult::Ok(Self::cached_handle(name, data))
+            }
+            OpenResult::NotAvailable => OpenResult::NotAvailable,
+            OpenResult::Err(error) => OpenResult::Err(error),
+        }
     }
 }
 
@@ -98,6 +124,7 @@ fn compile_source(
     let recording = RecordingBundle {
         inner: Box::new(network_bundle),
         requested,
+        cache: HashMap::new(),
     };
     let mut status = ResolverStatus;
     let mut builder = ProcessingSessionBuilder::default();
