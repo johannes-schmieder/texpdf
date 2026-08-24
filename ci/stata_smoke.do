@@ -26,11 +26,13 @@ assert strlen(`"`r(bundle_zip_sha256)'"') == 64
 assert r(warnings) == 0
 
 capture noisily texpdf
-assert _rc == 198
+local syntax_rc = _rc
+assert `syntax_rc' == 198
 
 tempfile missing
 capture noisily texpdf using `"`missing'"'
-assert _rc == 601
+local missing_rc = _rc
+assert `missing_rc' == 601
 
 tempfile source output
 tempname handle
@@ -41,12 +43,15 @@ file open `handle' using `"`output'"', write text replace
 file write `handle' "existing output" _n
 file close `handle'
 capture noisily texpdf using `"`source'"', saving(`"`output'"')
-assert _rc == 602
+local overwrite_rc = _rc
+assert `overwrite_rc' == 602
 
-display as result "TEXPDF STATA COMMAND SMOKE PASS"
+local command_marker = "TEXPDF STATA COMMAND SMOKE " + "PASS"
+display as result `"`command_marker'"'
 
 capture confirm file `"`repo'/ci/FULL_ENGINE"'
-if !_rc {
+local full_engine = (_rc == 0)
+if `full_engine' {
     tempfile compiled
     local compiled_pdf `"`compiled'.pdf"'
     texpdf using `"`repo'/tests/fixtures/academic.tex"', saving(`"`compiled_pdf'"') replace
@@ -58,13 +63,16 @@ if !_rc {
     assert r(warnings) >= 0
 
     tempfile bad badpdf
+    local bad_pdf `"`badpdf'.pdf"'
     file open `handle' using `"`bad'"', write text replace
     file write `handle' "\documentclass{article}\begin{document}\undefinedcontrolsequence\end{document}" _n
     file close `handle'
-    capture noisily texpdf using `"`bad'"', saving(`"`badpdf'.pdf"') replace
-    assert _rc == 459
-    capture confirm file `"`badpdf'.pdf"'
-    assert _rc != 0
+    capture noisily texpdf using `"`bad'"', saving(`"`bad_pdf'"') replace
+    local bad_rc = _rc
+    assert `bad_rc' == 459
+    capture confirm file `"`bad_pdf'"'
+    local bad_output_rc = _rc
+    assert `bad_output_rc' != 0
 
     * A recoverable TeX error must not damage the in-process plugin.
     texpdf, version
@@ -74,7 +82,9 @@ if !_rc {
         confirm file `"`compiled_pdf'"'
     }
 
-    display as result "TEXPDF FULL ENGINE STATA PASS"
+    local full_marker = "TEXPDF FULL ENGINE STATA " + "PASS"
+    display as result `"`full_marker'"'
 }
 
-display as result "TEXPDF STATA MATA SMOKE PASS"
+local suite_marker = "TEXPDF STATA MATA SMOKE " + "PASS"
+display as result `"`suite_marker'"'
