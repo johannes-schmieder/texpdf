@@ -38,6 +38,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           git fetch origin main
           git merge-base --is-ancestor "$SOURCE_SHA" origin/main
+          git show origin/main:release/targets.json > "$RUNNER_TEMP/texpdf-targets.json"
           receipt="$RUNNER_TEMP/texpdf-source-receipt.json"
           git show "origin/main:.ci/stata/results/$SOURCE_SHA.json" > "$receipt"
           /usr/bin/python3 ci/check_stata_receipt.py \
@@ -60,7 +61,7 @@ jobs:
 
       - name: Materialize complete source-bound notice tree
         shell: bash
-        run: /bin/bash ci/prepare_release_license_evidence.sh
+        run: GITHUB_SHA="$SOURCE_SHA" /bin/bash ci/prepare_release_license_evidence.sh
 
       - name: Assemble exact private candidate with notices
         shell: bash
@@ -76,6 +77,58 @@ jobs:
             --target universal2-apple-darwin \
             --package-version 0.1.0-rc.1 \
             --include-license-evidence
+
+      - name: Require identical ARM-qualified candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+
+          targets = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "texpdf-targets.json").read_text(
+                  encoding="utf-8"
+              )
+          )["targets"]
+          arm = targets["aarch64-apple-darwin"]
+          manifest = json.loads(
+              Path("dist/macos-universal/manifest.json").read_text(encoding="utf-8")
+          )
+          package = json.loads(
+              Path("dist/macos-universal/package-manifest.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          expected = {
+              "universal_build_source_sha": os.environ["SOURCE_SHA"],
+              "universal_plugin_sha256": manifest["universal"]["sha256"],
+              "universal_plugin_size_bytes": manifest["universal"]["size_bytes"],
+              "universal_arm_slice_sha256": manifest["slices"]["arm64"]["sha256"],
+              "universal_arm_runtime_qualified": True,
+              "candidate_package_sha256": package["package_zip_sha256"],
+              "candidate_package_size_bytes": package["package_zip_size_bytes"],
+              "candidate_package_version": package["package_version"],
+              "candidate_package_license_evidence_included": True,
+              "candidate_package_public_release": False,
+          }
+          mismatches = {
+              key: {"expected": value, "actual": arm.get(key)}
+              for key, value in expected.items()
+              if arm.get(key) != value
+          }
+          if mismatches:
+              raise SystemExit(
+                  "candidate differs from exact ARM-qualified bytes: "
+                  + json.dumps(mismatches, sort_keys=True)
+              )
+          print(
+              "TEXPDF_IDENTICAL_ARM_CANDIDATE "
+              f"zip_sha256={package['package_zip_sha256']} "
+              f"plugin_sha256={manifest['universal']['sha256']}"
+          )
+          PY
 
       - name: Run actual x86_64 Stata process
         shell: bash
@@ -148,6 +201,9 @@ jobs:
           Path("release/macos-intel-runtime.json").write_text(
               json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
           )
+          manifest["source_sha"] = source
+          manifest["arm_runtime_qualified"] = True
+          manifest["arm_runtime_source_sha"] = source
           manifest["intel_runtime_qualified"] = True
           manifest["intel_runtime_source_sha"] = source
           manifest["candidate_package"] = {
@@ -179,7 +235,10 @@ jobs:
           trap 'git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true' EXIT
           cp "$record" "$publish_tree/release/macos-intel-runtime.json"
           cp "$universal" "$publish_tree/release/macos-universal.json"
-          /usr/bin/python3 - "$publish_tree/release/targets.json" "$record" <<'PY'
+          /usr/bin/python3 - \
+            "$publish_tree/release/targets.json" \
+            "$record" \
+            "$universal" <<'PY'
           from pathlib import Path
           import json
           import sys
@@ -187,8 +246,31 @@ jobs:
           path = Path(sys.argv[1])
           registry = json.loads(path.read_text(encoding="utf-8"))
           record = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+          universal = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
+          candidate = universal["candidate_package"]
+          arm = registry["targets"]["aarch64-apple-darwin"]
+          arm.update({
+              "candidate_package_sha256": candidate["zip_sha256"],
+              "candidate_package_size_bytes": candidate["zip_size_bytes"],
+              "candidate_package_version": candidate["version"],
+              "candidate_package_license_evidence_included": candidate[
+                  "license_evidence_included"
+              ],
+              "candidate_package_public_release": candidate["public_release"],
+          })
+          intel_slice = universal["slices"]["x86_64"]
+          universal_plugin = universal["universal"]
           target = registry["targets"]["x86_64-apple-darwin"]
           target.update({
+              "artifact": "_texpdf_plugin.plugin",
+              "build_qualified": True,
+              "build_source_sha": record["source_sha"],
+              "plugin_sha256": intel_slice["sha256"],
+              "plugin_size_bytes": intel_slice["size_bytes"],
+              "embedded_helper_sha256": intel_slice["embedded_helper"]["sha256"],
+              "embedded_helper_size_bytes": intel_slice["embedded_helper"]["size_bytes"],
+              "universal_plugin_sha256": universal_plugin["sha256"],
+              "universal_plugin_size_bytes": universal_plugin["size_bytes"],
               "qualified_source_sha": record["source_sha"],
               "qualification_profile": "licensed x86_64 Stata quick",
               "stata_runtime_qualified": True,
