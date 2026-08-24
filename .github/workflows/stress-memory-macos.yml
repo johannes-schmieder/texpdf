@@ -12,6 +12,8 @@ on:
       - main
     paths:
       - ".github/workflows/stress-memory-macos.yml"
+      - "ci/run_memory_stress.sh"
+      - "ci/stata_stress_1000.do"
 
 concurrency:
   group: texpdf-macos-memory-stress
@@ -37,6 +39,8 @@ jobs:
           fetch-depth: 0
 
       - name: Validate iteration count and add temporary profile
+        id: profile
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -76,10 +80,14 @@ jobs:
           git add ci/stata_profiles.json
 
       - name: Build and test the real embedded plugin
+        id: build
+        if: ${{ steps.profile.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         run: /bin/bash ci/record_rust_quick.sh
 
       - name: Preserve Rust evidence
+        if: ${{ steps.build.outcome == 'success' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -88,14 +96,29 @@ jobs:
           cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-rust-evidence/"
 
       - name: Run licensed Stata stress with RSS sampling
+        id: stress
+        if: ${{ steps.build.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         run: /bin/bash ci/run_memory_stress.sh stress1000
 
-      - name: Restore Rust evidence and validate combined receipt
+      - name: Restore Rust evidence
+        if: ${{ always() && steps.build.outcome == 'success' }}
         shell: bash
         run: |
           set -euo pipefail
-          cp -R "$RUNNER_TEMP/texpdf-rust-evidence/." .ci/stata/run/
+          mkdir -p .ci/stata/run
+          if [[ -d "$RUNNER_TEMP/texpdf-rust-evidence" ]]; then
+            cp -R "$RUNNER_TEMP/texpdf-rust-evidence/." .ci/stata/run/
+          fi
+
+      - name: Validate combined receipt and growth gate
+        id: validate
+        if: ${{ steps.stress.outcome == 'success' && steps.build.outcome == 'success' }}
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
           /usr/bin/python3 ci/augment_ci_receipt.py \
             .ci/stata/run/receipt.json \
             .ci/stata/run/rust-quick.status
@@ -117,71 +140,139 @@ jobs:
           print("TEXPDF_MEMORY_STRESS_GREEN", data)
           PY
 
-      - name: Publish source-bound memory qualification
+      - name: Write attempt record
+        id: record
+        if: ${{ always() }}
         shell: bash
+        env:
+          PROFILE_OUTCOME: ${{ steps.profile.outcome }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          STRESS_OUTCOME: ${{ steps.stress.outcome }}
+          VALIDATE_OUTCOME: ${{ steps.validate.outcome }}
         run: |
           set -euo pipefail
-          source_summary="$GITHUB_WORKSPACE/.ci/stata/run/memory-stress.json"
-          source_receipt="$GITHUB_WORKSPACE/.ci/stata/run/receipt.json"
-          publish_tree="$RUNNER_TEMP/texpdf-memory-publish"
-          rm -rf "$publish_tree"
-          git fetch origin main
-          git worktree add --detach "$publish_tree" origin/main
-          trap 'git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true' EXIT
-          /usr/bin/python3 - \
-            "$source_summary" \
-            "$source_receipt" \
-            "$publish_tree/release/memory-stress-macos-arm64.json" \
-            "$publish_tree/release/targets.json" <<'PY'
+          mkdir -p .ci/stata/run
+          /usr/bin/python3 - <<'PY'
           from pathlib import Path
           import json
           import os
-          import sys
 
-          summary = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          receipt = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
-          output = Path(sys.argv[3])
-          targets_path = Path(sys.argv[4])
+          def load(path: str) -> dict:
+              try:
+                  value = json.loads(Path(path).read_text(encoding="utf-8"))
+              except (OSError, json.JSONDecodeError):
+                  return {}
+              return value if isinstance(value, dict) else {}
+
+          memory = load(".ci/stata/run/memory-stress.json")
+          receipt = load(".ci/stata/run/receipt.json")
+          outcomes = {
+              "profile": os.environ.get("PROFILE_OUTCOME", "unknown"),
+              "build": os.environ.get("BUILD_OUTCOME", "unknown"),
+              "stress": os.environ.get("STRESS_OUTCOME", "unknown"),
+              "validate": os.environ.get("VALIDATE_OUTCOME", "unknown"),
+          }
+          qualified = (
+              all(value == "success" for value in outcomes.values())
+              and receipt.get("tested_sha") == os.environ["GITHUB_SHA"]
+              and receipt.get("status") == "success"
+              and receipt.get("stata_status") == "success"
+              and receipt.get("rust_status") == "success"
+              and receipt.get("profile") == "stress1000"
+              and int(memory.get("iterations_requested", 0)) >= 1000
+              and memory.get("runner_rc") == 0
+              and memory.get("growth_gate") is True
+          )
           record = {
-              "schema_version": 1,
+              "schema_version": 2,
               "source_sha": os.environ["GITHUB_SHA"],
               "profile": "stress1000",
-              "overall_status": receipt["status"],
-              "stata_status": receipt["stata_status"],
-              "rust_status": receipt["rust_status"],
+              "qualified": qualified,
+              "step_outcomes": outcomes,
+              "overall_status": receipt.get("status", "failure"),
+              "stata_status": receipt.get("stata_status", "failure"),
+              "rust_status": receipt.get("rust_status", "failure"),
               "rust_mode": receipt.get("rust_mode"),
               "platform": receipt.get("platform"),
               "stata_version": receipt.get("stata_version"),
               "stata_edition": receipt.get("stata_edition"),
-              "memory": summary,
+              "memory": memory,
               "qualification_boundary": (
-                  "This records the macOS Apple Silicon licensed-Stata in-process "
-                  "stress result. It does not qualify other architectures or rule "
+                  "This records one macOS Apple Silicon licensed-Stata in-process "
+                  "stress attempt. It does not qualify other architectures or rule "
                   "out every native process-fatal failure mode."
               ),
           }
-          output.parent.mkdir(parents=True, exist_ok=True)
-          output.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          Path(".ci/stata/run/memory-qualification.json").write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("TEXPDF_MEMORY_ATTEMPT_RECORD", record)
+          PY
 
+      - name: Publish source-bound memory attempt
+        if: ${{ always() && steps.record.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_record="$GITHUB_WORKSPACE/.ci/stata/run/memory-qualification.json"
+          publish_tree=""
+          cleanup() {
+            if [[ -n "$publish_tree" ]]; then
+              git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true
+              publish_tree=""
+            fi
+          }
+          trap cleanup EXIT
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            publish_tree="$RUNNER_TEMP/texpdf-memory-publish-$attempt"
+            rm -rf "$publish_tree"
+            git worktree add --detach "$publish_tree" origin/main
+            mkdir -p "$publish_tree/release"
+            cp "$source_record" "$publish_tree/release/memory-stress-macos-arm64.json"
+            /usr/bin/python3 - \
+              "$source_record" \
+              "$publish_tree/release/targets.json" <<'PY'
+          from pathlib import Path
+          import json
+          import sys
+
+          record = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          targets_path = Path(sys.argv[2])
           targets = json.loads(targets_path.read_text(encoding="utf-8"))
           arm = targets["targets"]["aarch64-apple-darwin"]
-          arm.update(
-              {
-                  "memory_stress_source_sha": record["source_sha"],
-                  "memory_stress_iterations": summary["iterations_requested"],
-                  "memory_stress_peak_stata_rss_kib": summary["peak_stata_rss_kib"],
-                  "memory_stress_post_warmup_growth_kib": summary["post_warmup_growth_kib"],
-                  "memory_stress_growth_ratio": summary["post_warmup_growth_ratio"],
-                  "memory_stress_gate": summary["growth_gate"],
-              }
+          arm["memory_stress_latest_attempt_sha"] = record["source_sha"]
+          arm["memory_stress_latest_attempt_qualified"] = record["qualified"]
+          if record["qualified"]:
+              memory = record["memory"]
+              arm.update(
+                  {
+                      "memory_stress_source_sha": record["source_sha"],
+                      "memory_stress_iterations": memory["iterations_requested"],
+                      "memory_stress_peak_stata_rss_kib": memory["peak_stata_rss_kib"],
+                      "memory_stress_post_warmup_growth_kib": memory["post_warmup_growth_kib"],
+                      "memory_stress_growth_ratio": memory["post_warmup_growth_ratio"],
+                      "memory_stress_gate": memory["growth_gate"],
+                  }
+              )
+          targets_path.write_text(
+              json.dumps(targets, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
           )
-          targets_path.write_text(json.dumps(targets, indent=2, sort_keys=True) + "\n", encoding="utf-8")
           PY
-          git -C "$publish_tree" config user.name "github-actions[bot]"
-          git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$publish_tree" add release/memory-stress-macos-arm64.json release/targets.json
-          git -C "$publish_tree" commit -m "ci(target): record 1000-call memory stress [skip ci]"
-          git -C "$publish_tree" push origin HEAD:main
+            git -C "$publish_tree" config user.name "github-actions[bot]"
+            git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git -C "$publish_tree" add release/memory-stress-macos-arm64.json release/targets.json
+            git -C "$publish_tree" commit -m "ci(target): record 1000-call memory attempt [skip ci]"
+            if git -C "$publish_tree" push origin HEAD:main; then
+              exit 0
+            fi
+            cleanup
+            sleep "$attempt"
+          done
+          exit 1
 
       - name: Upload exact-source stress evidence
         if: ${{ always() }}
@@ -191,3 +282,17 @@ jobs:
           path: .ci/stata/run/
           if-no-files-found: error
           retention-days: 30
+
+      - name: Enforce qualification
+        if: ${{ always() && steps.record.outcome == 'success' }}
+        shell: bash
+        run: |
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+          data = json.loads(
+              Path(".ci/stata/run/memory-qualification.json").read_text(encoding="utf-8")
+          )
+          if data.get("qualified") is not True:
+              raise SystemExit("1000-call memory qualification did not pass")
+          PY
