@@ -35,9 +35,14 @@ mkdir -p "$(dirname "$output")" "$(dirname "$manifest")"
 temporary="$output.tmp"
 rm -f "$temporary"
 /usr/bin/lipo -create "$arm_library" "$intel_library" -output "$temporary"
-/usr/bin/lipo -verify_arch arm64 x86_64 "$temporary"
-/usr/bin/nm -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_pginit$'
-/usr/bin/nm -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_stata_call$'
+# With Apple's lipo, the input file precedes -verify_arch. Putting the file at
+# the end makes it look like an architecture name and caused the first
+# universal qualification attempt to fail after both slices built successfully.
+/usr/bin/lipo "$temporary" -verify_arch arm64 x86_64
+/usr/bin/nm -arch arm64 -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_pginit$'
+/usr/bin/nm -arch arm64 -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_stata_call$'
+/usr/bin/nm -arch x86_64 -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_pginit$'
+/usr/bin/nm -arch x86_64 -gU "$temporary" | /usr/bin/grep -Eq '(^|[[:space:]])_stata_call$'
 
 runtime_deps="$(/usr/bin/otool -L "$temporary")"
 if printf '%s\n' "$runtime_deps" | /usr/bin/grep -Eq '/(opt/homebrew|usr/local|private/tmp/texpdf-vcpkg|Users/[^/]+/\.vcpkg)/'; then
@@ -82,6 +87,8 @@ architectures = subprocess.run(
     text=True,
     capture_output=True,
 ).stdout.strip().split()
+if set(architectures) != {"arm64", "x86_64"}:
+    raise SystemExit(f"unexpected universal architectures: {architectures}")
 dependencies = subprocess.run(
     ["/usr/bin/otool", "-L", str(universal)],
     check=True,
