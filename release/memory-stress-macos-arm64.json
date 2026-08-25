@@ -6,8 +6,8 @@
     "zip_size_bytes": 4984973
   },
   "development_package": {
-    "zip_sha256": "b5d2b74a7d9b36df47c038047f441b968528e0bcd35fa306754598bb89a8c5c3",
-    "zip_size_bytes": 22496273
+    "zip_sha256": "fea5fd02b47c072577911217e54eb89eea86c4ae0b462d3970b2434fc58b76d3",
+    "zip_size_bytes": 22496276
   },
   "helper": {
     "sha256": "df1bf398fae80a57cb83c0e0796a1d2189bcbd2b2965ce23b6e7326298b24f06",
@@ -33,7 +33,7 @@
   "rust_mode": null,
   "rust_status": "failure",
   "schema_version": 3,
-  "source_sha": "079982acf809fa2c9d7e68894e70da0ccfbfe43c",
+  "source_sha": "39f67bf948b337c9a7a91dc704257a015402b7ed",
   "stata_edition": null,
   "stata_status": "failure",
   "stata_version": null,
