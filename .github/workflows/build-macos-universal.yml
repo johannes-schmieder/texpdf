@@ -154,6 +154,15 @@ jobs:
           git fetch origin main
           git worktree add --detach "$publish_tree" origin/main
           trap 'git -C "$GITHUB_WORKSPACE" worktree remove --force "$publish_tree" 2>/dev/null || true' EXIT
+          candidate_source_sha=$(
+            /usr/bin/python3 -c \
+              'import json,sys; print(json.load(open(sys.argv[1]))["candidate_source_sha"])' \
+              "$publish_tree/release/scope.json"
+          )
+          if [[ "$GITHUB_SHA" != "$candidate_source_sha" ]]; then
+            echo "Skipping release-record publication for non-candidate source $GITHUB_SHA"
+            exit 0
+          fi
           mkdir -p "$publish_tree/release"
           cp "$manifest" "$publish_tree/release/macos-universal.json"
           /usr/bin/python3 - "$publish_tree/release/targets.json" "$manifest" <<'PY'
