@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 import importlib.util
+import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 
 CI_DIR = Path(__file__).resolve().parents[1]
@@ -20,6 +22,17 @@ RUN_STATA_SPEC.loader.exec_module(RUN_STATA)
 
 
 class ReceiptTests(unittest.TestCase):
+    def test_runtime_artifact_directory_can_be_isolated(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "repo"
+            destination = Path(temporary) / "receipts" / "stata-18-quick"
+            with mock.patch.dict(
+                os.environ, {"TEXPDF_STATA_ARTIFACT_DIR": str(destination)}
+            ):
+                self.assertEqual(
+                    RUN_STATA.artifact_directory(root), destination.resolve()
+                )
+
     def test_runtime_artifact_identity_writer_is_atomic(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "nested" / "artifact.json"

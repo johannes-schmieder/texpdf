@@ -41,6 +41,7 @@ export STATA_BIN="$stata_bin"
 export TEXPDF_STATA_PLUGIN="$build_dir/_texpdf_plugin.plugin"
 export TEXPDF_STATA_PACKAGE_DIR="$build_dir/package"
 export TEXPDF_STATA_PACKAGE_MANIFEST="$build_dir/package-manifest.json"
+export TEXPDF_STATA_ARTIFACT_DIR="$evidence_dir"
 export GITHUB_SHA="$source_sha"
 export GITHUB_REPOSITORY=johannes-schmieder/texpdf
 export GITHUB_REF="refs/heads/main"
@@ -53,8 +54,7 @@ export STATA_CI_LOCK_FILE=/projectnb/welfgr/texpdf/stata-ci.lock
 mkdir -p "$RUNNER_TEMP" "$evidence_dir"
 cd "$code_dir"
 "$python_bin" ci/run_stata_ci.py "$profile"
-"$python_bin" ci/check_stata_receipt.py .ci/stata/run/receipt.json \
+"$python_bin" ci/check_stata_receipt.py "$evidence_dir/receipt.json" \
   --expect-tested-sha "$source_sha" --expect-profile "$profile" --require-success
-cp -R .ci/stata/run/. "$evidence_dir/"
 printf 'TEXPDF_SCC_STATA_PASS source=%s version=%s profile=%s\n' \
   "$source_sha" "$stata_version" "$profile"

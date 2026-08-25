@@ -28,6 +28,13 @@ def repo_root() -> Path:
     ).resolve()
 
 
+def artifact_directory(root: Path) -> Path:
+    configured = os.environ.get("TEXPDF_STATA_ARTIFACT_DIR")
+    if configured:
+        return Path(configured).expanduser().resolve()
+    return root / ".ci" / "stata" / "run"
+
+
 def tracked_files(root: Path) -> list[Path]:
     raw = subprocess.check_output(["git", "ls-files", "--cached", "-z"], cwd=root)
     files: list[Path] = []
@@ -200,7 +207,7 @@ def main() -> int:
         parser.error(f"unknown profile {args.profile!r}; choose one of: {choices}")
     profile = profiles[args.profile]
 
-    artifact_dir = root / ".ci" / "stata" / "run"
+    artifact_dir = artifact_directory(root)
     clear_directory(artifact_dir)
     parent = Path(os.environ.get("RUNNER_TEMP", tempfile.gettempdir())).resolve()
     parent.mkdir(parents=True, exist_ok=True)
