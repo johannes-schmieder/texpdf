@@ -36,16 +36,16 @@
   "dependency_undeclared_count": 0,
   "missing_native_notice_files": 0,
   "missing_rust_notice_files": 0,
-  "pipeline_complete": false,
+  "pipeline_complete": true,
   "qualification_boundary": "This status records the audit pipeline even when a stage fails. Public binary publication remains blocked unless release_license_complete is true.",
-  "release_license_complete": false,
+  "release_license_complete": true,
   "resource_count_matches_manifest": true,
   "schema_version": 2,
   "source_sha": "21cf28493624191d52488146b914b8d26cc5291d",
   "stage_return_codes": {
     "cargo_inventory": 0,
     "collect_license_texts": 0,
-    "collect_tex_license_notices": 2,
+    "collect_tex_license_notices": 0,
     "dependency_inventory": 0,
     "download_tlpdb": 0,
     "prepare_native_dependencies": 0,
@@ -68,7 +68,7 @@
       "name": "prepare_native_dependencies",
       "return_code": 0,
       "stderr_tail": "",
-      "stdout_tail": "TEXPDF_PKGCONF_READY version=2.5.1 path=/private/tmp/texpdf-pkgconf-4fc570f91d9d/bin/pkg-config\nTEXPDF_NATIVE_DEPS_READY host=aarch64-apple-darwin triplet=arm64-osx root=/private/tmp/texpdf-vcpkg-a62ce77d56ee"
+      "stdout_tail": "TEXPDF_PKGCONF_READY version=2.5.1 path=/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T//texpdf-pkgconf-4fc570f91d9d/bin/pkg-config\nTEXPDF_NATIVE_DEPS_READY host=aarch64-apple-darwin triplet=arm64-osx root=/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T//texpdf-vcpkg-a62ce77d56ee"
     },
     {
       "command": [
@@ -132,7 +132,7 @@
         "--manifest",
         "licenses/generated/license-texts.json",
         "--vcpkg-root",
-        "/private/tmp/texpdf-vcpkg-a62ce77d56ee",
+        "/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T//texpdf-vcpkg-a62ce77d56ee",
         "--triplet",
         "arm64-osx",
         "--require-native"
@@ -154,9 +154,9 @@
         "licenses/generated/tex-notices.json"
       ],
       "name": "collect_tex_license_notices",
-      "return_code": 2,
-      "stderr_tail": "TEXPDF_TEX_NOTICE_ERROR [Errno 2] No such file or directory: 'bundle/generated/texpdf-bundle.zip'",
-      "stdout_tail": ""
+      "return_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_TEX_NOTICES_READY resources=392 expressions=18 notices=10"
     },
     {
       "error": "",
@@ -168,8 +168,8 @@
       "url": "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb.xz"
     }
   ],
-  "tex_notice_complete": false,
-  "tex_notice_file_count": -1,
+  "tex_notice_complete": true,
+  "tex_notice_file_count": 10,
   "tex_resources": {
     "ambiguous": 0,
     "license_expression_count": 18,

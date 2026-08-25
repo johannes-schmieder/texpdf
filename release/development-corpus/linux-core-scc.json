@@ -1,0 +1,37 @@
+{
+  "bundle": {
+    "content_digest": "343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf",
+    "name": "texpdf-academic-v2-development",
+    "version": "33-academic-v2-dev.1",
+    "zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f"
+  },
+  "job_id": "7311141",
+  "licensed_stata_run": false,
+  "outputs": [
+    {
+      "name": "economics-manuscript.pdf",
+      "sha256": "75ff1e7290e22421f7f27b7e2328276ecdd84600087c1056afa151a88fe825ed",
+      "size_bytes": 71554
+    },
+    {
+      "name": "latexlog-current.pdf",
+      "sha256": "5af3beb5c0e5e2f1185a41a0e8aa06b91ca78cf6de1ac51703da8a3eb30a3b63",
+      "size_bytes": 76576
+    },
+    {
+      "name": "latexlog-legacy.pdf",
+      "sha256": "e1334bf2df7a7be49471d35004b55ed3fee3a669bdc9f83bf37df06161bac921",
+      "size_bytes": 34465
+    }
+  ],
+  "platform": {
+    "glibc": "glibc 2.28",
+    "machine": "x86_64",
+    "release": "4.18.0-553.157.1.el8_10.x86_64",
+    "system": "Linux"
+  },
+  "schema_version": 1,
+  "status": "success",
+  "test": "texpdf-core real-world corpus",
+  "tested_source_sha": "21cf28493624191d52488146b914b8d26cc5291d"
+}

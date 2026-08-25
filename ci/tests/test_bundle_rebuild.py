@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import base64
+import gzip
 import hashlib
 import importlib.util
 from pathlib import Path
@@ -29,6 +31,13 @@ def sha256(data: bytes) -> str:
 
 
 class BundleRebuildTests(unittest.TestCase):
+    def test_committed_resource_trace_is_strict_base64(self) -> None:
+        encoded = (REPOSITORY_ROOT / "bundle/resource-trace.txt.gz.b64").read_bytes()
+        compressed = base64.b64decode(encoded, validate=True)
+        names = gzip.decompress(compressed).decode("utf-8").splitlines()
+        self.assertGreater(len(names), 1_000)
+        self.assertEqual(names, sorted(set(names)))
+
     def test_bundle_info_preserves_required_qualification_identity(self) -> None:
         qualification = {
             "bundle": {

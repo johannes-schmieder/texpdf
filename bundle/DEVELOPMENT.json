@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "record_kind": "development-selection",
-  "selection_status": "awaiting-runtime-evidence",
+  "selection_status": "bounded-runtime-evidence",
   "bundle": {
     "name": "texpdf-academic-v2-development",
     "version": "33-academic-v2-dev.1",
@@ -17,9 +17,14 @@
     "selection_manifest": "bundle/curated-manifest.json"
   },
   "evidence": {
-    "tested_source_sha": null,
-    "macos_apple_silicon_stata": "pending",
-    "linux_core": "pending",
+    "tested_source_sha": "21cf28493624191d52488146b914b8d26cc5291d",
+    "macos_apple_silicon_stata": "success",
+    "macos_apple_silicon_receipt": "release/development-corpus/macos-apple-silicon.json",
+    "linux_core": "success",
+    "linux_core_receipt": "release/development-corpus/linux-core-scc.json",
+    "linux_core_accounting": "release/development-corpus/scc-accounting.json",
+    "license_audit": "success",
+    "license_audit_source_sha": "21cf28493624191d52488146b914b8d26cc5291d",
     "intel_macos_stata": "not-run",
     "linux_stata": "not-run"
   },

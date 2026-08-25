@@ -120,9 +120,10 @@ its provenance manifests.
       and legacy `subfigure` resources while preserving the prior selection.
 - [x] Add direct Rust corpus enumeration and an Apple-Silicon-only installed
       Stata corpus gate.
-- [ ] Record exact-source Apple Silicon Stata and SCC Linux core results for the
-      development selection.
-- [ ] Leave Intel macOS and licensed Linux Stata requalification intentionally
+- [x] Record exact-source Apple Silicon Stata and SCC Linux core results for the
+      development selection (`21cf28493624191d52488146b914b8d26cc5291d`;
+      SCC job `7311141`, GLIBC 2.28).
+- [x] Leave Intel macOS and licensed Linux Stata requalification intentionally
       unrun; do not advance the active candidate source.
 
 This checkpoint is a newer development artifact, not RC.3 and not a release.

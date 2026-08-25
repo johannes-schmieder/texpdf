@@ -20,6 +20,11 @@ the three PDFs under the run directory, and writes
 platform, and output hashes. It is development evidence, not Linux licensed-
 Stata qualification.
 
+The current bounded result is SCC job `7311141` in
+`/projectnb/welfgr/texpdf/runs/20260825T212251Z-21cf284-corpus-attempt2`.
+It passed on RHEL 8 / GLIBC 2.28 for source `21cf28493624191d52488146b914b8d26cc5291d`;
+the committed receipt lives under `release/development-corpus/`.
+
 ## Prepare an exact attempt
 
 Use one immutable directory under

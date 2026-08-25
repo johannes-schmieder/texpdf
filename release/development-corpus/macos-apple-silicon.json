@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "status": "success",
+  "evidence_kind": "development-real-world-corpus",
+  "tested_source_sha": "21cf28493624191d52488146b914b8d26cc5291d",
+  "completed_at": "2026-08-25T21:21:33.819040Z",
+  "duration_seconds": 65.976,
+  "platform": {
+    "system": "Darwin",
+    "release": "25.5.0",
+    "product_version": "26.5.2",
+    "machine": "arm64",
+    "stata_version": "19",
+    "stata_bundle_version": "19.0.115",
+    "stata_edition": "MP"
+  },
+  "bundle": {
+    "name": "texpdf-academic-v2-development",
+    "version": "33-academic-v2-dev.1",
+    "content_digest": "343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf",
+    "zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f"
+  },
+  "installed_package": {
+    "target": "aarch64-apple-darwin",
+    "plugin_sha256": "8855800d89e8bbf38e0b67ed2e2f408931d65292086a7eac1ca53f03740707be",
+    "embedded_helper_sha256": "8329adf0cb32d872aa7ebea5b5568d6959638e0948737a8e96f3ba085f635e39",
+    "net_install_tested": true
+  },
+  "hosted_exact_source_ci": {
+    "run_id": "32900656850",
+    "status": "success",
+    "rust_status": "success",
+    "stata_status": "success",
+    "rust_mode": "repository-engine",
+    "rust_toolchain": "1.97.1",
+    "receipt": ".ci/stata/results/21cf28493624191d52488146b914b8d26cc5291d.json"
+  },
+  "required_marker": "TEXPDF REALISTIC CORPUS PASS",
+  "required_marker_present": true,
+  "local_corpus_stata_receipt_sha256": "257d893a2d9e2cecfa5a3bbae77f6050c1b0fa20e5491bdeb50c6e7520132261",
+  "local_corpus_stata_log_sha256": "3d1a35657c087b71056772ffe1835f1bd855ba6c6429fe7ad2855fe85ab24399",
+  "outputs": [
+    {
+      "name": "economics-manuscript.pdf",
+      "pages": 3,
+      "size_bytes": 71554,
+      "sha256": "026868392ffa63ac6e6d59d84a985b21267a93f162da449b880bf52ec6f918af"
+    },
+    {
+      "name": "latexlog-current.pdf",
+      "pages": 5,
+      "size_bytes": 76576,
+      "sha256": "0142514370b3fce523d9531a2f6b9753478c81324c705f8a73f6d893a3ab6573"
+    },
+    {
+      "name": "latexlog-legacy.pdf",
+      "pages": 1,
+      "size_bytes": 34465,
+      "sha256": "b12c8d1b78fff3f5c39c98509e5b861ac764d6e0e394956fe13ea1a89c837821"
+    }
+  ],
+  "visual_review": {
+    "renderer": "Poppler 26.02.0",
+    "pages_inspected": 9,
+    "blank_pages": 0,
+    "missing_or_clipped_content": false,
+    "broken_references": false,
+    "missing_bibliography_entries": false
+  },
+  "licensed_stata_run": true,
+  "qualification_boundary": "Bounded development evidence only. This does not advance the active candidate source or qualify Intel macOS or Linux Stata targets."
+}

@@ -18,7 +18,7 @@
           "file": "licenses/generated/texts/native/fontconfig/copyright",
           "sha256": "51a51aa9823704fd90bccc616cdd17ebabb5b2b3e9cbde886ca02c7002288067",
           "size_bytes": 8616,
-          "source": "/private/tmp/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/fontconfig/copyright"
+          "source": "/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/fontconfig/copyright"
         }
       ],
       "vcpkg_triplet": "arm64-osx"
@@ -30,7 +30,7 @@
           "file": "licenses/generated/texts/native/freetype/copyright",
           "sha256": "57e6b185071cbb481589e17b654752d03d731600db0faf3cd07ae9ad8ea435b3",
           "size_bytes": 26853,
-          "source": "/private/tmp/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/freetype/copyright"
+          "source": "/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/freetype/copyright"
         }
       ],
       "vcpkg_triplet": "arm64-osx"
@@ -42,7 +42,7 @@
           "file": "licenses/generated/texts/native/graphite2/copyright",
           "sha256": "06efcedb9ce07473956b72b8669f03ced9f39ca19f3c1216e328b796a36ea6a8",
           "size_bytes": 27786,
-          "source": "/private/tmp/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/graphite2/copyright"
+          "source": "/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/graphite2/copyright"
         }
       ],
       "vcpkg_triplet": "arm64-osx"
@@ -54,7 +54,7 @@
           "file": "licenses/generated/texts/native/harfbuzz/copyright",
           "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
           "size_bytes": 1971,
-          "source": "/private/tmp/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/harfbuzz/copyright"
+          "source": "/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/harfbuzz/copyright"
         }
       ],
       "vcpkg_triplet": "arm64-osx"
@@ -66,7 +66,7 @@
           "file": "licenses/generated/texts/native/icu/copyright",
           "sha256": "17510cf7a58b4879b887ec05a45d72cf1b73544dd9ec7e72f20110ed104229ee",
           "size_bytes": 25185,
-          "source": "/private/tmp/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/icu/copyright"
+          "source": "/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/icu/copyright"
         }
       ],
       "vcpkg_triplet": "arm64-osx"
@@ -78,7 +78,7 @@
           "file": "licenses/generated/texts/native/libpng/copyright",
           "sha256": "16d9daaafbf63a31a5bdc91d4600972548fef5aaa1244202393288dbd079c49a",
           "size_bytes": 5345,
-          "source": "/private/tmp/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/libpng/copyright"
+          "source": "/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/libpng/copyright"
         }
       ],
       "vcpkg_triplet": "arm64-osx"
@@ -90,7 +90,7 @@
           "file": "licenses/generated/texts/native/zlib/copyright",
           "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243",
           "size_bytes": 1002,
-          "source": "/private/tmp/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/zlib/copyright"
+          "source": "/var/folders/2n/n_3w208j31sdjd6f7q7xtr_m0000gp/T/texpdf-vcpkg-a62ce77d56ee/installed/arm64-osx/share/zlib/copyright"
         }
       ],
       "vcpkg_triplet": "arm64-osx"
@@ -6534,7 +6534,7 @@
           "file": "licenses/generated/texts/rust/texpdf-core-0.1.0/LICENSE",
           "sha256": "bb11bb19bedaa54011947d021ccbb1b2ef6e17d202cc9844f3d189b55ee0b17b",
           "size_bytes": 1075,
-          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/LICENSE"
+          "source": "/Users/johannes/Git/texpdf/LICENSE"
         }
       ],
       "notice_origin": "workspace_root",
@@ -6551,7 +6551,7 @@
           "file": "licenses/generated/texts/rust/texpdf-helper-0.1.0/LICENSE",
           "sha256": "bb11bb19bedaa54011947d021ccbb1b2ef6e17d202cc9844f3d189b55ee0b17b",
           "size_bytes": 1075,
-          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/LICENSE"
+          "source": "/Users/johannes/Git/texpdf/LICENSE"
         }
       ],
       "notice_origin": "workspace_root",
@@ -6568,7 +6568,7 @@
           "file": "licenses/generated/texts/rust/texpdf-protocol-0.1.0/LICENSE",
           "sha256": "bb11bb19bedaa54011947d021ccbb1b2ef6e17d202cc9844f3d189b55ee0b17b",
           "size_bytes": 1075,
-          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/LICENSE"
+          "source": "/Users/johannes/Git/texpdf/LICENSE"
         }
       ],
       "notice_origin": "workspace_root",
@@ -6585,7 +6585,7 @@
           "file": "licenses/generated/texts/rust/texpdf-stata-0.1.0/LICENSE",
           "sha256": "bb11bb19bedaa54011947d021ccbb1b2ef6e17d202cc9844f3d189b55ee0b17b",
           "size_bytes": 1075,
-          "source": "/Users/johannes/actions-runners/texpdf-stata/_work/texpdf/texpdf/LICENSE"
+          "source": "/Users/johannes/Git/texpdf/LICENSE"
         }
       ],
       "notice_origin": "workspace_root",

@@ -1,8 +1,8 @@
 # Third-party license audit status
 
 - Source SHA: `21cf28493624191d52488146b914b8d26cc5291d`
-- Pipeline complete: **false**
-- Release-license complete: **false**
+- Pipeline complete: **true**
+- Release-license complete: **true**
 - Embedded resources: 392
 - Mapped resources: 392
 - Ambiguous resources: 0
@@ -12,8 +12,8 @@
 - Cargo packages missing metadata: 0
 - Rust packages without collected notice files: 0
 - Native libraries without collected notice files: 0
-- TeX resource notice tree complete: **false**
-- TeX resource notice files: -1
+- TeX resource notice tree complete: **true**
+- TeX resource notice files: 10
 
 ## Pipeline stages
 
@@ -25,7 +25,7 @@
 | `cargo_inventory` | 0 |  |
 | `dependency_inventory` | 0 |  |
 | `collect_license_texts` | 0 |  |
-| `collect_tex_license_notices` | 2 | TEXPDF_TEX_NOTICE_ERROR [Errno 2] No such file or directory: 'bundle/generated/texpdf-bundle.zip' |
+| `collect_tex_license_notices` | 0 |  |
 | `download_tlpdb` | 0 |  |
 
 A successful workflow run means the audit produced durable evidence.
