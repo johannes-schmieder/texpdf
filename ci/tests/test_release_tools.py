@@ -117,5 +117,13 @@ class GeneratedJsonTests(unittest.TestCase):
         self.assertEqual(parsed, payload)
 
 
+class WorkflowCompatibilityTests(unittest.TestCase):
+    def test_artifact_manifest_avoids_python_310_union_annotations(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/publish-artifact-manifest.yml"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn("Path | None", workflow)
+
+
 if __name__ == "__main__":
     unittest.main()

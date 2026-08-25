@@ -59,7 +59,7 @@ jobs:
           run_id = int(os.environ["SOURCE_RUN_ID"])
           run_attempt = int(os.environ["SOURCE_RUN_ATTEMPT"])
 
-          def find_json(*names: str) -> tuple[Path | None, dict]:
+          def find_json(*names):
               for name in names:
                   matches = sorted(root.rglob(name))
                   if matches:
