@@ -7,12 +7,17 @@ on:
         description: Exact already-green source SHA to qualify
         required: true
         type: string
+      arm_run_id:
+        description: Workflow run that produced the exact ARM-qualified universal candidate
+        required: true
+        type: string
 
 concurrency:
   group: texpdf-macos-intel-runtime
   cancel-in-progress: false
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -55,32 +60,14 @@ jobs:
           /usr/bin/lipo -archs "$stata_real" | /usr/bin/grep -qw x86_64
           /usr/bin/arch -x86_64 /usr/bin/true
 
-      - name: Build universal plugin with target-matching helpers
-        shell: bash
-        run: |
-          set -euo pipefail
-          /usr/bin/python3 tools/rebuild_curated_bundle.py \
-            --cache-dir "$TEXPDF_BUNDLE_CACHE"
-          /bin/bash tools/build_macos_universal.sh
-
-      - name: Materialize complete source-bound notice tree
-        shell: bash
-        run: GITHUB_SHA="$SOURCE_SHA" /bin/bash ci/prepare_release_license_evidence.sh
-
-      - name: Assemble exact private candidate with notices
-        shell: bash
-        run: |
-          set -euo pipefail
-          /usr/bin/python3 tools/package_release.py \
-            --plugin dist/macos-universal/_texpdf_plugin.plugin \
-            --embedded-helper-manifest dist/macos-universal/manifest.json \
-            --bundle-info bundle/generated/bundle-info.json \
-            --output-dir dist/macos-universal/texpdf \
-            --zip dist/macos-universal/texpdf-macos-universal-0.1.0-rc.2.zip \
-            --manifest dist/macos-universal/package-manifest.json \
-            --target universal2-apple-darwin \
-            --package-version 0.1.0-rc.2 \
-            --include-license-evidence
+      - name: Download exact ARM-qualified candidate
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: texpdf-macos-universal-${{ inputs.source_sha }}-${{ inputs.arm_run_id }}
+          path: .
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.arm_run_id }}
 
       - name: Require identical ARM-qualified candidate
         shell: bash
@@ -117,6 +104,8 @@ jobs:
               "candidate_package_license_evidence_included": True,
               "candidate_package_public_release": False,
           }
+          if str(manifest.get("source_sha", os.environ["SOURCE_SHA"])) != os.environ["SOURCE_SHA"]:
+              raise SystemExit("downloaded universal manifest belongs to another source SHA")
           mismatches = {
               key: {"expected": value, "actual": arm.get(key)}
               for key, value in expected.items()
