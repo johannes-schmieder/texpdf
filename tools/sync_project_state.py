@@ -135,6 +135,7 @@ def build_state(readiness_result: dict[str, Any]) -> dict[str, Any]:
     universal = read_json("release/macos-universal.json")
     memory = read_json("release/memory-stress-macos-arm64.json")
     licenses = read_json("licenses/generated/STATUS.json")
+    development_licenses = read_json("licenses/development-audit/STATUS.json")
     qualification = read_json("bundle/QUALIFICATION.json")
     development = read_json("bundle/DEVELOPMENT.json")
     receipts = successful_receipts()
@@ -163,6 +164,7 @@ def build_state(readiness_result: dict[str, Any]) -> dict[str, Any]:
         "universal": universal,
         "memory": memory,
         "licenses": licenses,
+        "development_licenses": development_licenses,
         "qualification": qualification,
         "development": development,
     }
@@ -185,6 +187,8 @@ def render_status(state: dict[str, Any]) -> str:
     development = state.get("development", {})
     development_bundle = development.get("bundle", {})
     development_evidence = development.get("evidence", {})
+    development_licenses = state.get("development_licenses", {})
+    development_tex = development_licenses.get("tex_resources", {})
 
     lines = [
         "# texpdf status",
@@ -220,7 +224,7 @@ def render_status(state: dict[str, Any]) -> str:
         f"| Licensed Stata runtime | {code(latest.get('platform'))}; {code(latest.get('stata_edition'))} {code(latest.get('stata_version'))} |",
         f"| Current ARM64 artifact source | {code(state.get('artifact_source'))} |",
         f"| Current universal build source | {code(universal.get('source_sha'))} |",
-        f"| Current license-audit source | {code(licenses.get('source_sha'))} |",
+        f"| Frozen candidate license-audit source | {code(licenses.get('source_sha'))} |",
         f"| Latest memory-stress attempt | {code(memory_record.get('source_sha'))}; qualified={yes_no(memory_record.get('qualified'))} |",
         "",
         "## Development bundle on `main`",
@@ -238,6 +242,8 @@ def render_status(state: dict[str, Any]) -> str:
         f"| Tested source | {code(development_evidence.get('tested_source_sha'), 'pending')} |",
         f"| Apple Silicon licensed Stata | {code(development_evidence.get('macos_apple_silicon_stata'))} |",
         f"| Linux core corpus | {code(development_evidence.get('linux_core'))} |",
+        f"| Development license audit | {code(development_licenses.get('source_sha'))}; complete={yes_no(development_licenses.get('release_license_complete'))} |",
+        f"| Development TeX resources | {development_tex.get('mapped', 0)}/{development_tex.get('resource_count', 0)} mapped |",
         f"| Intel macOS / Linux licensed Stata | {code(development_evidence.get('intel_macos_stata'))} / {code(development_evidence.get('linux_stata'))} |",
         "",
         "## Architecture",
@@ -291,13 +297,21 @@ def render_status(state: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## License evidence",
+            "## Frozen candidate license evidence",
             "",
             f"The source-bound audit covers {tex.get('resource_count', 0)} embedded TeX/font resources: "
             f"{tex.get('mapped', 0)} mapped, {tex.get('ambiguous', 0)} ambiguous, "
             f"{tex.get('unmapped', 0)} unmapped, and {tex.get('missing_license', 0)} missing license metadata. "
             f"Missing collected Rust/native notice files: {licenses.get('missing_rust_notice_files', 0)}/"
             f"{licenses.get('missing_native_notice_files', 0)}.",
+            "",
+            "The separate development audit is source-bound to "
+            f"{code(development_licenses.get('source_sha'))} and covers "
+            f"{development_tex.get('resource_count', 0)} resources: "
+            f"{development_tex.get('mapped', 0)} mapped, "
+            f"{development_tex.get('ambiguous', 0)} ambiguous, and "
+            f"{development_tex.get('unmapped', 0)} unmapped. It does not alter "
+            "the frozen candidate evidence above.",
             "",
             "## Memory evidence",
             "",

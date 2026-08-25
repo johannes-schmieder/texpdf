@@ -9,7 +9,7 @@ The active target is a **private `0.1.0-rc.2` macOS universal and Linux x86-64 r
 Windows, public distribution, and final `v0.1.0` publication are
 explicitly deferred and are not advertised as supported.
 
-Candidate ready: **false**
+Candidate ready: **true**
 
 Public release ready: **false**
 
@@ -31,7 +31,7 @@ tracked independently:
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Current universal build source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| Current license-audit source | `21cf28493624191d52488146b914b8d26cc5291d` |
+| Frozen candidate license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Latest memory-stress attempt | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8`; qualified=yes |
 
 ## Development bundle on `main`
@@ -45,10 +45,12 @@ qualify the newer bundle embedded by `main`.
 | Name / version | `texpdf-academic-v2-development` / `33-academic-v2-dev.1` |
 | ZIP SHA-256 | `cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f` |
 | Content digest | `343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf` |
-| Selection status | `awaiting-runtime-evidence` |
-| Tested source | `pending` |
-| Apple Silicon licensed Stata | `pending` |
-| Linux core corpus | `pending` |
+| Selection status | `bounded-runtime-evidence` |
+| Tested source | `21cf28493624191d52488146b914b8d26cc5291d` |
+| Apple Silicon licensed Stata | `success` |
+| Linux core corpus | `success` |
+| Development license audit | `21cf28493624191d52488146b914b8d26cc5291d`; complete=yes |
+| Development TeX resources | 392/392 mapped |
 | Intel macOS / Linux licensed Stata | `not-run` / `not-run` |
 
 ## Architecture
@@ -72,14 +74,13 @@ The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b9
 
 ## Active private-candidate blockers
 
-- `private_candidate_package`
-- `linux_x86_64_runtime`
-- `third_party_license_complete`
-- `candidate_license_source_coherence`
+None.
 
-## License evidence
+## Frozen candidate license evidence
 
-The source-bound audit covers 392 embedded TeX/font resources: 392 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
+The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
+
+The separate development audit is source-bound to `21cf28493624191d52488146b914b8d26cc5291d` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the frozen candidate evidence above.
 
 ## Memory evidence
 
@@ -88,11 +89,7 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 ## Deferred public-release blockers
 
 - `public_distribution`
-- `private_candidate_package`
-- `linux_x86_64_runtime`
 - `x86_64-pc-windows-msvc_runtime`
-- `third_party_license_complete`
-- `candidate_license_source_coherence`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

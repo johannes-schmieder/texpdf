@@ -24,7 +24,7 @@
     "linux_core_receipt": "release/development-corpus/linux-core-scc.json",
     "linux_core_accounting": "release/development-corpus/scc-accounting.json",
     "license_audit": "success",
-    "license_audit_source_sha": "21cf28493624191d52488146b914b8d26cc5291d",
+    "license_audit_receipt": "licenses/development-audit/STATUS.json",
     "intel_macos_stata": "not-run",
     "linux_stata": "not-run"
   },

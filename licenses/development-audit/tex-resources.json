@@ -9,6 +9,7 @@
     "licenseref-amsfonts-unchanged-or-renamed",
     "licenseref-texlive-generated-map",
     "lppl",
+    "lppl1.2",
     "lppl1.3",
     "lppl1.3c",
     "mit",
@@ -33,9 +34,12 @@
     "bitset",
     "booktabs",
     "caption",
+    "cleveref",
     "cm",
     "collectbox",
+    "colortbl",
     "dvipdfmx",
+    "economic",
     "enumitem",
     "environ",
     "etexcmds",
@@ -83,6 +87,7 @@
     "setspace",
     "siunitx",
     "stringenc",
+    "subfigure",
     "symbol",
     "tectonic",
     "tex-ini-files",
@@ -193,6 +198,18 @@
       "package": "adjustbox",
       "resource": "adjustbox.sty",
       "shortdesc": "Graphics package-alike macros for \"general\" boxes",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "economic"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "economic",
+      "resource": "aer.bst",
+      "shortdesc": "BibTeX support for submitting to Economics journals",
       "status": "mapped"
     },
     {
@@ -533,6 +550,18 @@
       "package": "dvipdfmx",
       "resource": "ckx.map",
       "shortdesc": "An extended version of dvipdfm",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "cleveref"
+      ],
+      "license": "lppl1.2",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "cleveref",
+      "resource": "cleveref.sty",
+      "shortdesc": "Intelligent cross-referencing",
       "status": "mapped"
     },
     {
@@ -2429,6 +2458,18 @@
     },
     {
       "candidate_packages": [
+        "colortbl"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "colortbl",
+      "resource": "colortbl.sty",
+      "shortdesc": "Add colour to LaTeX tables",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
         "latex-tools-dev",
         "tools"
       ],
@@ -3521,7 +3562,55 @@
       "method": "unique_basename",
       "origin": "",
       "package": "lm",
+      "resource": "lmroman17-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
       "resource": "lmroman7-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman8-bold.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman8-regular.otf",
+      "shortdesc": "Latin modern fonts in outline formats",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "lm"
+      ],
+      "license": "gfl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "lm",
+      "resource": "lmroman9-italic.otf",
       "shortdesc": "Latin modern fonts in outline formats",
       "status": "mapped"
     },
@@ -4024,6 +4113,18 @@
       "origin": "",
       "package": "microtype",
       "resource": "mt-LatinModernRoman.cfg",
+      "shortdesc": "Subliminal refinements towards typographical perfection",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "microtype"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "microtype",
+      "resource": "mt-cmr.cfg",
       "shortdesc": "Subliminal refinements towards typographical perfection",
       "status": "mapped"
     },
@@ -4600,6 +4701,23 @@
     },
     {
       "candidate_packages": [
+        "latex",
+        "latex-base-dev"
+      ],
+      "license": "lppl1.3c",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "latex",
+      "resource": "size11.clo",
+      "selected_candidates": [
+        "latex"
+      ],
+      "selection_reason": "unique_stable_candidate_over_development_mirrors",
+      "shortdesc": "A TeX macro package that defines LaTeX",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
         "stringenc"
       ],
       "license": "lppl1.3",
@@ -4620,6 +4738,30 @@
       "package": "caption",
       "resource": "subcaption.sty",
       "shortdesc": "Customising captions in floating environments",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "subfigure"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "subfigure",
+      "resource": "subfigure.cfg",
+      "shortdesc": "Deprecated: Figures divided into subfigures",
+      "status": "mapped"
+    },
+    {
+      "candidate_packages": [
+        "subfigure"
+      ],
+      "license": "lppl",
+      "method": "unique_basename",
+      "origin": "",
+      "package": "subfigure",
+      "resource": "subfigure.sty",
+      "shortdesc": "Deprecated: Figures divided into subfigures",
       "status": "mapped"
     },
     {
@@ -5178,11 +5320,11 @@
   "schema_version": 2,
   "summary": {
     "ambiguous": 0,
-    "license_expression_count": 17,
-    "mapped": 381,
+    "license_expression_count": 18,
+    "mapped": 392,
     "missing_license": 0,
-    "package_count": 84,
-    "resource_count": 381,
+    "package_count": 88,
+    "resource_count": 392,
     "unmapped": 0
   }
 }

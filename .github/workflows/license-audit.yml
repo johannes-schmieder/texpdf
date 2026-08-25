@@ -23,6 +23,7 @@ on:
       - "tools/collect_tex_license_notices.py"
       - "licenses/canonical/**"
       - "licenses/texlive/**"
+      - "release/scope.json"
       - "tools/summarize_license_review.py"
       - "tools/prepare_curated_bundle.py"
       - "tools/prepare_native_deps.sh"
@@ -54,6 +55,26 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
+
+      - name: Select durable audit namespace
+        shell: bash
+        run: |
+          set -euo pipefail
+          candidate_source=$(/usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          scope = json.loads(Path("release/scope.json").read_text(encoding="utf-8"))
+          print(scope["candidate_source_sha"])
+          PY
+          )
+          if [[ "$GITHUB_SHA" == "$candidate_source" ]]; then
+            audit_root="licenses/generated"
+          else
+            audit_root="licenses/development-audit"
+          fi
+          echo "TEXPDF_LICENSE_OUTPUT_ROOT=$audit_root" >> "$GITHUB_ENV"
+          echo "TEXPDF_LICENSE_NAMESPACE root=$audit_root source=$GITHUB_SHA candidate=$candidate_source"
 
       - name: Reconstruct and verify the source-bound curated manifest
         id: manifest
@@ -139,11 +160,16 @@ jobs:
 
       - name: Run source-bound fail-closed audit
         shell: bash
-        run: /usr/bin/python3 ci/run_license_audit.py
+        run: /usr/bin/python3 ci/run_license_audit.py --output-root "$TEXPDF_LICENSE_OUTPUT_ROOT"
 
       - name: Generate compact review queues
         shell: bash
-        run: /usr/bin/python3 tools/summarize_license_review.py
+        run: |
+          /usr/bin/python3 tools/summarize_license_review.py \
+            --tex-inventory "$TEXPDF_LICENSE_OUTPUT_ROOT/tex-resources.json" \
+            --rust-text-inventory "$TEXPDF_LICENSE_OUTPUT_ROOT/license-texts.json" \
+            --tex-output "$TEXPDF_LICENSE_OUTPUT_ROOT/tex-review.json" \
+            --rust-output "$TEXPDF_LICENSE_OUTPUT_ROOT/rust-notice-review.json"
 
       - name: Upload complete and partial audit evidence
         if: ${{ always() }}
@@ -152,6 +178,7 @@ jobs:
           name: texpdf-license-audit-${{ github.sha }}-${{ github.run_id }}
           path: |
             licenses/generated/
+            licenses/development-audit/
             bundle/curated-manifest.json
           if-no-files-found: error
           retention-days: 30
@@ -161,7 +188,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          source_dir="$GITHUB_WORKSPACE/licenses/generated"
+          case "$TEXPDF_LICENSE_OUTPUT_ROOT" in
+            licenses/generated|licenses/development-audit) ;;
+            *) echo "unexpected audit root: $TEXPDF_LICENSE_OUTPUT_ROOT" >&2; exit 2 ;;
+          esac
+          source_dir="$GITHUB_WORKSPACE/$TEXPDF_LICENSE_OUTPUT_ROOT"
           test -f "$source_dir/STATUS.json"
           test -f "$source_dir/STATUS.md"
           publish_tree=""
@@ -178,7 +209,7 @@ jobs:
             publish_tree="$RUNNER_TEMP/texpdf-license-publish-$attempt"
             rm -rf "$publish_tree"
             git worktree add --detach "$publish_tree" origin/main
-            mkdir -p "$publish_tree/licenses/generated" "$publish_tree/bundle"
+            mkdir -p "$publish_tree/$TEXPDF_LICENSE_OUTPUT_ROOT" "$publish_tree/bundle"
             for name in \
               STATUS.json STATUS.md \
               tex-resources.json tex-resources.md tex-review.json \
@@ -187,9 +218,9 @@ jobs:
               license-texts.json tex-notices.json rust-notice-review.json \
               license-sources.lock.json; do
               if [[ -f "$source_dir/$name" ]]; then
-                cp "$source_dir/$name" "$publish_tree/licenses/generated/$name"
+                cp "$source_dir/$name" "$publish_tree/$TEXPDF_LICENSE_OUTPUT_ROOT/$name"
               else
-                rm -f "$publish_tree/licenses/generated/$name"
+                rm -f "$publish_tree/$TEXPDF_LICENSE_OUTPUT_ROOT/$name"
               fi
             done
             if [[ -f "$GITHUB_WORKSPACE/bundle/curated-manifest.json" ]]; then
@@ -198,7 +229,7 @@ jobs:
             fi
             git -C "$publish_tree" config user.name "github-actions[bot]"
             git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git -C "$publish_tree" add -A licenses/generated bundle/curated-manifest.json
+            git -C "$publish_tree" add -A "$TEXPDF_LICENSE_OUTPUT_ROOT" bundle/curated-manifest.json
             if git -C "$publish_tree" diff --cached --quiet; then
               exit 0
             fi
@@ -215,12 +246,13 @@ jobs:
       - name: Enforce complete release-license status
         shell: bash
         run: |
-          /usr/bin/python3 - <<'PY'
+          /usr/bin/python3 - "$TEXPDF_LICENSE_OUTPUT_ROOT/STATUS.json" <<'PY'
           from pathlib import Path
           import json
+          import sys
 
           status = json.loads(
-              Path("licenses/generated/STATUS.json").read_text(encoding="utf-8")
+              Path(sys.argv[1]).read_text(encoding="utf-8")
           )
           if status.get("release_license_complete") is not True:
               raise SystemExit("release_license_complete is not true")

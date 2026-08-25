@@ -83,6 +83,16 @@ class ProjectStateTests(unittest.TestCase):
                 "universal": {"size_bytes": 200, "sha256": digest},
             },
             "licenses": {"tex_resources": {}},
+            "development_licenses": {
+                "source_sha": sha,
+                "release_license_complete": True,
+                "tex_resources": {
+                    "resource_count": 392,
+                    "mapped": 392,
+                    "ambiguous": 0,
+                    "unmapped": 0,
+                },
+            },
             "memory": {
                 "source_sha": sha,
                 "qualified": False,
@@ -116,6 +126,8 @@ class ProjectStateTests(unittest.TestCase):
         self.assertNotIn("memory stress qualified", rendered.lower())
         self.assertIn("development-bundle", rendered)
         self.assertIn("different artifacts", rendered)
+        self.assertIn("392/392 mapped", rendered)
+        self.assertIn("Frozen candidate license-audit source", rendered)
 
 
 if __name__ == "__main__":

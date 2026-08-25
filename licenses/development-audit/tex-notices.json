@@ -1,65 +1,71 @@
 {
-  "bundle_zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
+  "bundle_zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f",
   "complete": true,
-  "license_expression_count": 17,
+  "license_expression_count": 18,
   "notice_files": [
     {
-      "file": "licenses/generated/texts/texlive/license-texts/Apache-2.0.txt",
+      "file": "licenses/development-audit/texts/texlive/license-texts/Apache-2.0.txt",
       "sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
       "size_bytes": 10849,
       "source": "licenses/canonical/Apache-2.0.txt"
     },
     {
-      "file": "licenses/generated/texts/texlive/license-texts/CC0-1.0.txt",
+      "file": "licenses/development-audit/texts/texlive/license-texts/CC0-1.0.txt",
       "sha256": "36372075b0bbe85e7e664a7ead568150e3ea063d66226ca34ff683b05ee17e54",
       "size_bytes": 7008,
       "source": "licenses/texlive/CC0-1.0.txt"
     },
     {
-      "file": "licenses/generated/texts/texlive/license-texts/GPL-2.0.txt",
+      "file": "licenses/development-audit/texts/texlive/license-texts/GPL-2.0.txt",
       "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
       "size_bytes": 18092,
       "source": "licenses/texlive/GPL-2.0.txt"
     },
     {
-      "file": "licenses/generated/texts/texlive/license-texts/GUST-FONT-LICENSE.txt",
+      "file": "licenses/development-audit/texts/texlive/license-texts/GUST-FONT-LICENSE.txt",
       "sha256": "49ea6cb9257bbee0a3979c48a774cd221550ac1c20c95549efe45fc99cc18050",
       "size_bytes": 1377,
       "source": "licenses/texlive/GUST-FONT-LICENSE.txt"
     },
     {
-      "file": "licenses/generated/texts/texlive/license-texts/LPPL-1.3c.txt",
+      "file": "licenses/development-audit/texts/texlive/license-texts/LPPL-1.2.txt",
+      "sha256": "c5ccc6b3e36f75e1b44d8bfb178198a47692b6c86d936af804812c4866e0db58",
+      "size_bytes": 14439,
+      "source": "licenses/texlive/LPPL-1.2.txt"
+    },
+    {
+      "file": "licenses/development-audit/texts/texlive/license-texts/LPPL-1.3c.txt",
       "sha256": "565545b9d56394e8b78fa57330d97992c6f4e7238a81e9268348c1553b05b328",
       "size_bytes": 19110,
       "source": "licenses/texlive/LPPL-1.3c.txt"
     },
     {
-      "file": "licenses/generated/texts/texlive/license-texts/MIT.txt",
+      "file": "licenses/development-audit/texts/texlive/license-texts/MIT.txt",
       "sha256": "24f09d6d1dc1534b8efcaca939ddec1969cac255471aae25d299ab8e81ada29f",
       "size_bytes": 1078,
       "source": "licenses/canonical/MIT.txt"
     },
     {
-      "file": "licenses/generated/texts/texlive/license-texts/OFL-AMSFonts.txt",
+      "file": "licenses/development-audit/texts/texlive/license-texts/OFL-AMSFonts.txt",
       "sha256": "aa783fdd47e92743bafe79277ac4067d20339344dc5b64a09c2d0f869b2999dc",
       "size_bytes": 12520,
       "source": "licenses/texlive/OFL-AMSFonts.txt"
     },
     {
-      "file": "licenses/generated/texts/texlive/license-texts/RESOURCE-SPECIFIC-NOTICES.md",
+      "file": "licenses/development-audit/texts/texlive/license-texts/RESOURCE-SPECIFIC-NOTICES.md",
       "sha256": "4c2b18699731a14f30f1794b2de0fb9e49019bbc695bc2a681411dcd6f6599cf",
       "size_bytes": 3976,
       "source": "licenses/texlive/RESOURCE-SPECIFIC-NOTICES.md"
     },
     {
-      "file": "licenses/generated/texts/texlive/license-texts/Unicode-DFS-2016.txt",
+      "file": "licenses/development-audit/texts/texlive/license-texts/Unicode-DFS-2016.txt",
       "sha256": "74db5baf44a41b1000312c673544b3374e4198af5605c7f9080a402cec42cfa3",
       "size_bytes": 2847,
       "source": "licenses/texlive/Unicode-DFS-2016.txt"
     }
   ],
   "policy": "licenses/texlive/license-text-policy.json",
-  "resource_attribution": "licenses/generated/texts/texlive/resource-attribution.json",
-  "resource_count": 381,
+  "resource_attribution": "licenses/development-audit/texts/texlive/resource-attribution.json",
+  "resource_count": 392,
   "schema_version": 1
 }

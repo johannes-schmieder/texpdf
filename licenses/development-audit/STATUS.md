@@ -1,10 +1,10 @@
 # Third-party license audit status
 
-- Source SHA: `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8`
+- Source SHA: `21cf28493624191d52488146b914b8d26cc5291d`
 - Pipeline complete: **true**
 - Release-license complete: **true**
-- Embedded resources: 381
-- Mapped resources: 381
+- Embedded resources: 392
+- Mapped resources: 392
 - Ambiguous resources: 0
 - Unmapped resources: 0
 - Resources missing license metadata: 0
@@ -13,7 +13,7 @@
 - Rust packages without collected notice files: 0
 - Native libraries without collected notice files: 0
 - TeX resource notice tree complete: **true**
-- TeX resource notice files: 9
+- TeX resource notice files: 10
 
 ## Pipeline stages
 

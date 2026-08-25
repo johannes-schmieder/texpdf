@@ -18,6 +18,8 @@ on:
     paths:
       - ".ci/stata/results/**"
       - "bundle/QUALIFICATION.json"
+      - "bundle/DEVELOPMENT.json"
+      - "licenses/development-audit/STATUS.json"
       - "licenses/generated/STATUS.json"
       - "release/macos-intel-runtime.json"
       - "release/macos-universal.json"
