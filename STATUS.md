@@ -9,7 +9,7 @@ The active target is a **private `0.1.0-rc.2` macOS universal and Linux x86-64 r
 Windows, public distribution, and final `v0.1.0` publication are
 explicitly deferred and are not advertised as supported.
 
-Candidate ready: **false**
+Candidate ready: **true**
 
 Public release ready: **false**
 
@@ -24,7 +24,7 @@ tracked independently:
 | Latest exact green source | `15499efb401a1196339ad8eda1ad839912320d4d` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
-| Current ARM64 artifact source | `15499efb401a1196339ad8eda1ad839912320d4d` |
+| Current ARM64 artifact source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Current universal build source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Current license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Latest memory-stress attempt | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8`; qualified=yes |
@@ -41,18 +41,16 @@ the helper process, so a compiler crash does not run inside Stata.
 
 | Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
-| `aarch64-apple-darwin` | required | yes | yes | `15499efb401a1196339ad8eda1ad839912320d4d` |
+| `aarch64-apple-darwin` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | `x86_64-apple-darwin` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | `x86_64-pc-windows-msvc` | deferred | no | no | `not recorded` |
-| `x86_64-unknown-linux-gnu` | required | no | no | `not recorded` |
+| `x86_64-unknown-linux-gnu` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 
 The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787`). The current universal plugin record is 93.97 MiB (`aca37fb2ddd5356c4144ff07419bbfec352cf7a7d3222091f9d2d5971c3e796c`).
 
 ## Active private-candidate blockers
 
-- `linux_x86_64_runtime`
-- `required_target_source_coherence`
-- `candidate_license_source_coherence`
+None.
 
 ## License evidence
 
@@ -65,10 +63,7 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 ## Deferred public-release blockers
 
 - `public_distribution`
-- `linux_x86_64_runtime`
 - `x86_64-pc-windows-msvc_runtime`
-- `required_target_source_coherence`
-- `candidate_license_source_coherence`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

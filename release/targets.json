@@ -4,7 +4,7 @@
     "aarch64-apple-darwin": {
       "artifact": "_texpdf_plugin.plugin",
       "build_qualified": true,
-      "build_source_sha": "15499efb401a1196339ad8eda1ad839912320d4d",
+      "build_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
       "bundle_zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
       "bundle_zip_size_bytes": 4984973,
       "candidate_package_license_evidence_included": true,
@@ -39,8 +39,8 @@
       "plugin_sha256": "71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787",
       "plugin_size_bytes": 49429136,
       "qualification_profile": "quick",
-      "qualified_source_sha": "15499efb401a1196339ad8eda1ad839912320d4d",
-      "receipt": ".ci/stata/results/15499efb401a1196339ad8eda1ad839912320d4d.json",
+      "qualified_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
+      "receipt": ".ci/stata/results/7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8.json",
       "stata_edition": "MP",
       "stata_runtime_qualified": true,
       "stata_version": "18",
@@ -88,12 +88,28 @@
     },
     "x86_64-unknown-linux-gnu": {
       "artifact": "_texpdf_plugin.plugin",
-      "plugin_sha256": "",
+      "build_qualified": true,
+      "build_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
+      "bundle_zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
+      "bundle_zip_size_bytes": 4984973,
+      "candidate_package_sha256": "bdea44b009242302862dd450d30a08d00c9b8f22bf110fa7fa5e057a038b9bfc",
+      "candidate_package_size_bytes": 24270071,
+      "candidate_package_version": "0.1.0-rc.2",
+      "embedded_helper_sha256": "76f75ef1d14f1eb8b3f69c6a018fb21a78414ea158c354c7986df6ee68a67a99",
+      "embedded_helper_size_bytes": 51871912,
+      "minimum_glibc": "2.28",
+      "plugin_sha256": "f2aad30b6f96930d1487074ae1e9f49e91d8f4992a44bbafd1456c016bc021fd",
+      "plugin_size_bytes": 52480864,
       "qualification_profile": "",
-      "qualified_source_sha": "",
-      "stata_runtime_qualified": false,
+      "qualified_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
+      "receipt": "release/linux-x86_64.json",
+      "stata_runtime_qualified": true,
       "stata_version": "",
-      "status": "native build and Stata runtime qualification pending"
+      "status": "qualified on RHEL 8 / glibc 2.28 in licensed Stata/MP 18 and 19",
+      "tested_stata_versions": [
+        "18",
+        "19"
+      ]
     }
   }
 }

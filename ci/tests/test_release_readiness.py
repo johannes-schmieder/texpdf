@@ -58,6 +58,36 @@ INTEL_HELPER_SHA = "9" * 64
 
 
 class ReleaseReadinessRecordTests(unittest.TestCase):
+    def test_required_targets_must_match_frozen_candidate(self) -> None:
+        candidate = "1" * 40
+        newer = "2" * 40
+        scope = {
+            "candidate_source_sha": candidate,
+            "required_runtime_targets": ["arm", "intel", "linux"],
+        }
+        targets = {
+            "arm": {"qualified_source_sha": newer},
+            "intel": {"qualified_source_sha": candidate},
+            "linux": {"qualified_source_sha": candidate},
+        }
+        checks: list[dict[str, object]] = []
+        readiness.validate_required_source_coherence(scope, targets, checks)
+        self.assertFalse(checks[-1]["passed"])
+
+    def test_required_targets_accept_exact_frozen_candidate(self) -> None:
+        candidate = "1" * 40
+        scope = {
+            "candidate_source_sha": candidate,
+            "required_runtime_targets": ["arm", "intel", "linux"],
+        }
+        targets = {
+            target: {"qualified_source_sha": candidate}
+            for target in scope["required_runtime_targets"]
+        }
+        checks: list[dict[str, object]] = []
+        readiness.validate_required_source_coherence(scope, targets, checks)
+        self.assertTrue(checks[-1]["passed"])
+
     def test_license_coherence_allows_only_generated_evidence_commits(self) -> None:
         self.assertTrue(readiness.evidence_only_path("licenses/generated/STATUS.json"))
         self.assertTrue(readiness.evidence_only_path(".ci/stata/results/source.json"))

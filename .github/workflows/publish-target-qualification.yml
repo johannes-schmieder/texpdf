@@ -57,6 +57,14 @@ jobs:
           evidence = Path(os.environ["RUNNER_TEMP"]) / "texpdf-target-evidence"
           source_sha = os.environ["SOURCE_SHA"]
 
+          scope = json.loads(Path("release/scope.json").read_text(encoding="utf-8"))
+          candidate_source_sha = scope.get("candidate_source_sha")
+          if candidate_source_sha and source_sha != candidate_source_sha:
+              Path(".ci/target-qualification.skip").write_text(
+                  "source is not the active release candidate\n", encoding="utf-8"
+              )
+              raise SystemExit(0)
+
           def find(name: str) -> dict:
               matches = sorted(evidence.rglob(name))
               if not matches:

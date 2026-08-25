@@ -488,16 +488,21 @@ def validate_required_source_coherence(
     checks: list[dict[str, Any]],
 ) -> None:
     required = scope.get("required_runtime_targets", [])
+    expected = str(scope.get("candidate_source_sha", ""))
     sources = {
         str(targets.get(str(target), {}).get("qualified_source_sha", ""))
         for target in required
     }
-    passed = bool(required) and len(sources) == 1 and all(valid_source_sha(value) for value in sources)
+    passed = (
+        bool(required)
+        and valid_source_sha(expected)
+        and sources == {expected}
+    )
     add_check(
         checks,
         "required_target_source_coherence",
         passed,
-        f"required_targets={required}; sources={sorted(sources)}",
+        f"required_targets={required}; expected={expected}; sources={sorted(sources)}",
     )
 
 
@@ -663,6 +668,7 @@ def validate_scope(checks: list[dict[str, Any]]) -> dict[str, Any]:
         scope.get("schema_version") == 1
         and scope.get("release_kind") == "private_release_candidate"
         and scope.get("candidate_version") == "0.1.0-rc.2"
+        and valid_source_sha(scope.get("candidate_source_sha"))
         and required
         == [
             "aarch64-apple-darwin",
@@ -679,6 +685,7 @@ def validate_scope(checks: list[dict[str, Any]]) -> dict[str, Any]:
         valid,
         (
             f"kind={scope.get('release_kind')}; version={scope.get('candidate_version')}; "
+            f"source={scope.get('candidate_source_sha')}; "
             f"required_targets={required}"
         ),
     )

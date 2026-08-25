@@ -1,70 +1,74 @@
 # Qualification record
 
 This document separates demonstrated behavior from intended support. The
-immutable JSON receipts under `.ci/stata/results/` are the machine-readable
+machine-readable records under `.ci/stata/results/` and `release/` are the
 source of truth.
 
-## Comprehensive macOS Apple Silicon checkpoint
+## RC.2 candidate
 
-Qualified source:
-
-```text
-5d85840783ad4406a1606e5b3af09a06cca2f657
-```
-
-Required receipt fields:
+The private `0.1.0-rc.2` candidate is bound to source:
 
 ```text
-profile       quick
-status        success
-stata_status  success
-rust_status   success
-rust_mode     repository-engine
+7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8
 ```
 
-The licensed Stata log required these markers:
+The candidate includes complete source-bound license evidence. Its required
+runtime targets are macOS Apple Silicon, macOS Intel, and Linux x86-64.
+
+## macOS qualification
+
+The universal package was built from the exact candidate source. Its ARM64
+slice was exercised in licensed Stata/MP 18, including the quick corpus and a
+1,000-compile memory-stress run with injected failures and post-error recovery.
+The x86-64 slice is qualified by loading the same universal candidate in an
+actual Intel Stata process under Rosetta.
+
+Authoritative records:
+
+- `.ci/stata/results/7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8.json`
+- `release/macos-universal.json`
+- `release/macos-intel-runtime.json`
+- `release/memory-stress-macos-arm64.json`
+- `release/targets.json`
+
+## Linux qualification
+
+The Linux x86-64 candidate was built and tested on the Boston University
+Shared Computing Cluster's RHEL 8 environment. The build uses a fresh Cargo
+target directory, records the pinned toolchain, and rejects symbols newer than
+GLIBC 2.28. The exact packaged plugin was exercised in:
+
+- licensed Stata/MP 18 with the quick corpus;
+- licensed Stata/MP 18 with the 1,000-compile stress corpus;
+- licensed Stata/MP 19 with the quick corpus.
+
+The immutable SCC run is:
 
 ```text
-TEXPDF FULL ENGINE STATA PASS
-TEXPDF NET INSTALL PASS
-TEXPDF IN PROCESS STRESS PASS
-TEXPDF STATA MATA SMOKE PASS
+/projectnb/welfgr/texpdf/runs/20260825T1700Z-7aa7b16-linux-rc2
 ```
 
-The checkpoint demonstrated:
+Its SGE jobs are build `7308886`, Stata 18 quick `7308887`, Stata 18
+stress-1000 `7308888`, and Stata 19 quick `7308889`. All have `failed=0` and
+`exit_status=0`. The committed canonical record is
+`release/linux-x86_64.json`.
 
-- loading the generated plugin in Stata/MP 18 on Apple Silicon;
-- compilation with the embedded curated bundle and no runtime TeX executable;
+## Demonstrated behavior
+
+The qualification corpus covers:
+
+- loading the generated plugin and compiling without a runtime TeX executable;
 - mathematics, `booktabs`, `hyperref`, natbib, and internal BibTeX;
-- default and explicit output naming;
-- replacement protection;
-- spaces and Unicode in paths;
-- relative `\input` resolution;
+- default and explicit output naming and replacement protection;
+- spaces and Unicode in paths and relative `\input` resolution;
 - clean errors for missing input, existing output, and malformed TeX;
-- continued plugin usability after an ordinary TeX failure;
-- deterministic package assembly and a local `net install` test;
-- 100 successful compile calls in one Stata process with periodic injected
-  failures.
+- continued plugin usability after ordinary TeX failures;
+- exact artifact identity across packaging and runtime receipts;
+- complete bundled license notices and source-bound audit evidence.
 
-## Current artifact scale
+## Deliberately deferred
 
-The qualified development build measured approximately 6.62 MB for the
-embedded resource ZIP and 49.93 MB for the complete standalone plugin. Exact
-byte counts, digests, and package ZIP measurements belong in the generated
-artifact manifests and must be committed in the final release qualification
-record.
-
-## What this does not certify
-
-This checkpoint does not certify:
-
-- macOS Intel or a universal Mach-O artifact;
-- Windows x86-64;
-- Linux x86-64;
-- Stata releases other than the connected Stata/MP 18 installation;
-- completeness of the third-party package/font license inventory;
-- arbitrary TeX Live documents outside the documented compatibility tier;
-- process safety under unbounded or adversarial input.
-
-A target becomes supported only after its final plugin loads and compiles the
-release corpus in an actual Stata process on that target.
+This candidate does not certify Windows x86-64, Stata releases other than
+those recorded per target, arbitrary TeX Live documents outside the documented
+compatibility tier, or safety under unbounded/adversarial input. Public release
+and final `v0.1.0` publication remain separate decisions.
