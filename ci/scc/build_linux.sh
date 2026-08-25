@@ -73,6 +73,7 @@ cp "$CARGO_TARGET_DIR/x86_64-unknown-linux-gnu/release/libtexpdf_stata.so" "$plu
 "$python_bin" tools/plugin_smoke.py "$plugin" \
   --bundle-info bundle/generated/bundle-info.json \
   --output dist/linux-x86_64/plugin-smoke.json
+GITHUB_SHA="$source_sha" /bin/bash ci/prepare_release_license_evidence.sh
 "$python_bin" tools/package_release.py \
   --plugin "$plugin" \
   --embedded-helper "$TEXPDF_HELPER_PATH" \

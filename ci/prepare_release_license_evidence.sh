@@ -4,8 +4,15 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-/usr/bin/python3 ci/run_license_audit.py
-/usr/bin/python3 - <<'PY'
+python_bin="${TEXPDF_PYTHON:-$(command -v python3 || true)}"
+if [[ -z "$python_bin" ]] || [[ ! -x "$python_bin" ]] || \
+   ! "$python_bin" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 9) else 1)'; then
+  echo "TEXPDF_RELEASE_LICENSE_ERROR Python 3.9 or newer is required" >&2
+  exit 2
+fi
+
+"$python_bin" ci/run_license_audit.py
+"$python_bin" - <<'PY'
 from pathlib import Path
 import json
 
