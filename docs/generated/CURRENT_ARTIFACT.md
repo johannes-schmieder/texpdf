@@ -3,7 +3,7 @@
 This file is generated only from a successful exact-source-SHA
 embedded-engine Rust and licensed Stata run.
 
-- Source SHA: `bd2d38dc0bb44ef13860fc3032dd1eab0230c1f3`
+- Source SHA: `21cf28493624191d52488146b914b8d26cc5291d`
 - CI profile: `quick`
 - Overall status: `success`
 - Stata status: `success`
@@ -14,21 +14,21 @@ embedded-engine Rust and licensed Stata run.
 
 ## Embedded resource bundle
 
-- Logical files: `382`
-- Exact bytes: `4984973`
-- Binary size: **4.75 MiB**
-- ZIP SHA-256: `1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084`
-- Tectonic digest: `a5b8af5c48f71877bf3ca8296892757cf1868503f151acc6b7b77808b85b2d51`
+- Logical files: `393`
+- Exact bytes: `5263992`
+- Binary size: **5.02 MiB**
+- ZIP SHA-256: `cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f`
+- Tectonic digest: `343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf`
 
 ## Standalone plugin
 
-- Exact bytes: `49429136`
-- Binary size: **47.14 MiB**
-- SHA-256: `71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787`
+- Exact bytes: `49709840`
+- Binary size: **47.41 MiB**
+- SHA-256: `56fe47133a1132498e6a9852212017f86a7b68c9beb9e48013b489af5b967523`
 - Target/platform: `darwin`
 
 ## Installation package
 
-- Recorded metadata: `{"bundle_digest": "a5b8af5c48f71877bf3ca8296892757cf1868503f151acc6b7b77808b85b2d51", "bundle_file_count": 382, "bundle_name": "texpdf-academic-v1", "bundle_version": "33-academic-v1", "bundle_zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084", "bundle_zip_size_bytes": 4984973, "embedded_helper_count": 1, "embedded_helper_provenance_source": "/Users/johannes/actions-runners/texpdf-stata/_work/_temp/texpdf-cargo-target/release/texpdf-helper", "embedded_helper_sha256": "df1bf398fae80a57cb83c0e0796a1d2189bcbd2b2965ce23b6e7326298b24f06", "embedded_helper_size_bytes": 48515440, "embedded_helpers": {"aarch64-apple-darwin": {"sha256": "df1bf398fae80a57cb83c0e0796a1d2189bcbd2b2965ce23b6e7326298b24f06", "size_bytes": 48515440}}, "engine": "tectonic", "engine_version": "0.17.0", "installed_files": ["BUILD_INFO.json", "CHECKSUMS.sha256", "LICENSE", "THIRD_PARTY_NOTICES.md", "_texpdf_plugin.plugin", "stata.toc", "texpdf.ado", "texpdf.pkg", "texpdf.sthlp"], "license_audit_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8", "license_evidence_included": false, "net_install_license_file_count": 0, "package": "texpdf", "package_directory": "dist/texpdf-macos-arm64", "package_version": "0.1.0", "package_zip": "dist/texpdf-macos-arm64.zip", "package_zip_sha256": "5051594736cae7bf92b0b0bb6148ce6734ed921f26a23febfe860b2276344bda", "package_zip_size_bytes": 22496298, "packaged_license_file_count": 0, "plugin_sha256": "71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787", "plugin_size_bytes": 49429136, "public_release_mode": false, "release_license_complete": true, "runtime_network_required": false, "schema_version": 1, "standalone": true, "system_tex_required": false, "target": "aarch64-apple-darwin"}`
+- Recorded metadata: `{"bundle_digest": "343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf", "bundle_file_count": 393, "bundle_name": "texpdf-academic-v2-development", "bundle_version": "33-academic-v2-dev.1", "bundle_zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f", "bundle_zip_size_bytes": 5263992, "embedded_helper_count": 1, "embedded_helper_provenance_source": "/Users/johannes/actions-runners/texpdf-stata/_work/_temp/texpdf-cargo-target/release/texpdf-helper", "embedded_helper_sha256": "8329adf0cb32d872aa7ebea5b5568d6959638e0948737a8e96f3ba085f635e39", "embedded_helper_size_bytes": 48796144, "embedded_helpers": {"aarch64-apple-darwin": {"sha256": "8329adf0cb32d872aa7ebea5b5568d6959638e0948737a8e96f3ba085f635e39", "size_bytes": 48796144}}, "engine": "tectonic", "engine_version": "0.17.0", "installed_files": ["BUILD_INFO.json", "CHECKSUMS.sha256", "LICENSE", "THIRD_PARTY_NOTICES.md", "_texpdf_plugin.plugin", "stata.toc", "texpdf.ado", "texpdf.pkg", "texpdf.sthlp"], "license_audit_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8", "license_evidence_included": false, "net_install_license_file_count": 0, "package": "texpdf", "package_directory": "dist/texpdf-macos-arm64", "package_version": "0.1.0", "package_zip": "dist/texpdf-macos-arm64.zip", "package_zip_sha256": "b9c118cfe5931707b8261282787eedea18fc3356d7b04ab6bb2a673199b68eff", "package_zip_size_bytes": 22781173, "packaged_license_file_count": 0, "plugin_sha256": "56fe47133a1132498e6a9852212017f86a7b68c9beb9e48013b489af5b967523", "plugin_size_bytes": 49709840, "public_release_mode": false, "release_license_complete": true, "runtime_network_required": false, "schema_version": 1, "standalone": true, "system_tex_required": false, "target": "aarch64-apple-darwin"}`
 
 Build-only or failed runs never update this file.
