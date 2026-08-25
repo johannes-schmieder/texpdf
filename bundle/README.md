@@ -4,15 +4,21 @@
 plugin. Runtime compilation never downloads packages and never consults a
 system TeX tree.
 
-## Current qualified bundle
+## Frozen qualified bundle and current development selection
 
-The qualified bundle is `texpdf-academic-v1`, derived from the pinned
-Tectonic/TeX Live 2022 resources and the `tlextras-2022.0` local-resource
-archive.
+`QUALIFICATION.json` preserves the exact `texpdf-academic-v1` bytes qualified
+for the frozen private release candidate. It remains historical evidence and
+is not rewritten merely because `main` moves.
 
-Exact file counts, sizes, content digests, ZIP hashes, and the source SHA that
-qualified them are recorded in `QUALIFICATION.json`; they are not duplicated
-in this durable description. Platform support is authoritative in
+`DEVELOPMENT.json` records the newer bundle embedded by `main`. That selection
+adds the real-world compatibility corpus and is explicitly not an all-target
+qualification or a replacement release candidate. Its current evidence fields
+show which bounded development lanes have run and which licensed target lanes
+have not been repeated.
+
+Exact file counts, sizes, content digests, and ZIP hashes are recorded in the
+corresponding identity record; they are not duplicated in this durable
+description. Platform support is authoritative in
 `../release/targets.json`, and the human-readable current artifact summary is
 `../docs/generated/CURRENT_ARTIFACT.md`.
 
@@ -38,15 +44,19 @@ it through Tectonic's in-memory `ZipBundle` implementation. The bundle's
 index, local archive, and local index checksums are pinned by the bundle lock
 and manifest records.
 
-The build and CI tooling verifies the exact ZIP hash before embedding it. The
-same curated ZIP is used for all platform targets.
+The exact rebuilder defaults to `DEVELOPMENT.json`. A release reconstruction
+of the frozen candidate must use its recorded source checkout; the manifest on
+current `main` describes the newer development selection. The build and CI
+tooling verifies the exact ZIP hash before embedding it.
 
 ## Compatibility policy
 
 The public v1 compatibility tier is fixture-backed. The integrated academic
 corpus exercises the supported math, table, layout, figure, font, hyperlink,
-and bibliography packages. A package is not considered supported merely
-because a similarly named file is present in the ZIP.
+and bibliography packages. The development real-world corpus adds current
+latexlog, legacy subfigure, and conventional economics-manuscript structures.
+A package is not considered supported merely because a similarly named file
+is present in the ZIP.
 
 The exact user-facing contract is documented in
 `../docs/SUPPORTED_PACKAGES.md` and `../docs/COMPATIBILITY.md`.

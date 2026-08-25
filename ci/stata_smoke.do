@@ -179,6 +179,12 @@ if `full_engine' {
     local install_marker = "TEXPDF NET INSTALL " + "PASS"
     display as result `"`install_marker'"'
 
+    * The realistic corpus is intentionally limited to the native Apple
+    * Silicon lane. Intel macOS and licensed Linux keep the bounded smoke set.
+    if strpos(c(machine_type), "Apple Silicon") > 0 {
+        do `"`repo'/ci/stata_real_world_corpus.do"'
+    }
+
     local full_marker = "TEXPDF FULL ENGINE STATA " + "PASS"
     display as result `"`full_marker'"'
 }

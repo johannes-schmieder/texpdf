@@ -25,6 +25,20 @@ A package is advertised as supported only after a redistributable fixture using
 that package passes with the final curated bundle on every supported platform.
 Presence of a file in the bundle is not by itself a support guarantee.
 
+## Development real-world corpus
+
+`main` also carries a source-only synthetic corpus modeled on current latexlog
+reports, a legacy report, and a conventional multi-file economics manuscript.
+It tests PDF and PNG figures, generated-style tables, landscape/tabularx
+layouts, relative inputs, equations, natbib, `cleveref`, and `aer.bst`.
+
+`colortbl`, `cleveref`, and `aer.bst` are development-tested pending a full
+runtime requalification of every supported target. The obsolete `subfigure`
+package is retained only for legacy compatibility; the current isolated fixture
+is warning-free, and any future allowlist is limited to an exact obsolete-package
+warning. Use `subcaption` for new work. The development result does not advance
+the active release-candidate source.
+
 ## Deliberate exclusions
 
 The initial public tier excludes:

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "record_kind": "development-selection",
+  "selection_status": "awaiting-runtime-evidence",
+  "bundle": {
+    "name": "texpdf-academic-v2-development",
+    "version": "33-academic-v2-dev.1",
+    "content_digest": "343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf",
+    "zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f",
+    "file_count": 393,
+    "zip_size_bytes": 5263992,
+    "uncompressed_resource_bytes": 15817275,
+    "source_sha256": "425685e124746c15ba9bb8e0596bdaad98fce886afa347fbcf9ec0e9acd7fe79",
+    "index_sha256": "979a52178eb353c803dde1f66efe43ff7ae2ab908000323d4fef29e98e382ebd",
+    "resource_policy_sha256": "8a3e2a66a480b3d8ff19b11e53935aa43e43757ceaf0d647a344dbf3ccd4e58f",
+    "transform_version": "range-closure-v2-english-only",
+    "selection_manifest": "bundle/curated-manifest.json"
+  },
+  "evidence": {
+    "tested_source_sha": null,
+    "macos_apple_silicon_stata": "pending",
+    "linux_core": "pending",
+    "intel_macos_stata": "not-run",
+    "linux_stata": "not-run"
+  },
+  "capabilities": {
+    "colortbl": "fixture-added",
+    "cleveref": "fixture-added",
+    "aer_bst": "fixture-added",
+    "subfigure": "legacy-fixture-added"
+  },
+  "qualification_boundary": "This is a development bundle selection, not an all-target qualification or release candidate. The frozen qualification record remains in bundle/QUALIFICATION.json for the older candidate bytes."
+}

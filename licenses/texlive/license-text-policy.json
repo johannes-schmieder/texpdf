@@ -28,6 +28,9 @@
     "lppl": [
       "licenses/texlive/LPPL-1.3c.txt"
     ],
+    "lppl1.2": [
+      "licenses/texlive/LPPL-1.2.txt"
+    ],
     "lppl1.3": [
       "licenses/texlive/LPPL-1.3c.txt"
     ],

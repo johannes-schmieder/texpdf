@@ -60,7 +60,15 @@ def parse_lock(path: Path) -> dict[str, str]:
         if len(value) < 2 or value[0] != '"' or value[-1] != '"':
             raise BundleError(f"unsupported bundle lock value: {raw!r}")
         values[key.strip()] = value[1:-1]
-    for key in ("name", "version", "source_url", "index_url", "transform_version"):
+    for key in (
+        "name",
+        "version",
+        "source_url",
+        "index_url",
+        "transform_version",
+        "selection_name",
+        "selection_version",
+    ):
         if key not in values:
             raise BundleError(f"bundle lock is missing {key}")
     return values
@@ -537,8 +545,8 @@ def main() -> int:
 
         manifest_payload = {
             "schema_version": 1,
-            "bundle_name": "texpdf-academic-v1",
-            "bundle_version": "33-academic-v1",
+            "bundle_name": lock["selection_name"],
+            "bundle_version": lock["selection_version"],
             "source_url": lock["source_url"],
             "index_url": lock["index_url"],
             "source_sha256": source_sha,
@@ -571,8 +579,8 @@ def main() -> int:
                 )
         info = {
             "schema_version": 1,
-            "bundle_name": "texpdf-academic-v1",
-            "bundle_version": "33-academic-v1",
+            "bundle_name": lock["selection_name"],
+            "bundle_version": lock["selection_version"],
             "transform_version": "range-closure-v2-english-only",
             "source_sha256": source_sha,
             "index_sha256": index_sha,

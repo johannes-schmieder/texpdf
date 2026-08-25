@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Rebuild the exact qualified curated bundle from its committed manifest.
 
-This path is intended for release and cross-platform builders. It does not run
-resource discovery: it reconstructs the already-qualified byte-range selection
-and rejects any result whose size or SHA-256 differs from QUALIFICATION.json.
+This path is intended for development and cross-platform builders. It does not
+run resource discovery: it reconstructs the recorded byte-range selection and
+rejects any result whose size or SHA-256 differs from the selected identity
+record. Release builders can explicitly select the frozen qualification record.
 """
 
 from __future__ import annotations
@@ -416,7 +417,9 @@ def bundle_info_payload(qualification: dict[str, Any]) -> dict[str, Any]:
         "zip_sha256": bundle["zip_sha256"],
         "file_count": bundle["file_count"],
         "zip_size_bytes": bundle["zip_size_bytes"],
-        "rebuild_mode": "exact-qualified-manifest",
+        "rebuild_mode": str(
+            qualification.get("record_kind", "exact-qualified-manifest")
+        ),
     }
 
 
@@ -424,7 +427,17 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", type=Path, default=Path("bundle/curated-manifest.json"))
     parser.add_argument("--lock", type=Path, default=Path("bundle/bundle.lock.toml"))
-    parser.add_argument("--qualification", type=Path, default=Path("bundle/QUALIFICATION.json"))
+    parser.add_argument(
+        "--identity",
+        "--qualification",
+        dest="identity",
+        type=Path,
+        default=Path("bundle/DEVELOPMENT.json"),
+        help=(
+            "exact bundle identity record; --qualification is retained as a "
+            "backward-compatible alias"
+        ),
+    )
     parser.add_argument("--output", type=Path, default=Path("bundle/generated/texpdf-bundle.zip"))
     parser.add_argument(
         "--source-root",
@@ -445,7 +458,7 @@ def main() -> int:
     args = parser.parse_args()
     try:
         manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-        qualification = json.loads(args.qualification.read_text(encoding="utf-8"))
+        qualification = json.loads(args.identity.read_text(encoding="utf-8"))
         records = extract_records(manifest)
         rebuild(
             records,

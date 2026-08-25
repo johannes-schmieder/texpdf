@@ -18,13 +18,16 @@ graphics
 graphics-cfg
 graphics-def
 xcolor
+colortbl
 geometry
 float
 placeins
 rotating
 pdflscape
 caption
+subfigure
 hyperref
+cleveref
 url
 setspace
 enumitem
@@ -32,6 +35,7 @@ fancyhdr
 titlesec
 microtype
 natbib
+economic
 lm
 lm-math
 tex-gyre

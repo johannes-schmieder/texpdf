@@ -1,0 +1,16 @@
+\section{Empirical framework}\label{sec:methods}
+
+For unit $i$ in period $t$, define the synthetic outcome model
+\begin{equation}
+  y_{it}=\alpha_i+\lambda_t+\theta D_{it}+x_{it}'\gamma+u_{it},
+  \qquad \mathbb{E}[u_{it}\mid D_{it},x_{it},\alpha_i,\lambda_t]=0.
+  \label{eq:model}
+\end{equation}
+The target parameter is $\theta$. We report the event-study analogue
+\begin{equation}
+  y_{it}=\alpha_i+\lambda_t+
+  \sum_{k\neq-1}\theta_k\mathbf{1}\{t-T_i=k\}+u_{it}.
+  \label{eq:event-study}
+\end{equation}
+All observations and coefficients in this fixture are deterministic synthetic
+values.

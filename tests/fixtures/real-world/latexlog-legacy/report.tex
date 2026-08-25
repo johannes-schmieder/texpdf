@@ -1,0 +1,47 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx,float,placeins,subfigure}
+\title{Synthetic Legacy Econometric Report}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Estimating equations}
+The report deliberately retains a legacy preamble and figure syntax while all
+substantive content is invented. Let $g$ index groups and $t$ periods. The
+estimating system is
+\begin{align}
+y_{igt} & = \alpha_g + \lambda_t
+  + \sum_{k=-3}^{3} \beta_k
+    \mathbf{1}\{t-T_g=k\}
+  + x_{igt}'\gamma + \varepsilon_{igt}, \label{eq:event} \\
+\widehat{\Omega}
+  & = (X'X)^{-1}
+    \left(\sum_{g=1}^{G} X_g'\widehat{u}_g
+    \widehat{u}_g'X_g\right)(X'X)^{-1}. \label{eq:variance}
+\end{align}
+The normalization is $\beta_{-1}=0$, and the identifying restriction is
+$\mathbb{E}[\varepsilon_{igt}\mid X,\alpha_g,\lambda_t]=0$.
+
+\section{Legacy panels}
+\begin{figure}[H]
+  \centering
+  \subfigure[Synthetic outcome]{
+    \fbox{\rule{0pt}{22mm}\rule{.40\textwidth}{0pt}}}
+  \hfill
+  \subfigure[Synthetic exposure]{
+    \fbox{\rule{0pt}{22mm}\rule{.40\textwidth}{0pt}}}
+  \caption{Legacy subfigure layout}
+  \label{fig:legacy}
+\end{figure}
+\FloatBarrier
+
+\section{Regression output}
+\input{tables/regression.tex}
+
+Equations~\eqref{eq:event}--\eqref{eq:variance}, Figure~\ref{fig:legacy}, and
+Table~\ref{tab:legacy} verify the relative-input and cross-reference paths.
+
+\end{document}

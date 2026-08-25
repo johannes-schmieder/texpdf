@@ -3,6 +3,23 @@
 This is the authoritative Linux runtime gate for the private RC. Hosted Linux
 artifacts remain useful development evidence but do not qualify a Stata target.
 
+## Development-only core corpus
+
+For a Linux core corpus check that does not launch licensed Stata or advance
+target qualification, deploy an exact source checkout to a new immutable run
+directory and submit:
+
+```sh
+ci/scc/submit_corpus_linux.sh /projectnb/welfgr/texpdf/runs/RUN_ID
+```
+
+The job reconstructs the exact development bundle, validates the corpus
+manifest, runs only `texpdf-core`'s real-world corpus integration test, retains
+the three PDFs under the run directory, and writes
+`receipts/linux-core-corpus.json` with the source SHA, bundle identity, glibc,
+platform, and output hashes. It is development evidence, not Linux licensed-
+Stata qualification.
+
 ## Prepare an exact attempt
 
 Use one immutable directory under

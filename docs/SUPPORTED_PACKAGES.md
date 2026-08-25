@@ -53,6 +53,20 @@ successful final-platform corpus result:
 Candidates should be promoted in small fixture-backed groups so the incremental
 bundle cost and license closure are measurable.
 
+## Development-tested real-world additions
+
+The bundle on `main` contains a separate development selection that has not
+replaced the frozen private candidate. Its synthetic real-world corpus tests:
+
+- `colortbl` in current latexlog-generated tables;
+- `cleveref` in a multi-file economics manuscript;
+- the `aer.bst` BibTeX style from TeX Live's `economic` package with natbib;
+- the obsolete `subfigure` package in a sanitized legacy report.
+
+These are development-tested capabilities pending full all-target runtime
+requalification. `subfigure` is supported only to open and compile legacy
+documents; new documents should use `subcaption`.
+
 ## Deliberate exclusions for v1
 
 - shell escape and arbitrary helper programs;

@@ -136,6 +136,7 @@ def build_state(readiness_result: dict[str, Any]) -> dict[str, Any]:
     memory = read_json("release/memory-stress-macos-arm64.json")
     licenses = read_json("licenses/generated/STATUS.json")
     qualification = read_json("bundle/QUALIFICATION.json")
+    development = read_json("bundle/DEVELOPMENT.json")
     receipts = successful_receipts()
     history = git_history()
     latest_green = select_receipt(history, receipts)
@@ -163,6 +164,7 @@ def build_state(readiness_result: dict[str, Any]) -> dict[str, Any]:
         "memory": memory,
         "licenses": licenses,
         "qualification": qualification,
+        "development": development,
     }
 
 
@@ -180,6 +182,9 @@ def render_status(state: dict[str, Any]) -> str:
     memory = memory_record.get("memory", {})
     memory_qualified = memory_record.get("qualified") is True
     required = set(scope.get("required_runtime_targets", []))
+    development = state.get("development", {})
+    development_bundle = development.get("bundle", {})
+    development_evidence = development.get("evidence", {})
 
     lines = [
         "# texpdf status",
@@ -217,6 +222,23 @@ def render_status(state: dict[str, Any]) -> str:
         f"| Current universal build source | {code(universal.get('source_sha'))} |",
         f"| Current license-audit source | {code(licenses.get('source_sha'))} |",
         f"| Latest memory-stress attempt | {code(memory_record.get('source_sha'))}; qualified={yes_no(memory_record.get('qualified'))} |",
+        "",
+        "## Development bundle on `main`",
+        "",
+        "The frozen private candidate and the current development bundle are different artifacts.",
+        "Candidate readiness above applies only to the older qualified bytes and does not",
+        "qualify the newer bundle embedded by `main`.",
+        "",
+        "| Development selection | Value |",
+        "|---|---|",
+        f"| Name / version | {code(development_bundle.get('name'))} / {code(development_bundle.get('version'))} |",
+        f"| ZIP SHA-256 | {code(development_bundle.get('zip_sha256'))} |",
+        f"| Content digest | {code(development_bundle.get('content_digest'))} |",
+        f"| Selection status | {code(development.get('selection_status'))} |",
+        f"| Tested source | {code(development_evidence.get('tested_source_sha'), 'pending')} |",
+        f"| Apple Silicon licensed Stata | {code(development_evidence.get('macos_apple_silicon_stata'))} |",
+        f"| Linux core corpus | {code(development_evidence.get('linux_core'))} |",
+        f"| Intel macOS / Linux licensed Stata | {code(development_evidence.get('intel_macos_stata'))} / {code(development_evidence.get('linux_stata'))} |",
         "",
         "## Architecture",
         "",

@@ -28,6 +28,11 @@ releases or SSC versions.
   8 with an enforced GLIBC 2.28 compatibility ceiling.
 - Source-bound license inventories, notice collection, SCC accounting, and
   exact artifact identities in release and runtime receipts.
+- A source-only synthetic real-world corpus for current latexlog reports,
+  legacy `subfigure` output, and conventional multi-file economics manuscripts,
+  including an optional hash-pinned latexlog regeneration contract.
+- Development-tested offline resources for `colortbl`, `cleveref`, the
+  `economic` package's `aer.bst`, and legacy `subfigure` compatibility.
 
 ### Changed
 
@@ -37,6 +42,8 @@ releases or SSC versions.
   instead of replacing it with later green development commits.
 - Release and distribution policy now defines SSC as the stable user channel,
   GitHub final tags as immutable snapshots, and `main` as development.
+- Bundle selection name/version now live in the pinned bundle lock, and current
+  development identity is recorded separately from frozen candidate evidence.
 
 ### Fixed
 

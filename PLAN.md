@@ -111,6 +111,22 @@ its provenance manifests.
 - Final `v0.1.0` audit, tag, release assets, and public installation URLs.
 - Final `v0.1.0` GitHub Release followed by an exact-tag SSC submission.
 
+## Real-world compatibility development checkpoint
+
+- [x] Add synthetic current-latexlog, legacy-report, and standard economics
+      manuscript fixture families with a versioned fail-closed manifest.
+- [x] Add an exact-hash, isolated, explicit-update latexlog regeneration tool.
+- [x] Expand the deterministic bundle with `colortbl`, `cleveref`, `economic`,
+      and legacy `subfigure` resources while preserving the prior selection.
+- [x] Add direct Rust corpus enumeration and an Apple-Silicon-only installed
+      Stata corpus gate.
+- [ ] Record exact-source Apple Silicon Stata and SCC Linux core results for the
+      development selection.
+- [ ] Leave Intel macOS and licensed Linux Stata requalification intentionally
+      unrun; do not advance the active candidate source.
+
+This checkpoint is a newer development artifact, not RC.3 and not a release.
+
 ## Checkpoint discipline
 
 For every coherent source checkpoint: test locally, commit directly to `main`,

@@ -93,11 +93,29 @@ class ProjectStateTests(unittest.TestCase):
                     "growth_gate": False,
                 },
             },
+            "development": {
+                "selection_status": "partial-runtime-evidence",
+                "bundle": {
+                    "name": "development-bundle",
+                    "version": "dev.1",
+                    "zip_sha256": digest,
+                    "content_digest": digest,
+                },
+                "evidence": {
+                    "tested_source_sha": sha,
+                    "macos_apple_silicon_stata": "success",
+                    "linux_core": "success",
+                    "intel_macos_stata": "not-run",
+                    "linux_stata": "not-run",
+                },
+            },
         }
         rendered = state.render_status(fixture)
         self.assertIn("failed attempt", rendered)
         self.assertIn("qualified=no", rendered)
         self.assertNotIn("memory stress qualified", rendered.lower())
+        self.assertIn("development-bundle", rendered)
+        self.assertIn("different artifacts", rendered)
 
 
 if __name__ == "__main__":

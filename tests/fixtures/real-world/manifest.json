@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "corpus_version": "2026-08-25",
+  "permitted_engine_diagnostics": [
+    {"kind": "note", "contains": "generating format"},
+    {"kind": "note", "contains": "Running TeX"},
+    {"kind": "note", "contains": "Rerunning TeX because"},
+    {"kind": "note", "contains": "Running BibTeX"},
+    {"kind": "note", "contains": "Running xdvipdfmx"},
+    {"kind": "note", "contains": "Writing `"},
+    {"kind": "note", "contains": "Skipped writing"}
+  ],
+  "fixtures": [
+    {
+      "id": "latexlog-current",
+      "entrypoint": "latexlog-current/report.tex",
+      "assets": [
+        "latexlog-current/figures/outcome-by-index.pdf",
+        "latexlog-current/figures/outcome-by-treatment.png",
+        "latexlog-current/figures/panel-outcome.pdf",
+        "latexlog-current/figures/panel-exposure.pdf"
+      ],
+      "capabilities": [
+        "latexlog-generated-source",
+        "pdf-figure",
+        "png-figure",
+        "subcaption",
+        "collect-export",
+        "booktabs",
+        "threeparttable",
+        "tabularx",
+        "colortbl",
+        "landscape",
+        "custom-command",
+        "display-math"
+      ],
+      "provenance": {
+        "kind": "synthetic-derivative",
+        "description": "Deterministic synthetic Stata data exercised through the current latexlog command surface; no research data or prose is included."
+      },
+      "permitted_diagnostics": [],
+      "generator_contract": {
+        "script": "latexlog-current/generate.do",
+        "latexlog_ado_sha256": "0fe780432da074ddbd21971db263e65baf259344792c7f1857412b25c1eb5a3c",
+        "normalized_comment": "% LATEXLOG GENERATED TIMESTAMP"
+      }
+    },
+    {
+      "id": "latexlog-legacy",
+      "entrypoint": "latexlog-legacy/report.tex",
+      "assets": ["latexlog-legacy/tables/regression.tex"],
+      "capabilities": [
+        "legacy-subfigure",
+        "relative-input",
+        "placeins",
+        "figure-barrier",
+        "dense-econometric-equations"
+      ],
+      "provenance": {
+        "kind": "synthetic-derivative",
+        "description": "Sanitized legacy report structure with invented notation and estimates."
+      },
+      "permitted_diagnostics": []
+    },
+    {
+      "id": "economics-manuscript",
+      "entrypoint": "manuscript/main.tex",
+      "assets": [
+        "manuscript/figures/event-study.pdf",
+        "manuscript/figures/heterogeneity.png",
+        "manuscript/sections/introduction.tex",
+        "manuscript/sections/methods.tex",
+        "manuscript/sections/results.tex",
+        "manuscript/tables/regression.tex",
+        "manuscript/references.bib"
+      ],
+      "capabilities": [
+        "multi-file-article",
+        "relative-input",
+        "cleveref",
+        "pdf-figure",
+        "png-figure",
+        "regression-table",
+        "display-math",
+        "natbib",
+        "aer-bibliography-style"
+      ],
+      "provenance": {
+        "kind": "synthetic-derivative",
+        "description": "Conventional economics-paper topology with invented prose, citations, figures, and estimates."
+      },
+      "permitted_diagnostics": []
+    }
+  ]
+}

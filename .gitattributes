@@ -1,0 +1,3 @@
+# These files are committed byte-for-byte from external generators/sources.
+licenses/texlive/LPPL-1.2.txt -whitespace
+tests/fixtures/real-world/latexlog-current/report.tex -whitespace
