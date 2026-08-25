@@ -14,6 +14,8 @@
       "candidate_package_version": "0.1.0-rc.1",
       "embedded_helper_sha256": "1d1873912ce031669234640678052d5d645b2c5c2bce4df215caccc66c43047c",
       "embedded_helper_size_bytes": 48515440,
+      "memory_stress_latest_attempt_qualified": false,
+      "memory_stress_latest_attempt_sha": "22177738a5f2615bc43423625f32b6d1a9536408",
       "platform": "Unix; Mac (Apple Silicon)",
       "plugin_sha256": "bc6575fbc0e876734065f9378ca1d4cdc31390f19b3e2b59a4d634953b3e69d7",
       "plugin_size_bytes": 49429136,
