@@ -147,7 +147,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=eef6f5f23f110bc7d8977209bb82824258e3e1ad; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
+      "detail": "source=39f67bf948b337c9a7a91dc704257a015402b7ed; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
       "key": "third_party_license_complete",
       "passed": true,
       "public_release_blocker": false,
@@ -155,7 +155,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "candidate_source=missing; license_source=eef6f5f23f110bc7d8977209bb82824258e3e1ad; ancestor=False; non_evidence_changes=[]",
+      "detail": "candidate_source=missing; license_source=39f67bf948b337c9a7a91dc704257a015402b7ed; ancestor=False; non_evidence_changes=[]",
       "key": "candidate_license_source_coherence",
       "passed": false,
       "public_release_blocker": true,
