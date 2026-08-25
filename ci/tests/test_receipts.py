@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 from pathlib import Path
 import subprocess
 import sys
@@ -10,9 +11,23 @@ import unittest
 
 CI_DIR = Path(__file__).resolve().parents[1]
 TESTED_SHA = "a" * 40
+RUN_STATA_SPEC = importlib.util.spec_from_file_location(
+    "texpdf_run_stata_ci", CI_DIR / "run_stata_ci.py"
+)
+assert RUN_STATA_SPEC is not None and RUN_STATA_SPEC.loader is not None
+RUN_STATA = importlib.util.module_from_spec(RUN_STATA_SPEC)
+RUN_STATA_SPEC.loader.exec_module(RUN_STATA)
 
 
 class ReceiptTests(unittest.TestCase):
+    def test_runtime_artifact_identity_writer_is_atomic(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "nested" / "artifact.json"
+            payload = {"schema_version": 1, "plugin_sha256": "1" * 64}
+            RUN_STATA.write_json_atomic(path, payload)
+            self.assertEqual(json.loads(path.read_text(encoding="utf-8")), payload)
+            self.assertFalse(path.with_suffix(".json.tmp").exists())
+
     @staticmethod
     def normal_process(**overrides: object) -> dict[str, object]:
         value: dict[str, object] = {
