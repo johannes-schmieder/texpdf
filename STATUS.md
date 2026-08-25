@@ -49,7 +49,7 @@ qualify the newer bundle embedded by `main`.
 | Tested source | `21cf28493624191d52488146b914b8d26cc5291d` |
 | Apple Silicon licensed Stata | `success` |
 | Linux core corpus | `success` |
-| Development license audit | `21cf28493624191d52488146b914b8d26cc5291d`; complete=yes |
+| Development license audit | `75967266ed94454f761cfd33bdaddbcfef18f155`; complete=yes |
 | Development TeX resources | 392/392 mapped |
 | Intel macOS / Linux licensed Stata | `not-run` / `not-run` |
 
@@ -80,7 +80,7 @@ None.
 
 The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
 
-The separate development audit is source-bound to `21cf28493624191d52488146b914b8d26cc5291d` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the frozen candidate evidence above.
+The separate development audit is source-bound to `75967266ed94454f761cfd33bdaddbcfef18f155` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the frozen candidate evidence above.
 
 ## Memory evidence
 
