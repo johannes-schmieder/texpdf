@@ -1,6 +1,6 @@
 # Generated release dependency inventory
 
-Release roots: `texpdf-stata, texpdf-helper`
+Release roots: `texpdf-stata, texpdf-helper`  
 Release target: `aarch64-apple-darwin`
 
 This inventory follows the normal/build dependency closure of the
