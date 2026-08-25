@@ -15,7 +15,7 @@
       "embedded_helper_sha256": "df1bf398fae80a57cb83c0e0796a1d2189bcbd2b2965ce23b6e7326298b24f06",
       "embedded_helper_size_bytes": 48515440,
       "memory_stress_latest_attempt_qualified": false,
-      "memory_stress_latest_attempt_sha": "39f67bf948b337c9a7a91dc704257a015402b7ed",
+      "memory_stress_latest_attempt_sha": "d18626b61087e2b43cad60b52b9531dcbea112b3",
       "platform": "Unix; Mac (Apple Silicon)",
       "plugin_sha256": "71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787",
       "plugin_size_bytes": 49429136,
