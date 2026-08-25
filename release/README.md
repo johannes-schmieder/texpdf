@@ -14,12 +14,13 @@ when it contains:
 - a successful actual Stata runtime result on that platform.
 
 Build-only artifacts must keep `stata_runtime_qualified: false`, even when Rust
-tests and native linking succeed. The active private `v0.1.0-rc.1` gate requires
-the two macOS targets in `scope.json`. Windows and Linux are explicitly
-deferred; public distribution and final `v0.1.0` have a separate blocker set.
+tests and native linking succeed. The active private `v0.1.0-rc.2` gate requires
+both macOS targets and Linux x86-64 in `scope.json`. Linux also requires the
+source-bound record in `linux-x86_64.json`, a glibc 2.28 binary-policy pass,
+and licensed Stata/MP 18 and 19 receipts. Windows is explicitly deferred;
+public distribution and final `v0.1.0` have a separate blocker set.
 
-The current comprehensive runtime evidence is for macOS Apple Silicon. Manual
-workflows can build Windows, Linux, and macOS universal development artifacts,
-but those outputs remain unsupported until they pass the release corpus inside
-licensed Stata. `READINESS.json` and `READINESS.md` are generated from these
-records by `tools/sync_project_state.py`.
+Hosted workflows may build Windows, Linux, and macOS development artifacts,
+but build-only outputs remain unsupported. Linux release qualification is
+performed on BU SCC with `ci/scc/`; `READINESS.json` and `READINESS.md` are
+generated from canonical records by `tools/sync_project_state.py`.

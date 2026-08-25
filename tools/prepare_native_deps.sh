@@ -7,12 +7,24 @@ set -euo pipefail
 
 vcpkg_rev="a62ce77d56ee07513b4b67de1ec2daeaebfae51a"
 vcpkg_short="${vcpkg_rev:0:12}"
-vcpkg_root="${TEXPDF_VCPKG_ROOT:-/private/tmp/texpdf-vcpkg-$vcpkg_short}"
-vcpkg_binary_cache="${TEXPDF_VCPKG_BINARY_CACHE:-/private/tmp/texpdf-vcpkg-binary-cache}"
+temp_base="${RUNNER_TEMP:-${TMPDIR:-/tmp}}"
+vcpkg_root="${TEXPDF_VCPKG_ROOT:-$temp_base/texpdf-vcpkg-$vcpkg_short}"
+vcpkg_binary_cache="${TEXPDF_VCPKG_BINARY_CACHE:-$temp_base/texpdf-vcpkg-binary-cache}"
 
 pkgconf_rev="4fc570f91d9d8d843ab32d2198a5c064538d8ffd"
 pkgconf_short="${pkgconf_rev:0:12}"
-pkgconf_root="${TEXPDF_PKGCONF_ROOT:-/private/tmp/texpdf-pkgconf-$pkgconf_short}"
+pkgconf_root="${TEXPDF_PKGCONF_ROOT:-$temp_base/texpdf-pkgconf-$pkgconf_short}"
+pkgconf_bootstrap_revision="2:$pkgconf_rev"
+
+python_bin="${TEXPDF_PYTHON:-$(command -v python3 || true)}"
+if [[ -z "$python_bin" ]] || [[ ! -x "$python_bin" ]]; then
+  echo "TEXPDF_NATIVE_DEPS_ERROR Python 3.9 or newer is required" >&2
+  return 2 2>/dev/null || exit 2
+fi
+if ! "$python_bin" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 9) else 1)'; then
+  echo "TEXPDF_NATIVE_DEPS_ERROR Python 3.9 or newer is required: $python_bin" >&2
+  return 2 2>/dev/null || exit 2
+fi
 
 host="$(${RUSTC:-rustc} -vV | /usr/bin/sed -n 's/^host: //p')"
 case "$host" in
@@ -72,7 +84,15 @@ int main(void) { return 0; }
 int main(void) { (void) $symbol; return 0; }
 #endif
 EOF
-  if "$cc" -std=c99 -Werror=implicit-function-declaration -c "$source" -o "$object" >/dev/null 2>&1; then
+  local standard=c99
+  local feature_flags=()
+  if [[ "$host" == *-unknown-linux-gnu ]]; then
+    standard=gnu99
+    feature_flags=(-D_GNU_SOURCE)
+  fi
+  if "$cc" "-std=$standard" "${feature_flags[@]}" \
+      -Werror=implicit-function-declaration -c "$source" -o "$object" \
+      >/dev/null 2>&1; then
     printf '1'
   else
     printf '0'
@@ -110,7 +130,7 @@ write_pkgconf_config() {
 }
 
 patch_pkgconf_lite_sources() {
-  /usr/bin/python3 - "$pkgconf_root/Makefile.lite" <<'PY'
+  "$python_bin" - "$pkgconf_root/Makefile.lite" <<'PY'
 from pathlib import Path
 import sys
 
@@ -133,7 +153,7 @@ patch_vcpkg_ports() {
   # configure scripts. Their AUTORECONF flags needlessly require host-level
   # autoconf, automake, and libtoolize. Remove exactly those flags while leaving
   # vcpkg's source URLs, hashes, patches, and configure options unchanged.
-  /usr/bin/python3 - \
+  "$python_bin" - \
     "$vcpkg_root/ports/gperf/portfile.cmake:gperf" \
     "$vcpkg_root/ports/icu/portfile.cmake:icu" <<'PY'
 from pathlib import Path
@@ -160,7 +180,7 @@ PY
 # newer buffer module, so patch both defects in the pinned private checkout.
 if [[ ! -x "$pkgconf_root/bin/pkg-config" ]] ||
    [[ ! -f "$pkgconf_root/.texpdf-revision" ]] ||
-   [[ "$(cat "$pkgconf_root/.texpdf-revision" 2>/dev/null || true)" != "$pkgconf_rev" ]]; then
+   [[ "$(cat "$pkgconf_root/.texpdf-revision" 2>/dev/null || true)" != "$pkgconf_bootstrap_revision" ]]; then
   rm -rf "$pkgconf_root"
   mkdir -p "$pkgconf_root"
   git -C "$pkgconf_root" init -q
@@ -179,7 +199,7 @@ if [[ ! -x "$pkgconf_root/bin/pkg-config" ]] ||
   mkdir -p "$pkgconf_root/bin"
   cp "$pkgconf_root/pkgconf-lite" "$pkgconf_root/bin/pkgconf"
   ln -sf pkgconf "$pkgconf_root/bin/pkg-config"
-  printf '%s\n' "$pkgconf_rev" > "$pkgconf_root/.texpdf-revision"
+  printf '%s\n' "$pkgconf_bootstrap_revision" > "$pkgconf_root/.texpdf-revision"
 fi
 export PATH="$pkgconf_root/bin:$PATH"
 echo "TEXPDF_PKGCONF_READY version=$(pkg-config --version) path=$(command -v pkg-config)"

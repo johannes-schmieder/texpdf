@@ -12,6 +12,7 @@
 
 - [`QUALIFICATION.md`](QUALIFICATION.md) — exact-SHA evidence model.
 - [`PLATFORM_QUALIFICATION.md`](PLATFORM_QUALIFICATION.md) — steps required to support a target.
+- [`SCC_LINUX_QUALIFICATION.md`](SCC_LINUX_QUALIFICATION.md) — authoritative Linux build, Stata, accounting, and evidence workflow.
 - [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) — pinned inputs and deterministic/non-deterministic boundaries.
 - [`LICENSING.md`](LICENSING.md) — redistribution requirements and release gate.
 - [`RELEASE.md`](RELEASE.md) — fail-closed release procedure.

@@ -20,7 +20,8 @@ case "$target" in
 esac
 
 real_rustc="${RUSTC:-rustc}"
-wrapper_root="${RUNNER_TEMP:-/private/tmp}/texpdf-rustc-target-wrapper"
+temp_base="${RUNNER_TEMP:-${TMPDIR:-/tmp}}"
+wrapper_root="$temp_base/texpdf-rustc-target-wrapper"
 mkdir -p "$wrapper_root"
 wrapper="$wrapper_root/rustc-$target"
 cat > "$wrapper" <<EOF

@@ -24,6 +24,10 @@ jobs:
       CARGO_TERM_COLOR: always
       RUST_BACKTRACE: "1"
       TEXPDF_BUNDLE_CACHE: /private/tmp/texpdf-bundle-cache
+      TEXPDF_PYTHON: /usr/bin/python3
+      TEXPDF_VCPKG_ROOT: /private/tmp/texpdf-vcpkg-a62ce77d56ee
+      TEXPDF_VCPKG_BINARY_CACHE: /private/tmp/texpdf-vcpkg-binary-cache
+      TEXPDF_PKGCONF_ROOT: /private/tmp/texpdf-pkgconf-4fc570f91d9d
     steps:
       - name: Check out exact source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -72,10 +76,10 @@ jobs:
             --embedded-helper-manifest dist/macos-universal/manifest.json \
             --bundle-info bundle/generated/bundle-info.json \
             --output-dir dist/macos-universal/texpdf \
-            --zip dist/macos-universal/texpdf-macos-universal-0.1.0-rc.1.zip \
+            --zip dist/macos-universal/texpdf-macos-universal-0.1.0-rc.2.zip \
             --manifest dist/macos-universal/package-manifest.json \
             --target universal2-apple-darwin \
-            --package-version 0.1.0-rc.1 \
+            --package-version 0.1.0-rc.2 \
             --include-license-evidence
 
       - name: Require identical ARM-qualified candidate
@@ -196,6 +200,7 @@ jobs:
               "candidate_package_size_bytes": package["package_zip_size_bytes"],
               "candidate_package_sha256": package["package_zip_sha256"],
               "candidate_package_license_evidence_included": package["license_evidence_included"],
+              "candidate_package_license_audit_source_sha": package["license_audit_source_sha"],
               "candidate_package_public_release": package["public_release_mode"],
           }
           Path("release/macos-intel-runtime.json").write_text(
@@ -211,6 +216,7 @@ jobs:
               "zip_sha256": package["package_zip_sha256"],
               "zip_size_bytes": package["package_zip_size_bytes"],
               "license_evidence_included": package["license_evidence_included"],
+              "license_audit_source_sha": package["license_audit_source_sha"],
               "public_release": package["public_release_mode"],
               "arm_and_intel_runtime_tested": True,
           }
@@ -308,7 +314,7 @@ jobs:
             .ci/stata/run/
             dist/macos-universal/manifest.json
             dist/macos-universal/package-manifest.json
-            dist/macos-universal/texpdf-macos-universal-0.1.0-rc.1.zip
+            dist/macos-universal/texpdf-macos-universal-0.1.0-rc.2.zip
             release/macos-intel-runtime.json
           if-no-files-found: warn
           retention-days: 90

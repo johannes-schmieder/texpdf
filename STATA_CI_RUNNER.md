@@ -24,7 +24,7 @@ errors are distinct receipt failures.
 
 The workflow is `.github/workflows/stata-ci.yml`. Pushes to `main` and
 `codex/**` run the `quick` Stata/Mata infrastructure smoke plus Rust quick
-checks. Manual profiles are `version`, `smoke`, and `quick`. There is no
+checks. Manual profiles are `version`, `smoke`, `quick`, and `stress1000`. There is no
 `pull_request` trigger and no hosted matrix.
 
 Run locally from repository root with:
@@ -36,11 +36,14 @@ Run locally from repository root with:
 ./ci/run_rust_quick.sh
 ```
 
-Each Stata run stages only Git-tracked files into a fresh temporary tree,
-isolates all writable Stata system directories, and uses the shared lock
-`/private/tmp/varcomp-kss-stata-ci.lock`. A timeout terminates only the test
-process group. Sanitized evidence is copied to `.ci/stata/run/`; the raw Stata
-startup stream is not uploaded.
+Each Stata run stages Git-tracked source into a fresh temporary tree. Release
+qualification may additionally supply `TEXPDF_STATA_PLUGIN`,
+`TEXPDF_STATA_PACKAGE_DIR`, and `TEXPDF_STATA_PACKAGE_MANIFEST`; the runner
+copies those exact artifacts into the isolated tree and records their hashes.
+Writable Stata system directories are isolated. `STATA_CI_LOCK_FILE` selects
+the shared licensed-Stata lock and otherwise defaults under the host temporary
+directory. A timeout terminates only the test process group. Sanitized evidence
+is copied to `.ci/stata/run/`; the raw Stata startup stream is not uploaded.
 
 The publisher commits immutable
 `.ci/stata/results/<tested-sha>.json` receipts and updates
@@ -87,7 +90,7 @@ directory. Never store a token in this file or Git.
 - Artifacts are restricted to `.ci/stata/run/` and synthetic fixtures.
 - Home-directory content, credentials, license material, and confidential
   research data are never uploaded.
-- Package API, TeX backend, and platform support are intentionally undecided.
+- Platform support is limited to the targets and versions in `release/scope.json`.
 
 ## Qualification record
 

@@ -21,14 +21,21 @@ toolchain_cargo="$($rustup_bin which --toolchain "$toolchain" cargo)"
 toolchain_bin="$(/usr/bin/dirname "$toolchain_cargo")"
 export PATH="$toolchain_bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export RUSTC="$($rustup_bin which --toolchain "$toolchain" rustc)"
+python_bin="${TEXPDF_PYTHON:-$(command -v python3 || true)}"
+if [[ -z "$python_bin" ]] || [[ ! -x "$python_bin" ]] || \
+   ! "$python_bin" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 9) else 1)'; then
+  echo "Rust quick check requires Python 3.9 or newer" >&2
+  exit 127
+fi
+temp_base="${RUNNER_TEMP:-${TMPDIR:-/tmp}}"
 
 rustc_version="$($RUSTC --version)"
 echo "RUST_TOOLCHAIN=$toolchain"
 echo "RUSTC_VERSION=$rustc_version"
 
 if [[ -f Cargo.toml ]]; then
-  export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/private/tmp/texpdf-cargo-target}"
-  export TEXPDF_BUNDLE_CACHE="${TEXPDF_BUNDLE_CACHE:-/private/tmp/texpdf-bundle-cache}"
+  export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$temp_base/texpdf-cargo-target}"
+  export TEXPDF_BUNDLE_CACHE="${TEXPDF_BUNDLE_CACHE:-$temp_base/texpdf-bundle-cache}"
   rust_profile="${TEXPDF_RUST_PROFILE:-quick}"
   if [[ -f ci/FULL_ENGINE ]]; then
     rust_profile=engine
@@ -40,7 +47,7 @@ if [[ -f Cargo.toml ]]; then
   /bin/mkdir -p .ci/stata/run
   /bin/cp Cargo.lock .ci/stata/run/Cargo.lock.generated
 
-  /usr/bin/python3 tools/prepare_stub_bundle.py
+  "$python_bin" tools/prepare_stub_bundle.py
   source tools/prepare_native_deps.sh
 
   case "$rust_profile" in
@@ -54,13 +61,13 @@ if [[ -f Cargo.toml ]]; then
       fi
 
       if [[ -f bundle/curated-manifest.json ]]; then
-        /usr/bin/python3 tools/prepare_curated_bundle.py \
+        "$python_bin" tools/prepare_curated_bundle.py \
           --manifest bundle/curated-manifest.json \
           "${common_bundle_args[@]}"
       else
         trace_path="bundle/generated/resource-trace.txt"
         if [[ -f bundle/resource-trace.txt.gz.b64 ]]; then
-          /usr/bin/python3 - <<'PY'
+          "$python_bin" - <<'PY'
 from pathlib import Path
 import base64
 import gzip
@@ -80,12 +87,12 @@ print(
     f"path={destination} lines={len(names)}"
 )
 PY
-          /usr/bin/python3 tools/prepare_curated_bundle.py \
+          "$python_bin" tools/prepare_curated_bundle.py \
             --trace "$trace_path" \
             --write-manifest bundle/generated/curated-manifest.json \
             "${common_bundle_args[@]}"
         else
-          source_url="$(/usr/bin/python3 - <<'PY'
+          source_url="$("$python_bin" - <<'PY'
 from pathlib import Path
 for raw in Path('bundle/bundle.lock.toml').read_text(encoding='utf-8').splitlines():
     line = raw.strip()
@@ -109,7 +116,7 @@ PY
             echo "TEXPDF_BUNDLE_RESOLVER_FAILED rc=$resolver_rc trace=$trace_path" >&2
             exit "$resolver_rc"
           fi
-          /usr/bin/python3 tools/prepare_curated_bundle.py \
+          "$python_bin" tools/prepare_curated_bundle.py \
             --trace "$trace_path" \
             --resource-dir "$resource_dir" \
             --write-manifest bundle/generated/curated-manifest.json \
@@ -137,7 +144,7 @@ PY
   if [[ "${OS:-}" == Windows_NT ]]; then helper_name=texpdf-helper.exe; fi
   export TEXPDF_HELPER_PATH="$CARGO_TARGET_DIR/release/$helper_name"
   test -f "$TEXPDF_HELPER_PATH"
-  /usr/bin/python3 - "$TEXPDF_HELPER_PATH" .ci/stata/run/helper-manifest.json <<'PY'
+  "$python_bin" - "$TEXPDF_HELPER_PATH" .ci/stata/run/helper-manifest.json <<'PY'
 from pathlib import Path
 import hashlib
 import json
@@ -172,11 +179,11 @@ PY
   fi
 
   "$toolchain_cargo" build --locked --release --package texpdf-stata
-  /usr/bin/python3 tools/stage_plugin.py --target-dir "$CARGO_TARGET_DIR"
+  "$python_bin" tools/stage_plugin.py --target-dir "$CARGO_TARGET_DIR"
   git add -f stata/_texpdf_plugin.plugin
 
   if [[ "$rust_profile" == engine ]]; then
-    /usr/bin/python3 tools/package_release.py \
+    "$python_bin" tools/package_release.py \
       --plugin stata/_texpdf_plugin.plugin \
       --embedded-helper "$TEXPDF_HELPER_PATH" \
       --bundle-info bundle/generated/bundle-info.json \
@@ -189,7 +196,7 @@ PY
 
   echo "RUST_QUICK_MODE=$rust_mode"
 else
-  smoke_root="${RUNNER_TEMP:-/private/tmp}/texpdf-rust-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
+  smoke_root="$temp_base/texpdf-rust-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
   /bin/mkdir -p "$smoke_root"
   /usr/bin/printf '%s\n' 'fn main() { println!("TEXPDF_RUST_CI_OK"); }' > "$smoke_root/main.rs"
   "$RUSTC" "$smoke_root/main.rs" -o "$smoke_root/texpdf-rust-smoke"

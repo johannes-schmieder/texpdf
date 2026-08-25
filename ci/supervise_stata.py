@@ -12,6 +12,7 @@ from pathlib import Path
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 
 
@@ -52,7 +53,12 @@ def main() -> int:
     parser.add_argument(
         "--lock-file",
         type=Path,
-        default=Path("/private/tmp/varcomp-kss-stata-ci.lock"),
+        default=Path(
+            os.environ.get(
+                "STATA_CI_LOCK_FILE",
+                str(Path(tempfile.gettempdir()) / "varcomp-kss-stata-ci.lock"),
+            )
+        ),
         help="Shared lock used by every licensed-Stata repository runner.",
     )
     parser.add_argument("command", nargs=argparse.REMAINDER)

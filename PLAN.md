@@ -1,14 +1,14 @@
-# texpdf plan to the private release candidate
+# texpdf plan to the Linux-ready private release candidate
 
 Development branch: **main**
 
-Active target: **private `v0.1.0-rc.1`**
+Active target: **private `v0.1.0-rc.2`**
 
-Required runtimes: **macOS ARM64 and macOS Intel**
+Required runtimes: **macOS ARM64, macOS Intel, and Linux x86-64**
 
-The machine-readable scope is `release/scope.json`. Windows, Linux, public
-distribution, and final `v0.1.0` are deferred. They remain visible as public
-release blockers but cannot block the private macOS candidate.
+The machine-readable scope is `release/scope.json`. Linux requires glibc 2.28
+or newer and licensed Stata/MP 18 and 19 evidence from BU SCC. Windows, public
+distribution, and final `v0.1.0` remain deferred.
 
 ## Evidence rules
 
@@ -82,9 +82,25 @@ Exit achieved: annotated tag `v0.1.0-rc.1` points to the audited release commit.
 The private prerelease attaches the exact dual-runtime-qualified package and
 its provenance manifests.
 
+## Linux-ready RC.2 completion
+
+- [x] Repair exact bundle reconstruction metadata on a clean Linux checkout.
+- [x] Make private pkgconf probing, Python selection, temporary paths, and the
+      licensed-Stata lock portable across macOS and Linux.
+- [x] Add fail-closed stale-helper detection and artifact-bound Stata receipts.
+- [x] Add repository-owned SCC build, submission, accounting, and evidence
+      import tools.
+- [ ] Freeze one RC.2 source SHA and rerun the exact-source license audit.
+- [ ] Requalify the macOS universal package and ARM64 memory gate at that SHA.
+- [ ] Qualify the Linux package on RHEL 8/glibc 2.28 under Stata/MP 18 quick,
+      Stata/MP 18 stress1000, and Stata/MP 19 quick.
+- [ ] Import scheduler/application/artifact evidence and clear every private
+      candidate blocker.
+- [ ] Tag `v0.1.0-rc.2` and attach both private candidate packages plus hashes.
+
 ## Deferred work
 
-- Windows x86-64 and Linux x86-64 licensed-Stata runtime qualification.
+- Windows x86-64 licensed-Stata runtime qualification.
 - Public repository and public `net install` distribution.
 - Final `v0.1.0` audit, tag, release assets, and public installation URLs.
 

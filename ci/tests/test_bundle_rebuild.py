@@ -29,6 +29,29 @@ def sha256(data: bytes) -> str:
 
 
 class BundleRebuildTests(unittest.TestCase):
+    def test_bundle_info_preserves_required_qualification_identity(self) -> None:
+        qualification = {
+            "bundle": {
+                "name": "academic",
+                "version": "1",
+                "transform_version": "range-v2",
+                "source_sha256": "1" * 64,
+                "index_sha256": "2" * 64,
+                "content_digest": "3" * 64,
+                "zip_sha256": "4" * 64,
+                "file_count": 10,
+                "zip_size_bytes": 20,
+            }
+        }
+        payload = module.bundle_info_payload(qualification)
+        self.assertEqual(payload["transform_version"], "range-v2")
+        self.assertEqual(payload["source_sha256"], "1" * 64)
+        self.assertEqual(payload["index_sha256"], "2" * 64)
+
+    def test_bundle_info_fails_closed_when_identity_is_missing(self) -> None:
+        with self.assertRaises(KeyError):
+            module.bundle_info_payload({"bundle": {"name": "incomplete"}})
+
     def test_generated_resource_is_rebuilt_from_repository_source(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

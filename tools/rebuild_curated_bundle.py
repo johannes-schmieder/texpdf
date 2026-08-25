@@ -403,6 +403,23 @@ def rebuild(
         raise RebuildError("exact bundle reconstruction failed: " + "; ".join(errors))
 
 
+def bundle_info_payload(qualification: dict[str, Any]) -> dict[str, Any]:
+    bundle = qualification["bundle"]
+    return {
+        "schema_version": 1,
+        "bundle_name": bundle["name"],
+        "bundle_version": bundle["version"],
+        "transform_version": bundle["transform_version"],
+        "source_sha256": bundle["source_sha256"],
+        "index_sha256": bundle["index_sha256"],
+        "tectonic_bundle_digest": bundle["content_digest"],
+        "zip_sha256": bundle["zip_sha256"],
+        "file_count": bundle["file_count"],
+        "zip_size_bytes": bundle["zip_size_bytes"],
+        "rebuild_mode": "exact-qualified-manifest",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", type=Path, default=Path("bundle/curated-manifest.json"))
@@ -438,16 +455,7 @@ def main() -> int:
             args.output,
             args.source_root,
         )
-        info = {
-            "schema_version": 1,
-            "bundle_name": qualification["bundle"]["name"],
-            "bundle_version": qualification["bundle"]["version"],
-            "tectonic_bundle_digest": qualification["bundle"]["content_digest"],
-            "zip_sha256": qualification["bundle"]["zip_sha256"],
-            "file_count": qualification["bundle"]["file_count"],
-            "zip_size_bytes": qualification["bundle"]["zip_size_bytes"],
-            "rebuild_mode": "exact-qualified-manifest",
-        }
+        info = bundle_info_payload(qualification)
         info_path = args.output.parent / "bundle-info.json"
         info_path.write_text(json.dumps(info, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(

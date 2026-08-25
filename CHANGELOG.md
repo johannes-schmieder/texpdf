@@ -3,6 +3,25 @@
 All notable changes to `texpdf` are recorded here. Semantic versioning begins
 with the first public release.
 
+## 0.1.0-rc.2 — unreleased (private release candidate)
+
+### Added
+
+- Linux x86-64 packaging and licensed Stata/MP 18 and 19 qualification on
+  RHEL 8 with an enforced glibc 2.28 compatibility ceiling;
+- source-bound SCC scheduler, build, package, and runtime evidence;
+- exact artifact identities in licensed-Stata receipts.
+
+### Fixed
+
+- exact bundle reconstruction now preserves every metadata field required by
+  the embedded Rust bundle reader;
+- Linux pkgconf declaration probes use the same GNU feature environment as the
+  compiled bootstrap and invalidate older cached configurations;
+- temporary paths, Python selection, and the licensed-Stata lock are portable;
+- release builds reject stale helpers whose embedded bundle identity differs
+  from the regenerated bundle metadata.
+
 ## 0.1.0-rc.1 — 2026-08-24 (private release candidate)
 
 ### Added

@@ -5,11 +5,11 @@ evidence or release scope, then regenerate it; do not hand-edit status claims.
 
 ## Release scope
 
-The active target is a **private `0.1.0-rc.1` macOS universal release candidate**.
-Windows, Linux, public distribution, and final `v0.1.0` publication are
+The active target is a **private `0.1.0-rc.2` macOS universal and Linux x86-64 release candidate**.
+Windows, public distribution, and final `v0.1.0` publication are
 explicitly deferred and are not advertised as supported.
 
-Candidate ready: **true**
+Candidate ready: **false**
 
 Public release ready: **false**
 
@@ -44,13 +44,16 @@ the helper process, so a compiler crash does not run inside Stata.
 | `aarch64-apple-darwin` | required | yes | yes | `e1be7f90ef4061d8e1a5770d0f75ea3cedcfb116` |
 | `x86_64-apple-darwin` | required | yes | yes | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
 | `x86_64-pc-windows-msvc` | deferred | no | no | `not recorded` |
-| `x86_64-unknown-linux-gnu` | deferred | no | no | `not recorded` |
+| `x86_64-unknown-linux-gnu` | required | no | no | `not recorded` |
 
 The current ARM64 plugin is 47.14 MiB (`bc6575fbc0e876734065f9378ca1d4cdc31390f19b3e2b59a4d634953b3e69d7`). The current universal plugin record is 93.97 MiB (`1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f`).
 
 ## Active private-candidate blockers
 
-None.
+- `private_candidate_package`
+- `linux_x86_64_runtime`
+- `required_target_source_coherence`
+- `candidate_license_source_coherence`
 
 ## License evidence
 
@@ -62,9 +65,12 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 ## Deferred public-release blockers
 
-- `x86_64-pc-windows-msvc_runtime`
-- `x86_64-unknown-linux-gnu_runtime`
 - `public_distribution`
+- `private_candidate_package`
+- `linux_x86_64_runtime`
+- `x86_64-pc-windows-msvc_runtime`
+- `required_target_source_coherence`
+- `candidate_license_source_coherence`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

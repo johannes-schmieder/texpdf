@@ -18,11 +18,10 @@ Rust toolchain, package download, or network connection.
 ## Project state
 
 The private macOS universal [`v0.1.0-rc.1`](https://github.com/johannes-schmieder/texpdf/releases/tag/v0.1.0-rc.1)
-candidate is published. Its exact package bytes are qualified under licensed
-Stata/MP 18 on Apple Silicon and in an x86_64 process under Rosetta; the
-permanent 1,000-call helper-lifecycle and memory gate also passes. The
-redistribution inventory is source-bound and complete. Windows, Linux, public
-distribution, and final `v0.1.0` publication are explicitly deferred.
+candidate is published. The active `v0.1.0-rc.2` checkpoint adds Linux x86-64
+as a required runtime with a glibc 2.28 floor and licensed Stata/MP 18 and 19
+qualification on BU SCC. Windows, public distribution, and final `v0.1.0`
+publication remain deferred until their separate gates are authorized and met.
 
 Exact SHAs, artifact sizes, target support, failed attempts, and live blockers
 are generated from repository evidence in [`STATUS.md`](STATUS.md) and

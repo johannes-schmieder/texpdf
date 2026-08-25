@@ -58,6 +58,12 @@ INTEL_HELPER_SHA = "9" * 64
 
 
 class ReleaseReadinessRecordTests(unittest.TestCase):
+    def test_license_coherence_allows_only_generated_evidence_commits(self) -> None:
+        self.assertTrue(readiness.evidence_only_path("licenses/generated/STATUS.json"))
+        self.assertTrue(readiness.evidence_only_path(".ci/stata/results/source.json"))
+        self.assertTrue(readiness.evidence_only_path("release/targets.json"))
+        self.assertFalse(readiness.evidence_only_path("tools/prepare_native_deps.sh"))
+
     def prepare_records(self, root: Path) -> None:
         write_json(
             root / ".ci/stata/results" / f"{SOURCE_SHA}.json",
@@ -142,10 +148,11 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                 },
                 "universal": {"size_bytes": 401, "sha256": UNIVERSAL_SHA},
                 "candidate_package": {
-                    "version": "0.1.0-rc.1",
+                    "version": "0.1.0-rc.2",
                     "zip_size_bytes": 300,
                     "zip_sha256": PACKAGE_SHA,
                     "license_evidence_included": True,
+                    "license_audit_source_sha": SOURCE_SHA,
                     "public_release": False,
                     "arm_and_intel_runtime_tested": False,
                 },
@@ -215,6 +222,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                 targets = readiness.read_targets(checks)
                 readiness.validate_arm_target(targets, checks)
                 readiness.validate_universal(targets, checks)
+                readiness.validate_linux_target(targets, checks, "0.1.0-rc.2")
                 readiness.validate_other_targets(targets, checks)
                 readiness.validate_license_status(checks)
                 readiness.validate_memory(targets, checks)
@@ -229,7 +237,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         self.assertTrue(by_key["third_party_license_complete"]["passed"])
         self.assertTrue(by_key["macos_arm_memory_stress"]["passed"])
         self.assertFalse(by_key["x86_64-pc-windows-msvc_runtime"]["passed"])
-        self.assertFalse(by_key["x86_64-unknown-linux-gnu_runtime"]["passed"])
+        self.assertFalse(by_key["linux_x86_64_runtime"]["passed"])
 
     def test_license_status_fails_closed_on_one_unmapped_resource(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -328,6 +336,96 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         by_key = {row["key"]: row for row in checks}
         self.assertTrue(by_key["macos_intel_runtime"]["passed"])
         self.assertTrue(by_key["private_candidate_package"]["passed"])
+
+    def test_linux_candidate_requires_exact_build_package_and_three_runtimes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.prepare_records(root)
+            package = {
+                "package_version": "0.1.0-rc.2",
+                "target": "x86_64-unknown-linux-gnu",
+                "package_zip_sha256": PACKAGE_SHA,
+                "package_zip_size_bytes": 300,
+                "plugin_sha256": PLUGIN_SHA,
+                "plugin_size_bytes": 200,
+                "embedded_helper_sha256": HELPER_SHA,
+                "embedded_helper_size_bytes": 150,
+                "bundle_zip_sha256": BUNDLE_SHA,
+                "bundle_zip_size_bytes": 100,
+                "license_evidence_included": True,
+                "release_license_complete": True,
+                "license_audit_source_sha": SOURCE_SHA,
+                "public_release_mode": False,
+            }
+
+            def receipt(version: str, profile: str) -> dict[str, object]:
+                return {
+                    "tested_sha": SOURCE_SHA,
+                    "status": "success",
+                    "stata_status": "success",
+                    "stata_version": version,
+                    "profile": profile,
+                    "platform": "Unix; PC (64-bit x86-64)",
+                    "required_log_markers": [{"marker": "PASS", "present": True}],
+                    "artifact": {
+                        "plugin_sha256": PLUGIN_SHA,
+                        "package_zip_sha256": PACKAGE_SHA,
+                        "bundle_zip_sha256": BUNDLE_SHA,
+                    },
+                }
+
+            write_json(
+                root / "release/linux-x86_64.json",
+                {
+                    "schema_version": 1,
+                    "qualified": True,
+                    "source_sha": SOURCE_SHA,
+                    "target": "x86_64-unknown-linux-gnu",
+                    "build_receipt": {
+                        "status": "success",
+                        "source_sha": SOURCE_SHA,
+                        "rust_tests": "success",
+                        "cargo_target_seed": "fresh-empty-run-directory",
+                        "plugin_sha256": PLUGIN_SHA,
+                        "helper_sha256": HELPER_SHA,
+                        "package_sha256": PACKAGE_SHA,
+                        "binary_policy": {
+                            "maximum_allowed_glibc": "2.28",
+                            "violations": [],
+                        },
+                    },
+                    "package": package,
+                    "runtimes": {
+                        "stata_18_quick": receipt("18", "quick"),
+                        "stata_18_stress1000": receipt("18", "stress1000"),
+                        "stata_19_quick": receipt("19", "quick"),
+                    },
+                },
+            )
+            targets_path = root / "release/targets.json"
+            registry = json.loads(targets_path.read_text(encoding="utf-8"))
+            registry["targets"]["x86_64-unknown-linux-gnu"].update(
+                {
+                    "build_qualified": True,
+                    "build_source_sha": SOURCE_SHA,
+                    "qualified_source_sha": SOURCE_SHA,
+                    "stata_runtime_qualified": True,
+                    "plugin_sha256": PLUGIN_SHA,
+                    "embedded_helper_sha256": HELPER_SHA,
+                    "candidate_package_sha256": PACKAGE_SHA,
+                    "minimum_glibc": "2.28",
+                    "tested_stata_versions": ["18", "19"],
+                    "receipt": "release/linux-x86_64.json",
+                }
+            )
+            write_json(targets_path, registry)
+            with working_directory(root):
+                checks: list[dict[str, object]] = []
+                targets = readiness.read_targets(checks)
+                readiness.validate_linux_target(targets, checks, "0.1.0-rc.2")
+
+        by_key = {row["key"]: row for row in checks}
+        self.assertTrue(by_key["linux_x86_64_runtime"]["passed"])
 
 
 if __name__ == "__main__":

@@ -43,6 +43,7 @@ class ReceiptTests(unittest.TestCase):
         process: dict[str, object],
         status: str | None,
         log: str = "PASS_MARKER\n",
+        artifact: dict[str, object] | None = None,
     ) -> dict[str, object]:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -65,8 +66,7 @@ class ReceiptTests(unittest.TestCase):
                 encoding="utf-8",
             )
             receipt_path = root / "receipt.json"
-            subprocess.run(
-                [
+            command = [
                     sys.executable,
                     str(CI_DIR / "make_stata_receipt.py"),
                     "--profile-config",
@@ -85,7 +85,13 @@ class ReceiptTests(unittest.TestCase):
                     TESTED_SHA,
                     "--stata-executable",
                     "/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp",
-                ],
+                ]
+            if artifact is not None:
+                artifact_path = root / "artifact.json"
+                artifact_path.write_text(json.dumps(artifact), encoding="utf-8")
+                command.extend(["--artifact-json", str(artifact_path)])
+            subprocess.run(
+                command,
                 check=True,
                 capture_output=True,
                 text=True,
@@ -107,6 +113,17 @@ class ReceiptTests(unittest.TestCase):
         )
         self.assertEqual(receipt["failure_kind"], "stata_error")
         self.assertEqual(receipt["stata_rc"], 9)
+
+    def test_artifact_identity_is_preserved(self) -> None:
+        artifact = {
+            "schema_version": 1,
+            "plugin_sha256": "1" * 64,
+            "package_zip_sha256": "2" * 64,
+        }
+        receipt = self.build_receipt(
+            process=self.normal_process(), status=self.status(0), artifact=artifact
+        )
+        self.assertEqual(receipt["artifact"], artifact)
 
     def test_launch_timeout_crash_and_missing_outputs(self) -> None:
         cases = (

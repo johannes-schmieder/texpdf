@@ -39,6 +39,10 @@ env:
   RUST_BACKTRACE: "1"
   RUST_TOOLCHAIN: "1.97.1"
   TEXPDF_BUNDLE_CACHE: /private/tmp/texpdf-bundle-cache
+  TEXPDF_PYTHON: /usr/bin/python3
+  TEXPDF_VCPKG_ROOT: /private/tmp/texpdf-vcpkg-a62ce77d56ee
+  TEXPDF_VCPKG_BINARY_CACHE: /private/tmp/texpdf-vcpkg-binary-cache
+  TEXPDF_PKGCONF_ROOT: /private/tmp/texpdf-pkgconf-4fc570f91d9d
   TLPDB_URL: https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/tlnet-final/tlpkg/texlive.tlpdb.xz
 
 jobs:

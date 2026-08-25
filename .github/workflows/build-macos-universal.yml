@@ -29,6 +29,10 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: "1"
+  TEXPDF_PYTHON: /usr/bin/python3
+  TEXPDF_VCPKG_ROOT: /private/tmp/texpdf-vcpkg-a62ce77d56ee
+  TEXPDF_VCPKG_BINARY_CACHE: /private/tmp/texpdf-vcpkg-binary-cache
+  TEXPDF_PKGCONF_ROOT: /private/tmp/texpdf-pkgconf-4fc570f91d9d
   STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
   TEXPDF_RUST_PROFILE: engine
 
@@ -74,10 +78,10 @@ jobs:
             --embedded-helper-manifest dist/macos-universal/manifest.json \
             --bundle-info bundle/generated/bundle-info.json \
             --output-dir dist/macos-universal/texpdf \
-            --zip dist/macos-universal/texpdf-macos-universal-0.1.0-rc.1.zip \
+            --zip dist/macos-universal/texpdf-macos-universal-0.1.0-rc.2.zip \
             --manifest dist/macos-universal/package-manifest.json \
             --target universal2-apple-darwin \
-            --package-version 0.1.0-rc.1 \
+            --package-version 0.1.0-rc.2 \
             --include-license-evidence
 
       - name: Stage universal plugin for licensed Stata
@@ -128,6 +132,7 @@ jobs:
               "zip_sha256": package.get("package_zip_sha256"),
               "zip_size_bytes": package.get("package_zip_size_bytes"),
               "license_evidence_included": package.get("license_evidence_included"),
+              "license_audit_source_sha": package.get("license_audit_source_sha"),
               "public_release": package.get("public_release_mode"),
           }
           data["intel_runtime_qualified"] = False

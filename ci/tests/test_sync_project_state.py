@@ -47,10 +47,11 @@ class ProjectStateTests(unittest.TestCase):
         digest = "2" * 64
         fixture = {
             "scope": {
-                "candidate_version": "0.1.0-rc.1",
+                "candidate_version": "0.1.0-rc.2",
                 "required_runtime_targets": [
                     "aarch64-apple-darwin",
                     "x86_64-apple-darwin",
+                    "x86_64-unknown-linux-gnu",
                 ],
             },
             "readiness": {

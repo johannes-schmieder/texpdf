@@ -40,24 +40,23 @@ Intel slice.
 
 ## Linux x86-64
 
-The release artifact should be built against the oldest intentional glibc
-baseline, preferably a manylinux2014/glibc 2.17 environment, with TeX/native
-libraries statically linked. Inspect the ELF for RPATH/RUNPATH, accidental
-build paths, dynamic TeX libraries, exports, and required GLIBC symbol versions.
+The private RC.2 artifact is built and qualified on BU SCC's RHEL 8/glibc 2.28
+environment, with TeX/native libraries statically linked. Inspect the ELF for
+RPATH/RUNPATH, accidental build paths, dynamic TeX libraries, exports, and
+required GLIBC symbol versions; no required symbol may exceed 2.28.
 
 On the licensed Linux Stata host or cluster node:
 
 ```sh
-export STATA_BIN=/path/to/stata-mp
-export TEXPDF_STRESS_ITERATIONS=1000
-./ci/run_stata_ci.sh quick
-./ci/run_stata_ci.sh stress
+ci/scc/submit_linux_qualification.sh /projectnb/welfgr/texpdf/runs/RUN_ID
 ```
 
-The existing harness may require platform-specific lock/temp-path adjustments;
-those changes must be committed and tested rather than made manually on the
-qualification host. Use only synthetic fixtures and upload only sanitized
-`.ci/stata/run/` evidence.
+The required profiles are Stata/MP 18 quick, Stata/MP 18 stress1000, and
+Stata/MP 19 quick. The runner stages the exact built package and binds its
+plugin, helper, bundle, and ZIP hashes into every receipt. Require successful
+SGE accounting, application markers, and outputs as documented in
+`SCC_LINUX_QUALIFICATION.md`. Use only synthetic fixtures and collect only
+sanitized evidence.
 
 ## Windows x86-64
 

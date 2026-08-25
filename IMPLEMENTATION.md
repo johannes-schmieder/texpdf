@@ -73,7 +73,8 @@ gates. See `SECURITY.md`.
 
 ## Platform and release boundary
 
-macOS ARM64 is runtime-qualified. The private RC additionally requires macOS
-Intel. Windows and Linux are deferred and unsupported; build-only outputs are
-never marketed as runtime support. Public distribution and final `v0.1.0` are
-separate deferred gates.
+The private RC requires macOS ARM64, macOS Intel, and Linux x86-64 runtime
+qualification from one exact source SHA. Linux support is bounded to glibc 2.28
+or newer and the tested Stata/MP 18 and 19 runtimes. Windows remains deferred;
+build-only outputs are never marketed as runtime support. Public distribution
+and final `v0.1.0` are separate deferred gates.

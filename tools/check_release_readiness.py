@@ -12,6 +12,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 from typing import Any
 
@@ -26,9 +27,22 @@ REQUIRED_PACKAGE_FILES = (
 TARGETS_PATH = Path("release/targets.json")
 UNIVERSAL_PATH = Path("release/macos-universal.json")
 INTEL_RUNTIME_PATH = Path("release/macos-intel-runtime.json")
+LINUX_RUNTIME_PATH = Path("release/linux-x86_64.json")
 MEMORY_PATH = Path("release/memory-stress-macos-arm64.json")
 LICENSE_STATUS_PATH = Path("licenses/generated/STATUS.json")
 SCOPE_PATH = Path("release/scope.json")
+EVIDENCE_ONLY_PREFIXES = (".ci/", "docs/generated/", "licenses/generated/")
+EVIDENCE_ONLY_FILES = {
+    "STATUS.md",
+    "bundle/QUALIFICATION.json",
+    "release/READINESS.json",
+    "release/READINESS.md",
+    "release/macos-intel-runtime.json",
+    "release/macos-universal.json",
+    "release/memory-probe-rust-macos-arm64.json",
+    "release/memory-stress-macos-arm64.json",
+    "release/targets.json",
+}
 
 
 class AuditError(RuntimeError):
@@ -74,6 +88,10 @@ def valid_sha256(value: object) -> bool:
 
 def valid_source_sha(value: object) -> bool:
     return SOURCE_SHA_RE.fullmatch(str(value or "")) is not None
+
+
+def evidence_only_path(path: str) -> bool:
+    return path in EVIDENCE_ONLY_FILES or path.startswith(EVIDENCE_ONLY_PREFIXES)
 
 
 def successful_receipt(source_sha: str) -> tuple[bool, str]:
@@ -162,7 +180,9 @@ def validate_arm_target(
 
 
 def validate_universal(
-    targets: dict[str, dict[str, Any]], checks: list[dict[str, Any]]
+    targets: dict[str, dict[str, Any]],
+    checks: list[dict[str, Any]],
+    candidate_version: str = "0.1.0-rc.2",
 ) -> None:
     data: dict[str, Any] = {}
     if not UNIVERSAL_PATH.is_file():
@@ -279,10 +299,13 @@ def validate_universal(
     arm = targets.get("aarch64-apple-darwin", {})
     package_ok = (
         isinstance(candidate, dict)
-        and candidate.get("version") == "0.1.0-rc.1"
+        and candidate.get("version") == candidate_version
         and int(candidate.get("zip_size_bytes", 0)) > 0
         and valid_sha256(candidate.get("zip_sha256"))
         and candidate.get("license_evidence_included") is True
+        and LICENSE_STATUS_PATH.is_file()
+        and candidate.get("license_audit_source_sha")
+        == read_json(LICENSE_STATUS_PATH).get("source_sha")
         and candidate.get("public_release") is False
         and candidate.get("arm_and_intel_runtime_tested") is True
         and data.get("arm_runtime_qualified") is True
@@ -306,10 +329,7 @@ def validate_universal(
 def validate_other_targets(
     targets: dict[str, dict[str, Any]], checks: list[dict[str, Any]]
 ) -> None:
-    for target, label in (
-        ("x86_64-pc-windows-msvc", "Windows x86-64"),
-        ("x86_64-unknown-linux-gnu", "Linux x86-64"),
-    ):
+    for target, label in (("x86_64-pc-windows-msvc", "Windows x86-64"),):
         record = targets.get(target, {})
         build_ok = (
             record.get("build_qualified") is True
@@ -337,6 +357,197 @@ def validate_other_targets(
             release_blocker=False,
             public_release_blocker=True,
         )
+
+
+def successful_linux_runtime(
+    receipt: object,
+    *,
+    source_sha: str,
+    stata_version: str,
+    profile: str,
+    plugin_sha256: object,
+    package_sha256: object,
+    bundle_sha256: object,
+) -> bool:
+    if not isinstance(receipt, dict):
+        return False
+    artifact = receipt.get("artifact", {})
+    markers = receipt.get("required_log_markers", [])
+    return (
+        receipt.get("tested_sha") == source_sha
+        and receipt.get("status") == "success"
+        and receipt.get("stata_status") == "success"
+        and str(receipt.get("stata_version", "")).split(".", 1)[0] == stata_version
+        and receipt.get("profile") == profile
+        and "PC (64-bit x86-64)" in str(receipt.get("platform", ""))
+        and isinstance(artifact, dict)
+        and artifact.get("plugin_sha256") == plugin_sha256
+        and artifact.get("package_zip_sha256") == package_sha256
+        and artifact.get("bundle_zip_sha256") == bundle_sha256
+        and isinstance(markers, list)
+        and bool(markers)
+        and all(isinstance(item, dict) and item.get("present") is True for item in markers)
+    )
+
+
+def validate_linux_target(
+    targets: dict[str, dict[str, Any]],
+    checks: list[dict[str, Any]],
+    candidate_version: str,
+) -> None:
+    target = targets.get("x86_64-unknown-linux-gnu", {})
+    if not LINUX_RUNTIME_PATH.is_file():
+        add_check(checks, "linux_x86_64_runtime", False, f"missing {LINUX_RUNTIME_PATH}")
+        return
+    data = read_json(LINUX_RUNTIME_PATH)
+    source_sha = str(data.get("source_sha", ""))
+    build = data.get("build_receipt", {})
+    package = data.get("package", {})
+    runtimes = data.get("runtimes", {})
+    policy = build.get("binary_policy", {}) if isinstance(build, dict) else {}
+    plugin_sha = package.get("plugin_sha256") if isinstance(package, dict) else None
+    helper_sha = package.get("embedded_helper_sha256") if isinstance(package, dict) else None
+    package_sha = package.get("package_zip_sha256") if isinstance(package, dict) else None
+    bundle_sha = package.get("bundle_zip_sha256") if isinstance(package, dict) else None
+    build_ok = (
+        data.get("schema_version") == 1
+        and data.get("qualified") is True
+        and data.get("target") == "x86_64-unknown-linux-gnu"
+        and valid_source_sha(source_sha)
+        and isinstance(build, dict)
+        and build.get("status") == "success"
+        and build.get("source_sha") == source_sha
+        and build.get("rust_tests") == "success"
+        and build.get("cargo_target_seed") == "fresh-empty-run-directory"
+        and isinstance(policy, dict)
+        and policy.get("maximum_allowed_glibc") == "2.28"
+        and policy.get("violations") == []
+    )
+    package_ok = (
+        isinstance(package, dict)
+        and package.get("package_version") == candidate_version
+        and package.get("target") == "x86_64-unknown-linux-gnu"
+        and package.get("license_evidence_included") is True
+        and package.get("public_release_mode") is False
+        and LICENSE_STATUS_PATH.is_file()
+        and package.get("license_audit_source_sha")
+        == read_json(LICENSE_STATUS_PATH).get("source_sha")
+        and valid_sha256(plugin_sha)
+        and valid_sha256(helper_sha)
+        and valid_sha256(package_sha)
+        and valid_sha256(bundle_sha)
+        and build.get("plugin_sha256") == plugin_sha
+        and build.get("helper_sha256") == helper_sha
+        and build.get("package_sha256") == package_sha
+    )
+    runtime_ok = isinstance(runtimes, dict) and all(
+        successful_linux_runtime(
+            runtimes.get(key),
+            source_sha=source_sha,
+            stata_version=version,
+            profile=profile,
+            plugin_sha256=plugin_sha,
+            package_sha256=package_sha,
+            bundle_sha256=bundle_sha,
+        )
+        for key, version, profile in (
+            ("stata_18_quick", "18", "quick"),
+            ("stata_18_stress1000", "18", "stress1000"),
+            ("stata_19_quick", "19", "quick"),
+        )
+    )
+    registry_ok = (
+        target.get("build_qualified") is True
+        and target.get("stata_runtime_qualified") is True
+        and target.get("build_source_sha") == source_sha
+        and target.get("qualified_source_sha") == source_sha
+        and target.get("plugin_sha256") == plugin_sha
+        and target.get("embedded_helper_sha256") == helper_sha
+        and target.get("candidate_package_sha256") == package_sha
+        and target.get("minimum_glibc") == "2.28"
+        and target.get("tested_stata_versions") == ["18", "19"]
+        and target.get("receipt") == str(LINUX_RUNTIME_PATH)
+    )
+    add_check(
+        checks,
+        "linux_x86_64_runtime",
+        build_ok and package_ok and runtime_ok and registry_ok,
+        (
+            f"source={source_sha or 'missing'}; glibc_max={policy.get('maximum_allowed_glibc')}; "
+            f"package_version={package.get('package_version') if isinstance(package, dict) else None}; "
+            f"Stata18_quick={runtime_ok and bool(runtimes.get('stata_18_quick'))}; "
+            f"Stata18_stress1000={runtime_ok and bool(runtimes.get('stata_18_stress1000'))}; "
+            f"Stata19_quick={runtime_ok and bool(runtimes.get('stata_19_quick'))}"
+        ),
+    )
+
+
+def validate_required_source_coherence(
+    scope: dict[str, Any],
+    targets: dict[str, dict[str, Any]],
+    checks: list[dict[str, Any]],
+) -> None:
+    required = scope.get("required_runtime_targets", [])
+    sources = {
+        str(targets.get(str(target), {}).get("qualified_source_sha", ""))
+        for target in required
+    }
+    passed = bool(required) and len(sources) == 1 and all(valid_source_sha(value) for value in sources)
+    add_check(
+        checks,
+        "required_target_source_coherence",
+        passed,
+        f"required_targets={required}; sources={sorted(sources)}",
+    )
+
+
+def validate_license_source_coherence(
+    scope: dict[str, Any],
+    targets: dict[str, dict[str, Any]],
+    checks: list[dict[str, Any]],
+) -> None:
+    required = scope.get("required_runtime_targets", [])
+    sources = {
+        str(targets.get(str(target), {}).get("qualified_source_sha", ""))
+        for target in required
+    }
+    license_source = ""
+    if LICENSE_STATUS_PATH.is_file():
+        license_source = str(read_json(LICENSE_STATUS_PATH).get("source_sha", ""))
+    candidate_source = next(iter(sources)) if len(sources) == 1 else ""
+    changed_paths: list[str] = []
+    ancestor = False
+    if valid_source_sha(license_source) and valid_source_sha(candidate_source):
+        ancestor_result = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", license_source, candidate_source],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        ancestor = ancestor_result.returncode == 0
+        if ancestor:
+            diff = subprocess.run(
+                ["git", "diff", "--name-only", f"{license_source}..{candidate_source}"],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            if diff.returncode == 0:
+                changed_paths = [line for line in diff.stdout.splitlines() if line]
+            else:
+                ancestor = False
+    allowed = all(evidence_only_path(path) for path in changed_paths)
+    passed = ancestor and allowed
+    add_check(
+        checks,
+        "candidate_license_source_coherence",
+        passed,
+        (
+            f"candidate_source={candidate_source or 'missing'}; "
+            f"license_source={license_source or 'missing'}; ancestor={ancestor}; "
+            f"non_evidence_changes={sorted(path for path in changed_paths if not evidence_only_path(path))}"
+        ),
+    )
 
 
 def validate_license_status(checks: list[dict[str, Any]]) -> None:
@@ -451,10 +662,15 @@ def validate_scope(checks: list[dict[str, Any]]) -> dict[str, Any]:
     valid = (
         scope.get("schema_version") == 1
         and scope.get("release_kind") == "private_release_candidate"
-        and scope.get("candidate_version") == "0.1.0-rc.1"
-        and required == ["aarch64-apple-darwin", "x86_64-apple-darwin"]
+        and scope.get("candidate_version") == "0.1.0-rc.2"
+        and required
+        == [
+            "aarch64-apple-darwin",
+            "x86_64-apple-darwin",
+            "x86_64-unknown-linux-gnu",
+        ]
         and scope.get("deferred_runtime_targets")
-        == ["x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu"]
+        == ["x86_64-pc-windows-msvc"]
         and scope.get("public_distribution_enabled") is False
     )
     add_check(
@@ -483,7 +699,7 @@ def render_markdown(result: dict[str, Any]) -> str:
         "# texpdf release-readiness audit",
         "",
         f"macOS ARM64 implementation qualified: **{str(result['implementation_complete_macos_arm64']).lower()}**",
-        f"Private macOS universal candidate ready: **{str(result['candidate_ready']).lower()}**",
+        f"Private required-target candidate ready: **{str(result['candidate_ready']).lower()}**",
         f"Public cross-platform v1 ready: **{str(result['public_release_ready']).lower()}**",
         "",
         "| Check | Result | Candidate blocker | Public blocker | Detail |",
@@ -527,13 +743,16 @@ def build_result() -> dict[str, Any]:
         Path("Cargo.lock").is_file(),
         "Cargo.lock is committed",
     )
+    scope = validate_scope(checks)
     targets = read_targets(checks)
     validate_arm_target(targets, checks)
-    validate_universal(targets, checks)
+    validate_universal(targets, checks, str(scope.get("candidate_version", "")))
+    validate_linux_target(targets, checks, str(scope.get("candidate_version", "")))
     validate_other_targets(targets, checks)
+    validate_required_source_coherence(scope, targets, checks)
     validate_license_status(checks)
+    validate_license_source_coherence(scope, targets, checks)
     validate_memory(targets, checks)
-    scope = validate_scope(checks)
 
     mac_required = {
         "package_file_texpdf.ado",
@@ -556,7 +775,7 @@ def build_result() -> dict[str, Any]:
     ]
     result = {
         "schema_version": 3,
-        "candidate_version": scope.get("candidate_version", "0.1.0-rc.1"),
+        "candidate_version": scope.get("candidate_version", "0.1.0-rc.2"),
         "release_kind": scope.get("release_kind", "private_release_candidate"),
         "implementation_complete_macos_arm64": implementation_complete,
         "candidate_ready": not candidate_blockers,

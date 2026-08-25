@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -46,6 +47,68 @@ def stage_repository(root: Path, destination: Path) -> None:
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def stage_runtime_artifacts(staged_root: Path, run_root: Path) -> dict[str, object] | None:
+    package_text = os.environ.get("TEXPDF_STATA_PACKAGE_DIR")
+    plugin_text = os.environ.get("TEXPDF_STATA_PLUGIN")
+    manifest_text = os.environ.get("TEXPDF_STATA_PACKAGE_MANIFEST")
+    if not any((package_text, plugin_text, manifest_text)):
+        return None
+
+    package_source = Path(package_text).expanduser().resolve() if package_text else None
+    if package_source is not None and not package_source.is_dir():
+        raise FileNotFoundError(f"Stata package directory is missing: {package_source}")
+    plugin_source = Path(plugin_text).expanduser().resolve() if plugin_text else None
+    if plugin_source is None and package_source is not None:
+        plugin_source = package_source / "_texpdf_plugin.plugin"
+    if plugin_source is None or not plugin_source.is_file():
+        raise FileNotFoundError(f"Stata plugin is missing: {plugin_source}")
+
+    staged_plugin = staged_root / "stata" / "_texpdf_plugin.plugin"
+    staged_plugin.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(plugin_source, staged_plugin)
+
+    staged_package: Path | None = None
+    if package_source is not None:
+        staged_package = run_root / "package"
+        shutil.copytree(package_source, staged_package)
+        os.environ["TEXPDF_STATA_PACKAGE_DIR"] = str(staged_package)
+
+    manifest: dict[str, object] = {}
+    if manifest_text:
+        manifest_path = Path(manifest_text).expanduser().resolve()
+        value = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if not isinstance(value, dict):
+            raise ValueError("TEXPDF_STATA_PACKAGE_MANIFEST must contain a JSON object")
+        manifest = value
+
+    identity: dict[str, object] = {
+        "schema_version": 1,
+        "plugin_sha256": sha256_file(staged_plugin),
+        "plugin_size_bytes": staged_plugin.stat().st_size,
+        "package_directory": str(staged_package) if staged_package else None,
+        "package_version": manifest.get("package_version"),
+        "package_zip_sha256": manifest.get("package_zip_sha256"),
+        "package_zip_size_bytes": manifest.get("package_zip_size_bytes"),
+        "bundle_zip_sha256": manifest.get("bundle_zip_sha256"),
+        "embedded_helper_sha256": manifest.get("embedded_helper_sha256"),
+        "embedded_helper_size_bytes": manifest.get("embedded_helper_size_bytes"),
+        "license_evidence_included": manifest.get("license_evidence_included"),
+        "target": manifest.get("target"),
+    }
+    expected_plugin = manifest.get("plugin_sha256")
+    if expected_plugin is not None and expected_plugin != identity["plugin_sha256"]:
+        raise ValueError("package manifest does not match the staged Stata plugin")
+    return identity
 
 
 def clear_directory(path: Path) -> None:
@@ -138,6 +201,7 @@ def main() -> int:
     staged_root = run_root / "repo"
     staged_root.mkdir()
     stage_repository(root, staged_root)
+    artifact_identity = stage_runtime_artifacts(staged_root, run_root)
     for directory in (
         "stata-plus",
         "stata-personal",
@@ -158,6 +222,9 @@ def main() -> int:
     stata_log = run_root / "stata.log"
     process_json = run_root / "process.json"
     process_log = run_root / "process.stdout.log"
+    artifact_json = run_root / "artifact.json"
+    if artifact_identity is not None:
+        write_json_atomic(artifact_json, artifact_identity)
     timeout_seconds = int(profile["timeout_seconds"])
     raw_arguments = profile.get("arguments", [])
     if not isinstance(raw_arguments, list):
@@ -248,6 +315,8 @@ def main() -> int:
         "--stata-bundle-version",
         bundle_version(stata_executable),
     ]
+    if artifact_json.is_file():
+        make_receipt.extend(["--artifact-json", str(artifact_json)])
     receipt_rc = subprocess.run(make_receipt, check=False).returncode
     copy_evidence(run_root, artifact_dir)
 

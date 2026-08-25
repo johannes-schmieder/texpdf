@@ -75,6 +75,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("plugin", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--bundle-info",
+        type=Path,
+        help="fail unless the embedded helper reports this exact bundle identity",
+    )
     args = parser.parse_args()
 
     if not args.plugin.is_file():
@@ -98,6 +103,20 @@ def main() -> int:
             raise SmokeError(f"unexpected engine version: {version.get('engine_version')}")
         if len(version.get("bundle_digest", "")) != 64:
             raise SmokeError("bundle digest is missing or malformed")
+        if args.bundle_info is not None:
+            expected = json.loads(args.bundle_info.read_text(encoding="utf-8"))
+            comparisons = {
+                "bundle_version": expected.get("bundle_version"),
+                "bundle_digest": expected.get("tectonic_bundle_digest"),
+                "bundle_zip_sha256": expected.get("zip_sha256"),
+            }
+            mismatches = [
+                f"{key}: embedded={version.get(key)!r} expected={value!r}"
+                for key, value in comparisons.items()
+                if not value or version.get(key) != value
+            ]
+            if mismatches:
+                raise SmokeError("stale embedded bundle: " + "; ".join(mismatches))
 
         include_dir = temporary / "sections"
         include_dir.mkdir()

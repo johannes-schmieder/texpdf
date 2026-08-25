@@ -75,6 +75,7 @@ def main() -> int:
     parser.add_argument("--runner-name", default="local")
     parser.add_argument("--stata-executable", required=True)
     parser.add_argument("--stata-bundle-version", default="unknown")
+    parser.add_argument("--artifact-json", type=Path)
     args = parser.parse_args()
 
     if not SHA_RE.fullmatch(args.tested_sha):
@@ -132,6 +133,9 @@ def main() -> int:
             failure_detail = f"required Stata log marker was absent: {marker}"
 
     status = "success" if failure_kind is None else "failure"
+    artifact: dict[str, object] | None = None
+    if args.artifact_json is not None:
+        artifact = read_json(args.artifact_json)
     platform = "; ".join(
         part
         for part in (stata.get("stata_os", ""), stata.get("stata_machine_type", ""))
@@ -177,6 +181,8 @@ def main() -> int:
         else 1,
         "required_log_markers": marker_checks,
     }
+    if artifact is not None:
+        receipt["artifact"] = artifact
     write_json_atomic(args.receipt, receipt)
     print(
         f"STATA_CI_RECEIPT status={status} profile={args.profile} "
