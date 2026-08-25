@@ -27,7 +27,7 @@ tracked independently:
 | Current ARM64 artifact source | `39f67bf948b337c9a7a91dc704257a015402b7ed` |
 | Current universal build source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
 | Current license-audit source | `39f67bf948b337c9a7a91dc704257a015402b7ed` |
-| Latest memory-stress attempt | `079982acf809fa2c9d7e68894e70da0ccfbfe43c`; qualified=no |
+| Latest memory-stress attempt | `39f67bf948b337c9a7a91dc704257a015402b7ed`; qualified=no |
 
 ## Architecture
 
