@@ -1,18 +1,18 @@
 {
   "bundle": {
-    "content_digest": "a5b8af5c48f71877bf3ca8296892757cf1868503f151acc6b7b77808b85b2d51",
-    "file_count": 382,
-    "zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
-    "zip_size_bytes": 4984973
+    "content_digest": null,
+    "file_count": null,
+    "zip_sha256": null,
+    "zip_size_bytes": null
   },
   "development_package": {
     "zip_sha256": null,
     "zip_size_bytes": null
   },
   "helper": {
-    "sha256": "df1bf398fae80a57cb83c0e0796a1d2189bcbd2b2965ce23b6e7326298b24f06",
-    "size_bytes": 48515440,
-    "target": "native"
+    "sha256": null,
+    "size_bytes": null,
+    "target": null
   },
   "memory": {},
   "overall_status": "failure",
@@ -30,12 +30,12 @@
   "rust_mode": null,
   "rust_status": "failure",
   "schema_version": 3,
-  "source_sha": "22177738a5f2615bc43423625f32b6d1a9536408",
+  "source_sha": "b468ec0d4b934f9825ae4fb6711967a84ebce52f",
   "stata_edition": null,
   "stata_status": "failure",
   "stata_version": null,
   "step_outcomes": {
-    "build": "cancelled",
+    "build": "failure",
     "profile": "success",
     "stress": "skipped",
     "validate": "skipped"
