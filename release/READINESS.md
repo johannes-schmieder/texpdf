@@ -17,8 +17,8 @@ Public cross-platform v1 ready: **false**
 | `macos_arm_runtime` | PASS | no | no | source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=98532016; arm_runtime=True |
 | `macos_intel_build` | PASS | no | no | source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; plugin_bytes=49098680 |
-| `macos_intel_runtime` | FAIL | yes | yes | Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed |
-| `private_candidate_package` | FAIL | yes | yes | version=0.1.0-rc.2; zip_bytes=45982571; license_evidence=True; both_runtimes=None |
+| `macos_intel_runtime` | PASS | no | no | qualified in an actual x86_64 Stata process under Rosetta; runtime_record=valid; exact receipt profile=quick rust_mode=repository-engine |
+| `private_candidate_package` | PASS | no | no | version=0.1.0-rc.2; zip_bytes=45982571; license_evidence=True; both_runtimes=True |
 | `linux_x86_64_runtime` | FAIL | yes | yes | missing release/linux-x86_64.json |
 | `x86_64-pc-windows-msvc_build` | FAIL | no | no | native build and Stata runtime qualification pending |
 | `x86_64-pc-windows-msvc_runtime` | FAIL | no | yes | native build and Stata runtime qualification pending |
@@ -29,8 +29,6 @@ Public cross-platform v1 ready: **false**
 
 ## Active private-candidate blockers
 
-- `macos_intel_runtime`
-- `private_candidate_package`
 - `linux_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
@@ -38,8 +36,6 @@ Public cross-platform v1 ready: **false**
 ## Deferred public-release blockers
 
 - `public_distribution`
-- `macos_intel_runtime`
-- `private_candidate_package`
 - `linux_x86_64_runtime`
 - `x86_64-pc-windows-msvc_runtime`
 - `required_target_source_coherence`

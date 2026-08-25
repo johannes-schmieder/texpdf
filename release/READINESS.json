@@ -1,7 +1,5 @@
 {
   "candidate_blockers": [
-    "macos_intel_runtime",
-    "private_candidate_package",
     "linux_x86_64_runtime",
     "required_target_source_coherence",
     "candidate_license_source_coherence"
@@ -98,20 +96,20 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed",
+      "candidate_release_blocker": false,
+      "detail": "qualified in an actual x86_64 Stata process under Rosetta; runtime_record=valid; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_intel_runtime",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "version=0.1.0-rc.2; zip_bytes=45982571; license_evidence=True; both_runtimes=None",
+      "candidate_release_blocker": false,
+      "detail": "version=0.1.0-rc.2; zip_bytes=45982571; license_evidence=True; both_runtimes=True",
       "key": "private_candidate_package",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": true,
@@ -173,8 +171,6 @@
   "implementation_complete_macos_arm64": true,
   "public_release_blockers": [
     "public_distribution",
-    "macos_intel_runtime",
-    "private_candidate_package",
     "linux_x86_64_runtime",
     "x86_64-pc-windows-msvc_runtime",
     "required_target_source_coherence",
@@ -182,8 +178,6 @@
   ],
   "public_release_ready": false,
   "release_blockers": [
-    "macos_intel_runtime",
-    "private_candidate_package",
     "linux_x86_64_runtime",
     "required_target_source_coherence",
     "candidate_license_source_coherence"
