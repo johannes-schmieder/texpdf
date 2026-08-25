@@ -21,12 +21,12 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `22177738a5f2615bc43423625f32b6d1a9536408` |
+| Latest exact green source | `39f67bf948b337c9a7a91dc704257a015402b7ed` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
 | Current ARM64 artifact source | `e1be7f90ef4061d8e1a5770d0f75ea3cedcfb116` |
 | Current universal build source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
-| Current license-audit source | `079982acf809fa2c9d7e68894e70da0ccfbfe43c` |
+| Current license-audit source | `eef6f5f23f110bc7d8977209bb82824258e3e1ad` |
 | Latest memory-stress attempt | `079982acf809fa2c9d7e68894e70da0ccfbfe43c`; qualified=no |
 
 ## Architecture
