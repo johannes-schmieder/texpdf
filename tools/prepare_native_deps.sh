@@ -14,7 +14,7 @@ vcpkg_binary_cache="${TEXPDF_VCPKG_BINARY_CACHE:-$temp_base/texpdf-vcpkg-binary-
 pkgconf_rev="4fc570f91d9d8d843ab32d2198a5c064538d8ffd"
 pkgconf_short="${pkgconf_rev:0:12}"
 pkgconf_root="${TEXPDF_PKGCONF_ROOT:-$temp_base/texpdf-pkgconf-$pkgconf_short}"
-pkgconf_bootstrap_revision="3:$pkgconf_rev"
+pkgconf_bootstrap_revision="4:$pkgconf_rev"
 
 python_bin="${TEXPDF_PYTHON:-$(command -v python3 || true)}"
 if [[ -z "$python_bin" ]] || [[ ! -x "$python_bin" ]]; then
@@ -27,7 +27,7 @@ if ! "$python_bin" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3,
 fi
 
 host="$(${RUSTC:-rustc} -vV | /usr/bin/sed -n 's/^host: //p')"
-pkgconf_cflags=""
+pkgconf_feature_cflags=""
 case "$host" in
   aarch64-apple-darwin)
     triplet="arm64-osx"
@@ -43,7 +43,7 @@ case "$host" in
     # Keep the compile environment identical to the declaration probes. On
     # glibc, reallocarray is exposed only with GNU feature declarations; using
     # it without this flag produces an implicit-int ABI mismatch on 64-bit.
-    pkgconf_cflags="-std=gnu99 -D_GNU_SOURCE"
+    pkgconf_feature_cflags="-std=gnu99 -D_GNU_SOURCE"
     ;;
   x86_64-pc-windows-msvc)
     triplet="x64-windows-static-release"
@@ -141,6 +141,12 @@ import sys
 
 path = Path(sys.argv[1])
 text = path.read_text(encoding="utf-8")
+feature_flag = "${TEXPDF_CFLAGS}"
+if feature_flag not in text:
+    needle = "CFLAGS = ${STATIC} "
+    if text.count(needle) != 1:
+        raise SystemExit("cannot locate Makefile.lite CFLAGS anchor")
+    text = text.replace(needle, f"CFLAGS = ${{STATIC}} {feature_flag} ", 1)
 if "libpkgconf/buffer.c" not in text:
     lines = text.splitlines(keepends=True)
     for index, line in enumerate(lines):
@@ -150,6 +156,8 @@ if "libpkgconf/buffer.c" not in text:
     else:
         raise SystemExit("cannot locate Makefile.lite SRCS anchor")
     path.write_text("".join(lines), encoding="utf-8")
+elif feature_flag in text:
+    path.write_text(text, encoding="utf-8")
 PY
 }
 
@@ -197,7 +205,7 @@ if [[ ! -x "$pkgconf_root/bin/pkg-config" ]] ||
   patch_pkgconf_lite_sources
   /usr/bin/make -C "$pkgconf_root" -f Makefile.lite \
     CC="$cc" \
-    CFLAGS="$pkgconf_cflags" \
+    TEXPDF_CFLAGS="$pkgconf_feature_cflags" \
     STRIP=/usr/bin/strip \
     SYSTEM_LIBDIR='/usr/lib:/usr/local/lib:/opt/homebrew/lib' \
     SYSTEM_INCLUDEDIR='/usr/include:/usr/local/include:/opt/homebrew/include' \
