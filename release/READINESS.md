@@ -14,7 +14,7 @@ Public cross-platform v1 ready: **false**
 | `release_scope` | PASS | no | no | kind=private_release_candidate; version=0.1.0-rc.2; required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu'] |
 | `public_distribution` | FAIL | no | yes | public repository and net-install publication are deferred by owner decision |
 | `target_registry` | PASS | no | no | target count=4 |
-| `macos_arm_runtime` | PASS | no | no | source=e1be7f90ef4061d8e1a5770d0f75ea3cedcfb116; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
+| `macos_arm_runtime` | PASS | no | no | source=39f67bf948b337c9a7a91dc704257a015402b7ed; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=98532016; arm_runtime=True |
 | `macos_intel_build` | PASS | no | no | source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49098680 |
 | `macos_intel_runtime` | PASS | no | no | qualified in an actual x86_64 Stata process under Rosetta; runtime_record=valid; exact receipt profile=quick rust_mode=repository-engine |
@@ -22,7 +22,7 @@ Public cross-platform v1 ready: **false**
 | `linux_x86_64_runtime` | FAIL | yes | yes | missing release/linux-x86_64.json |
 | `x86_64-pc-windows-msvc_build` | FAIL | no | no | native build and Stata runtime qualification pending |
 | `x86_64-pc-windows-msvc_runtime` | FAIL | no | yes | native build and Stata runtime qualification pending |
-| `required_target_source_coherence` | FAIL | yes | yes | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu']; sources=['', '68d7c8b2f4de569fad5fb583978cd13efb4c5dae', 'e1be7f90ef4061d8e1a5770d0f75ea3cedcfb116'] |
+| `required_target_source_coherence` | FAIL | yes | yes | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu']; sources=['', '39f67bf948b337c9a7a91dc704257a015402b7ed', '68d7c8b2f4de569fad5fb583978cd13efb4c5dae'] |
 | `third_party_license_complete` | PASS | no | no | source=eef6f5f23f110bc7d8977209bb82824258e3e1ad; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
 | `candidate_license_source_coherence` | FAIL | yes | yes | candidate_source=missing; license_source=eef6f5f23f110bc7d8977209bb82824258e3e1ad; ancestor=False; non_evidence_changes=[] |
 | `macos_arm_memory_stress` | FAIL | yes | yes | source=079982acf809fa2c9d7e68894e70da0ccfbfe43c; iterations=None; peak_rss_kib=None; post_warmup_growth_kib=None; growth_ratio=None |
