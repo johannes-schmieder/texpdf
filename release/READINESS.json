@@ -1,5 +1,6 @@
 {
   "candidate_blockers": [
+    "macos_intel_runtime",
     "private_candidate_package",
     "linux_x86_64_runtime",
     "required_target_source_coherence",
@@ -91,23 +92,23 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; plugin_bytes=49098680",
+      "detail": "source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; plugin_bytes=49098680",
       "key": "macos_intel_build",
       "passed": true,
       "public_release_blocker": false,
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": false,
-      "detail": "qualified in an actual x86_64 Stata process under Rosetta; runtime_record=valid; exact receipt profile=quick rust_mode=repository-engine",
+      "candidate_release_blocker": true,
+      "detail": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed",
       "key": "macos_intel_runtime",
-      "passed": true,
-      "public_release_blocker": false,
-      "release_blocker": false
+      "passed": false,
+      "public_release_blocker": true,
+      "release_blocker": true
     },
     {
       "candidate_release_blocker": true,
-      "detail": "version=0.1.0-rc.1; zip_bytes=45982321; license_evidence=True; both_runtimes=True",
+      "detail": "version=0.1.0-rc.2; zip_bytes=45982571; license_evidence=True; both_runtimes=None",
       "key": "private_candidate_package",
       "passed": false,
       "public_release_blocker": true,
@@ -139,7 +140,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu']; sources=['', '39f67bf948b337c9a7a91dc704257a015402b7ed', '68d7c8b2f4de569fad5fb583978cd13efb4c5dae']",
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu']; sources=['', '39f67bf948b337c9a7a91dc704257a015402b7ed']",
       "key": "required_target_source_coherence",
       "passed": false,
       "public_release_blocker": true,
@@ -147,7 +148,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=39f67bf948b337c9a7a91dc704257a015402b7ed; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
+      "detail": "source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
       "key": "third_party_license_complete",
       "passed": true,
       "public_release_blocker": false,
@@ -155,7 +156,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "candidate_source=missing; license_source=39f67bf948b337c9a7a91dc704257a015402b7ed; ancestor=False; non_evidence_changes=[]",
+      "detail": "candidate_source=missing; license_source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; ancestor=False; non_evidence_changes=[]",
       "key": "candidate_license_source_coherence",
       "passed": false,
       "public_release_blocker": true,
@@ -163,7 +164,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "source=39f67bf948b337c9a7a91dc704257a015402b7ed; iterations=None; peak_rss_kib=None; post_warmup_growth_kib=None; growth_ratio=None",
+      "detail": "source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; iterations=1000; peak_rss_kib=72304; post_warmup_growth_kib=32; growth_ratio=1.0004427717511624",
       "key": "macos_arm_memory_stress",
       "passed": false,
       "public_release_blocker": true,
@@ -173,6 +174,7 @@
   "implementation_complete_macos_arm64": true,
   "public_release_blockers": [
     "public_distribution",
+    "macos_intel_runtime",
     "private_candidate_package",
     "linux_x86_64_runtime",
     "x86_64-pc-windows-msvc_runtime",
@@ -182,6 +184,7 @@
   ],
   "public_release_ready": false,
   "release_blockers": [
+    "macos_intel_runtime",
     "private_candidate_package",
     "linux_x86_64_runtime",
     "required_target_source_coherence",

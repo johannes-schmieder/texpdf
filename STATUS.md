@@ -21,13 +21,13 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `39f67bf948b337c9a7a91dc704257a015402b7ed` |
+| Latest exact green source | `d18626b61087e2b43cad60b52b9531dcbea112b3` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
 | Current ARM64 artifact source | `39f67bf948b337c9a7a91dc704257a015402b7ed` |
-| Current universal build source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
-| Current license-audit source | `39f67bf948b337c9a7a91dc704257a015402b7ed` |
-| Latest memory-stress attempt | `39f67bf948b337c9a7a91dc704257a015402b7ed`; qualified=no |
+| Current universal build source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
+| Current license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
+| Latest memory-stress attempt | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8`; qualified=yes |
 
 ## Architecture
 
@@ -42,14 +42,15 @@ the helper process, so a compiler crash does not run inside Stata.
 | Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
 | `aarch64-apple-darwin` | required | yes | yes | `39f67bf948b337c9a7a91dc704257a015402b7ed` |
-| `x86_64-apple-darwin` | required | yes | yes | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
+| `x86_64-apple-darwin` | required | yes | no | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | `x86_64-pc-windows-msvc` | deferred | no | no | `not recorded` |
 | `x86_64-unknown-linux-gnu` | required | no | no | `not recorded` |
 
-The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787`). The current universal plugin record is 93.97 MiB (`1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f`).
+The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787`). The current universal plugin record is 93.97 MiB (`aca37fb2ddd5356c4144ff07419bbfec352cf7a7d3222091f9d2d5971c3e796c`).
 
 ## Active private-candidate blockers
 
+- `macos_intel_runtime`
 - `private_candidate_package`
 - `linux_x86_64_runtime`
 - `required_target_source_coherence`
@@ -62,11 +63,12 @@ The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 amb
 
 ## Memory evidence
 
-The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was unknown KiB against a unknown KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
+The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 32 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
 
 ## Deferred public-release blockers
 
 - `public_distribution`
+- `macos_intel_runtime`
 - `private_candidate_package`
 - `linux_x86_64_runtime`
 - `x86_64-pc-windows-msvc_runtime`
