@@ -24,7 +24,7 @@ tracked independently:
 | Latest exact green source | `15499efb401a1196339ad8eda1ad839912320d4d` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
-| Current ARM64 artifact source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
+| Current ARM64 artifact source | `15499efb401a1196339ad8eda1ad839912320d4d` |
 | Current universal build source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Current license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Latest memory-stress attempt | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8`; qualified=yes |
@@ -41,7 +41,7 @@ the helper process, so a compiler crash does not run inside Stata.
 
 | Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
-| `aarch64-apple-darwin` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
+| `aarch64-apple-darwin` | required | yes | yes | `15499efb401a1196339ad8eda1ad839912320d4d` |
 | `x86_64-apple-darwin` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | `x86_64-pc-windows-msvc` | deferred | no | no | `not recorded` |
 | `x86_64-unknown-linux-gnu` | required | no | no | `not recorded` |
