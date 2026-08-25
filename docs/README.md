@@ -10,12 +10,13 @@
 
 ## Qualification and release
 
+- [`../RELEASING.md`](../RELEASING.md) — authoritative development, versioning, GitHub Release, and SSC policy.
 - [`QUALIFICATION.md`](QUALIFICATION.md) — exact-SHA evidence model.
 - [`PLATFORM_QUALIFICATION.md`](PLATFORM_QUALIFICATION.md) — steps required to support a target.
 - [`SCC_LINUX_QUALIFICATION.md`](SCC_LINUX_QUALIFICATION.md) — authoritative Linux build, Stata, accounting, and evidence workflow.
 - [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) — pinned inputs and deterministic/non-deterministic boundaries.
 - [`LICENSING.md`](LICENSING.md) — redistribution requirements and release gate.
-- [`RELEASE.md`](RELEASE.md) — fail-closed release procedure.
+- [`RELEASE.md`](RELEASE.md) — fail-closed technical qualification checklist.
 - [`generated/CURRENT_ARTIFACT.md`](generated/CURRENT_ARTIFACT.md) — current exact artifact measurement.
 
 ## Project control documents
@@ -23,7 +24,7 @@
 - [`../STATUS.md`](../STATUS.md) — live branch state and last exact green checkpoint.
 - [`../PLAN.md`](../PLAN.md) — remaining work toward v1.
 - [`../IMPLEMENTATION.md`](../IMPLEMENTATION.md) — durable architecture and qualification record.
-- [`../CHANGELOG.md`](../CHANGELOG.md) — unreleased 0.1.0 change log.
+- [`../CHANGELOG.md`](../CHANGELOG.md) — user-facing unreleased and final-release history.
 
 Machine-readable platform support is recorded in
 [`../release/targets.json`](../release/targets.json).

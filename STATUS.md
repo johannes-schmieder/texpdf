@@ -13,6 +13,11 @@ Candidate ready: **true**
 
 Public release ready: **false**
 
+Distribution channels: `main` is active development; an immutable final
+`vX.Y.Z` tag and GitHub Release define that stable version; SSC receives
+only the exact package from a final release. Release candidates are GitHub
+prereleases and are never submitted to SSC. See `RELEASING.md`.
+
 ## Evidence boundaries
 
 The branch tip is a development position, not qualification evidence. Exact

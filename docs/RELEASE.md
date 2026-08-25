@@ -1,8 +1,10 @@
-# Release procedure
+# Technical release qualification checklist
 
-This procedure is intentionally fail-closed. Do not create a public binary
-release by bypassing a failed check or by treating a build-only target as a
-supported Stata runtime.
+The authoritative channel, versioning, tag, GitHub Release, and SSC policy is
+[`../RELEASING.md`](../RELEASING.md). This document supplies the fail-closed
+technical qualification checklist used within that policy. Do not create a
+binary release by bypassing a failed check or by treating a build-only target
+as a supported Stata runtime.
 
 ## 1. Freeze the source checkpoint
 
@@ -62,7 +64,8 @@ real evidence. Never edit completion fields merely to pass the gate.
 
 ## 3. Build and qualify each target
 
-Required v1 targets:
+The required targets for a particular release come from `release/scope.json`.
+The intended public v1 target set is:
 
 ```text
 aarch64-apple-darwin
@@ -164,7 +167,9 @@ The durable report is published as `release/READINESS.json` and
 
 ## 7. Create and verify the GitHub Release
 
-- Tag the exact qualified source as `v0.1.0`.
+- Follow `RELEASING.md` to update the changelog and synchronized metadata.
+- Run `python3 ci/check_release_metadata.py --tag vX.Y.Z`.
+- Tag the exact qualified source as immutable `vX.Y.Z`.
 - Create a draft release first.
 - Upload every target package, manifests, third-party notice bundle, and one
   combined checksum file.
@@ -175,7 +180,21 @@ The durable report is published as `release/READINESS.json` and
 - Publish only after release notes state the tested Stata versions, supported
   package tier, exclusions, and Tectonic/pdfLaTeX compatibility boundary.
 
-## 8. Post-release verification
+RC tags use `vX.Y.Z-rcN`, remain GitHub prereleases, and are never sent to SSC.
+
+## 8. Prepare the exact SSC submission
+
+- Start from a clean checkout of final tag `vX.Y.Z`, not `main`.
+- Use only assets whose recorded build source is that tag's commit.
+- Compare every SSC-bound file with the final GitHub Release checksum manifest.
+- Verify ado/help version headers, `.pkg` distribution date, changelog version,
+  and tag with `ci/check_release_metadata.py --tag vX.Y.Z`.
+- Run clean `net install` and offline corpus checks from the exact submission
+  directory.
+- If SSC review requires source changes, publish a new patch release; never
+  alter or rebuild an existing final tag in place.
+
+## 9. Post-release verification
 
 - Re-run public `net install` on every supported platform.
 - Compile the release corpus offline.

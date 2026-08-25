@@ -1,70 +1,87 @@
-# Installation design
+# Installation channels
 
-Public installation is not enabled until the target and third-party license
-gates pass. The final distribution uses two GitHub mechanisms for different
-purposes.
+The authoritative release and distribution policy is
+[`../RELEASING.md`](../RELEASING.md). Installation instructions must preserve
+the distinction between stable SSC distribution, development on `main`, and an
+exact historical GitHub release.
 
-## Human-downloadable release assets
+## Stable installation from SSC
 
-A tagged GitHub Release contains:
+SSC is the normal stable channel. After the first final version is accepted,
+ordinary users install with:
+
+```stata
+ssc install texpdf
+```
+
+The SSC files must be taken from the corresponding final immutable GitHub tag
+and Release. SSC must never receive a release candidate or files rebuilt from a
+later `main` tip. The project is not yet available on SSC, so this command is
+documented policy rather than a currently working installation route.
+
+## Development installation from `main`
+
+`main` answers “what are we developing now?” It is never described as the
+latest stable release. When a public development installation tree is enabled,
+its command is:
+
+```stata
+net install texpdf, replace ///
+    from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/main/stata/")
+```
+
+`texpdf` contains a compiled plugin, and the private source tree does not
+currently commit a platform binary under `stata/`. Until CI publishes a public
+flat development tree, install development builds from the platform-specific
+CI artifact and verify its manifest. This limitation must not be hidden by
+publishing a command that cannot supply the plugin.
+
+## Exact historical versions
+
+A final tag such as `v0.2.0` is the immutable answer to “what exactly was
+version 0.2.0?” If the tag contains the applicable installation tree:
+
+```stata
+net install texpdf, replace ///
+    from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/v0.2.0/stata/")
+```
+
+When compiled binaries are distributed only as GitHub Release assets, use the
+platform-specific immutable asset or versioned installation URL recorded in
+that Release. Never substitute a binary from `main` into a historical tagged
+installation.
+
+## Compiled release artifacts
+
+A final GitHub Release may contain:
 
 - one deterministic ZIP per supported platform;
 - a combined SHA-256 manifest;
 - source and qualification metadata;
 - complete third-party notices and inventories.
 
-The ZIP is useful for archival verification and manual installation.
-
-## Stata `net install` tree
-
-Stata's package installer expects a directory containing `stata.toc`, a `.pkg`
-file, and every file referenced by that package. A flat GitHub Release asset URL
-is not treated as such a directory. The release workflow therefore publishes a
-versioned static installation tree, for example:
-
-```text
-/v0.1.0/macos-arm64/
-    stata.toc
-    texpdf.pkg
-    texpdf.ado
-    texpdf.sthlp
-    _texpdf_plugin.plugin
-    LICENSE
-    THIRD_PARTY_NOTICES.md
-    CHECKSUMS.sha256
-```
-
-The intended installation command is then:
-
-```stata
-net install texpdf, from("https://<GitHub-hosted-site>/texpdf/v0.1.0/macos-arm64")
-```
-
-A separate directory is published for each platform so the installed package
-still contains exactly one plugin file. The static tree may be served by GitHub
-Pages or another GitHub-hosted static branch; it is generated from the same
-checked release ZIP and checksum manifest and is not maintained manually.
-
-## Platform selection
-
-The first public documentation must not advertise one generic URL unless a
-small installer can select a platform without weakening checksum verification.
-Until such an installer is qualified, users choose the explicit platform URL:
-
-- macOS Apple Silicon;
-- macOS Intel/universal, when qualified;
-- Windows x86-64, when qualified;
-- Linux x86-64, when qualified.
+Each installable platform tree contains `stata.toc`, `texpdf.pkg`, the ado and
+help files, the correct `_texpdf_plugin.plugin`, project and third-party
+notices, `BUILD_INFO.json`, and `CHECKSUMS.sha256`. A package is supported only
+when its plugin was built from and qualified for the final tag.
 
 ## Offline operation
 
 Internet access is needed only to install or update the package. After the ado,
-help file, notices, and one native plugin are installed, compilation is fully
-offline and performs no package retrieval.
+help, notices, and target plugin are installed, compilation is offline and does
+not retrieve TeX packages or a separate compiler.
 
-## Verification
+## Release verification
 
-Every installation directory includes `CHECKSUMS.sha256`. The release notes
-publish the same digests independently. CI performs a clean local `net install`
-from the generated directory and compiles the release corpus before the files
-are published.
+Before publishing an installation tree or sending it to SSC:
+
+1. check out the exact final tag and require a clean worktree;
+2. run `python3 ci/check_release_metadata.py --tag vX.Y.Z`;
+3. compare the plugin and ZIP hashes with the GitHub Release checksum manifest
+   and committed qualification records;
+4. run a clean local `net install` from the exact distribution directory on
+   every supported platform;
+5. compile the release corpus offline.
+
+These checks establish that GitHub tag, GitHub Release, and SSC package all
+refer to the same stable version even after development continues on `main`.

@@ -41,7 +41,7 @@ def write_json(path: Path, payload: dict[str, object]) -> None:
 
 class PackageReleaseTests(unittest.TestCase):
     def prepare_project(self, root: Path) -> tuple[Path, Path]:
-        write(root / "stata/texpdf.ado")
+        write(root / "stata/texpdf.ado", "*! version 0.1.0 25aug2026\n")
         write(root / "stata/texpdf.sthlp")
         write(
             root / "stata/texpdf.pkg",
@@ -79,6 +79,7 @@ class PackageReleaseTests(unittest.TestCase):
         public: bool = False,
         include_license_evidence: bool = False,
         helper_manifest: Path | None = None,
+        package_version: str | None = None,
     ) -> subprocess.CompletedProcess[str]:
         command = [
             sys.executable,
@@ -104,6 +105,8 @@ class PackageReleaseTests(unittest.TestCase):
             command.append("--public-release")
         if include_license_evidence:
             command.append("--include-license-evidence")
+        if package_version is not None:
+            command.extend(["--package-version", package_version])
         return subprocess.run(
             command,
             cwd=root,
@@ -168,6 +171,16 @@ class PackageReleaseTests(unittest.TestCase):
             result = self.command(root, plugin, bundle_info, public=True)
             self.assertEqual(result.returncode, 2)
             self.assertIn("license-evidence packaging requires", result.stderr)
+
+    def test_explicit_package_version_must_match_ado_base_version(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plugin, bundle_info = self.prepare_project(root)
+            result = self.command(
+                root, plugin, bundle_info, package_version="0.2.0-rc1"
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("does not match ado version 0.1.0", result.stderr)
 
     def test_public_release_packages_inventory_and_texts(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

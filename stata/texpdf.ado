@@ -1,4 +1,4 @@
-*! version 0.1.0 24aug2026
+*! version 0.1.0 25aug2026
 program define texpdf, rclass
     version 14.1
     syntax [using/] [, SAVing(string) REPLACE VERSION]

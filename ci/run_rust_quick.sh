@@ -27,6 +27,7 @@ if [[ -z "$python_bin" ]] || [[ ! -x "$python_bin" ]] || \
   echo "Rust quick check requires Python 3.9 or newer" >&2
   exit 127
 fi
+"$python_bin" ci/check_release_metadata.py
 temp_base="${RUNNER_TEMP:-${TMPDIR:-/tmp}}"
 
 rustc_version="$($RUSTC --version)"

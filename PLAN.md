@@ -2,7 +2,11 @@
 
 Development branch: **main**
 
-Active target: **private `v0.1.0-rc.2`**
+Active target: **private `0.1.0-rc.2` qualification checkpoint**
+
+This is prerelease evidence, not a final release or SSC package. New release
+tags follow [`RELEASING.md`](RELEASING.md): `main` is development, RC tags use
+`vX.Y.Z-rcN`, final tags are immutable, and SSC receives only a final release.
 
 Required runtimes: **macOS ARM64, macOS Intel, and Linux x86-64**
 
@@ -90,19 +94,22 @@ its provenance manifests.
 - [x] Add fail-closed stale-helper detection and artifact-bound Stata receipts.
 - [x] Add repository-owned SCC build, submission, accounting, and evidence
       import tools.
-- [ ] Freeze one RC.2 source SHA and rerun the exact-source license audit.
-- [ ] Requalify the macOS universal package and ARM64 memory gate at that SHA.
-- [ ] Qualify the Linux package on RHEL 8/glibc 2.28 under Stata/MP 18 quick,
+- [x] Freeze one RC.2 source SHA and rerun the exact-source license audit.
+- [x] Requalify the macOS universal package and ARM64 memory gate at that SHA.
+- [x] Qualify the Linux package on RHEL 8/glibc 2.28 under Stata/MP 18 quick,
       Stata/MP 18 stress1000, and Stata/MP 19 quick.
-- [ ] Import scheduler/application/artifact evidence and clear every private
+- [x] Import scheduler/application/artifact evidence and clear every private
       candidate blocker.
-- [ ] Tag `v0.1.0-rc.2` and attach both private candidate packages plus hashes.
+- [ ] Make an explicit decision whether to publish a new-policy `v0.1.0-rc2`
+      GitHub prerelease with both candidate packages and hashes. Never submit
+      it to SSC.
 
 ## Deferred work
 
 - Windows x86-64 licensed-Stata runtime qualification.
 - Public repository and public `net install` distribution.
 - Final `v0.1.0` audit, tag, release assets, and public installation URLs.
+- Final `v0.1.0` GitHub Release followed by an exact-tag SSC submission.
 
 ## Checkpoint discipline
 

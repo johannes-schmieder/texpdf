@@ -27,6 +27,9 @@ jobs:
           --check
           --require-candidate-ready
 
+      - name: Require synchronized Stata release metadata
+        run: /usr/bin/python3 ci/check_release_metadata.py
+
       - name: Upload audit report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

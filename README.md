@@ -17,11 +17,11 @@ Rust toolchain, package download, or network connection.
 
 ## Project state
 
-The private macOS universal [`v0.1.0-rc.1`](https://github.com/johannes-schmieder/texpdf/releases/tag/v0.1.0-rc.1)
-candidate is published. The active `v0.1.0-rc.2` checkpoint adds Linux x86-64
-as a required runtime with a glibc 2.28 floor and licensed Stata/MP 18 and 19
-qualification on BU SCC. Windows, public distribution, and final `v0.1.0`
-publication remain deferred until their separate gates are authorized and met.
+`main` is the active development branch; it is not a stable distribution
+channel. The private `0.1.0-rc.2` qualification checkpoint covers macOS
+universal and Linux x86-64, including a GLIBC 2.28 floor and licensed Stata/MP
+18 and 19 qualification on BU SCC. It is not a final release and is not eligible
+for SSC. Windows, public distribution, and final `v0.1.0` remain deferred.
 
 Exact SHAs, artifact sizes, target support, failed attempts, and live blockers
 are generated from repository evidence in [`STATUS.md`](STATUS.md) and
@@ -32,10 +32,55 @@ See:
 
 - [`STATUS.md`](STATUS.md) — generated current evidence and blockers;
 - [`PLAN.md`](PLAN.md) — remaining work in execution order;
+- [`RELEASING.md`](RELEASING.md) — authoritative versioning, GitHub Release, and SSC policy;
+- [`CHANGELOG.md`](CHANGELOG.md) — user-facing changes on `main` and in final releases;
 - [`IMPLEMENTATION.md`](IMPLEMENTATION.md) — durable architecture and guarantees;
 - [`docs/README.md`](docs/README.md) — documentation index;
 - [`docs/generated/CURRENT_ARTIFACT.md`](docs/generated/CURRENT_ARTIFACT.md) — exact artifact measurements;
 - [`release/targets.json`](release/targets.json) — platform qualification registry.
+
+## Installation channels
+
+### Stable version from SSC
+
+No final version is on SSC yet. Once SSC publishes `texpdf`, this will be the
+normal recommended installation for ordinary users:
+
+```stata
+ssc install texpdf
+```
+
+The SSC package will always correspond to a final immutable GitHub release,
+not to the current tip of `main` or to a release candidate.
+
+### Development version from `main`
+
+Installation from `main` is a **development version** and may differ from SSC.
+When a public flat development installation tree is enabled, its form is:
+
+```stata
+net install texpdf, replace ///
+    from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/main/stata/")
+```
+
+The repository is currently private, and `texpdf` requires a compiled
+platform plugin, so use a qualified CI development artifact until that public
+tree exists. Do not treat the command above as a stable-release install.
+
+### Exact historical release
+
+An immutable tag identifies exact historical source. If that tag contains the
+applicable installation tree, install it explicitly, for example:
+
+```stata
+net install texpdf, replace ///
+    from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/v0.2.0/stata/")
+```
+
+For compiled releases whose plugin is delivered as a platform-specific GitHub
+Release asset, use the immutable installation URL documented in that release.
+See [`RELEASING.md`](RELEASING.md) and
+[`docs/INSTALLATION.md`](docs/INSTALLATION.md).
 
 ## Command behavior
 

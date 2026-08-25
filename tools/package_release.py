@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import sys
 import zipfile
@@ -34,6 +35,10 @@ LICENSE_EVIDENCE_FILES = (
     "license-texts.json",
     "tex-notices.json",
     "license-sources.lock.json",
+)
+ADO_VERSION_RE = re.compile(
+    r"^\*!\s+(?:version\s+)?(?:texpdf\s+)?(?P<version>\d+\.\d+\.\d+)\s+",
+    re.MULTILINE,
 )
 
 
@@ -62,6 +67,13 @@ def write_json_atomic(path: Path, payload: object) -> None:
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     os.replace(temporary, path)
+
+
+def read_ado_version(path: Path = Path("stata/texpdf.ado")) -> str:
+    match = ADO_VERSION_RE.search(path.read_text(encoding="utf-8"))
+    if match is None:
+        raise ValueError(f"{path} has no conventional version header")
+    return match.group("version")
 
 
 def zip_info(name: str) -> zipfile.ZipInfo:
@@ -219,7 +231,10 @@ def main() -> int:
     parser.add_argument("--zip", dest="zip_path", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--target", default="aarch64-apple-darwin")
-    parser.add_argument("--package-version", default="0.1.0")
+    parser.add_argument(
+        "--package-version",
+        help="package version; defaults to the version in stata/texpdf.ado",
+    )
     parser.add_argument(
         "--public-release",
         action="store_true",
@@ -233,6 +248,12 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
+        ado_version = read_ado_version()
+        package_version = args.package_version or ado_version
+        if package_version.split("-", 1)[0] != ado_version:
+            raise ValueError(
+                f"package version {package_version} does not match ado version {ado_version}"
+            )
         bundle_info = json.loads(args.bundle_info.read_text(encoding="utf-8"))
         if bundle_info.get("schema_version") != 1:
             raise ValueError("unsupported bundle-info schema")
@@ -276,7 +297,7 @@ def main() -> int:
         build_info = {
             "schema_version": 1,
             "package": "texpdf",
-            "package_version": args.package_version,
+            "package_version": package_version,
             "target": args.target,
             "engine": "tectonic",
             "engine_version": "0.17.0",
