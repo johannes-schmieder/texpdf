@@ -4,14 +4,15 @@
     "arm64"
   ],
   "arm_runtime_qualified": true,
-  "arm_runtime_source_sha": "68d7c8b2f4de569fad5fb583978cd13efb4c5dae",
+  "arm_stata_profile": "quick",
+  "arm_stata_receipt": ".ci/stata/run/receipt.json",
   "candidate_package": {
-    "arm_and_intel_runtime_tested": true,
+    "license_audit_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
     "license_evidence_included": true,
     "public_release": false,
-    "version": "0.1.0-rc.1",
-    "zip_sha256": "75a7cfe9feb592002643f934035c64ab7824bb3cb4f9c71595be6a0ff6493de2",
-    "zip_size_bytes": 45982321
+    "version": "0.1.0-rc.2",
+    "zip_sha256": "db7658a81409626bc980bb2d13fdcfb89949405abd3934c6b1d003a079ed899d",
+    "zip_size_bytes": 45982571
   },
   "dynamic_dependencies": [
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
@@ -31,36 +32,35 @@
     "pginit",
     "stata_call"
   ],
-  "intel_runtime_qualified": true,
-  "intel_runtime_source_sha": "68d7c8b2f4de569fad5fb583978cd13efb4c5dae",
+  "intel_runtime_qualified": false,
   "kind": "macOS universal Stata plugin",
-  "qualification_boundary": "Both slices were built from the exact source. The universal plugin was loaded and exercised in licensed ARM64 and x86_64 Stata/MP 18 processes.",
+  "qualification_boundary": "Both Mach-O slices were built and inspected. The universal plugin was loaded and tested only through its ARM64 slice in licensed Stata/MP 18. Intel runtime qualification remains pending.",
   "schema_version": 1,
   "slices": {
     "arm64": {
       "embedded_helper": {
-        "sha256": "cfe5d91d7b691549000230bee62e436b421bef2e0c15e0893dc65e2894cbfd06",
+        "sha256": "97eaef62222f182b7f729ee87739696fd7256e4652e0f0addf36e0044091d82e",
         "size_bytes": 48516288,
         "target": "aarch64-apple-darwin"
       },
-      "sha256": "283ec2d412ff6ac8cf3eb06de95752aa059f3ed31b860f7ce5d27646ac582a92",
+      "sha256": "1651ffbba8ce93ee0462939c32c5e142743136b4495193dea5bbc6fc84c96987",
       "size_bytes": 49429168,
       "target": "aarch64-apple-darwin"
     },
     "x86_64": {
       "embedded_helper": {
-        "sha256": "16c18263b100ee939d6b4cb4cbd2b0dc2701c7da7eb404d9fd1ef3257119f298",
+        "sha256": "fc880363883be613bc993d29a5819105667b4db7f0eb21965105631244d25b8d",
         "size_bytes": 48574376,
         "target": "x86_64-apple-darwin"
       },
-      "sha256": "f697476cf74c78c407cf70344dc2b60360a1afebc7a69fa25e78abead2af32bb",
+      "sha256": "b9cf7f92617035a157b3577d10e3e5a4035682c695aa49d9054104dbc299d235",
       "size_bytes": 49098680,
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "68d7c8b2f4de569fad5fb583978cd13efb4c5dae",
+  "source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
   "universal": {
-    "sha256": "1a30a5a4d72fc5e85591219aaae55264451af0095f7e50d54af4a44d2ceb946f",
+    "sha256": "aca37fb2ddd5356c4144ff07419bbfec352cf7a7d3222091f9d2d5971c3e796c",
     "size_bytes": 98532016,
     "target": "universal2-apple-darwin"
   }
