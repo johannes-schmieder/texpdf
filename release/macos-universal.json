@@ -4,9 +4,11 @@
     "arm64"
   ],
   "arm_runtime_qualified": true,
+  "arm_runtime_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
   "arm_stata_profile": "quick",
   "arm_stata_receipt": ".ci/stata/run/receipt.json",
   "candidate_package": {
+    "arm_and_intel_runtime_tested": true,
     "license_audit_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
     "license_evidence_included": true,
     "public_release": false,
@@ -32,9 +34,10 @@
     "pginit",
     "stata_call"
   ],
-  "intel_runtime_qualified": false,
+  "intel_runtime_qualified": true,
+  "intel_runtime_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
   "kind": "macOS universal Stata plugin",
-  "qualification_boundary": "Both Mach-O slices were built and inspected. The universal plugin was loaded and tested only through its ARM64 slice in licensed Stata/MP 18. Intel runtime qualification remains pending.",
+  "qualification_boundary": "Both slices were built from the exact source. The universal plugin was loaded and exercised in licensed ARM64 and x86_64 Stata/MP 18 processes.",
   "schema_version": 1,
   "slices": {
     "arm64": {
