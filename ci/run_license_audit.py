@@ -11,6 +11,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 import urllib.request
 from typing import Any
 
@@ -19,6 +20,21 @@ DEFAULT_TLPDB_URL = (
     "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2022/"
     "tlnet-final/tlpkg/texlive.tlpdb.xz"
 )
+
+
+def default_license_cache() -> Path:
+    configured = os.environ.get("TEXPDF_LICENSE_CACHE")
+    if configured:
+        return Path(configured).expanduser()
+    return Path(tempfile.gettempdir()) / "texpdf-license-cache"
+
+
+def rustup_executable(environment: dict[str, str]) -> str:
+    configured = environment.get("RUSTUP_BIN")
+    if configured:
+        return configured
+    discovered = shutil.which("rustup", path=environment.get("PATH"))
+    return discovered or "rustup"
 
 
 def git_output(*arguments: str) -> str:
@@ -305,11 +321,7 @@ def main() -> int:
     parser.add_argument(
         "--cache-dir",
         type=Path,
-        default=Path(
-            os.environ.get(
-                "TEXPDF_LICENSE_CACHE", "/private/tmp/texpdf-license-cache"
-            )
-        ),
+        default=default_license_cache(),
     )
     args = parser.parse_args()
 
@@ -320,7 +332,7 @@ def main() -> int:
     args.output_root.mkdir(parents=True, exist_ok=True)
 
     environment = dict(os.environ)
-    rustup = Path(environment.get("RUSTUP_BIN", "/opt/homebrew/bin/rustup"))
+    rustup = Path(rustup_executable(environment))
     toolchain = environment.get("RUST_TOOLCHAIN", "1.97.1")
     try:
         cargo = subprocess.check_output(
@@ -331,7 +343,7 @@ def main() -> int:
             [str(rustup), "which", "--toolchain", toolchain, "rustc"],
             text=True,
         ).strip()
-        environment["PATH"] = f"{Path(cargo).parent}:/opt/homebrew/bin:/usr/local/bin:{environment.get('PATH', '')}"
+        environment["PATH"] = f"{Path(cargo).parent}:{environment.get('PATH', '')}"
         environment["RUSTC"] = rustc
         setup_stage: dict[str, Any] = {
             "name": "prepare_rust_toolchain",
