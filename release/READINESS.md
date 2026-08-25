@@ -23,9 +23,9 @@ Public cross-platform v1 ready: **false**
 | `x86_64-pc-windows-msvc_build` | FAIL | no | no | native build and Stata runtime qualification pending |
 | `x86_64-pc-windows-msvc_runtime` | FAIL | no | yes | native build and Stata runtime qualification pending |
 | `required_target_source_coherence` | FAIL | yes | yes | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu']; sources=['', '68d7c8b2f4de569fad5fb583978cd13efb4c5dae', 'e1be7f90ef4061d8e1a5770d0f75ea3cedcfb116'] |
-| `third_party_license_complete` | PASS | no | no | source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
-| `candidate_license_source_coherence` | FAIL | yes | yes | candidate_source=missing; license_source=68d7c8b2f4de569fad5fb583978cd13efb4c5dae; ancestor=False; non_evidence_changes=[] |
-| `macos_arm_memory_stress` | PASS | no | no | source=e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1; iterations=1000; peak_rss_kib=72304; post_warmup_growth_kib=16; growth_ratio=1.0002213368747233 |
+| `third_party_license_complete` | PASS | no | no | source=079982acf809fa2c9d7e68894e70da0ccfbfe43c; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
+| `candidate_license_source_coherence` | FAIL | yes | yes | candidate_source=missing; license_source=079982acf809fa2c9d7e68894e70da0ccfbfe43c; ancestor=False; non_evidence_changes=[] |
+| `macos_arm_memory_stress` | FAIL | yes | yes | source=079982acf809fa2c9d7e68894e70da0ccfbfe43c; iterations=None; peak_rss_kib=None; post_warmup_growth_kib=None; growth_ratio=None |
 
 ## Active private-candidate blockers
 
@@ -33,6 +33,7 @@ Public cross-platform v1 ready: **false**
 - `linux_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 ## Deferred public-release blockers
 
@@ -42,3 +43,4 @@ Public cross-platform v1 ready: **false**
 - `x86_64-pc-windows-msvc_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
+- `macos_arm_memory_stress`

@@ -21,13 +21,13 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `e1be7f90ef4061d8e1a5770d0f75ea3cedcfb116` |
+| Latest exact green source | `22177738a5f2615bc43423625f32b6d1a9536408` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `18` |
 | Current ARM64 artifact source | `e1be7f90ef4061d8e1a5770d0f75ea3cedcfb116` |
 | Current universal build source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
-| Current license-audit source | `68d7c8b2f4de569fad5fb583978cd13efb4c5dae` |
-| Latest memory-stress attempt | `e67de2cdf6a1cc7fff4aeb82c3a116a2b95e14a1`; qualified=yes |
+| Current license-audit source | `079982acf809fa2c9d7e68894e70da0ccfbfe43c` |
+| Latest memory-stress attempt | `079982acf809fa2c9d7e68894e70da0ccfbfe43c`; qualified=no |
 
 ## Architecture
 
@@ -54,6 +54,7 @@ The current ARM64 plugin is 47.14 MiB (`bc6575fbc0e876734065f9378ca1d4cdc31390f1
 - `linux_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 ## License evidence
 
@@ -61,7 +62,7 @@ The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 amb
 
 ## Memory evidence
 
-The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 16 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
+The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was unknown KiB against a unknown KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
 
 ## Deferred public-release blockers
 
@@ -71,6 +72,7 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 - `x86_64-pc-windows-msvc_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.
