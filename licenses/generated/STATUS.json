@@ -36,19 +36,19 @@
   "dependency_undeclared_count": 0,
   "missing_native_notice_files": 0,
   "missing_rust_notice_files": 0,
-  "pipeline_complete": false,
+  "pipeline_complete": true,
   "qualification_boundary": "This status records the audit pipeline even when a stage fails. Public binary publication remains blocked unless release_license_complete is true.",
-  "release_license_complete": false,
+  "release_license_complete": true,
   "resource_count_matches_manifest": true,
   "schema_version": 2,
-  "source_sha": "b468ec0d4b934f9825ae4fb6711967a84ebce52f",
+  "source_sha": "079982acf809fa2c9d7e68894e70da0ccfbfe43c",
   "stage_return_codes": {
     "cargo_inventory": 0,
-    "collect_license_texts": 125,
+    "collect_license_texts": 0,
     "collect_tex_license_notices": 0,
     "dependency_inventory": 0,
     "download_tlpdb": 0,
-    "prepare_native_dependencies": 2,
+    "prepare_native_dependencies": 0,
     "prepare_rust_toolchain": 0,
     "tex_inventory": 0
   },
@@ -66,9 +66,9 @@
         "\nset -euo pipefail\nsource tools/prepare_native_deps.sh\n/usr/bin/python3 - \"$TEXPDF_NATIVE_ENV_PATH\" <<'PYENV'\nfrom pathlib import Path\nimport json\nimport os\nimport sys\nkeys = (\"VCPKG_ROOT\", \"VCPKGRS_TRIPLET\", \"TECTONIC_DEP_BACKEND\", \"PATH\", \"RUSTC\")\nPath(sys.argv[1]).write_text(\n    json.dumps({key: os.environ.get(key, \"\") for key in keys}, indent=2, sort_keys=True) + \"\\n\",\n    encoding=\"utf-8\",\n)\nPYENV\n"
       ],
       "name": "prepare_native_dependencies",
-      "return_code": 2,
-      "stderr_tail": "From github.com:pkgconf/pkgconf\n * branch            4fc570f91d9d8d843ab32d2198a5c064538d8ffd -> FETCH_HEAD\nHEAD is now at 4fc570f pkgconf 2.5.1.\nlibpkgconf/argvsplit.c:16:10: fatal error: 'libpkgconf/stdinc.h' file not found\n   16 | #include <libpkgconf/stdinc.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~\n1 error generated.\nmake: *** [libpkgconf/argvsplit.o] Error 1",
-      "stdout_tail": "/usr/bin/clang    -c -o libpkgconf/argvsplit.o libpkgconf/argvsplit.c"
+      "return_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_PKGCONF_READY version=2.5.1 path=/private/tmp/texpdf-pkgconf-4fc570f91d9d/bin/pkg-config\nTEXPDF_NATIVE_DEPS_READY host=aarch64-apple-darwin triplet=arm64-osx root=/private/tmp/texpdf-vcpkg-a62ce77d56ee"
     },
     {
       "command": [
@@ -132,15 +132,15 @@
         "--manifest",
         "licenses/generated/license-texts.json",
         "--vcpkg-root",
-        "",
+        "/private/tmp/texpdf-vcpkg-a62ce77d56ee",
         "--triplet",
-        "",
+        "arm64-osx",
         "--require-native"
       ],
       "name": "collect_license_texts",
-      "return_code": 125,
-      "stderr_tail": "skipped because a prerequisite stage failed",
-      "stdout_tail": ""
+      "return_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "TEXPDF_LICENSE_TEXTS_READY rust=369 native=7 missing_rust=0 missing_native=0 target=aarch64-apple-darwin roots=texpdf-stata,texpdf-helper"
     },
     {
       "command": [
