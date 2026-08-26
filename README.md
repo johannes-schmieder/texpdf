@@ -89,10 +89,11 @@ Without `saving()`, a final `.tex` suffix is replaced by `.pdf`; otherwise
 `.pdf` is appended. Existing output is protected unless `replace` is supplied.
 Relative `\input`, `\includegraphics`, and bibliography paths are resolved from
 the primary source directory. The opt-in `view` option opens a successful PDF
-with the operating system's default application. `help texpdf` includes two
+with the operating system's default application. `help texpdf` includes three
 one-click examples whose inspectable outputs remain under
-`./texpdf_examples/`; the second uses the suggested but optional `latexlog`
-package.
+`./texpdf_examples/`: manual `file write`, the suggested but optional
+`latexlog` package, and Stata's built-in `etable` producing a polished
+three-model regression table.
 
 After successful compilation, `texpdf` returns:
 

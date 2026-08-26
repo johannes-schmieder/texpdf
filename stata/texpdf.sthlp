@@ -32,7 +32,7 @@ replaced by {cmd:.pdf}; otherwise {cmd:.pdf} is appended.
 {cmd:texpdf} is tested with Stata 18 and 19. It does not require a system TeX
 installation or another community-contributed Stata package. The optional
 {cmd:latexlog} package is suggested for constructing reports and is used only
-by Example 2 below.
+by Example 2 below. Example 3 uses Stata's built-in {cmd:etable} command.
 
 {title:Options}
 
@@ -139,6 +139,58 @@ the document. {cmd:texpdf}, rather than {cmd:latexlog: pdf}, compiles it.
 {space 4}{hline 80}
 {space 4}{it:({stata texpdf_run latexlog using texpdf.sthlp, preserve:click to run and open the PDF})}
 
+{space 4}{hline 10} {it:Example 3 - Build a regression table with etable} {hline 12}
+{pstd}
+This example estimates three nested models and uses Stata's built-in
+{help etable} command to create a publication-style regression table.
+
+{cmd}{...}
+{* example_start - etable}{...}
+    local root "./texpdf_examples/etable"
+    capture mkdir "./texpdf_examples"
+    capture mkdir "`root'"
+
+    sysuse auto, clear
+    label variable price "Price"
+    label variable mpg "Mileage (mpg)"
+    label variable weight "Weight (lbs.)"
+    label variable foreign "Foreign car"
+
+    estimates clear
+    quietly regress price mpg
+    estimates store model1
+    quietly regress price mpg weight
+    estimates store model2
+    quietly regress price mpg weight foreign
+    estimates store model3
+
+    etable, estimates(model1 model2 model3) column(index) ///
+        keep(mpg weight foreign _cons) ///
+        cstat(_r_b, nformat(%9.2f)) ///
+        cstat(_r_se, nformat(%9.2f)) ///
+        mstat(N, label("Observations")) ///
+        mstat(r2_a, label("Adjusted R-squared") nformat(%9.3f)) ///
+        stars(.10 "*" .05 "**" .01 "***") showstars showstarsnote ///
+        title("Price regressions") ///
+        note("Dependent variable: price. Standard errors in parentheses.") ///
+        export("`root'/regression-table.tex", tableonly replace)
+
+    tempname tex
+    file open `tex' using "`root'/report.tex", write text replace
+    file write `tex' "\documentclass{c -(}article{c )-}" _n
+    file write `tex' "\usepackage[margin=1in]{c -(}geometry{c )-}" _n
+    file write `tex' "\begin{c -(}document{c )-}" _n
+    file write `tex' "\input{c -(}regression-table.tex{c )-}" _n
+    file write `tex' "\end{c -(}document{c )-}" _n
+    file close `tex'
+
+    texpdf using "`root'/report.tex", ///
+        saving("`root'/report.pdf") replace view
+{* example_end}{...}
+{txt}{...}
+{space 4}{hline 80}
+{space 4}{it:({stata texpdf_run etable using texpdf.sthlp, preserve:click to run and open the PDF})}
+
 {title:Stored results}
 
 {synoptset 24 tabbed}{...}
@@ -163,6 +215,9 @@ hyphenation only; broad language and hyphenation collections are unsupported.
 
 {p 0 21}
 Online: {help table}, {help collect export}, {help graph export}, {help latexlog}
+{p_end}
+{p 0 21}
+{help etable}
 {p_end}
 
 {title:Author}

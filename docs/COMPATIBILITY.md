@@ -35,6 +35,12 @@ landscape/tabularx layouts, relative inputs, equations, natbib, `cleveref`, and
 chromatic drawing content; the legacy blackwhite scenario remains deliberately
 monochrome and includes real PDF graphs rather than layout placeholders.
 
+The runnable Stata help examples additionally cover tables exported by
+`table`/`collect`, `latexlog`, and the built-in `etable` command. The `etable`
+example exports a `tableonly` LaTeX fragment and places it in a minimal wrapper
+document. Stata's complete-document `etable` export adds packages outside the
+current bundle and is therefore not the documented compatibility path.
+
 `colortbl`, `cleveref`, and `aer.bst` are development-tested pending a full
 runtime requalification of every supported target. The obsolete `subfigure`
 package is retained only for legacy compatibility; the current isolated fixture
