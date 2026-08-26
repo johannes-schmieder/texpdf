@@ -9,7 +9,7 @@ The active target is a **private `0.1.0-rc.2` macOS universal and Linux x86-64 r
 Windows, public distribution, and final `v0.1.0` publication are
 explicitly deferred and are not advertised as supported.
 
-Candidate ready: **true**
+Candidate ready: **false**
 
 Public release ready: **false**
 
@@ -32,7 +32,7 @@ tracked independently:
 | Current ARM64 artifact source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Current universal build source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Frozen candidate license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| Latest memory-stress attempt | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8`; qualified=yes |
+| Latest memory-stress attempt | `329e323a2d386f49fabeb7d844c72feb2af40ef7`; qualified=yes |
 
 ## Development bundle on `main`
 
@@ -74,7 +74,7 @@ The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b9
 
 ## Active private-candidate blockers
 
-None.
+- `macos_arm_memory_stress`
 
 ## Frozen candidate license evidence
 
@@ -84,12 +84,13 @@ The separate development audit is source-bound to `75967266ed94454f761cfd33bdadd
 
 ## Memory evidence
 
-The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 32 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
+The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 48 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
 
 ## Deferred public-release blockers
 
 - `public_distribution`
 - `x86_64-pc-windows-msvc_runtime`
+- `macos_arm_memory_stress`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.
