@@ -17,7 +17,7 @@
     "selection_manifest": "bundle/curated-manifest.json"
   },
   "evidence": {
-    "tested_source_sha": "21cf28493624191d52488146b914b8d26cc5291d",
+    "tested_source_sha": "0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f",
     "macos_apple_silicon_stata": "success",
     "macos_apple_silicon_receipt": "release/development-corpus/macos-apple-silicon.json",
     "linux_core": "success",

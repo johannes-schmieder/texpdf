@@ -5,23 +5,23 @@
     "version": "33-academic-v2-dev.1",
     "zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f"
   },
-  "job_id": "7311141",
+  "job_id": "7314871",
   "licensed_stata_run": false,
   "outputs": [
     {
       "name": "economics-manuscript.pdf",
-      "sha256": "75ff1e7290e22421f7f27b7e2328276ecdd84600087c1056afa151a88fe825ed",
-      "size_bytes": 71554
+      "sha256": "2a99cf1392d18381a627c9ad3d442950a1bc5c48f820266d713e02c262f3b7e8",
+      "size_bytes": 72818
     },
     {
       "name": "latexlog-current.pdf",
-      "sha256": "5af3beb5c0e5e2f1185a41a0e8aa06b91ca78cf6de1ac51703da8a3eb30a3b63",
-      "size_bytes": 76576
+      "sha256": "45a94ecd4249be1f68535663a26bf3be93879403b8a2b8aa0125bd764c0d5c91",
+      "size_bytes": 77738
     },
     {
       "name": "latexlog-legacy.pdf",
-      "sha256": "e1334bf2df7a7be49471d35004b55ed3fee3a669bdc9f83bf37df06161bac921",
-      "size_bytes": 34465
+      "sha256": "66870ae3430ebe57927504ecfff39057f5ab040dfe794126deebffc66bc82937",
+      "size_bytes": 54966
     }
   ],
   "platform": {
@@ -33,5 +33,5 @@
   "schema_version": 1,
   "status": "success",
   "test": "texpdf-core real-world corpus",
-  "tested_source_sha": "21cf28493624191d52488146b914b8d26cc5291d"
+  "tested_source_sha": "0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f"
 }

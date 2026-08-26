@@ -46,7 +46,7 @@ qualify the newer bundle embedded by `main`.
 | ZIP SHA-256 | `cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f` |
 | Content digest | `343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf` |
 | Selection status | `bounded-runtime-evidence` |
-| Tested source | `21cf28493624191d52488146b914b8d26cc5291d` |
+| Tested source | `0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f` |
 | Apple Silicon licensed Stata | `success` |
 | Linux core corpus | `success` |
 | Development license audit | `75967266ed94454f761cfd33bdaddbcfef18f155`; complete=yes |

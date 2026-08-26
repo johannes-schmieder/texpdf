@@ -2,9 +2,9 @@
   "schema_version": 1,
   "status": "success",
   "evidence_kind": "development-real-world-corpus",
-  "tested_source_sha": "21cf28493624191d52488146b914b8d26cc5291d",
-  "completed_at": "2026-08-25T21:21:33.819040Z",
-  "duration_seconds": 65.976,
+  "tested_source_sha": "0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f",
+  "completed_at": "2026-08-26T02:12:56.708436Z",
+  "duration_seconds": 64.566,
   "platform": {
     "system": "Darwin",
     "release": "25.5.0",
@@ -22,41 +22,41 @@
   },
   "installed_package": {
     "target": "aarch64-apple-darwin",
-    "plugin_sha256": "8855800d89e8bbf38e0b67ed2e2f408931d65292086a7eac1ca53f03740707be",
+    "plugin_sha256": "56fe47133a1132498e6a9852212017f86a7b68c9beb9e48013b489af5b967523",
     "embedded_helper_sha256": "8329adf0cb32d872aa7ebea5b5568d6959638e0948737a8e96f3ba085f635e39",
     "net_install_tested": true
   },
   "hosted_exact_source_ci": {
-    "run_id": "32900656850",
+    "run_id": "32921673245",
     "status": "success",
     "rust_status": "success",
     "stata_status": "success",
     "rust_mode": "repository-engine",
     "rust_toolchain": "1.97.1",
-    "receipt": ".ci/stata/results/21cf28493624191d52488146b914b8d26cc5291d.json"
+    "receipt": ".ci/stata/results/0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f.json"
   },
   "required_marker": "TEXPDF REALISTIC CORPUS PASS",
   "required_marker_present": true,
-  "local_corpus_stata_receipt_sha256": "257d893a2d9e2cecfa5a3bbae77f6050c1b0fa20e5491bdeb50c6e7520132261",
-  "local_corpus_stata_log_sha256": "3d1a35657c087b71056772ffe1835f1bd855ba6c6429fe7ad2855fe85ab24399",
+  "local_corpus_stata_receipt_sha256": "f84befbddd05f1016298cc29967e0aea5e3200a887945ac749435b65f11eb2fc",
+  "local_corpus_stata_log_sha256": "a6fad687ab3824fe5e2656debdd502c4ea5cc7b71c9788c90d189db7a0dff73d",
   "outputs": [
     {
       "name": "economics-manuscript.pdf",
       "pages": 3,
-      "size_bytes": 71554,
-      "sha256": "026868392ffa63ac6e6d59d84a985b21267a93f162da449b880bf52ec6f918af"
+      "size_bytes": 72819,
+      "sha256": "210569259dc53b115324833c1a237ce0eccb71507c37dec80e1e1a02409f885e"
     },
     {
       "name": "latexlog-current.pdf",
-      "pages": 5,
-      "size_bytes": 76576,
-      "sha256": "0142514370b3fce523d9531a2f6b9753478c81324c705f8a73f6d893a3ab6573"
+      "pages": 4,
+      "size_bytes": 77738,
+      "sha256": "f92b50f70cbeffa79d96c1e48c0502577454a4d3b10556f50830cf707d231e78"
     },
     {
       "name": "latexlog-legacy.pdf",
-      "pages": 1,
-      "size_bytes": 34465,
-      "sha256": "b12c8d1b78fff3f5c39c98509e5b861ac764d6e0e394956fe13ea1a89c837821"
+      "pages": 2,
+      "size_bytes": 54967,
+      "sha256": "e8bda5c4c04eb612612976fa09fb5569b045910ac3de50683e80b90e68730a69"
     }
   ],
   "visual_review": {

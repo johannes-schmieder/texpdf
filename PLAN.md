@@ -125,8 +125,8 @@ its provenance manifests.
 - [x] Replace legacy layout placeholders with two actual monochrome PDF graphs
       and validate that both are included through legacy `subfigure` syntax.
 - [x] Record exact-source Apple Silicon Stata and SCC Linux core results for the
-      development selection (`21cf28493624191d52488146b914b8d26cc5291d`;
-      SCC job `7311141`, GLIBC 2.28).
+      corrected development corpus (`0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f`;
+      SCC job `7314871`, GLIBC 2.28).
 - [x] Leave Intel macOS and licensed Linux Stata requalification intentionally
       unrun; do not advance the active candidate source.
 
