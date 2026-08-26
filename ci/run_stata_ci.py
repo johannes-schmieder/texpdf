@@ -172,6 +172,24 @@ def seed_stata_plus(config: dict[str, object], run_root: Path) -> None:
         shutil.copy2(source, destination)
 
 
+def install_macos_viewer_shim(run_root: Path) -> None:
+    if sys.platform != "darwin":
+        return
+    shim_directory = run_root / "viewer-bin"
+    shim_directory.mkdir()
+    viewer_log = run_root / "viewer-invocations.txt"
+    opener = shim_directory / "open"
+    opener.write_text(
+        "#!/bin/sh\n"
+        "set -eu\n"
+        "printf '%s\\n' \"$@\" >> \"$TEXPDF_VIEW_LOG\"\n",
+        encoding="utf-8",
+    )
+    opener.chmod(0o755)
+    os.environ["TEXPDF_VIEW_LOG"] = str(viewer_log)
+    os.environ["PATH"] = str(shim_directory) + os.pathsep + os.environ.get("PATH", "")
+
+
 def copy_evidence(run_root: Path, artifact_dir: Path) -> None:
     for source in sorted(run_root.iterdir()):
         # Stata's process stdout can contain the startup/license banner.  The
@@ -227,6 +245,7 @@ def main() -> int:
     ):
         (run_root / directory).mkdir()
     seed_stata_plus(config, run_root)
+    install_macos_viewer_shim(run_root)
 
     tested_sha = os.environ.get("GITHUB_SHA") or command_output(
         ["git", "rev-parse", "HEAD"], root

@@ -1,11 +1,12 @@
-*! version 0.1.0 25aug2026
+*! version 0.1.0 26aug2026
 program define texpdf, rclass
     version 14.1
-    syntax [using/] [, SAVing(string) REPLACE VERSION]
+    syntax [using/] [, SAVing(string) REPLACE VERSION VIEW]
 
     if "`version'" != "" {
-        if `"`using'"' != "" | `"`saving'"' != "" | "`replace'" != "" {
-            display as error "option version may not be combined with using, saving(), or replace"
+        if `"`using'"' != "" | `"`saving'"' != "" | "`replace'" != "" | ///
+                "`view'" != "" {
+            display as error "option version may not be combined with using, saving(), replace, or view"
             exit 198
         }
 
@@ -100,6 +101,12 @@ program define texpdf, rclass
     }
 
     display as text "PDF written to " as result `"`pdf'"'
+    if "`view'" != "" {
+        capture noisily _texpdf_view_pdf `"`pdf'"'
+        if _rc {
+            display as text "PDF was written but could not be opened automatically"
+        }
+    }
     return local pdf `"`pdf'"'
     return local engine `"`engine'"'
     return local engine_version `"`engine_version'"'
@@ -107,6 +114,37 @@ program define texpdf, rclass
     return local bundle_digest `"`bundle_digest'"'
     return local bundle_zip_sha256 `"`bundle_zip_sha256'"'
     return scalar warnings = `warnings'
+end
+
+program define _texpdf_view_pdf
+    version 14.1
+    args pdf
+
+    local unsafe = strpos(`"`pdf'"', char(36)) | ///
+        strpos(`"`pdf'"', char(96)) | strpos(`"`pdf'"', char(34)) | ///
+        strpos(`"`pdf'"', char(10)) | strpos(`"`pdf'"', char(13))
+    if "`=c(os)'" == "Windows" {
+        local unsafe = `unsafe' | strpos(`"`pdf'"', "%")
+    }
+    if `unsafe' {
+        display as error "PDF viewer path contains unsupported shell-expansion characters"
+        exit 198
+    }
+
+    if "`=c(os)'" == "Windows" {
+        shell start "" "`pdf'"
+    }
+    else if "`c(os)'" == "MacOSX" | ///
+            ("`c(os)'" == "Unix" & strmatch("`c(machine_type)'", "Mac*")) {
+        shell open "`pdf'"
+    }
+    else if "`=c(os)'" == "Unix" {
+        shell xdg-open "`pdf'"
+    }
+    else {
+        display as error "automatic PDF viewing is unsupported on this operating system"
+        exit 198
+    }
 end
 
 program define _texpdf_read_result, rclass

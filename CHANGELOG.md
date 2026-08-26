@@ -33,6 +33,10 @@ releases or SSC versions.
   including an optional hash-pinned latexlog regeneration contract.
 - Development-tested offline resources for `colortbl`, `cleveref`, the
   `economic` package's `aer.bst`, and legacy `subfigure` compatibility.
+- An opt-in `view` option that opens a successfully compiled PDF in the
+  operating system's default viewer without changing batch-mode defaults.
+- Two self-contained, one-click help examples for manual `file write` report
+  construction and the suggested but optional `latexlog` workflow.
 
 ### Changed
 

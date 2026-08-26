@@ -5,6 +5,7 @@
 ```stata
 texpdf using paper.tex
 texpdf using paper.tex, saving(paper.pdf) replace
+texpdf using paper.tex, replace view
 texpdf, version
 ```
 
@@ -87,7 +88,11 @@ See [`RELEASING.md`](RELEASING.md) and
 Without `saving()`, a final `.tex` suffix is replaced by `.pdf`; otherwise
 `.pdf` is appended. Existing output is protected unless `replace` is supplied.
 Relative `\input`, `\includegraphics`, and bibliography paths are resolved from
-the primary source directory.
+the primary source directory. The opt-in `view` option opens a successful PDF
+with the operating system's default application. `help texpdf` includes two
+one-click examples whose inspectable outputs remain under
+`./texpdf_examples/`; the second uses the suggested but optional `latexlog`
+package.
 
 After successful compilation, `texpdf` returns:
 

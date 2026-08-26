@@ -42,8 +42,11 @@ qualification may additionally supply `TEXPDF_STATA_PLUGIN`,
 copies those exact artifacts into the isolated tree and records their hashes.
 Writable Stata system directories are isolated. `STATA_CI_LOCK_FILE` selects
 the shared licensed-Stata lock and otherwise defaults under the host temporary
-directory. A timeout terminates only the test process group. Sanitized evidence
-is copied to `.ci/stata/run/`; the raw Stata startup stream is not uploaded.
+directory. On macOS, the runner places an isolated `open` shim first on `PATH`;
+help examples can therefore verify `view` requests in
+`viewer-invocations.txt` without launching a GUI application during CI. A
+timeout terminates only the test process group. Sanitized evidence is copied to
+`.ci/stata/run/`; the raw Stata startup stream is not uploaded.
 
 The publisher commits immutable
 `.ci/stata/results/<tested-sha>.json` receipts and updates

@@ -21,6 +21,14 @@
     },
     {
       "candidate_release_blocker": false,
+      "detail": "stata/texpdf_run.ado",
+      "key": "package_file_texpdf_run.ado",
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
+    },
+    {
+      "candidate_release_blocker": false,
       "detail": "stata/texpdf.pkg",
       "key": "package_file_texpdf.pkg",
       "passed": true,

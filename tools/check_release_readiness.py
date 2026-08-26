@@ -21,6 +21,7 @@ SOURCE_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 REQUIRED_PACKAGE_FILES = (
     "stata/texpdf.ado",
     "stata/texpdf.sthlp",
+    "stata/texpdf_run.ado",
     "stata/texpdf.pkg",
     "stata/stata.toc",
 )
@@ -764,6 +765,7 @@ def build_result() -> dict[str, Any]:
     mac_required = {
         "package_file_texpdf.ado",
         "package_file_texpdf.sthlp",
+        "package_file_texpdf_run.ado",
         "package_file_texpdf.pkg",
         "package_file_stata.toc",
         "cargo_lock",

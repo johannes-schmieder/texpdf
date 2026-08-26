@@ -22,6 +22,29 @@ RUN_STATA_SPEC.loader.exec_module(RUN_STATA)
 
 
 class ReceiptTests(unittest.TestCase):
+    def test_macos_viewer_shim_records_exact_argument(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with mock.patch.object(RUN_STATA.sys, "platform", "darwin"), mock.patch.dict(
+                os.environ, {"PATH": "/usr/bin"}, clear=False
+            ):
+                RUN_STATA.install_macos_viewer_shim(root)
+                opener = root / "viewer-bin/open"
+                viewer_log = root / "viewer-invocations.txt"
+                self.assertTrue(opener.is_file())
+                self.assertTrue(os.access(opener, os.X_OK))
+                self.assertEqual(os.environ["TEXPDF_VIEW_LOG"], str(viewer_log))
+                self.assertTrue(os.environ["PATH"].startswith(str(opener.parent)))
+                subprocess.run(
+                    [str(opener), "/tmp/report with spaces.pdf"],
+                    check=True,
+                    env=os.environ,
+                )
+                self.assertEqual(
+                    viewer_log.read_text(encoding="utf-8"),
+                    "/tmp/report with spaces.pdf\n",
+                )
+
     def test_runtime_artifact_directory_can_be_isolated(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary) / "repo"

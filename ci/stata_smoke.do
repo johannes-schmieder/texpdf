@@ -25,6 +25,10 @@ assert strlen(`"`r(bundle_digest)'"') == 64
 assert strlen(`"`r(bundle_zip_sha256)'"') == 64
 assert r(warnings) == 0
 
+capture noisily texpdf, version view
+local version_view_rc = _rc
+assert `version_view_rc' == 198
+
 capture noisily texpdf
 local syntax_rc = _rc
 assert `syntax_rc' == 198
@@ -169,6 +173,7 @@ if `full_engine' {
     discard
     adopath - `"`repo'/stata"'
     which texpdf
+    which texpdf_run
     texpdf, version
     assert `"`r(engine)'"' == "tectonic"
     assert `"`r(engine_version)'"' == "0.17.0"
@@ -176,6 +181,9 @@ if `full_engine' {
     local installed_pdf `"`installed'.pdf"'
     texpdf using `"`repo'/tests/fixtures/academic.tex"', saving(`"`installed_pdf'"') replace
     confirm file `"`installed_pdf'"'
+    tempfile help_examples_anchor
+    local help_examples_dir `"`help_examples_anchor'_dir"'
+    do `"`repo'/ci/stata_help_examples.do"' `"`help_examples_dir'"'
     local install_marker = "TEXPDF NET INSTALL " + "PASS"
     display as result `"`install_marker'"'
 

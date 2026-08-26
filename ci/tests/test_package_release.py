@@ -43,9 +43,11 @@ class PackageReleaseTests(unittest.TestCase):
     def prepare_project(self, root: Path) -> tuple[Path, Path]:
         write(root / "stata/texpdf.ado", "*! version 0.1.0 25aug2026\n")
         write(root / "stata/texpdf.sthlp")
+        write(root / "stata/texpdf_run.ado")
         write(
             root / "stata/texpdf.pkg",
-            "v 3\nf texpdf.ado\nf texpdf.sthlp\nf _texpdf_plugin.plugin\n"
+            "v 3\nf texpdf.ado\nf texpdf.sthlp\nf texpdf_run.ado\n"
+            "f _texpdf_plugin.plugin\n"
             "f LICENSE\nf THIRD_PARTY_NOTICES.md\nf BUILD_INFO.json\n"
             "f CHECKSUMS.sha256\n",
         )
@@ -160,8 +162,10 @@ class PackageReleaseTests(unittest.TestCase):
             self.assertFalse(build["release_license_complete"])
             self.assertEqual(build["embedded_helper_size_bytes"], 14)
             self.assertTrue((root / "dist/package/THIRD_PARTY_NOTICES.md").is_file())
+            self.assertTrue((root / "dist/package/texpdf_run.ado").is_file())
             with zipfile.ZipFile(root / "dist/package.zip") as archive:
                 self.assertIn("THIRD_PARTY_NOTICES.md", archive.namelist())
+                self.assertIn("texpdf_run.ado", archive.namelist())
                 self.assertNotIn("LICENSES/STATUS.json", archive.namelist())
 
     def test_public_release_fails_without_complete_audit(self) -> None:

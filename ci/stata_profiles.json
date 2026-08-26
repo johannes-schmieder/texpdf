@@ -14,6 +14,7 @@
       "required_log_markers": [
         "TEXPDF IN PROCESS STRESS PASS",
         "TEXPDF NET INSTALL PASS",
+        "TEXPDF HELP EXAMPLES PASS",
         "TEXPDF FULL ENGINE STATA PASS",
         "TEXPDF STATA MATA SMOKE PASS"
       ]
@@ -25,6 +26,7 @@
       "required_log_markers": [
         "TEXPDF IN PROCESS STRESS PASS",
         "TEXPDF NET INSTALL PASS",
+        "TEXPDF HELP EXAMPLES PASS",
         "TEXPDF FULL ENGINE STATA PASS",
         "TEXPDF STATA MATA SMOKE PASS"
       ]

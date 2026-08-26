@@ -8,6 +8,7 @@ Public cross-platform v1 ready: **false**
 |---|---|---|---|---|
 | `package_file_texpdf.ado` | PASS | no | no | stata/texpdf.ado |
 | `package_file_texpdf.sthlp` | PASS | no | no | stata/texpdf.sthlp |
+| `package_file_texpdf_run.ado` | PASS | no | no | stata/texpdf_run.ado |
 | `package_file_texpdf.pkg` | PASS | no | no | stata/texpdf.pkg |
 | `package_file_stata.toc` | PASS | no | no | stata/stata.toc |
 | `cargo_lock` | PASS | no | no | Cargo.lock is committed |

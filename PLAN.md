@@ -24,6 +24,8 @@ position and build-only artifacts are never treated as runtime qualification.
 ## Completed foundations
 
 - [x] Compiler-only Stata command, stable syntax, help, and `r()` results.
+- [x] One-click manual and optional-latexlog help examples with opt-in PDF
+      viewing and inspectable persistent outputs.
 - [x] Tectonic 0.17.0 core with deterministic curated offline bundle.
 - [x] Academic/econometric compatibility corpus and local `net install` test.
 - [x] Thin panic-safe SPI bridge and versioned result protocol.

@@ -279,6 +279,7 @@ def main() -> int:
         sources = {
             "texpdf.ado": Path("stata/texpdf.ado"),
             "texpdf.sthlp": Path("stata/texpdf.sthlp"),
+            "texpdf_run.ado": Path("stata/texpdf_run.ado"),
             "texpdf.pkg": Path("stata/texpdf.pkg"),
             "stata.toc": Path("stata/stata.toc"),
             "_texpdf_plugin.plugin": args.plugin,
