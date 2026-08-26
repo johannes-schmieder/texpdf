@@ -1,6 +1,5 @@
 {
   "candidate_blockers": [
-    "public_repository_security",
     "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
@@ -83,12 +82,12 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "missing release/publication.json",
+      "candidate_release_blocker": false,
+      "detail": "visibility=public; audit_tip=8ff91b152c28c0465282977f6df204dd41fcc15d; scope_source=8ff91b152c28c0465282977f6df204dd41fcc15d; sha_pinning=True; vulnerability_reporting=True",
       "key": "public_repository_security",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": false,
@@ -189,7 +188,6 @@
   ],
   "implementation_complete_macos_arm64": true,
   "public_release_blockers": [
-    "public_repository_security",
     "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
@@ -198,7 +196,6 @@
   ],
   "public_release_ready": false,
   "release_blockers": [
-    "public_repository_security",
     "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",

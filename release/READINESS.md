@@ -15,7 +15,7 @@ Public cross-platform release ready: **false**
 | `release_scope` | PASS | no | no | kind=public_release_candidate; version=0.1.0-rc2; source=8ff91b152c28c0465282977f6df204dd41fcc15d; required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc'] |
 | `public_distribution` | PASS | no | no | public GitHub distribution is explicitly authorized in release scope |
 | `ssc_distribution` | PASS | no | no | SSC distribution is explicitly authorized in release scope |
-| `public_repository_security` | FAIL | yes | yes | missing release/publication.json |
+| `public_repository_security` | PASS | no | no | visibility=public; audit_tip=8ff91b152c28c0465282977f6df204dd41fcc15d; scope_source=8ff91b152c28c0465282977f6df204dd41fcc15d; sha_pinning=True; vulnerability_reporting=True |
 | `target_registry` | PASS | no | no | target count=4 |
 | `macos_arm_runtime` | PASS | no | no | source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=98532016; arm_runtime=True |
@@ -31,7 +31,6 @@ Public cross-platform release ready: **false**
 
 ## Active candidate blockers
 
-- `public_repository_security`
 - `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
@@ -40,7 +39,6 @@ Public cross-platform release ready: **false**
 
 ## Public-release blockers
 
-- `public_repository_security`
 - `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`

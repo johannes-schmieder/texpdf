@@ -77,7 +77,6 @@ The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b9
 
 ## Active candidate blockers
 
-- `public_repository_security`
 - `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
@@ -96,7 +95,6 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 ## Public-release blockers
 
-- `public_repository_security`
 - `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`

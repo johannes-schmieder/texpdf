@@ -1,0 +1,40 @@
+{
+  "historical_rc1": {
+    "asset_sha256": {
+      "macos-intel-runtime.json": "fa7ce2a850d4f5de6d6a0a0e878ef8613fe5865856fc49f3c3e66c525b240a26",
+      "package-manifest.json": "64ecb385e5f2ec49ef4094e25c5c86409fb0adbcd673eebf103e353df6628aae",
+      "texpdf-macos-universal-0.1.0-rc.1.zip": "75a7cfe9feb592002643f934035c64ab7824bb3cb4f9c71595be6a0ff6493de2"
+    },
+    "assets_preserved": true,
+    "release_title": "texpdf v0.1.0-rc.1 (superseded macOS-only)",
+    "superseded_label": true,
+    "tag": "v0.1.0-rc.1",
+    "tag_preserved": true
+  },
+  "history_audit": {
+    "bytes_scanned": 12477867,
+    "commits_scanned": 611,
+    "history_rewritten": false,
+    "scanner": "gitleaks",
+    "scanner_binary_sha256": "ba52fb1bfabbcde42f032afad3d6e0b19dff8ed105229a16e7caa338bbc0e84f",
+    "scanner_version": "8.30.1",
+    "secrets_found": 0,
+    "tip_sha": "8ff91b152c28c0465282977f6df204dd41fcc15d"
+  },
+  "repository": "johannes-schmieder/texpdf",
+  "repository_url": "https://github.com/johannes-schmieder/texpdf",
+  "repository_visibility": "public",
+  "schema_version": 1,
+  "settings": {
+    "branch_protection": {
+      "allow_deletions": false,
+      "allow_force_pushes": false,
+      "required_pull_request_reviews": false,
+      "required_status_checks": false
+    },
+    "can_approve_pull_request_reviews": false,
+    "default_workflow_permissions": "read",
+    "private_vulnerability_reporting": true,
+    "sha_pinning_required": true
+  }
+}
