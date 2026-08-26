@@ -1,6 +1,6 @@
 {
   "candidate_version": "0.1.0-rc2",
-  "candidate_source_sha": "11a07ef66f69db83e2a1317a900a1bcccf3b29ab",
+  "candidate_source_sha": "8ff91b152c28c0465282977f6df204dd41fcc15d",
   "deferred_runtime_targets": [],
   "github_release_enabled": true,
   "public_distribution_enabled": true,
