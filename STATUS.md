@@ -26,13 +26,13 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `329e323a2d386f49fabeb7d844c72feb2af40ef7` |
+| Latest exact green source | `2f8da039576e3107ed678e1e652cc265eb674543` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Current universal build source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Frozen candidate license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| Latest memory-stress attempt | `329e323a2d386f49fabeb7d844c72feb2af40ef7`; qualified=yes |
+| Latest memory-stress attempt | `2f8da039576e3107ed678e1e652cc265eb674543`; qualified=yes |
 
 ## Development bundle on `main`
 
