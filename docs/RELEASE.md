@@ -107,10 +107,12 @@ At minimum:
 - offline/no-system-TeX verification;
 - exact embedded-ZIP integrity verification.
 
-The durable macOS memory result is
-`release/memory-stress-macos-arm64.json`. A passing growth gate is required but
-cannot prove that no native process-fatal path exists; the remaining boundary
-must be documented in `SECURITY.md`.
+The frozen candidate's durable macOS memory result is
+`release/memory-stress-macos-arm64.json`; the latest attempt is recorded
+separately in `release/latest-memory-stress-macos-arm64.json`.
+A passing growth gate is required but cannot prove that no native
+process-fatal path exists; the remaining boundary must be documented in
+`SECURITY.md`.
 
 ## 5. Assemble public package assets
 

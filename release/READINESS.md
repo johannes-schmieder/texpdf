@@ -1,7 +1,7 @@
 # texpdf release-readiness audit
 
 macOS ARM64 implementation qualified: **true**
-Private required-target candidate ready: **false**
+Private required-target candidate ready: **true**
 Public cross-platform v1 ready: **false**
 
 | Check | Result | Candidate blocker | Public blocker | Detail |
@@ -26,14 +26,13 @@ Public cross-platform v1 ready: **false**
 | `required_target_source_coherence` | PASS | no | no | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu']; expected=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; sources=['7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8'] |
 | `third_party_license_complete` | PASS | no | no | source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
 | `candidate_license_source_coherence` | PASS | no | no | candidate_source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; license_source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; ancestor=True; non_evidence_changes=[] |
-| `macos_arm_memory_stress` | FAIL | yes | yes | source=329e323a2d386f49fabeb7d844c72feb2af40ef7; iterations=1000; peak_rss_kib=74816; post_warmup_growth_kib=48; growth_ratio=1.0006419858763107 |
+| `macos_arm_memory_stress` | PASS | no | no | source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; iterations=1000; peak_rss_kib=72304; post_warmup_growth_kib=32; growth_ratio=1.0004427717511624 |
 
 ## Active private-candidate blockers
 
-- `macos_arm_memory_stress`
+None.
 
 ## Deferred public-release blockers
 
 - `public_distribution`
 - `x86_64-pc-windows-msvc_runtime`
-- `macos_arm_memory_stress`

@@ -297,21 +297,30 @@ jobs:
             rm -rf "$publish_tree"
             git worktree add --detach "$publish_tree" origin/main
             mkdir -p "$publish_tree/release"
-            cp "$source_record" "$publish_tree/release/memory-stress-macos-arm64.json"
+            cp "$source_record" "$publish_tree/release/latest-memory-stress-macos-arm64.json"
             /usr/bin/python3 - \
               "$source_record" \
-              "$publish_tree/release/targets.json" <<'PY'
+              "$publish_tree/release/targets.json" \
+              "$publish_tree/release/scope.json" \
+              "$publish_tree/release/memory-stress-macos-arm64.json" <<'PY'
           from pathlib import Path
           import json
           import sys
 
           record = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           targets_path = Path(sys.argv[2])
+          scope = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
+          candidate_record_path = Path(sys.argv[4])
           targets = json.loads(targets_path.read_text(encoding="utf-8"))
           arm = targets["targets"]["aarch64-apple-darwin"]
           arm["memory_stress_latest_attempt_sha"] = record["source_sha"]
           arm["memory_stress_latest_attempt_qualified"] = record["qualified"]
-          if record["qualified"]:
+          is_candidate = record["source_sha"] == scope["candidate_source_sha"]
+          if is_candidate and record["qualified"]:
+              candidate_record_path.write_text(
+                  json.dumps(record, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
               memory = record["memory"]
               arm.update(
                   {
@@ -349,7 +358,13 @@ jobs:
           PY
             git -C "$publish_tree" config user.name "github-actions[bot]"
             git -C "$publish_tree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git -C "$publish_tree" add release/memory-stress-macos-arm64.json release/targets.json
+            git -C "$publish_tree" add \
+              release/latest-memory-stress-macos-arm64.json \
+              release/memory-stress-macos-arm64.json \
+              release/targets.json
+            if git -C "$publish_tree" diff --cached --quiet; then
+              exit 0
+            fi
             git -C "$publish_tree" commit -m "ci(target): record 1000-call memory attempt [skip ci]"
             if git -C "$publish_tree" push origin HEAD:main; then
               exit 0

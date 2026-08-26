@@ -124,6 +124,14 @@ class WorkflowCompatibilityTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertNotIn("Path | None", workflow)
 
+    def test_memory_publisher_preserves_frozen_candidate_evidence(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/stress-memory-macos.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("latest-memory-stress-macos-arm64.json", workflow)
+        self.assertIn('scope["candidate_source_sha"]', workflow)
+        self.assertIn("if is_candidate and record[\"qualified\"]", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

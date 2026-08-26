@@ -51,6 +51,8 @@ releases or SSC versions.
 
 ### Fixed
 
+- Development memory-stress publication now preserves the frozen candidate's
+  canonical record and stores newer `main` attempts separately.
 - Real-world modern corpus figures now contain obvious navy/orange color, and
   manifest validation rejects declared color PDF/PNG assets whose drawing
   content is actually monochrome. Snapshot normalization also preserves the

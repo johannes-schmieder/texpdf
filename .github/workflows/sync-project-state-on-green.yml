@@ -23,6 +23,7 @@ on:
       - "licenses/generated/STATUS.json"
       - "release/macos-intel-runtime.json"
       - "release/macos-universal.json"
+      - "release/latest-memory-stress-macos-arm64.json"
       - "release/memory-stress-macos-arm64.json"
       - "release/scope.json"
       - "release/targets.json"

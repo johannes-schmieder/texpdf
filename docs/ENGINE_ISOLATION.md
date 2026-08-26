@@ -60,6 +60,7 @@ invocations rather than Stata, result transport, or the Rust SPI wrapper.
 Source-bound evidence is recorded in:
 
 - `release/memory-stress-macos-arm64.json`;
+- `release/latest-memory-stress-macos-arm64.json` for the latest attempt;
 - `release/memory-probe-rust-macos-arm64.json`.
 
 ## Safety properties

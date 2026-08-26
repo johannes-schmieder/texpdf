@@ -1,8 +1,6 @@
 {
-  "candidate_blockers": [
-    "macos_arm_memory_stress"
-  ],
-  "candidate_ready": false,
+  "candidate_blockers": [],
+  "candidate_ready": true,
   "candidate_version": "0.1.0-rc.2",
   "checks": [
     {
@@ -166,24 +164,21 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "source=329e323a2d386f49fabeb7d844c72feb2af40ef7; iterations=1000; peak_rss_kib=74816; post_warmup_growth_kib=48; growth_ratio=1.0006419858763107",
+      "candidate_release_blocker": false,
+      "detail": "source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; iterations=1000; peak_rss_kib=72304; post_warmup_growth_kib=32; growth_ratio=1.0004427717511624",
       "key": "macos_arm_memory_stress",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     }
   ],
   "implementation_complete_macos_arm64": true,
   "public_release_blockers": [
     "public_distribution",
-    "x86_64-pc-windows-msvc_runtime",
-    "macos_arm_memory_stress"
+    "x86_64-pc-windows-msvc_runtime"
   ],
   "public_release_ready": false,
-  "release_blockers": [
-    "macos_arm_memory_stress"
-  ],
+  "release_blockers": [],
   "release_kind": "private_release_candidate",
   "schema_version": 3
 }

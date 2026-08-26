@@ -133,7 +133,12 @@ def build_state(readiness_result: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(targets, dict):
         raise StateError("release/targets.json has no target registry")
     universal = read_json("release/macos-universal.json")
-    memory = read_json("release/memory-stress-macos-arm64.json")
+    latest_memory_path = ROOT / "release/latest-memory-stress-macos-arm64.json"
+    memory = read_json(
+        "release/latest-memory-stress-macos-arm64.json"
+        if latest_memory_path.is_file()
+        else "release/memory-stress-macos-arm64.json"
+    )
     licenses = read_json("licenses/generated/STATUS.json")
     development_licenses = read_json("licenses/development-audit/STATUS.json")
     qualification = read_json("bundle/QUALIFICATION.json")

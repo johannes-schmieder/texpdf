@@ -9,7 +9,7 @@ The active target is a **private `0.1.0-rc.2` macOS universal and Linux x86-64 r
 Windows, public distribution, and final `v0.1.0` publication are
 explicitly deferred and are not advertised as supported.
 
-Candidate ready: **false**
+Candidate ready: **true**
 
 Public release ready: **false**
 
@@ -74,7 +74,7 @@ The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b9
 
 ## Active private-candidate blockers
 
-- `macos_arm_memory_stress`
+None.
 
 ## Frozen candidate license evidence
 
@@ -90,7 +90,6 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 - `public_distribution`
 - `x86_64-pc-windows-msvc_runtime`
-- `macos_arm_memory_stress`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.
