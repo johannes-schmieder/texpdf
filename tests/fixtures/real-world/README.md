@@ -22,8 +22,10 @@ actual PDF drawing operators and PNG pixel data, so a nominally RGB asset that
 contains only black, white, and gray cannot silently replace a color figure.
 The legacy blackwhite scenario is intentionally monochrome.
 
-The legacy fixture currently compiles without warnings. If the obsolete
-`subfigure` package begins emitting a platform-specific warning, only an exact
+The legacy fixture includes two actual monochrome PDF graphs through obsolete
+`subfigure` syntax and currently compiles without warnings. Manifest validation
+rejects missing, unused, or accidentally colored legacy graph assets. If the
+obsolete package begins emitting a platform-specific warning, only an exact
 obsolete-package diagnostic may be added; new documents should use `subcaption`.
 
 Validate the corpus structure with:

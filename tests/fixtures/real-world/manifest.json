@@ -54,9 +54,18 @@
     {
       "id": "latexlog-legacy",
       "entrypoint": "latexlog-legacy/report.tex",
-      "assets": ["latexlog-legacy/tables/regression.tex"],
+      "assets": [
+        "latexlog-legacy/figures/legacy-outcome.pdf",
+        "latexlog-legacy/figures/legacy-exposure.pdf",
+        "latexlog-legacy/tables/regression.tex"
+      ],
+      "monochrome_assets": [
+        "latexlog-legacy/figures/legacy-outcome.pdf",
+        "latexlog-legacy/figures/legacy-exposure.pdf"
+      ],
       "capabilities": [
         "legacy-subfigure",
+        "monochrome-pdf-figures",
         "relative-input",
         "placeins",
         "figure-barrier",

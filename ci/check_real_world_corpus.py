@@ -252,6 +252,54 @@ def validate_manifest(manifest_path: Path, stata_path: Path) -> dict[str, Any]:
         elif color_asset_names:
             raise CorpusError(f"{identifier} must remain intentionally monochrome")
 
+        monochrome_assets = fixture.get("monochrome_assets", [])
+        if not isinstance(monochrome_assets, list):
+            raise CorpusError(f"{identifier} monochrome_assets must be a list")
+        monochrome_asset_names: set[str] = set()
+        for asset_number, asset in enumerate(monochrome_assets, 1):
+            relative = safe_relative(
+                asset, f"{identifier} monochrome asset {asset_number}"
+            )
+            encoded = str(relative)
+            if encoded in monochrome_asset_names:
+                raise CorpusError(
+                    f"{identifier} lists duplicate monochrome asset {encoded}"
+                )
+            if encoded not in asset_names:
+                raise CorpusError(
+                    f"{identifier} monochrome asset is not listed in assets: {encoded}"
+                )
+            monochrome_asset_names.add(encoded)
+            monochrome_path = resolve_file(
+                root, encoded, f"{identifier} monochrome asset {asset_number}"
+            )
+            if asset_has_chromatic_content(monochrome_path):
+                raise CorpusError(
+                    f"{identifier} monochrome asset contains color: {encoded}"
+                )
+        if identifier == "latexlog-legacy":
+            if len(monochrome_asset_names) != 2 or any(
+                PurePosixPath(value).suffix.lower() != ".pdf"
+                for value in monochrome_asset_names
+            ):
+                raise CorpusError(
+                    "latexlog-legacy must declare two monochrome PDF figure assets"
+                )
+            entrypoint_relative = safe_relative(
+                fixture["entrypoint"], f"{identifier} entrypoint"
+            )
+            entrypoint_text = entrypoint.read_text(encoding="utf-8")
+            for encoded in monochrome_asset_names:
+                figure_reference = PurePosixPath(encoded).relative_to(
+                    entrypoint_relative.parent
+                )
+                if f"{{{figure_reference}}}" not in entrypoint_text:
+                    raise CorpusError(
+                        f"{identifier} does not include monochrome asset: {encoded}"
+                    )
+        elif monochrome_asset_names:
+            raise CorpusError(f"unexpected monochrome assets on {identifier}")
+
         capabilities = fixture.get("capabilities")
         if not isinstance(capabilities, list) or not capabilities or not all(
             isinstance(value, str) and value for value in capabilities

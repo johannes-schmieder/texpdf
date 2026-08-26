@@ -122,6 +122,8 @@ its provenance manifests.
       Stata corpus gate.
 - [x] Make modern PDF/PNG figures visibly chromatic and fail validation if a
       declared color asset contains only black, white, or gray content.
+- [x] Replace legacy layout placeholders with two actual monochrome PDF graphs
+      and validate that both are included through legacy `subfigure` syntax.
 - [x] Record exact-source Apple Silicon Stata and SCC Linux core results for the
       development selection (`21cf28493624191d52488146b914b8d26cc5291d`;
       SCC job `7311141`, GLIBC 2.28).

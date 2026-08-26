@@ -51,6 +51,8 @@ releases or SSC versions.
   manifest validation rejects declared color PDF/PNG assets whose drawing
   content is actually monochrome. Snapshot normalization also preserves the
   intended orientation of Stata PDF graphs instead of auto-rotating a panel.
+- The legacy blackwhite corpus now embeds two real monochrome PDF graphs instead
+  of empty framed placeholders, with manifest checks for inclusion and color.
 - Exact bundle reconstruction preserves every metadata field required by the
   embedded Rust bundle reader.
 - Linux pkgconf probes use the same GNU feature environment as the compiled
