@@ -1,6 +1,6 @@
 {
-  "completed_at": "2026-08-26T16:20:56.003995Z",
-  "duration_seconds": 66.996,
+  "completed_at": "2026-08-26T16:31:59.230178Z",
+  "duration_seconds": 66.276,
   "failure_detail": null,
   "failure_kind": null,
   "platform": "Unix; Mac (Apple Silicon)",
@@ -31,7 +31,7 @@
     }
   ],
   "run_attempt": "1",
-  "run_id": "32987255339",
+  "run_id": "32988591952",
   "runner_name": "macstudio-stata-mp18-texpdf",
   "rust_mode": "repository-engine",
   "rust_rc": 0,
@@ -39,7 +39,7 @@
   "rust_toolchain": "1.97.1",
   "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
   "schema_version": 1,
-  "started_at": "2026-08-26T16:19:49.008028Z",
+  "started_at": "2026-08-26T16:30:52.954521Z",
   "stata_bundle_version": "19.0.115",
   "stata_edition": "MP",
   "stata_executable": "/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp",
