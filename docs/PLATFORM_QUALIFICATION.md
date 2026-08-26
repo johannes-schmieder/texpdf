@@ -9,7 +9,7 @@ platform.
 For each target, preserve:
 
 - exact Git source SHA;
-- `_texpdf_plugin.plugin` bytes and SHA-256;
+- the canonical platform plugin bytes and SHA-256;
 - embedded bundle SHA-256;
 - target triple and binary-policy report;
 - Stata executable path, version, and edition;
@@ -20,8 +20,9 @@ Do not rebuild the plugin between checksum recording and Stata testing.
 
 ## macOS Apple Silicon
 
-This is the connected qualification target. The self-hosted workflow builds the
-real embedded engine before running the `quick` profile under Stata/MP 18. The
+This is a connected qualification target. The self-hosted workflow builds the
+real embedded engine before running the `quick` profile under licensed Stata.
+The
 comprehensive checkpoint includes a real PDF compile, local `net install`,
 Unicode/relative paths, recoverable errors, and 100 installed-plugin calls.
 
@@ -40,7 +41,7 @@ Intel slice.
 
 ## Linux x86-64
 
-The private RC.2 artifact is built and qualified on BU SCC's RHEL 8/glibc 2.28
+The release artifact is built and qualified on BU SCC's RHEL 8/glibc 2.28
 environment, with TeX/native libraries statically linked. Inspect the ELF for
 RPATH/RUNPATH, accidental build paths, dynamic TeX libraries, exports, and
 required GLIBC symbol versions; no required symbol may exceed 2.28.
@@ -69,6 +70,10 @@ isolated ado path and temporary directory. The Windows harness must distinguish
 Stata-language errors from process exit status just like the macOS harness.
 It must run the `quick` and `stress` profiles and preserve an exact binary
 SHA-256 receipt.
+
+The quick profile must compile the full realistic corpus and all three runnable
+help examples with system TeX absent from `PATH`. Windows is advertised as
+qualified specifically on 64-bit Stata/MP 19.
 
 ## Promotion rule
 

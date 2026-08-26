@@ -10,6 +10,7 @@ program define texpdf, rclass
             exit 198
         }
 
+        quietly _texpdf_load_plugin
         tempfile result
         capture noisily plugin call _texpdf_plugin, version `"`result'"'
         local plugin_rc = _rc
@@ -72,6 +73,7 @@ program define texpdf, rclass
     }
 
     local replace_flag = cond("`replace'" == "", 0, 1)
+    quietly _texpdf_load_plugin
     tempfile result
     capture noisily plugin call _texpdf_plugin, compile `"`input'"' `"`output'"' `"`result'"' `replace_flag' 0
     local plugin_rc = _rc
@@ -116,9 +118,65 @@ program define texpdf, rclass
     return scalar warnings = `warnings'
 end
 
+program define _texpdf_load_plugin
+    version 14.1
+
+    local operating_system `"`c(os)'"'
+    if `"`operating_system'"' == "MacOSX" | ///
+            (`"`operating_system'"' == "Unix" & ///
+            strmatch(`"`c(machine_type)'"', "Mac*")) {
+        local plugin_file "_texpdf_plugin_macosx.plugin"
+    }
+    else if `"`operating_system'"' == "Unix" {
+        local plugin_file "_texpdf_plugin_unix.plugin"
+    }
+    else if `"`operating_system'"' == "Windows" {
+        local plugin_file "_texpdf_plugin_windows.plugin"
+    }
+    else {
+        display as error "texpdf does not include a native plugin for `operating_system'"
+        display as error "install a texpdf package for macOS, Linux, or 64-bit Windows"
+        exit 601
+    }
+
+    * A native plugin cannot be unloaded and safely reopened for every call.
+    * Reuse only a binding created by this dispatcher for the current OS. If
+    * an older generic binding is resident, fail closed and require a restart.
+    capture program _texpdf_plugin, plugin using("`plugin_file'")
+    local load_rc = _rc
+    if `load_rc' == 110 {
+        local loaded_plugin "$TEXPDF_NATIVE_PLUGIN_FILE"
+        if `"`loaded_plugin'"' == `"`plugin_file'"' exit
+        display as error "texpdf found an unknown or stale native plugin in this Stata session"
+        display as error "restart Stata after reinstalling texpdf"
+        exit 601
+    }
+    if `load_rc' {
+        display as error "texpdf could not load `plugin_file'"
+        display as error "reinstall texpdf for `operating_system' and restart Stata"
+        exit 601
+    }
+    global TEXPDF_NATIVE_PLUGIN_FILE "`plugin_file'"
+end
+
 program define _texpdf_view_pdf
     version 14.1
     args pdf
+
+    * Release CI supplies an isolated capture file so runnable help examples
+    * verify the view request without launching a desktop application.
+    local viewer_log : environment TEXPDF_VIEW_LOG
+    if `"`viewer_log'"' != "" {
+        tempname viewer_handle
+        capture file open `viewer_handle' using `"`viewer_log'"', write text append
+        if _rc {
+            display as error "texpdf could not record the PDF viewer request"
+            exit 603
+        }
+        file write `viewer_handle' `"`pdf'"' _n
+        file close `viewer_handle'
+        exit
+    }
 
     local unsafe = strpos(`"`pdf'"', char(36)) | ///
         strpos(`"`pdf'"', char(96)) | strpos(`"`pdf'"', char(34)) | ///
@@ -242,5 +300,3 @@ program define _texpdf_read_result, rclass
     return scalar warnings = `warning_number'
     return scalar diagnostic_count = `diagnostic_number'
 end
-
-program define _texpdf_plugin, plugin

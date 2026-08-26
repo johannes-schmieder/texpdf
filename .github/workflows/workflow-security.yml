@@ -1,0 +1,28 @@
+name: Audit public workflow security
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/**"
+      - "ci/check_workflow_security.py"
+      - "ci/tests/test_workflow_security.py"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Enforce workflow security policy
+        run: python3 ci/check_workflow_security.py
+
+      - name: Test workflow security policy
+        run: python3 -m unittest ci.tests.test_workflow_security

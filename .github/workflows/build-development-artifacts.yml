@@ -113,7 +113,7 @@ jobs:
           mkdir -p .ci/stata/run
           : > .ci/stata/run/artifact-checksums.sha256
           for path in \
-            stata/_texpdf_plugin.plugin \
+            stata/_texpdf_plugin_macosx.plugin \
             dist/texpdf-macos-arm64.zip \
             bundle/generated/texpdf-bundle.zip; do
             if [[ -f "$path" ]]; then
@@ -128,7 +128,7 @@ jobs:
         with:
           name: texpdf-macos-arm64-${{ github.sha }}-${{ inputs.profile }}
           path: |
-            stata/_texpdf_plugin.plugin
+            stata/_texpdf_plugin_macosx.plugin
             dist/texpdf-macos-arm64.zip
             dist/texpdf-macos-arm64/
             bundle/generated/bundle-info.json

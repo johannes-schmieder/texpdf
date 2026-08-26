@@ -7,6 +7,7 @@ __pycache__/
 /target/
 /.ci/stata/run/
 /bundle/generated/
+/licenses/generated/texts/
 /stata/texpdf.plugin
 /stata/_texpdf_plugin.plugin
 /dist/

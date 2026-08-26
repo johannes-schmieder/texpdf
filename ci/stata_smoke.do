@@ -168,7 +168,16 @@ if `full_engine' {
         local package_dir `"`repo'/dist/texpdf-macos-arm64"'
     }
     confirm file `"`package_dir'/texpdf.pkg"'
-    confirm file `"`package_dir'/_texpdf_plugin.plugin"'
+    if c(os) == "Windows" local installed_plugin "_texpdf_plugin_windows.plugin"
+    else if c(os) == "MacOSX" | ///
+            (c(os) == "Unix" & strmatch(c(machine_type), "Mac*")) ///
+        local installed_plugin "_texpdf_plugin_macosx.plugin"
+    else if c(os) == "Unix" local installed_plugin "_texpdf_plugin_unix.plugin"
+    else {
+        display as error "unsupported Stata operating system in installation test"
+        exit 601
+    }
+    confirm file `"`package_dir'/`installed_plugin'"'
     net install texpdf, from(`"`package_dir'"') replace
     discard
     adopath - `"`repo'/stata"'
@@ -187,11 +196,8 @@ if `full_engine' {
     local install_marker = "TEXPDF NET INSTALL " + "PASS"
     display as result `"`install_marker'"'
 
-    * The realistic corpus is intentionally limited to the native Apple
-    * Silicon lane. Intel macOS and licensed Linux keep the bounded smoke set.
-    if strpos(c(machine_type), "Apple Silicon") > 0 {
-        do `"`repo'/ci/stata_real_world_corpus.do"'
-    }
+    * Every release target compiles the same offline realistic corpus.
+    do `"`repo'/ci/stata_real_world_corpus.do"'
 
     local full_marker = "TEXPDF FULL ENGINE STATA " + "PASS"
     display as result `"`full_marker'"'

@@ -169,6 +169,7 @@ print(
 PY
 
   "$toolchain_cargo" fmt --all --check
+  "$python_bin" ci/check_workflow_security.py
   "$toolchain_cargo" clippy --locked --workspace --all-targets --all-features -- -D warnings
   if [[ "$rust_profile" == engine ]]; then
     "$toolchain_cargo" test --locked --workspace --all-targets --all-features
@@ -181,11 +182,14 @@ PY
 
   "$toolchain_cargo" build --locked --release --package texpdf-stata
   "$python_bin" tools/stage_plugin.py --target-dir "$CARGO_TARGET_DIR"
-  git add -f stata/_texpdf_plugin.plugin
+  staged_plugin=stata/_texpdf_plugin_macosx.plugin
+  if [[ "${OS:-}" == Windows_NT ]]; then staged_plugin=stata/_texpdf_plugin_windows.plugin; fi
+  if [[ "$(uname -s)" == Linux ]]; then staged_plugin=stata/_texpdf_plugin_unix.plugin; fi
+  git add -f "$staged_plugin"
 
   if [[ "$rust_profile" == engine ]]; then
     "$python_bin" tools/package_release.py \
-      --plugin stata/_texpdf_plugin.plugin \
+      --plugin "$staged_plugin" \
       --embedded-helper "$TEXPDF_HELPER_PATH" \
       --bundle-info bundle/generated/bundle-info.json \
       --output-dir dist/texpdf-macos-arm64 \

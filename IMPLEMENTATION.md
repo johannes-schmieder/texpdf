@@ -34,7 +34,8 @@ not cross the process protocol or public project API.
 
 ## Implemented guarantees
 
-- one installed plugin file per platform, with no separately distributed helper;
+- one installed plugin file per GitHub platform package and all three in the
+  combined SSC package, with no separately distributed helper;
 - target architecture and helper digest checked before execution;
 - content-addressed private helper cache with invalid-cache replacement;
 - direct no-shell execution and a configurable bounded timeout;
@@ -73,8 +74,8 @@ gates. See `SECURITY.md`.
 
 ## Platform and release boundary
 
-The private RC requires macOS ARM64, macOS Intel, and Linux x86-64 runtime
-qualification from one exact source SHA. Linux support is bounded to glibc 2.28
-or newer and the tested Stata/MP 18 and 19 runtimes. Windows remains deferred;
-build-only outputs are never marketed as runtime support. Public distribution
-and final `v0.1.0` are separate deferred gates.
+The public release requires macOS ARM64, macOS Intel, Linux x86-64, and Windows
+x86-64 runtime qualification from one exact source SHA. Linux support enforces
+a GLIBC 2.28 compatibility ceiling and licensed Stata/MP 18 and 19 tests.
+Windows requires static CRT linkage and licensed Stata/MP 19. Build-only
+outputs are never marketed as runtime support.

@@ -1,6 +1,6 @@
 # GPT Pro handoff: licensed Stata and Rust CI
 
-This private repository uses a repository-scoped GitHub Actions runner on Johannes's Mac Studio. Use it when a ChatGPT/GPT Pro session cannot execute licensed Stata or Rust in its own sandbox.
+This public repository uses a repository-scoped GitHub Actions runner on Johannes's Mac Studio. The runner is restricted to trusted pushes and explicit dispatches; no pull-request event can execute on it. Use it when a ChatGPT/GPT Pro session cannot execute licensed Stata or Rust in its own sandbox.
 
 ## What this repository provides
 
@@ -15,11 +15,12 @@ There is no self-hosted `pull_request` trigger and no redundant GitHub-hosted ma
 
 ## Available test machine
 
-- Runner: `macstudio-stata-mp18-texpdf`
-- Labels: `self-hosted`, `macOS`, `ARM64`, `stata`, `stata-mp`, `stata18`, `texpdf`
+- Runner: `macstudio-stata-mp18-texpdf` (historical machine name)
+- Workflow labels: `self-hosted`, `macOS`, `ARM64`, `stata-mp`, `texpdf`
 - Hardware: Mac Studio `Mac14,14`, Apple M2 Ultra, arm64, 24 CPU cores, 192 GB RAM
 - Operating system: macOS 26.5.2
-- Licensed Stata: Stata/MP 18, bundle 18.0.130
+- Licensed Stata: Stata/MP 19 at the default application path; Stata/MP 18 is
+  retained separately for explicit compatibility runs
 - Stata executable: `/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp`
 - Working Stata batch form: `stata-mp -q -b do FILE.do`
 - Rust: stable 1.97.1, plus installed 1.81.0 and 1.85.1 toolchains; rustfmt and Clippy are available
@@ -55,14 +56,18 @@ A missing exact-SHA receipt is not evidence that the source passed or failed. It
 
 ## GitHub access note
 
-OpenAI's standard ChatGPT GitHub app may be read-only in some ChatGPT experiences. If the current GPT Pro session lacks branch/file write actions, it cannot push a checkpoint by itself; use a write-capable Codex session or another authorized Git client for the push, then use the same receipt loop. Newly created private repositories may also need to be enabled under **Settings → Apps → GitHub → Choose repositories** and can take several minutes to appear.
+OpenAI's standard ChatGPT GitHub app may be read-only in some ChatGPT experiences. If the current GPT Pro session lacks branch/file write actions, it cannot push a checkpoint by itself; use a write-capable Codex session or another authorized Git client for the push, then use the same receipt loop.
 
 ## Security boundary
 
 The self-hosted runner executes workflow code with the authority of the logged-in macOS user. Therefore:
 
-- use only this private repository and trusted branches;
-- never enable execution for public repositories, public pull requests, or untrusted forks;
+- execute self-hosted jobs only from trusted pushes or explicit dispatches in
+  this repository;
+- never add `pull_request` or `pull_request_target` triggers to a self-hosted
+  or licensed-Stata workflow, and never execute an untrusted fork/ref;
+- keep every third-party action pinned to a full commit SHA and default
+  workflow permissions read-only;
 - never print, request, commit, or upload registration tokens, passwords, credentials, Stata license material, home-directory contents, unrelated files, or confidential research data;
 - use synthetic fixtures unless the owner explicitly authorizes data;
 - keep artifacts limited to `.ci/stata/run/`;

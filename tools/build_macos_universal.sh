@@ -7,7 +7,7 @@ toolchain="${RUST_TOOLCHAIN:-1.97.1}"
 cargo_bin="$($rustup_bin which --toolchain "$toolchain" cargo)"
 export RUSTC="$($rustup_bin which --toolchain "$toolchain" rustc)"
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/private/tmp/texpdf-cargo-target}"
-output="${1:-dist/macos-universal/_texpdf_plugin.plugin}"
+output="${1:-dist/macos-universal/_texpdf_plugin_macosx.plugin}"
 manifest="${2:-dist/macos-universal/manifest.json}"
 
 cd "$repo_root"

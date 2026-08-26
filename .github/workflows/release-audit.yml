@@ -25,7 +25,7 @@ jobs:
         run: >-
           /usr/bin/python3 tools/sync_project_state.py
           --check
-          --require-candidate-ready
+          --require-public-release-ready
 
       - name: Require synchronized Stata release metadata
         run: /usr/bin/python3 ci/check_release_metadata.py

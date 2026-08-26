@@ -2,7 +2,7 @@
 
 All notable user-facing changes to `texpdf` are recorded here. `Unreleased`
 describes development on `main`; dated sections are created only for final
-releases. Private release candidates are testing checkpoints, not stable
+releases. Release candidates are testing checkpoints, not stable
 releases or SSC versions.
 
 ## Unreleased
@@ -38,6 +38,16 @@ releases or SSC versions.
 - Three self-contained, one-click help examples for manual `file write` report
   construction, the suggested but optional `latexlog` workflow, and a polished
   three-model regression table created with Stata's built-in `etable`.
+- Cross-platform distribution support with canonical macOS, Linux, and Windows
+  plugin filenames, one plugin per GitHub package, and all three in the single
+  SSC package.
+- Fail-closed Windows Stata/MP 19 qualification tooling, including full corpus,
+  help-example, recovery, offline/no-system-TeX, and 1,000-call stress gates.
+- Deterministic SSC combination with a compressed complete license archive,
+  combined build manifest, and checksums.
+- A static public-workflow security audit for immutable action pins, minimal
+  permissions, and prohibition of pull-request execution on licensed or
+  self-hosted runners.
 
 ### Changed
 
@@ -49,6 +59,10 @@ releases or SSC versions.
   GitHub final tags as immutable snapshots, and `main` as development.
 - Bundle selection name/version now live in the pinned bundle lock, and current
   development identity is recorded separately from frozen candidate evidence.
+- Release scope and readiness are data-driven for RC/final version, exact
+  source, required targets, public GitHub authorization, and SSC authorization.
+- Public license manifests use portable provenance labels instead of local
+  machine paths.
 
 ### Fixed
 
@@ -68,6 +82,10 @@ releases or SSC versions.
   macOS and Linux.
 - Release builds reject stale helpers whose embedded bundle identity differs
   from regenerated bundle metadata.
+- Windows builds link the MSVC CRT statically and reject dynamic CRT imports.
+- The Stata dispatcher reuses only its verified platform binding and fails
+  closed on an unknown/stale resident plugin instead of trying to reload a
+  native library within the same session.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.

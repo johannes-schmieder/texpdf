@@ -30,8 +30,8 @@ net install texpdf, replace ///
     from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/main/stata/")
 ```
 
-`texpdf` contains a compiled plugin, and the private source tree does not
-currently commit a platform binary under `stata/`. Until CI publishes a public
+`texpdf` contains a compiled plugin, and the source tree does not commit
+platform binaries under `stata/`. Until CI publishes a public
 flat development tree, install development builds from the platform-specific
 CI artifact and verify its manifest. This limitation must not be hidden by
 publishing a command that cannot supply the plugin.
@@ -60,10 +60,15 @@ A final GitHub Release may contain:
 - source and qualification metadata;
 - complete third-party notices and inventories.
 
-Each installable platform tree contains `stata.toc`, `texpdf.pkg`, the ado and
-help files, the correct `_texpdf_plugin.plugin`, project and third-party
+Each installable GitHub platform tree contains `stata.toc`, `texpdf.pkg`, the
+ado and help files, exactly one of `_texpdf_plugin_macosx.plugin`,
+`_texpdf_plugin_unix.plugin`, or `_texpdf_plugin_windows.plugin`, project and third-party
 notices, `BUILD_INFO.json`, and `CHECKSUMS.sha256`. A package is supported only
 when its plugin was built from and qualified for the final tag.
+
+SSC installs all three native plugin files so the same `ssc install texpdf`
+command works on every supported operating system. The ado dispatcher never
+falls back to a stale generic `_texpdf_plugin.plugin`.
 
 ## Offline operation
 

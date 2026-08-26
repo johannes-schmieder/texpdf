@@ -122,7 +122,7 @@ with:
 
 ```sh
 python3 tools/package_release.py \
-  --plugin path/to/_texpdf_plugin.plugin \
+  --plugin path/to/platform-plugin \
   --embedded-helper path/to/texpdf-helper \
   --bundle-info path/to/bundle-info.json \
   --output-dir dist/texpdf-TARGET \
@@ -133,13 +133,13 @@ python3 tools/package_release.py \
 ```
 
 `--public-release` refuses to build unless the license audit is complete. It
-adds the generated inventories and collected texts under `LICENSES/` and lists
-them in the release-specific `texpdf.pkg`.
+adds the generated inventories and collected texts under `LICENSES/`. The
+release-specific `texpdf.pkg` lists exactly the plugin for that GitHub asset.
 
 Each target package must contain:
 
 - `texpdf.ado` and `texpdf.sthlp`;
-- the target `_texpdf_plugin.plugin`;
+- exactly one operating-system plugin with the canonical platform filename;
 - `texpdf.pkg` and `stata.toc`;
 - the project MIT License;
 - the third-party notice index;
@@ -149,6 +149,12 @@ Each target package must contain:
 Build ZIP archives deterministically and verify that a second build from the
 same source reproduces the resource ZIP and, where the platform toolchain
 permits, the plugin/package digest.
+
+After assembling the three platform packages and the combined SSC archive,
+run `tools/write_release_index.py`. It validates each archive against its
+package manifest and writes one source-bound release manifest plus
+`SHA256SUMS`; mismatched versions, targets, plugin names, license sources,
+hashes, and case-insensitive asset names are rejected.
 
 ## 6. Enforce the release gate
 
@@ -195,6 +201,13 @@ RC tags use `vX.Y.Z-rcN`, remain GitHub prereleases, and are never sent to SSC.
   directory.
 - If SSC review requires source changes, publish a new patch release; never
   alter or rebuild an existing final tag in place.
+- Combine the already-qualified package trees with
+  `tools/assemble_ssc_package.py`; require all shared files, bundle hashes, and
+  license-tree digests to match.
+- Include all three canonical plugin filenames and `texpdf_licenses.zip`, but
+  do not submit a `.pkg` file because SSC generates it.
+- Require the SSC archive and all three GitHub archives to pass the same
+  `tools/write_release_index.py` invocation before upload.
 
 ## 9. Post-release verification
 

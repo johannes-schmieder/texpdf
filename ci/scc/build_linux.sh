@@ -66,7 +66,7 @@ test -x "$TEXPDF_HELPER_PATH"
   --target x86_64-unknown-linux-gnu --jobs "$CARGO_BUILD_JOBS"
 
 mkdir -p dist/linux-x86_64
-plugin=dist/linux-x86_64/_texpdf_plugin.plugin
+plugin=dist/linux-x86_64/_texpdf_plugin_unix.plugin
 cp "$CARGO_TARGET_DIR/x86_64-unknown-linux-gnu/release/libtexpdf_stata.so" "$plugin"
 "$python_bin" tools/check_plugin_binary.py "$plugin" --platform linux \
   --maximum-glibc 2.28 --output dist/linux-x86_64/binary-policy.json
@@ -83,7 +83,7 @@ GITHUB_SHA="$source_sha" /bin/bash ci/prepare_release_license_evidence.sh
   --manifest dist/linux-x86_64/package-manifest.json \
   --target x86_64-unknown-linux-gnu \
   --package-version "$candidate_version" \
-  --include-license-evidence
+  --public-release
 
 cp "$plugin" "$output_dir/"
 cp dist/linux-x86_64/binary-policy.json "$output_dir/"
@@ -96,7 +96,7 @@ cp bundle/generated/bundle-info.json "$output_dir/"
 "$python_bin" ci/scc/write_linux_build_receipt.py \
   --source-sha "$source_sha" \
   --job-id "${JOB_ID:-local}" \
-  --plugin "$output_dir/_texpdf_plugin.plugin" \
+  --plugin "$output_dir/_texpdf_plugin_unix.plugin" \
   --helper "$TEXPDF_HELPER_PATH" \
   --package "$output_dir/texpdf-linux-x86_64.zip" \
   --package-manifest "$output_dir/package-manifest.json" \

@@ -24,8 +24,8 @@ GitHub prereleases for testing only and must never be submitted to SSC. A
 release candidate does not become final automatically: creating `v0.2.0` is a
 separate, explicit release decision.
 
-The existing private `0.1.0-rc.1`/`0.1.0-rc.2` evidence uses an older dotted
-RC label. Preserve those historical records; all new RC tags use `-rcN`.
+The existing private `v0.1.0-rc.1` prerelease is historical, macOS-only, and
+superseded. Preserve its tag and assets; all new RC tags use `-rcN`.
 
 ## Version numbers and immutable tags
 
@@ -106,6 +106,10 @@ Continue development on main
 5. Require exact-SHA receipts for every supported runtime. A build-only binary,
    the tip of `main`, or a receipt for another commit is not release evidence.
 6. Build all candidate assets from the chosen commit and record their hashes.
+7. Before the first cross-platform freeze, obtain the SSC archive maintainer's
+   confirmation that one package may ship the three platform plugins plus the
+   compressed `texpdf_licenses.zip`. Record the approved recipient, subject,
+   body, and response without committing private correspondence.
 
 If external testing is useful, create an annotated `vX.Y.Z-rcN` tag at that
 exact commit and a GitHub prerelease with the corresponding artifacts. RC
@@ -151,6 +155,15 @@ platform artifacts attached to that GitHub Release. Before submission:
    each supported platform and compile the release corpus offline;
 6. archive the submitted file list, hashes, final tag, GitHub Release URL, and
    SSC correspondence in the release record.
+
+The SSC submission is assembled with `tools/assemble_ssc_package.py`. It
+combines the already-qualified platform plugins, compresses the identical
+license tree as `texpdf_licenses.zip`, and deliberately omits `texpdf.pkg`;
+SSC generates the package index. Do not rebuild a plugin during combination.
+
+Run `tools/write_release_index.py` over the macOS, Linux, Windows, and SSC
+archives. Its source-bound manifest and combined `SHA256SUMS` are the release
+asset index; publish only archives accepted by that invocation.
 
 The SSC package version and GitHub final release must remain the same. If SSC
 review reveals a source defect, make the fix on `main` and publish a patch

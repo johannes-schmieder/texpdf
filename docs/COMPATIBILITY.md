@@ -41,12 +41,12 @@ example exports a `tableonly` LaTeX fragment and places it in a minimal wrapper
 document. Stata's complete-document `etable` export adds packages outside the
 current bundle and is therefore not the documented compatibility path.
 
-`colortbl`, `cleveref`, and `aer.bst` are development-tested pending a full
-runtime requalification of every supported target. The obsolete `subfigure`
+`colortbl`, `cleveref`, and `aer.bst` are included in the `0.1.0` compatibility
+corpus and become release-tested only when the exact final artifact passes on
+every required target. The obsolete `subfigure`
 package is retained only for legacy compatibility; the current isolated fixture
 is warning-free, and any future allowlist is limited to an exact obsolete-package
-warning. Use `subcaption` for new work. The development result does not advance
-the active release-candidate source.
+warning. Use `subcaption` for new work.
 
 ## Deliberate exclusions
 

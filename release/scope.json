@@ -1,15 +1,17 @@
 {
-  "candidate_version": "0.1.0-rc.2",
-  "candidate_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
-  "deferred_runtime_targets": [
-    "x86_64-pc-windows-msvc"
-  ],
-  "public_distribution_enabled": false,
-  "release_kind": "private_release_candidate",
+  "candidate_version": "0.1.0-rc2",
+  "candidate_source_sha": "11a07ef66f69db83e2a1317a900a1bcccf3b29ab",
+  "deferred_runtime_targets": [],
+  "github_release_enabled": true,
+  "public_distribution_enabled": true,
+  "release_kind": "public_release_candidate",
+  "repository_publication_authorized": true,
   "required_runtime_targets": [
     "aarch64-apple-darwin",
     "x86_64-apple-darwin",
-    "x86_64-unknown-linux-gnu"
+    "x86_64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc"
   ],
-  "schema_version": 1
+  "schema_version": 1,
+  "ssc_distribution_enabled": true
 }

@@ -164,7 +164,7 @@ def main() -> int:
         "stata_version": stata.get("stata_version"),
         "stata_edition": stata.get("stata_edition"),
         "stata_bundle_version": args.stata_bundle_version,
-        "stata_executable": args.stata_executable,
+        "stata_executable": Path(args.stata_executable).name,
         "platform": platform,
         "stata_processors": optional_int(stata.get("stata_processors")),
         "runner_name": args.runner_name,

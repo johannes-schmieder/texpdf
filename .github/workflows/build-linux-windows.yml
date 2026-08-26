@@ -85,21 +85,21 @@ jobs:
             --target x86_64-unknown-linux-gnu
           source="$CARGO_TARGET_DIR/x86_64-unknown-linux-gnu/release/libtexpdf_stata.so"
           mkdir -p dist/linux-x86_64
-          cp "$source" dist/linux-x86_64/_texpdf_plugin.plugin
-          nm -D --defined-only dist/linux-x86_64/_texpdf_plugin.plugin | grep -Eq '(^|[[:space:]])pginit$'
-          nm -D --defined-only dist/linux-x86_64/_texpdf_plugin.plugin | grep -Eq '(^|[[:space:]])stata_call$'
-          ldd dist/linux-x86_64/_texpdf_plugin.plugin | tee dist/linux-x86_64/ldd.txt
+          cp "$source" dist/linux-x86_64/_texpdf_plugin_unix.plugin
+          nm -D --defined-only dist/linux-x86_64/_texpdf_plugin_unix.plugin | grep -Eq '(^|[[:space:]])pginit$'
+          nm -D --defined-only dist/linux-x86_64/_texpdf_plugin_unix.plugin | grep -Eq '(^|[[:space:]])stata_call$'
+          ldd dist/linux-x86_64/_texpdf_plugin_unix.plugin | tee dist/linux-x86_64/ldd.txt
           if grep -Eiq '(fontconfig|freetype|harfbuzz|graphite|icu|libpng|libz\.so|vcpkg)' dist/linux-x86_64/ldd.txt; then
             echo "unexpected dynamically linked typesetting dependency" >&2
             exit 2
           fi
           python3 tools/check_plugin_binary.py \
-            dist/linux-x86_64/_texpdf_plugin.plugin \
+            dist/linux-x86_64/_texpdf_plugin_unix.plugin \
             --platform linux \
             --maximum-glibc 2.28 \
             --output dist/linux-x86_64/binary-policy.json
           python3 tools/plugin_smoke.py \
-            dist/linux-x86_64/_texpdf_plugin.plugin \
+            dist/linux-x86_64/_texpdf_plugin_unix.plugin \
             --bundle-info bundle/generated/bundle-info.json \
             --output dist/linux-x86_64/plugin-smoke.json
 
@@ -115,7 +115,7 @@ jobs:
           import platform
           import subprocess
 
-          plugin = Path("dist/linux-x86_64/_texpdf_plugin.plugin")
+          plugin = Path("dist/linux-x86_64/_texpdf_plugin_unix.plugin")
           sha = hashlib.sha256(plugin.read_bytes()).hexdigest()
           payload = {
               "schema_version": 1,
@@ -138,15 +138,14 @@ jobs:
           PY
           candidate_version=$(python3 -c 'import json; print(json.load(open("release/scope.json"))["candidate_version"])')
           python3 tools/package_release.py \
-            --plugin dist/linux-x86_64/_texpdf_plugin.plugin \
+            --plugin dist/linux-x86_64/_texpdf_plugin_unix.plugin \
             --embedded-helper "$RUNNER_TEMP/texpdf-target/x86_64-unknown-linux-gnu/release/texpdf-helper" \
             --bundle-info bundle/generated/bundle-info.json \
             --output-dir dist/texpdf-linux-x86_64 \
             --zip dist/texpdf-linux-x86_64.zip \
             --manifest dist/linux-x86_64/package-manifest.json \
             --target x86_64-unknown-linux-gnu \
-            --package-version "$candidate_version" \
-            --include-license-evidence
+            --package-version "$candidate_version"
 
       - name: Upload Linux development artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -207,7 +206,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $source = "$env:CARGO_TARGET_DIR\x86_64-pc-windows-msvc\release\texpdf_stata.dll"
           New-Item -ItemType Directory -Force -Path dist\windows-x86_64 | Out-Null
-          Copy-Item $source dist\windows-x86_64\_texpdf_plugin.plugin
+          Copy-Item $source dist\windows-x86_64\_texpdf_plugin_windows.plugin
+          Copy-Item $env:TEXPDF_HELPER_PATH dist\windows-x86_64\texpdf-helper.exe
 
       - name: Audit Windows exports and dependencies
         shell: pwsh
@@ -221,15 +221,22 @@ jobs:
               Sort-Object FullName -Descending |
               Select-Object -First 1
           if (-not $dumpbin) { throw "dumpbin.exe was not found" }
-          $plugin = "dist\windows-x86_64\_texpdf_plugin.plugin"
+          $plugin = "dist\windows-x86_64\_texpdf_plugin_windows.plugin"
+          $helper = "dist\windows-x86_64\texpdf-helper.exe"
           $exports = & $dumpbin.FullName /exports $plugin
           $exports | Set-Content -Encoding UTF8 dist\windows-x86_64\exports.txt
           if (-not ($exports -match '\bpginit\b')) { throw "pginit export is missing" }
           if (-not ($exports -match '\bstata_call\b')) { throw "stata_call export is missing" }
           $dependents = & $dumpbin.FullName /dependents $plugin
           $dependents | Set-Content -Encoding UTF8 dist\windows-x86_64\dependents.txt
-          if ($dependents -match '(?i)(fontconfig|freetype|harfbuzz|graphite|icu|libpng|zlib|vcpkg).*\.dll') {
+          $helperDependents = & $dumpbin.FullName /dependents $helper
+          $helperDependents | Set-Content -Encoding UTF8 dist\windows-x86_64\helper-dependents.txt
+          $allDependents = @($dependents) + @($helperDependents)
+          if ($allDependents -match '(?i)(fontconfig|freetype|harfbuzz|graphite|icu|libpng|zlib|vcpkg).*\.dll') {
               throw "unexpected dynamically linked typesetting dependency"
+          }
+          if ($allDependents -match '(?i)(vcruntime|msvcp|ucrtbase|api-ms-win-crt).*\.dll') {
+              throw "MSVC C/C++ runtime is dynamically linked"
           }
 
       - name: Write Windows artifact manifest and package
@@ -241,8 +248,28 @@ jobs:
           import json
           import os
           import platform
+          import re
 
-          plugin = Path(r"dist/windows-x86_64/_texpdf_plugin.plugin")
+          plugin = Path(r"dist/windows-x86_64/_texpdf_plugin_windows.plugin")
+          helper = Path(r"dist/windows-x86_64/texpdf-helper.exe")
+          dependencies = {
+              "plugin": Path(r"dist/windows-x86_64/dependents.txt").read_text(encoding="utf-8").splitlines(),
+              "helper": Path(r"dist/windows-x86_64/helper-dependents.txt").read_text(encoding="utf-8").splitlines(),
+          }
+          forbidden = [
+              line for lines in dependencies.values() for line in lines
+              if re.search(r"(?i)(vcruntime|msvcp|ucrtbase|api-ms-win-crt).*\.dll", line)
+          ]
+          policy = {
+              "schema_version": 1,
+              "target": "x86_64-pc-windows-msvc",
+              "static_msvc_crt": not forbidden,
+              "forbidden_dynamic_crt_dependencies": forbidden,
+              "violations": ([] if not forbidden else ["dynamic-msvc-crt"]),
+          }
+          Path(r"dist/windows-x86_64/binary-policy.json").write_text(
+              json.dumps(policy, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
           payload = {
               "schema_version": 1,
               "source_sha": os.environ["GITHUB_SHA"],
@@ -250,8 +277,11 @@ jobs:
               "build_platform": platform.platform(),
               "plugin_size_bytes": plugin.stat().st_size,
               "plugin_sha256": hashlib.sha256(plugin.read_bytes()).hexdigest(),
+              "helper_size_bytes": helper.stat().st_size,
+              "helper_sha256": hashlib.sha256(helper.read_bytes()).hexdigest(),
               "exports": ["pginit", "stata_call"],
-              "dynamic_dependencies": Path(r"dist/windows-x86_64/dependents.txt").read_text(encoding="utf-8").splitlines(),
+              "dynamic_dependencies": dependencies,
+              "binary_policy": policy,
               "rust_tests": "success",
               "stata_runtime_qualified": False,
               "qualification_boundary": "Compiler/core tests passed on Windows; actual licensed Windows Stata loading is still required.",
@@ -262,14 +292,16 @@ jobs:
           )
           print("TEXPDF_WINDOWS_BUILD_READY", payload)
           '@ | python -
+          $candidateVersion = (Get-Content release\scope.json | ConvertFrom-Json).candidate_version
           python tools/package_release.py `
-            --plugin dist\windows-x86_64\_texpdf_plugin.plugin `
+            --plugin dist\windows-x86_64\_texpdf_plugin_windows.plugin `
             --embedded-helper "$env:RUNNER_TEMP\texpdf-target\x86_64-pc-windows-msvc\release\texpdf-helper.exe" `
             --bundle-info bundle\generated\bundle-info.json `
             --output-dir dist\texpdf-windows-x86_64 `
             --zip dist\texpdf-windows-x86_64.zip `
             --manifest dist\windows-x86_64\package-manifest.json `
-            --target x86_64-pc-windows-msvc
+            --target x86_64-pc-windows-msvc `
+            --package-version $candidateVersion
 
       - name: Upload Windows development artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

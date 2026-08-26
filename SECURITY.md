@@ -47,7 +47,7 @@ gates remain part of qualification.
 
 ## Reporting vulnerabilities
 
-Report suspected vulnerabilities privately to the repository owner. Include
+Use GitHub's private vulnerability reporting for this repository. Include
 the exact source/tag and plugin SHA-256, OS/architecture/Stata version, a minimal
 nonconfidential reproducer, and the outcome category. Do not include
 credentials, Stata license material, confidential data, or unrelated files in

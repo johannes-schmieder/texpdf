@@ -1,6 +1,7 @@
 # BU SCC Linux qualification
 
-This is the authoritative Linux runtime gate for the private RC. Hosted Linux
+This is the authoritative Linux runtime gate for a release candidate or final
+release. Hosted Linux
 artifacts remain useful development evidence but do not qualify a Stata target.
 
 ## Development-only core corpus

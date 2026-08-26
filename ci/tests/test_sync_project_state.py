@@ -52,6 +52,7 @@ class ProjectStateTests(unittest.TestCase):
                     "aarch64-apple-darwin",
                     "x86_64-apple-darwin",
                     "x86_64-unknown-linux-gnu",
+                    "x86_64-pc-windows-msvc",
                 ],
             },
             "readiness": {
@@ -127,7 +128,7 @@ class ProjectStateTests(unittest.TestCase):
         self.assertIn("development-bundle", rendered)
         self.assertIn("different artifacts", rendered)
         self.assertIn("392/392 mapped", rendered)
-        self.assertIn("Frozen candidate license-audit source", rendered)
+        self.assertIn("Last completed candidate license-audit source", rendered)
 
 
 if __name__ == "__main__":

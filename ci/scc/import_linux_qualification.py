@@ -24,6 +24,7 @@ def compact_package(manifest: dict[str, object]) -> dict[str, object]:
     keys = (
         "package_version",
         "target",
+        "installed_plugin",
         "package_zip_sha256",
         "package_zip_size_bytes",
         "plugin_sha256",
@@ -36,6 +37,7 @@ def compact_package(manifest: dict[str, object]) -> dict[str, object]:
         "release_license_complete",
         "license_audit_source_sha",
         "public_release_mode",
+        "release_license_complete",
     )
     return {key: manifest.get(key) for key in keys}
 
@@ -101,7 +103,7 @@ def main() -> int:
     target = registry.setdefault("targets", {}).setdefault("x86_64-unknown-linux-gnu", {})
     target.update(
         {
-            "artifact": "_texpdf_plugin.plugin",
+            "artifact": "_texpdf_plugin_unix.plugin",
             "build_qualified": True,
             "build_source_sha": source_sha,
             "qualified_source_sha": source_sha,

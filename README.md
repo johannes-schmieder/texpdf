@@ -9,7 +9,9 @@ texpdf using paper.tex, replace view
 texpdf, version
 ```
 
-The package installs one native Stata plugin. The plugin contains a thin Rust
+Each GitHub package installs one operating-system-specific native Stata plugin;
+the combined SSC package installs all three and selects the correct one at
+runtime. The plugin contains a thin Rust
 SPI bridge plus a target-matching compiler helper that embeds Tectonic 0.17.0,
 its native libraries, and a curated academic TeX resource bundle. The bridge
 verifies and extracts the helper into a private cache and launches it directly.
@@ -19,10 +21,11 @@ Rust toolchain, package download, or network connection.
 ## Project state
 
 `main` is the active development branch; it is not a stable distribution
-channel. The private `0.1.0-rc.2` qualification checkpoint covers macOS
-universal and Linux x86-64, including a GLIBC 2.28 floor and licensed Stata/MP
-18 and 19 qualification on BU SCC. It is not a final release and is not eligible
-for SSC. Windows, public distribution, and final `v0.1.0` remain deferred.
+channel. The active scope prepares a public `0.1.0-rc2` for macOS universal,
+Linux x86-64 with a GLIBC 2.28 ceiling, and Windows x86-64. All four runtime
+targets are required and none is deferred. Historical private RC evidence is
+preserved, but the new cross-platform source and artifacts must be fully
+requalified before the RC or final `v0.1.0` is published.
 
 Exact SHAs, artifact sizes, target support, failed attempts, and live blockers
 are generated from repository evidence in [`STATUS.md`](STATUS.md) and
@@ -64,9 +67,10 @@ net install texpdf, replace ///
     from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/main/stata/")
 ```
 
-The repository is currently private, and `texpdf` requires a compiled
-platform plugin, so use a qualified CI development artifact until that public
-tree exists. Do not treat the command above as a stable-release install.
+Because `texpdf` requires a compiled platform plugin and binaries are not
+committed to `main`, use a platform-specific development artifact until a
+public flat development tree exists. Do not treat the command above as a
+stable-release install.
 
 ### Exact historical release
 
@@ -141,3 +145,7 @@ Project-owned source is MIT licensed. Embedded TeX resources, fonts, Tectonic,
 and native libraries retain their upstream licenses. Candidate packaging is
 fail-closed unless the exact plugin/helper graphs, bundle resources, and full
 notice tree pass the source-bound audit.
+
+The intended `0.1.0` runtime matrix is Stata 18 and 19 overall. Windows is
+qualified specifically with 64-bit Stata/MP 19; the exact per-target record is
+authoritative.

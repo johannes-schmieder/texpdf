@@ -38,7 +38,7 @@ PY
 
 export TEXPDF_PYTHON="$python_bin"
 export STATA_BIN="$stata_bin"
-export TEXPDF_STATA_PLUGIN="$build_dir/_texpdf_plugin.plugin"
+export TEXPDF_STATA_PLUGIN="$build_dir/_texpdf_plugin_unix.plugin"
 export TEXPDF_STATA_PACKAGE_DIR="$build_dir/package"
 export TEXPDF_STATA_PACKAGE_MANIFEST="$build_dir/package-manifest.json"
 export TEXPDF_STATA_ARTIFACT_DIR="$evidence_dir"

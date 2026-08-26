@@ -110,7 +110,7 @@ jobs:
           targets = payload.setdefault("targets", {})
           arm = targets.setdefault("aarch64-apple-darwin", {})
           arm.update({
-              "artifact": "_texpdf_plugin.plugin",
+              "artifact": "_texpdf_plugin_macosx.plugin",
               "build_qualified": True,
               "build_source_sha": source_sha,
               "plugin_sha256": plugin_sha,
@@ -222,15 +222,15 @@ jobs:
               json.dumps(qualification, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
-          for target in (
-              "x86_64-apple-darwin",
-              "x86_64-pc-windows-msvc",
-              "x86_64-unknown-linux-gnu",
+          for target, artifact in (
+              ("x86_64-apple-darwin", "_texpdf_plugin_macosx.plugin"),
+              ("x86_64-pc-windows-msvc", "_texpdf_plugin_windows.plugin"),
+              ("x86_64-unknown-linux-gnu", "_texpdf_plugin_unix.plugin"),
           ):
               targets.setdefault(
                   target,
                   {
-                      "artifact": "_texpdf_plugin.plugin",
+                      "artifact": artifact,
                       "plugin_sha256": "",
                       "qualified_source_sha": "",
                       "qualification_profile": "",

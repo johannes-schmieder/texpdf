@@ -2,7 +2,7 @@
   "schema_version": 1,
   "targets": {
     "aarch64-apple-darwin": {
-      "artifact": "_texpdf_plugin.plugin",
+      "artifact": "_texpdf_plugin_macosx.plugin",
       "build_qualified": true,
       "build_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
       "bundle_zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
@@ -52,7 +52,7 @@
       "universal_plugin_size_bytes": 98532016
     },
     "x86_64-apple-darwin": {
-      "artifact": "_texpdf_plugin.plugin",
+      "artifact": "_texpdf_plugin_macosx.plugin",
       "build_qualified": true,
       "build_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
       "candidate_package_license_evidence_included": true,
@@ -78,7 +78,7 @@
       "universal_plugin_size_bytes": 98532016
     },
     "x86_64-pc-windows-msvc": {
-      "artifact": "_texpdf_plugin.plugin",
+      "artifact": "_texpdf_plugin_windows.plugin",
       "plugin_sha256": "",
       "qualification_profile": "",
       "qualified_source_sha": "",
@@ -87,7 +87,7 @@
       "status": "native build and Stata runtime qualification pending"
     },
     "x86_64-unknown-linux-gnu": {
-      "artifact": "_texpdf_plugin.plugin",
+      "artifact": "_texpdf_plugin_unix.plugin",
       "build_qualified": true,
       "build_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
       "bundle_zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",

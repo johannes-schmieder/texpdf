@@ -1,15 +1,17 @@
 # Licensed Stata/Rust CI runner
 
-`texpdf` uses one private, repository-level GitHub Actions runner on the Mac
-Studio. Workflow code executes as the logged-in `johannes` macOS account and
-therefore has the same practical authority as that account.
+`texpdf` uses one repository-level GitHub Actions runner on the Mac Studio.
+The repository is public, but self-hosted jobs run only for trusted pushes and
+explicit dispatches—never for pull requests or fork code. Workflow code
+executes as the logged-in `johannes` macOS account and therefore has the same
+practical authority as that account.
 
 ## Machine and tools
 
 - Mac Studio `Mac14,14`, Apple M2 Ultra, arm64, 24 CPU cores, 192 GB RAM.
 - macOS 26.5.2 build 25F84.
-- Stata/MP 18 bundle 18.0.130, executable
-  `/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp`.
+- Stata/MP 19 at `/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp`;
+  Stata/MP 18 is retained under `/Applications/Stata 18/` for explicit lanes.
 - Batch invocation: `stata-mp -q -b do FILE.do`.
 - Rust stable 1.97.1 with rustfmt and Clippy; installed pinned toolchains also
   include 1.81.0 and 1.85.1.
@@ -57,9 +59,8 @@ change. Receipt paths are excluded from triggers and commits use `[skip ci]`.
 
 - Installation: `/Users/johannes/actions-runners/texpdf-stata`.
 - Runner name: `macstudio-stata-mp18-texpdf`.
-- Scope: private `johannes-schmieder/texpdf` repository only.
-- Labels: `self-hosted`, `macOS`, `ARM64`, `stata`, `stata-mp`, `stata18`,
-  `texpdf`.
+- Scope: public `johannes-schmieder/texpdf` repository, trusted events only.
+- Workflow labels: `self-hosted`, `macOS`, `ARM64`, `stata-mp`, `texpdf`.
 - Work directory: `_work` under the installation.
 - LaunchAgent:
   `/Users/johannes/Library/LaunchAgents/actions.runner.johannes-schmieder-texpdf.macstudio-stata-mp18-texpdf.plist`.
@@ -88,8 +89,10 @@ directory. Never store a token in this file or Git.
 
 ## Security assumptions
 
-- The repository remains private and workflow writers are trusted.
-- Fork and pull-request execution remain disabled.
+- Repository writers and workflow dispatchers are trusted; the repository is
+  public but fork and pull-request execution on this runner remain disabled.
+- `pull_request_target` is prohibited everywhere and all third-party actions
+  are pinned to full commit SHAs by the static workflow-security check.
 - Artifacts are restricted to `.ci/stata/run/` and synthetic fixtures.
 - Home-directory content, credentials, license material, and confidential
   research data are never uploaded.

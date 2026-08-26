@@ -203,9 +203,11 @@ def render_status(state: dict[str, Any]) -> str:
         "",
         "## Release scope",
         "",
-        f"The active target is a **private `{scope.get('candidate_version')}` macOS universal and Linux x86-64 release candidate**.",
-        "Windows, public distribution, and final `v0.1.0` publication are",
-        "explicitly deferred and are not advertised as supported.",
+        f"The active target is a **public `{scope.get('candidate_version')}` cross-platform release candidate**.",
+        "macOS universal, Linux x86-64, and Windows x86-64 are all required;",
+        "no runtime target is deferred. Public GitHub and SSC distribution are",
+        "authorized, but publication remains fail-closed until every exact-source",
+        "qualification and asset-validation gate passes.",
         "",
         f"Candidate ready: **{str(readiness.get('candidate_ready')).lower()}**",
         "",
@@ -229,14 +231,15 @@ def render_status(state: dict[str, Any]) -> str:
         f"| Licensed Stata runtime | {code(latest.get('platform'))}; {code(latest.get('stata_edition'))} {code(latest.get('stata_version'))} |",
         f"| Current ARM64 artifact source | {code(state.get('artifact_source'))} |",
         f"| Current universal build source | {code(universal.get('source_sha'))} |",
-        f"| Frozen candidate license-audit source | {code(licenses.get('source_sha'))} |",
+        f"| Last completed candidate license-audit source | {code(licenses.get('source_sha'))} |",
         f"| Latest memory-stress attempt | {code(memory_record.get('source_sha'))}; qualified={yes_no(memory_record.get('qualified'))} |",
         "",
         "## Development bundle on `main`",
         "",
-        "The frozen private candidate and the current development bundle are different artifacts.",
-        "Candidate readiness above applies only to the older qualified bytes and does not",
-        "qualify the newer bundle embedded by `main`.",
+        "The last frozen candidate and the current development bundle are different artifacts.",
+        "Historical readiness applies only to the older qualified bytes and does not",
+        "qualify the newer bundle embedded by `main`; the active public candidate must",
+        "replace every target record with exact-source evidence.",
         "",
         "| Development selection | Value |",
         "|---|---|",
@@ -289,7 +292,7 @@ def render_status(state: dict[str, Any]) -> str:
             f"{mib(universal.get('universal', {}).get('size_bytes'))} "
             f"({code(universal.get('universal', {}).get('sha256'))}).",
             "",
-            "## Active private-candidate blockers",
+            "## Active candidate blockers",
             "",
         ]
     )
@@ -302,7 +305,7 @@ def render_status(state: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## Frozen candidate license evidence",
+            "## Previous candidate license evidence",
             "",
             f"The source-bound audit covers {tex.get('resource_count', 0)} embedded TeX/font resources: "
             f"{tex.get('mapped', 0)} mapped, {tex.get('ambiguous', 0)} ambiguous, "
@@ -316,7 +319,7 @@ def render_status(state: dict[str, Any]) -> str:
             f"{development_tex.get('mapped', 0)} mapped, "
             f"{development_tex.get('ambiguous', 0)} ambiguous, and "
             f"{development_tex.get('unmapped', 0)} unmapped. It does not alter "
-            "the frozen candidate evidence above.",
+            "the previous candidate evidence above.",
             "",
             "## Memory evidence",
             "",
@@ -330,7 +333,7 @@ def render_status(state: dict[str, Any]) -> str:
                 else "This failed attempt is retained as evidence and is not described as qualification."
             ),
             "",
-            "## Deferred public-release blockers",
+            "## Public-release blockers",
             "",
         ]
     )
@@ -374,7 +377,12 @@ def main() -> int:
     parser.add_argument(
         "--require-candidate-ready",
         action="store_true",
-        help="also fail while a private-candidate blocker remains",
+        help="also fail while a candidate blocker remains",
+    )
+    parser.add_argument(
+        "--require-public-release-ready",
+        action="store_true",
+        help="also fail while a public-release blocker remains",
     )
     args = parser.parse_args()
 
@@ -401,6 +409,13 @@ def main() -> int:
         print(
             "TEXPDF_CANDIDATE_BLOCKED blockers="
             + ",".join(readiness["candidate_blockers"]),
+            file=sys.stderr,
+        )
+        return 2
+    if args.require_public_release_ready and not readiness["public_release_ready"]:
+        print(
+            "TEXPDF_PUBLIC_RELEASE_BLOCKED blockers="
+            + ",".join(readiness["public_release_blockers"]),
             file=sys.stderr,
         )
         return 2

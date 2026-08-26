@@ -4,7 +4,16 @@ This document separates demonstrated behavior from intended support. The
 machine-readable records under `.ci/stata/results/` and `release/` are the
 source of truth.
 
-## RC.2 candidate
+## Active public 0.1.0 qualification
+
+The active scope requires macOS Apple Silicon, macOS Intel, Linux x86-64, and
+Windows x86-64 at one exact source SHA. The public `v0.1.0-rc2` and final
+`v0.1.0` each require their own complete evidence matrix; the final metadata
+commit is requalified rather than inheriting RC evidence. Until those records
+are complete, `release/READINESS.json` must report the public release as not
+ready.
+
+## Historical private RC.2 evidence
 
 The private `0.1.0-rc.2` candidate is bound to source:
 
@@ -68,7 +77,6 @@ The qualification corpus covers:
 
 ## Deliberately deferred
 
-This candidate does not certify Windows x86-64, Stata releases other than
-those recorded per target, arbitrary TeX Live documents outside the documented
-compatibility tier, or safety under unbounded/adversarial input. Public release
-and final `v0.1.0` publication remain separate decisions.
+The historical candidate does not certify Windows x86-64, the newer realistic
+corpus bundle, or the current cross-platform distribution layout. It remains
+valid only for its recorded bytes and must not be reused for public promotion.

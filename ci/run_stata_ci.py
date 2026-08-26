@@ -64,6 +64,16 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def host_plugin_filename() -> str:
+    if sys.platform == "darwin":
+        return "_texpdf_plugin_macosx.plugin"
+    if sys.platform == "win32":
+        return "_texpdf_plugin_windows.plugin"
+    if sys.platform.startswith("linux"):
+        return "_texpdf_plugin_unix.plugin"
+    raise RuntimeError(f"unsupported Stata CI platform: {sys.platform}")
+
+
 def write_json_atomic(path: Path, payload: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -83,13 +93,28 @@ def stage_runtime_artifacts(staged_root: Path, run_root: Path) -> dict[str, obje
     package_source = Path(package_text).expanduser().resolve() if package_text else None
     if package_source is not None and not package_source.is_dir():
         raise FileNotFoundError(f"Stata package directory is missing: {package_source}")
+
+    manifest: dict[str, object] = {}
+    if manifest_text:
+        manifest_path = Path(manifest_text).expanduser().resolve()
+        value = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if not isinstance(value, dict):
+            raise ValueError("TEXPDF_STATA_PACKAGE_MANIFEST must contain a JSON object")
+        manifest = value
+    installed_plugin = manifest.get("installed_plugin", host_plugin_filename())
+    if not isinstance(installed_plugin, str) or installed_plugin != host_plugin_filename():
+        raise ValueError(
+            "package manifest plugin does not match this Stata operating system: "
+            f"{installed_plugin}"
+        )
+
     plugin_source = Path(plugin_text).expanduser().resolve() if plugin_text else None
     if plugin_source is None and package_source is not None:
-        plugin_source = package_source / "_texpdf_plugin.plugin"
+        plugin_source = package_source / installed_plugin
     if plugin_source is None or not plugin_source.is_file():
         raise FileNotFoundError(f"Stata plugin is missing: {plugin_source}")
 
-    staged_plugin = staged_root / "stata" / "_texpdf_plugin.plugin"
+    staged_plugin = staged_root / "stata" / installed_plugin
     staged_plugin.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(plugin_source, staged_plugin)
 
@@ -99,19 +124,12 @@ def stage_runtime_artifacts(staged_root: Path, run_root: Path) -> dict[str, obje
         shutil.copytree(package_source, staged_package)
         os.environ["TEXPDF_STATA_PACKAGE_DIR"] = str(staged_package)
 
-    manifest: dict[str, object] = {}
-    if manifest_text:
-        manifest_path = Path(manifest_text).expanduser().resolve()
-        value = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if not isinstance(value, dict):
-            raise ValueError("TEXPDF_STATA_PACKAGE_MANIFEST must contain a JSON object")
-        manifest = value
-
     identity: dict[str, object] = {
         "schema_version": 1,
+        "installed_plugin": installed_plugin,
         "plugin_sha256": sha256_file(staged_plugin),
         "plugin_size_bytes": staged_plugin.stat().st_size,
-        "package_directory": str(staged_package) if staged_package else None,
+        "package_directory": "isolated-qualified-package" if staged_package else None,
         "package_version": manifest.get("package_version"),
         "package_zip_sha256": manifest.get("package_zip_sha256"),
         "package_zip_size_bytes": manifest.get("package_zip_size_bytes"),
@@ -173,11 +191,12 @@ def seed_stata_plus(config: dict[str, object], run_root: Path) -> None:
 
 
 def install_macos_viewer_shim(run_root: Path) -> None:
+    viewer_log = run_root / "viewer-invocations.txt"
+    os.environ["TEXPDF_VIEW_LOG"] = str(viewer_log)
     if sys.platform != "darwin":
         return
     shim_directory = run_root / "viewer-bin"
     shim_directory.mkdir()
-    viewer_log = run_root / "viewer-invocations.txt"
     opener = shim_directory / "open"
     opener.write_text(
         "#!/bin/sh\n"
@@ -186,7 +205,6 @@ def install_macos_viewer_shim(run_root: Path) -> None:
         encoding="utf-8",
     )
     opener.chmod(0o755)
-    os.environ["TEXPDF_VIEW_LOG"] = str(viewer_log)
     os.environ["PATH"] = str(shim_directory) + os.pathsep + os.environ.get("PATH", "")
 
 
@@ -267,10 +285,10 @@ def main() -> int:
     replacements = {"repo_root": str(staged_root), "run_root": str(run_root)}
     suite_arguments = [str(value).format(**replacements) for value in raw_arguments]
 
+    stata_flags = ["/q", "/e"] if sys.platform == "win32" else ["-q", "-b"]
     stata_command = [
         str(stata_executable),
-        "-q",
-        "-b",
+        *stata_flags,
         "do",
         str(staged_root / "ci" / "stata_ci.do"),
         str(staged_root / str(profile["suite"])),

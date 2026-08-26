@@ -127,8 +127,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cp dist/macos-universal/_texpdf_plugin.plugin stata/_texpdf_plugin.plugin
-          git add -f stata/_texpdf_plugin.plugin
+          cp dist/macos-universal/_texpdf_plugin_macosx.plugin stata/_texpdf_plugin_macosx.plugin
+          git add -f stata/_texpdf_plugin_macosx.plugin
           wrapper="$RUNNER_TEMP/texpdf-stata-x86_64"
           cat > "$wrapper" <<'SH'
           #!/bin/bash
@@ -257,7 +257,7 @@ jobs:
           universal_plugin = universal["universal"]
           target = registry["targets"]["x86_64-apple-darwin"]
           target.update({
-              "artifact": "_texpdf_plugin.plugin",
+              "artifact": "_texpdf_plugin_macosx.plugin",
               "build_qualified": True,
               "build_source_sha": record["source_sha"],
               "plugin_sha256": intel_slice["sha256"],

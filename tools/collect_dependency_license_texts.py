@@ -75,10 +75,18 @@ def safe_component(value: str) -> str:
     )
 
 
+def portable_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(Path.cwd().resolve()).as_posix()
+    except ValueError:
+        return path.name
+
+
 def copy_notices(
     source_root: Path,
     destination: Path,
     *,
+    source_label: str,
     include_notice_directories: bool = True,
 ) -> list[dict[str, object]]:
     records: list[dict[str, object]] = []
@@ -92,8 +100,8 @@ def copy_notices(
         shutil.copyfile(source, target)
         records.append(
             {
-                "source": str(source),
-                "file": str(target),
+                "source": f"{source_label}/{relative.as_posix()}",
+                "file": portable_path(target),
                 "sha256": sha256(target),
                 "size_bytes": target.stat().st_size,
             }
@@ -125,8 +133,8 @@ def copy_canonical_spdx_texts(
         shutil.copyfile(source, target)
         records.append(
             {
-                "source": str(source),
-                "file": str(target),
+                "source": f"repository:{source.as_posix()}",
+                "file": portable_path(target),
                 "sha256": sha256(target),
                 "size_bytes": target.stat().st_size,
                 "spdx_component": component,
@@ -148,7 +156,8 @@ def collect_rust(
         destination = output_root / "rust" / safe_component(
             f"{package['name']}-{package['version']}"
         )
-        notices = copy_notices(package_root, destination)
+        package_label = f"cargo:{package['name']}@{package['version']}"
+        notices = copy_notices(package_root, destination, source_label=package_label)
         notice_origin = "package"
         license_file = package.get("license_file")
         if license_file:
@@ -156,15 +165,15 @@ def collect_rust(
             if not license_path.is_absolute():
                 license_path = package_root / license_path
             if license_path.is_file() and all(
-                Path(record["source"]).resolve() != license_path.resolve()
+                Path(str(record["file"])).name != license_path.name
                 for record in notices
             ):
                 target = destination / license_path.name
                 shutil.copyfile(license_path, target)
                 notices.append(
                     {
-                        "source": str(license_path),
-                        "file": str(target),
+                        "source": f"{package_label}/{license_path.name}",
+                        "file": portable_path(target),
                         "sha256": sha256(target),
                         "size_bytes": target.stat().st_size,
                     }
@@ -177,6 +186,7 @@ def collect_rust(
             notices = copy_notices(
                 workspace_root,
                 destination,
+                source_label="repository:workspace",
                 include_notice_directories=False,
             )
             notice_origin = "workspace_root"
@@ -228,8 +238,8 @@ def collect_native(
             shutil.copyfile(source, target)
             notices.append(
                 {
-                    "source": str(source),
-                    "file": str(target),
+                    "source": f"vcpkg:{port}/copyright",
+                    "file": portable_path(target),
                     "sha256": sha256(target),
                     "size_bytes": target.stat().st_size,
                 }

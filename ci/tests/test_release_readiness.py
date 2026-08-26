@@ -145,6 +145,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                         "status": "Windows pending",
                     },
                     "x86_64-unknown-linux-gnu": {
+                        "artifact": "_texpdf_plugin_unix.plugin",
                         "stata_runtime_qualified": False,
                         "status": "Linux pending",
                     },
@@ -263,7 +264,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         self.assertTrue(by_key["macos_universal_build"]["passed"])
         self.assertTrue(by_key["macos_intel_build"]["passed"])
         self.assertFalse(by_key["macos_intel_runtime"]["passed"])
-        self.assertFalse(by_key["private_candidate_package"]["passed"])
+        self.assertFalse(by_key["macos_candidate_package"]["passed"])
         self.assertTrue(by_key["third_party_license_complete"]["passed"])
         self.assertTrue(by_key["macos_arm_memory_stress"]["passed"])
         self.assertFalse(by_key["x86_64-pc-windows-msvc_runtime"]["passed"])
@@ -286,6 +287,46 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         self.assertEqual(checks[0]["key"], "third_party_license_complete")
         self.assertFalse(checks[0]["passed"])
         self.assertTrue(checks[0]["release_blocker"])
+
+    def test_publication_state_requires_public_hardened_repository(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            scope = {"candidate_source_sha": SOURCE_SHA}
+            write_json(
+                root / "release/publication.json",
+                {
+                    "schema_version": 1,
+                    "repository": "johannes-schmieder/texpdf",
+                    "repository_visibility": "public",
+                    "history_audit": {
+                        "scanner": "gitleaks",
+                        "scanner_version": "8.30.1",
+                        "tip_sha": SOURCE_SHA,
+                        "commits_scanned": 614,
+                        "secrets_found": 0,
+                        "history_rewritten": False,
+                    },
+                    "settings": {
+                        "default_workflow_permissions": "read",
+                        "can_approve_pull_request_reviews": False,
+                        "sha_pinning_required": True,
+                        "private_vulnerability_reporting": True,
+                        "branch_protection": {
+                            "allow_force_pushes": False,
+                            "allow_deletions": False,
+                        },
+                    },
+                    "historical_rc1": {
+                        "tag_preserved": True,
+                        "assets_preserved": True,
+                        "superseded_label": True,
+                    },
+                },
+            )
+            with working_directory(root):
+                checks: list[dict[str, object]] = []
+                readiness.validate_publication_state(scope, checks)
+            self.assertTrue(checks[0]["passed"])
 
     def test_runtime_target_requires_matching_exact_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -365,7 +406,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
 
         by_key = {row["key"]: row for row in checks}
         self.assertTrue(by_key["macos_intel_runtime"]["passed"])
-        self.assertTrue(by_key["private_candidate_package"]["passed"])
+        self.assertTrue(by_key["macos_candidate_package"]["passed"])
 
     def test_linux_candidate_requires_exact_build_package_and_three_runtimes(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -374,6 +415,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
             package = {
                 "package_version": "0.1.0-rc.2",
                 "target": "x86_64-unknown-linux-gnu",
+                "installed_plugin": "_texpdf_plugin_unix.plugin",
                 "package_zip_sha256": PACKAGE_SHA,
                 "package_zip_size_bytes": 300,
                 "plugin_sha256": PLUGIN_SHA,
@@ -456,6 +498,103 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
 
         by_key = {row["key"]: row for row in checks}
         self.assertTrue(by_key["linux_x86_64_runtime"]["passed"])
+
+    def test_windows_candidate_requires_static_crt_and_exact_stata19_receipts(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.prepare_records(root)
+            package = {
+                "package_version": "0.1.0-rc2",
+                "target": "x86_64-pc-windows-msvc",
+                "installed_plugin": "_texpdf_plugin_windows.plugin",
+                "package_zip_sha256": PACKAGE_SHA,
+                "plugin_sha256": PLUGIN_SHA,
+                "embedded_helper_sha256": HELPER_SHA,
+                "bundle_zip_sha256": BUNDLE_SHA,
+                "license_evidence_included": True,
+                "release_license_complete": True,
+                "license_audit_source_sha": SOURCE_SHA,
+                "public_release_mode": False,
+            }
+
+            def receipt(profile: str) -> dict[str, object]:
+                markers = (
+                    ["TEXPDF STRESS 1000 PASS"]
+                    if profile == "stress1000"
+                    else [
+                        "TEXPDF REALISTIC CORPUS PASS",
+                        "TEXPDF HELP EXAMPLES PASS",
+                        "TEXPDF FULL ENGINE STATA PASS",
+                    ]
+                )
+                return {
+                    "tested_sha": SOURCE_SHA,
+                    "status": "success",
+                    "stata_status": "success",
+                    "stata_version": "19.0",
+                    "stata_edition": "MP",
+                    "profile": profile,
+                    "platform": "Windows; PC (64-bit x86-64)",
+                    "required_log_markers": [
+                        {"marker": marker, "present": True} for marker in markers
+                    ],
+                    "artifact": {
+                        "plugin_sha256": PLUGIN_SHA,
+                        "package_zip_sha256": PACKAGE_SHA,
+                        "bundle_zip_sha256": BUNDLE_SHA,
+                    },
+                }
+
+            write_json(
+                root / "release/windows-x86_64.json",
+                {
+                    "schema_version": 1,
+                    "qualified": True,
+                    "source_sha": SOURCE_SHA,
+                    "target": "x86_64-pc-windows-msvc",
+                    "build_receipt": {
+                        "status": "success",
+                        "source_sha": SOURCE_SHA,
+                        "rust_tests": "success",
+                        "plugin_sha256": PLUGIN_SHA,
+                        "helper_sha256": HELPER_SHA,
+                        "package_sha256": PACKAGE_SHA,
+                        "binary_policy": {
+                            "static_msvc_crt": True,
+                            "violations": [],
+                        },
+                    },
+                    "package": package,
+                    "runtimes": {
+                        "stata_19_quick": receipt("quick"),
+                        "stata_19_stress1000": receipt("stress1000"),
+                    },
+                },
+            )
+            targets_path = root / "release/targets.json"
+            registry = json.loads(targets_path.read_text(encoding="utf-8"))
+            registry["targets"]["x86_64-pc-windows-msvc"].update(
+                {
+                    "artifact": "_texpdf_plugin_windows.plugin",
+                    "build_qualified": True,
+                    "build_source_sha": SOURCE_SHA,
+                    "qualified_source_sha": SOURCE_SHA,
+                    "stata_runtime_qualified": True,
+                    "plugin_sha256": PLUGIN_SHA,
+                    "embedded_helper_sha256": HELPER_SHA,
+                    "candidate_package_sha256": PACKAGE_SHA,
+                    "tested_stata_versions": ["19"],
+                    "receipt": "release/windows-x86_64.json",
+                }
+            )
+            write_json(targets_path, registry)
+            with working_directory(root):
+                checks: list[dict[str, object]] = []
+                targets = readiness.read_targets(checks)
+                readiness.validate_windows_target(targets, checks, "0.1.0-rc2")
+
+        by_key = {row["key"]: row for row in checks}
+        self.assertTrue(by_key["windows_x86_64_runtime"]["passed"])
 
 
 if __name__ == "__main__":

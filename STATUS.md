@@ -5,11 +5,13 @@ evidence or release scope, then regenerate it; do not hand-edit status claims.
 
 ## Release scope
 
-The active target is a **private `0.1.0-rc.2` macOS universal and Linux x86-64 release candidate**.
-Windows, public distribution, and final `v0.1.0` publication are
-explicitly deferred and are not advertised as supported.
+The active target is a **public `0.1.0-rc2` cross-platform release candidate**.
+macOS universal, Linux x86-64, and Windows x86-64 are all required;
+no runtime target is deferred. Public GitHub and SSC distribution are
+authorized, but publication remains fail-closed until every exact-source
+qualification and asset-validation gate passes.
 
-Candidate ready: **true**
+Candidate ready: **false**
 
 Public release ready: **false**
 
@@ -31,14 +33,15 @@ tracked independently:
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Current universal build source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| Frozen candidate license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
+| Last completed candidate license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | Latest memory-stress attempt | `2f8da039576e3107ed678e1e652cc265eb674543`; qualified=yes |
 
 ## Development bundle on `main`
 
-The frozen private candidate and the current development bundle are different artifacts.
-Candidate readiness above applies only to the older qualified bytes and does not
-qualify the newer bundle embedded by `main`.
+The last frozen candidate and the current development bundle are different artifacts.
+Historical readiness applies only to the older qualified bytes and does not
+qualify the newer bundle embedded by `main`; the active public candidate must
+replace every target record with exact-source evidence.
 
 | Development selection | Value |
 |---|---|
@@ -67,29 +70,38 @@ the helper process, so a compiler crash does not run inside Stata.
 |---|---|---:|---:|---|
 | `aarch64-apple-darwin` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 | `x86_64-apple-darwin` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| `x86_64-pc-windows-msvc` | deferred | no | no | `not recorded` |
+| `x86_64-pc-windows-msvc` | required | no | no | `not recorded` |
 | `x86_64-unknown-linux-gnu` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 
 The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787`). The current universal plugin record is 93.97 MiB (`aca37fb2ddd5356c4144ff07419bbfec352cf7a7d3222091f9d2d5971c3e796c`).
 
-## Active private-candidate blockers
+## Active candidate blockers
 
-None.
+- `public_repository_security`
+- `macos_candidate_package`
+- `linux_x86_64_runtime`
+- `windows_x86_64_runtime`
+- `required_target_source_coherence`
+- `candidate_license_source_coherence`
 
-## Frozen candidate license evidence
+## Previous candidate license evidence
 
 The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
 
-The separate development audit is source-bound to `75967266ed94454f761cfd33bdaddbcfef18f155` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the frozen candidate evidence above.
+The separate development audit is source-bound to `75967266ed94454f761cfd33bdaddbcfef18f155` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
 
 ## Memory evidence
 
 The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 48 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
 
-## Deferred public-release blockers
+## Public-release blockers
 
-- `public_distribution`
-- `x86_64-pc-windows-msvc_runtime`
+- `public_repository_security`
+- `macos_candidate_package`
+- `linux_x86_64_runtime`
+- `windows_x86_64_runtime`
+- `required_target_source_coherence`
+- `candidate_license_source_coherence`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

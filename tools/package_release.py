@@ -40,6 +40,14 @@ ADO_VERSION_RE = re.compile(
     r"^\*!\s+(?:version\s+)?(?:texpdf\s+)?(?P<version>\d+\.\d+\.\d+)\s+",
     re.MULTILINE,
 )
+PLUGIN_FILENAMES = {
+    "aarch64-apple-darwin": "_texpdf_plugin_macosx.plugin",
+    "x86_64-apple-darwin": "_texpdf_plugin_macosx.plugin",
+    "universal-apple-darwin": "_texpdf_plugin_macosx.plugin",
+    "universal2-apple-darwin": "_texpdf_plugin_macosx.plugin",
+    "x86_64-unknown-linux-gnu": "_texpdf_plugin_unix.plugin",
+    "x86_64-pc-windows-msvc": "_texpdf_plugin_windows.plugin",
+}
 
 
 def sha256_file(path: Path) -> str:
@@ -74,6 +82,33 @@ def read_ado_version(path: Path = Path("stata/texpdf.ado")) -> str:
     if match is None:
         raise ValueError(f"{path} has no conventional version header")
     return match.group("version")
+
+
+def plugin_filename(target: str) -> str:
+    try:
+        return PLUGIN_FILENAMES[target]
+    except KeyError as error:
+        raise ValueError(f"unsupported release target: {target}") from error
+
+
+def render_platform_pkg(source: Path, installed_plugin: str) -> str:
+    """Render a net-install index containing exactly one native plugin."""
+    lines = source.read_text(encoding="utf-8").splitlines()
+    output: list[str] = []
+    inserted = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("f _texpdf_plugin") and stripped.endswith(".plugin"):
+            if not inserted:
+                output.append(f"f {installed_plugin}")
+                inserted = True
+            continue
+        if stripped == "f texpdf_licenses.zip":
+            continue
+        output.append(line)
+    if not inserted:
+        raise ValueError("stata/texpdf.pkg has no native plugin entries")
+    return "\n".join(output) + "\n"
 
 
 def zip_info(name: str) -> zipfile.ZipInfo:
@@ -170,7 +205,7 @@ def helper_provenance(
                     "size_bytes": helper.stat().st_size,
                 }
             },
-            str(helper),
+            f"embedded-helper:{target}",
         )
     if universal_manifest is None:
         return {}, None
@@ -210,7 +245,7 @@ def helper_provenance(
             "sha256": helper_sha,
             "size_bytes": helper_size,
         }
-    return records, str(universal_manifest)
+    return records, f"universal-manifest:{universal_manifest.name}"
 
 
 def main() -> int:
@@ -276,18 +311,22 @@ def main() -> int:
 
         shutil.rmtree(args.output_dir, ignore_errors=True)
         args.output_dir.mkdir(parents=True)
+        installed_plugin = plugin_filename(args.target)
         sources = {
             "texpdf.ado": Path("stata/texpdf.ado"),
             "texpdf.sthlp": Path("stata/texpdf.sthlp"),
             "texpdf_run.ado": Path("stata/texpdf_run.ado"),
-            "texpdf.pkg": Path("stata/texpdf.pkg"),
             "stata.toc": Path("stata/stata.toc"),
-            "_texpdf_plugin.plugin": args.plugin,
+            installed_plugin: args.plugin,
             "LICENSE": Path("LICENSE"),
             "THIRD_PARTY_NOTICES.md": Path("licenses/THIRD_PARTY_NOTICES.md"),
         }
         for name, source in sources.items():
             copy_atomic(source, args.output_dir / name)
+        (args.output_dir / "texpdf.pkg").write_text(
+            render_platform_pkg(Path("stata/texpdf.pkg"), installed_plugin),
+            encoding="utf-8",
+        )
 
         packaged_license_files: list[str] = []
         if include_license_evidence:
@@ -300,6 +339,7 @@ def main() -> int:
             "package": "texpdf",
             "package_version": package_version,
             "target": args.target,
+            "installed_plugin": installed_plugin,
             "engine": "tectonic",
             "engine_version": "0.17.0",
             "bundle_name": bundle_info["bundle_name"],
@@ -363,8 +403,8 @@ def main() -> int:
 
         manifest = {
             **build_info,
-            "package_directory": str(args.output_dir),
-            "package_zip": str(args.zip_path),
+            "package_directory": args.output_dir.name,
+            "package_zip": args.zip_path.name,
             "package_zip_sha256": sha256_file(args.zip_path),
             "package_zip_size_bytes": args.zip_path.stat().st_size,
             "installed_files": [

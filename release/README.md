@@ -19,14 +19,19 @@ when it contains:
 - a successful actual Stata runtime result on that platform.
 
 Build-only artifacts must keep `stata_runtime_qualified: false`, even when Rust
-tests and native linking succeed. The active private `0.1.0-rc.2` qualification
-checkpoint requires
-both macOS targets and Linux x86-64 in `scope.json`. Linux also requires the
+tests and native linking succeed. The active public `0.1.0-rc2` scope requires
+both macOS targets, Linux x86-64, and Windows x86-64. Linux also requires the
 source-bound record in `linux-x86_64.json`, a glibc 2.28 binary-policy pass,
-and licensed Stata/MP 18 and 19 receipts. Windows is explicitly deferred;
-public distribution and final `v0.1.0` have a separate blocker set.
+and licensed Stata/MP 18 and 19 receipts. Windows requires
+`windows-x86_64.json`, static CRT evidence, and exact Stata/MP 19 quick and
+stress receipts. No target is deferred.
 
 Hosted workflows may build Windows, Linux, and macOS development artifacts,
 but build-only outputs remain unsupported. Linux release qualification is
 performed on BU SCC with `ci/scc/`; `READINESS.json` and `READINESS.md` are
 generated from canonical records by `tools/sync_project_state.py`.
+
+`publication.json` is written only after a full-history secret scan and
+read-back verification of the live public GitHub settings. It binds the audit
+tip to the active candidate source and records the preserved/superseded RC.1
+state without modifying that historical tag or its assets.

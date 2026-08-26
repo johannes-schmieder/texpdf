@@ -47,7 +47,9 @@ class PackageReleaseTests(unittest.TestCase):
         write(
             root / "stata/texpdf.pkg",
             "v 3\nf texpdf.ado\nf texpdf.sthlp\nf texpdf_run.ado\n"
-            "f _texpdf_plugin.plugin\n"
+            "f _texpdf_plugin_macosx.plugin\n"
+            "f _texpdf_plugin_unix.plugin\n"
+            "f _texpdf_plugin_windows.plugin\n"
             "f LICENSE\nf THIRD_PARTY_NOTICES.md\nf BUILD_INFO.json\n"
             "f CHECKSUMS.sha256\n",
         )
@@ -97,7 +99,7 @@ class PackageReleaseTests(unittest.TestCase):
             "--manifest",
             "dist/manifest.json",
             "--target",
-            "test-target",
+            "x86_64-unknown-linux-gnu",
         ]
         if helper_manifest is None:
             command.extend(["--embedded-helper", str(root / "helper.bin")])
@@ -161,11 +163,20 @@ class PackageReleaseTests(unittest.TestCase):
             self.assertFalse(build["public_release_mode"])
             self.assertFalse(build["release_license_complete"])
             self.assertEqual(build["embedded_helper_size_bytes"], 14)
+            self.assertEqual(
+                build["embedded_helper_provenance_source"],
+                "embedded-helper:x86_64-unknown-linux-gnu",
+            )
+            self.assertEqual(build["installed_plugin"], "_texpdf_plugin_unix.plugin")
             self.assertTrue((root / "dist/package/THIRD_PARTY_NOTICES.md").is_file())
             self.assertTrue((root / "dist/package/texpdf_run.ado").is_file())
             with zipfile.ZipFile(root / "dist/package.zip") as archive:
                 self.assertIn("THIRD_PARTY_NOTICES.md", archive.namelist())
                 self.assertIn("texpdf_run.ado", archive.namelist())
+                self.assertIn("_texpdf_plugin_unix.plugin", archive.namelist())
+                self.assertNotIn("_texpdf_plugin.plugin", archive.namelist())
+                self.assertNotIn("_texpdf_plugin_macosx.plugin", archive.namelist())
+                self.assertNotIn("_texpdf_plugin_windows.plugin", archive.namelist())
                 self.assertNotIn("LICENSES/STATUS.json", archive.namelist())
 
     def test_public_release_fails_without_complete_audit(self) -> None:
@@ -203,6 +214,8 @@ class PackageReleaseTests(unittest.TestCase):
             package_text = (root / "dist/package/texpdf.pkg").read_text(
                 encoding="utf-8"
             )
+            self.assertEqual(package_text.count("f _texpdf_plugin_"), 1)
+            self.assertIn("f _texpdf_plugin_unix.plugin", package_text)
             self.assertNotIn("f LICENSES/STATUS.json", package_text)
             self.assertEqual(build["net_install_license_file_count"], 0)
             with zipfile.ZipFile(root / "dist/package.zip") as archive:
@@ -273,6 +286,10 @@ class PackageReleaseTests(unittest.TestCase):
                 (root / "dist/package/BUILD_INFO.json").read_text(encoding="utf-8")
             )
             self.assertEqual(build["embedded_helper_count"], 2)
+            self.assertEqual(
+                build["embedded_helper_provenance_source"],
+                "universal-manifest:universal.json",
+            )
             self.assertIsNone(build["embedded_helper_sha256"])
             self.assertEqual(
                 set(build["embedded_helpers"]),

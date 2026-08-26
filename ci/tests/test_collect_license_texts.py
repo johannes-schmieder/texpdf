@@ -41,11 +41,13 @@ class NoticeBoundaryTests(unittest.TestCase):
             records = module.copy_notices(
                 root,
                 destination,
+                source_label="repository:workspace",
                 include_notice_directories=False,
             )
             self.assertEqual([Path(record["file"]).name for record in records], ["LICENSE"])
             self.assertEqual((destination / "LICENSE").read_text(), "project license\n")
             self.assertFalse((destination / "licenses").exists())
+            self.assertEqual(records[0]["source"], "repository:workspace/LICENSE")
 
 
 if __name__ == "__main__":

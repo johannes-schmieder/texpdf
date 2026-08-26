@@ -29,9 +29,11 @@ TARGETS_PATH = Path("release/targets.json")
 UNIVERSAL_PATH = Path("release/macos-universal.json")
 INTEL_RUNTIME_PATH = Path("release/macos-intel-runtime.json")
 LINUX_RUNTIME_PATH = Path("release/linux-x86_64.json")
+WINDOWS_RUNTIME_PATH = Path("release/windows-x86_64.json")
 MEMORY_PATH = Path("release/memory-stress-macos-arm64.json")
 LICENSE_STATUS_PATH = Path("licenses/generated/STATUS.json")
 SCOPE_PATH = Path("release/scope.json")
+PUBLICATION_PATH = Path("release/publication.json")
 EVIDENCE_ONLY_PREFIXES = (".ci/", "docs/generated/", "licenses/generated/")
 EVIDENCE_ONLY_FILES = {
     "STATUS.md",
@@ -184,6 +186,7 @@ def validate_universal(
     targets: dict[str, dict[str, Any]],
     checks: list[dict[str, Any]],
     candidate_version: str = "0.1.0-rc.2",
+    public_release: bool = False,
 ) -> None:
     data: dict[str, Any] = {}
     if not UNIVERSAL_PATH.is_file():
@@ -307,7 +310,7 @@ def validate_universal(
         and LICENSE_STATUS_PATH.is_file()
         and candidate.get("license_audit_source_sha")
         == read_json(LICENSE_STATUS_PATH).get("source_sha")
-        and candidate.get("public_release") is False
+        and candidate.get("public_release") is public_release
         and candidate.get("arm_and_intel_runtime_tested") is True
         and data.get("arm_runtime_qualified") is True
         and data.get("intel_runtime_qualified") is True
@@ -316,7 +319,7 @@ def validate_universal(
     )
     add_check(
         checks,
-        "private_candidate_package",
+        "macos_candidate_package",
         package_ok,
         (
             f"version={candidate.get('version')}; "
@@ -395,6 +398,7 @@ def validate_linux_target(
     targets: dict[str, dict[str, Any]],
     checks: list[dict[str, Any]],
     candidate_version: str,
+    public_release: bool = False,
 ) -> None:
     target = targets.get("x86_64-unknown-linux-gnu", {})
     if not LINUX_RUNTIME_PATH.is_file():
@@ -428,8 +432,10 @@ def validate_linux_target(
         isinstance(package, dict)
         and package.get("package_version") == candidate_version
         and package.get("target") == "x86_64-unknown-linux-gnu"
+        and package.get("installed_plugin") == "_texpdf_plugin_unix.plugin"
         and package.get("license_evidence_included") is True
-        and package.get("public_release_mode") is False
+        and package.get("release_license_complete") is True
+        and package.get("public_release_mode") is public_release
         and LICENSE_STATUS_PATH.is_file()
         and package.get("license_audit_source_sha")
         == read_json(LICENSE_STATUS_PATH).get("source_sha")
@@ -458,7 +464,8 @@ def validate_linux_target(
         )
     )
     registry_ok = (
-        target.get("build_qualified") is True
+        target.get("artifact") == "_texpdf_plugin_unix.plugin"
+        and target.get("build_qualified") is True
         and target.get("stata_runtime_qualified") is True
         and target.get("build_source_sha") == source_sha
         and target.get("qualified_source_sha") == source_sha
@@ -479,6 +486,123 @@ def validate_linux_target(
             f"Stata18_quick={runtime_ok and bool(runtimes.get('stata_18_quick'))}; "
             f"Stata18_stress1000={runtime_ok and bool(runtimes.get('stata_18_stress1000'))}; "
             f"Stata19_quick={runtime_ok and bool(runtimes.get('stata_19_quick'))}"
+        ),
+    )
+
+
+def validate_windows_target(
+    targets: dict[str, dict[str, Any]],
+    checks: list[dict[str, Any]],
+    candidate_version: str,
+    public_release: bool = False,
+) -> None:
+    target = targets.get("x86_64-pc-windows-msvc", {})
+    if not WINDOWS_RUNTIME_PATH.is_file():
+        add_check(checks, "windows_x86_64_runtime", False, f"missing {WINDOWS_RUNTIME_PATH}")
+        return
+    data = read_json(WINDOWS_RUNTIME_PATH)
+    source_sha = str(data.get("source_sha", ""))
+    build = data.get("build_receipt", {})
+    package = data.get("package", {})
+    runtimes = data.get("runtimes", {})
+    policy = build.get("binary_policy", {}) if isinstance(build, dict) else {}
+    plugin_sha = package.get("plugin_sha256") if isinstance(package, dict) else None
+    helper_sha = package.get("embedded_helper_sha256") if isinstance(package, dict) else None
+    package_sha = package.get("package_zip_sha256") if isinstance(package, dict) else None
+    bundle_sha = package.get("bundle_zip_sha256") if isinstance(package, dict) else None
+    build_ok = (
+        data.get("schema_version") == 1
+        and data.get("qualified") is True
+        and data.get("target") == "x86_64-pc-windows-msvc"
+        and valid_source_sha(source_sha)
+        and isinstance(build, dict)
+        and build.get("status") == "success"
+        and build.get("source_sha") == source_sha
+        and build.get("rust_tests") == "success"
+        and isinstance(policy, dict)
+        and policy.get("violations") == []
+        and policy.get("static_msvc_crt") is True
+    )
+    package_ok = (
+        isinstance(package, dict)
+        and package.get("package_version") == candidate_version
+        and package.get("target") == "x86_64-pc-windows-msvc"
+        and package.get("installed_plugin") == "_texpdf_plugin_windows.plugin"
+        and package.get("license_evidence_included") is True
+        and package.get("release_license_complete") is True
+        and package.get("public_release_mode") is public_release
+        and LICENSE_STATUS_PATH.is_file()
+        and package.get("license_audit_source_sha")
+        == read_json(LICENSE_STATUS_PATH).get("source_sha")
+        and valid_sha256(plugin_sha)
+        and valid_sha256(helper_sha)
+        and valid_sha256(package_sha)
+        and valid_sha256(bundle_sha)
+        and build.get("plugin_sha256") == plugin_sha
+        and build.get("helper_sha256") == helper_sha
+        and build.get("package_sha256") == package_sha
+    )
+
+    def runtime_ok(key: str, profile: str) -> bool:
+        receipt = runtimes.get(key) if isinstance(runtimes, dict) else None
+        if not isinstance(receipt, dict):
+            return False
+        artifact = receipt.get("artifact", {})
+        markers = receipt.get("required_log_markers", [])
+        marker_names = {
+            str(item.get("marker"))
+            for item in markers
+            if isinstance(item, dict) and item.get("present") is True
+        }
+        expected_markers = (
+            {"TEXPDF STRESS 1000 PASS"}
+            if profile == "stress1000"
+            else {
+                "TEXPDF REALISTIC CORPUS PASS",
+                "TEXPDF HELP EXAMPLES PASS",
+                "TEXPDF FULL ENGINE STATA PASS",
+            }
+        )
+        return (
+            receipt.get("tested_sha") == source_sha
+            and receipt.get("status") == "success"
+            and receipt.get("stata_status") == "success"
+            and str(receipt.get("stata_version", "")).split(".", 1)[0] == "19"
+            and receipt.get("stata_edition") == "MP"
+            and receipt.get("profile") == profile
+            and "Windows" in str(receipt.get("platform", ""))
+            and isinstance(artifact, dict)
+            and artifact.get("plugin_sha256") == plugin_sha
+            and artifact.get("package_zip_sha256") == package_sha
+            and artifact.get("bundle_zip_sha256") == bundle_sha
+            and expected_markers <= marker_names
+        )
+
+    runtimes_ok = runtime_ok("stata_19_quick", "quick") and runtime_ok(
+        "stata_19_stress1000", "stress1000"
+    )
+    registry_ok = (
+        target.get("artifact") == "_texpdf_plugin_windows.plugin"
+        and target.get("build_qualified") is True
+        and target.get("stata_runtime_qualified") is True
+        and target.get("build_source_sha") == source_sha
+        and target.get("qualified_source_sha") == source_sha
+        and target.get("plugin_sha256") == plugin_sha
+        and target.get("embedded_helper_sha256") == helper_sha
+        and target.get("candidate_package_sha256") == package_sha
+        and target.get("tested_stata_versions") == ["19"]
+        and target.get("receipt") == str(WINDOWS_RUNTIME_PATH)
+    )
+    add_check(
+        checks,
+        "windows_x86_64_runtime",
+        build_ok and package_ok and runtimes_ok and registry_ok,
+        (
+            f"source={source_sha or 'missing'}; package_version="
+            f"{package.get('package_version') if isinstance(package, dict) else None}; "
+            f"static_crt={policy.get('static_msvc_crt')}; "
+            f"Stata19_quick={runtime_ok('stata_19_quick', 'quick')}; "
+            f"Stata19_stress1000={runtime_ok('stata_19_stress1000', 'stress1000')}"
         ),
     )
 
@@ -665,20 +789,32 @@ def validate_scope(checks: list[dict[str, Any]]) -> dict[str, Any]:
         return {}
     scope = read_json(SCOPE_PATH)
     required = scope.get("required_runtime_targets")
+    release_kind = scope.get("release_kind")
+    version = scope.get("candidate_version")
+    version_ok = (
+        isinstance(version, str)
+        and (
+            (release_kind == "public_release_candidate" and re.fullmatch(r"\d+\.\d+\.\d+-rc\d+", version))
+            or (release_kind == "final_release" and re.fullmatch(r"\d+\.\d+\.\d+", version))
+        )
+    )
     valid = (
         scope.get("schema_version") == 1
-        and scope.get("release_kind") == "private_release_candidate"
-        and scope.get("candidate_version") == "0.1.0-rc.2"
+        and release_kind in {"public_release_candidate", "final_release"}
+        and version_ok
         and valid_source_sha(scope.get("candidate_source_sha"))
         and required
         == [
             "aarch64-apple-darwin",
             "x86_64-apple-darwin",
             "x86_64-unknown-linux-gnu",
+            "x86_64-pc-windows-msvc",
         ]
-        and scope.get("deferred_runtime_targets")
-        == ["x86_64-pc-windows-msvc"]
-        and scope.get("public_distribution_enabled") is False
+        and scope.get("deferred_runtime_targets") == []
+        and scope.get("repository_publication_authorized") is True
+        and scope.get("public_distribution_enabled") is True
+        and scope.get("github_release_enabled") is True
+        and scope.get("ssc_distribution_enabled") is True
     )
     add_check(
         checks,
@@ -695,11 +831,69 @@ def validate_scope(checks: list[dict[str, Any]]) -> dict[str, Any]:
         checks,
         "public_distribution",
         public_enabled,
-        "public repository and net-install publication are deferred by owner decision",
-        release_blocker=False,
-        public_release_blocker=True,
+        "public GitHub distribution is explicitly authorized in release scope",
+    )
+    add_check(
+        checks,
+        "ssc_distribution",
+        scope.get("ssc_distribution_enabled") is True,
+        "SSC distribution is explicitly authorized in release scope",
     )
     return scope
+
+
+def validate_publication_state(
+    scope: dict[str, Any], checks: list[dict[str, Any]]
+) -> None:
+    if not PUBLICATION_PATH.is_file():
+        add_check(
+            checks,
+            "public_repository_security",
+            False,
+            f"missing {PUBLICATION_PATH}",
+        )
+        return
+    data = read_json(PUBLICATION_PATH)
+    audit = data.get("history_audit", {})
+    settings = data.get("settings", {})
+    branch = settings.get("branch_protection", {}) if isinstance(settings, dict) else {}
+    rc1 = data.get("historical_rc1", {})
+    passed = (
+        data.get("schema_version") == 1
+        and data.get("repository") == "johannes-schmieder/texpdf"
+        and data.get("repository_visibility") == "public"
+        and isinstance(audit, dict)
+        and audit.get("scanner") == "gitleaks"
+        and bool(audit.get("scanner_version"))
+        and audit.get("tip_sha") == scope.get("candidate_source_sha")
+        and int(audit.get("commits_scanned", 0)) > 0
+        and audit.get("secrets_found") == 0
+        and audit.get("history_rewritten") is False
+        and isinstance(settings, dict)
+        and settings.get("default_workflow_permissions") == "read"
+        and settings.get("can_approve_pull_request_reviews") is False
+        and settings.get("sha_pinning_required") is True
+        and settings.get("private_vulnerability_reporting") is True
+        and isinstance(branch, dict)
+        and branch.get("allow_force_pushes") is False
+        and branch.get("allow_deletions") is False
+        and isinstance(rc1, dict)
+        and rc1.get("tag_preserved") is True
+        and rc1.get("assets_preserved") is True
+        and rc1.get("superseded_label") is True
+    )
+    add_check(
+        checks,
+        "public_repository_security",
+        passed,
+        (
+            f"visibility={data.get('repository_visibility')}; "
+            f"audit_tip={audit.get('tip_sha') if isinstance(audit, dict) else None}; "
+            f"scope_source={scope.get('candidate_source_sha')}; "
+            f"sha_pinning={settings.get('sha_pinning_required') if isinstance(settings, dict) else None}; "
+            f"vulnerability_reporting={settings.get('private_vulnerability_reporting') if isinstance(settings, dict) else None}"
+        ),
+    )
 
 
 def render_markdown(result: dict[str, Any]) -> str:
@@ -707,8 +901,8 @@ def render_markdown(result: dict[str, Any]) -> str:
         "# texpdf release-readiness audit",
         "",
         f"macOS ARM64 implementation qualified: **{str(result['implementation_complete_macos_arm64']).lower()}**",
-        f"Private required-target candidate ready: **{str(result['candidate_ready']).lower()}**",
-        f"Public cross-platform v1 ready: **{str(result['public_release_ready']).lower()}**",
+        f"Required-target candidate ready: **{str(result['candidate_ready']).lower()}**",
+        f"Public cross-platform release ready: **{str(result['public_release_ready']).lower()}**",
         "",
         "| Check | Result | Candidate blocker | Public blocker | Detail |",
         "|---|---|---|---|---|",
@@ -720,13 +914,13 @@ def render_markdown(result: dict[str, Any]) -> str:
             f"{'yes' if check['candidate_release_blocker'] else 'no'} | "
             f"{'yes' if check['public_release_blocker'] else 'no'} | {detail} |"
         )
-    lines.extend(["", "## Active private-candidate blockers", ""])
+    lines.extend(["", "## Active candidate blockers", ""])
     blockers = result["candidate_blockers"]
     if blockers:
         lines.extend(f"- `{item}`" for item in blockers)
     else:
         lines.append("None.")
-    lines.extend(["", "## Deferred public-release blockers", ""])
+    lines.extend(["", "## Public-release blockers", ""])
     public_blockers = result["public_release_blockers"]
     if public_blockers:
         lines.extend(f"- `{item}`" for item in public_blockers)
@@ -752,11 +946,19 @@ def build_result() -> dict[str, Any]:
         "Cargo.lock is committed",
     )
     scope = validate_scope(checks)
+    validate_publication_state(scope, checks)
     targets = read_targets(checks)
     validate_arm_target(targets, checks)
-    validate_universal(targets, checks, str(scope.get("candidate_version", "")))
-    validate_linux_target(targets, checks, str(scope.get("candidate_version", "")))
-    validate_other_targets(targets, checks)
+    public_release = scope.get("public_distribution_enabled") is True
+    validate_universal(
+        targets, checks, str(scope.get("candidate_version", "")), public_release
+    )
+    validate_linux_target(
+        targets, checks, str(scope.get("candidate_version", "")), public_release
+    )
+    validate_windows_target(
+        targets, checks, str(scope.get("candidate_version", "")), public_release
+    )
     validate_required_source_coherence(scope, targets, checks)
     validate_license_status(checks)
     validate_license_source_coherence(scope, targets, checks)
@@ -785,7 +987,7 @@ def build_result() -> dict[str, Any]:
     result = {
         "schema_version": 3,
         "candidate_version": scope.get("candidate_version", "0.1.0-rc.2"),
-        "release_kind": scope.get("release_kind", "private_release_candidate"),
+        "release_kind": scope.get("release_kind", "public_release_candidate"),
         "implementation_complete_macos_arm64": implementation_complete,
         "candidate_ready": not candidate_blockers,
         "public_release_ready": not public_blockers,

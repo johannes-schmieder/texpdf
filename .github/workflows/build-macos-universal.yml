@@ -62,34 +62,35 @@ jobs:
         shell: bash
         run: >-
           /bin/bash tools/build_macos_universal.sh
-          dist/macos-universal/_texpdf_plugin.plugin
+          dist/macos-universal/_texpdf_plugin_macosx.plugin
           dist/macos-universal/manifest.json
 
       - name: Materialize complete source-bound notice tree
         shell: bash
         run: /bin/bash ci/prepare_release_license_evidence.sh
 
-      - name: Assemble private universal candidate with notices
+      - name: Assemble public universal candidate with notices
         shell: bash
         run: |
           set -euo pipefail
+          candidate_version=$(/usr/bin/python3 -c 'import json; print(json.load(open("release/scope.json"))["candidate_version"])')
           /usr/bin/python3 tools/package_release.py \
-            --plugin dist/macos-universal/_texpdf_plugin.plugin \
+            --plugin dist/macos-universal/_texpdf_plugin_macosx.plugin \
             --embedded-helper-manifest dist/macos-universal/manifest.json \
             --bundle-info bundle/generated/bundle-info.json \
             --output-dir dist/macos-universal/texpdf \
-            --zip dist/macos-universal/texpdf-macos-universal-0.1.0-rc.2.zip \
+            --zip "dist/macos-universal/texpdf-macos-universal-${candidate_version}.zip" \
             --manifest dist/macos-universal/package-manifest.json \
             --target universal2-apple-darwin \
-            --package-version 0.1.0-rc.2 \
-            --include-license-evidence
+            --package-version "$candidate_version" \
+            --public-release
 
       - name: Stage universal plugin for licensed Stata
         shell: bash
         run: |
           set -euo pipefail
-          cp dist/macos-universal/_texpdf_plugin.plugin stata/_texpdf_plugin.plugin
-          git add -f stata/_texpdf_plugin.plugin
+          cp dist/macos-universal/_texpdf_plugin_macosx.plugin stata/_texpdf_plugin_macosx.plugin
+          git add -f stata/_texpdf_plugin_macosx.plugin
 
       - name: Test ARM slice in licensed Stata
         shell: bash
@@ -202,7 +203,7 @@ jobs:
           intel_record = targets["targets"]["x86_64-apple-darwin"]
           intel_record.update(
               {
-                  "artifact": "_texpdf_plugin.plugin",
+                  "artifact": "_texpdf_plugin_macosx.plugin",
                   "build_qualified": True,
                   "build_source_sha": source_sha,
                   "plugin_sha256": intel["sha256"],

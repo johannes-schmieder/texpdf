@@ -31,6 +31,16 @@ def native_library_name() -> str:
     raise RuntimeError(f"unsupported native platform: {sys.platform}")
 
 
+def installed_plugin_name() -> str:
+    if sys.platform == "darwin":
+        return "_texpdf_plugin_macosx.plugin"
+    if sys.platform.startswith("linux"):
+        return "_texpdf_plugin_unix.plugin"
+    if os.name == "nt":
+        return "_texpdf_plugin_windows.plugin"
+    raise RuntimeError(f"unsupported native platform: {sys.platform}")
+
+
 def verify_symbols(path: Path) -> list[str]:
     if sys.platform == "darwin":
         command = ["/usr/bin/nm", "-gU", str(path)]
@@ -96,13 +106,13 @@ def main() -> int:
         type=Path,
         default=Path(os.environ.get("CARGO_TARGET_DIR", "target")),
     )
-    parser.add_argument(
-        "--output", type=Path, default=Path("stata/_texpdf_plugin.plugin")
-    )
+    parser.add_argument("--output", type=Path)
     parser.add_argument(
         "--manifest", type=Path, default=Path(".ci/stata/run/plugin-manifest.json")
     )
     args = parser.parse_args()
+    if args.output is None:
+        args.output = Path("stata") / installed_plugin_name()
 
     source = args.target_dir / args.profile / native_library_name()
     if not source.is_file():
@@ -130,6 +140,7 @@ def main() -> int:
         "schema_version": 1,
         "source": str(source),
         "output": str(args.output),
+        "installed_plugin": args.output.name,
         "size_bytes": args.output.stat().st_size,
         "sha256": sha256_file(args.output),
         "platform": sys.platform,

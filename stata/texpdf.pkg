@@ -7,8 +7,11 @@ d retain their upstream licenses and notices.
 f texpdf.ado
 f texpdf.sthlp
 f texpdf_run.ado
-f _texpdf_plugin.plugin
+f _texpdf_plugin_macosx.plugin
+f _texpdf_plugin_unix.plugin
+f _texpdf_plugin_windows.plugin
 f LICENSE
 f THIRD_PARTY_NOTICES.md
 f BUILD_INFO.json
 f CHECKSUMS.sha256
+f texpdf_licenses.zip

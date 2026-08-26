@@ -1,18 +1,21 @@
-# texpdf plan to the Linux-ready private release candidate
+# texpdf plan to public cross-platform 0.1.0
 
 Development branch: **main**
 
-Active target: **private `0.1.0-rc.2` qualification checkpoint**
+Active target: **public `0.1.0-rc2`, then immutable `0.1.0`**
 
-This is prerelease evidence, not a final release or SSC package. New release
-tags follow [`RELEASING.md`](RELEASING.md): `main` is development, RC tags use
-`vX.Y.Z-rcN`, final tags are immutable, and SSC receives only a final release.
+The historical private candidates remain evidence for their exact bytes only.
+New tags follow [`RELEASING.md`](RELEASING.md): `main` is development, RC tags
+use `vX.Y.Z-rcN`, final tags are immutable, and SSC receives only a final
+release.
 
-Required runtimes: **macOS ARM64, macOS Intel, and Linux x86-64**
+Required runtimes: **macOS ARM64, macOS Intel, Linux x86-64, and Windows
+x86-64**
 
-The machine-readable scope is `release/scope.json`. Linux requires glibc 2.28
-or newer and licensed Stata/MP 18 and 19 evidence from BU SCC. Windows, public
-distribution, and final `v0.1.0` remain deferred.
+The machine-readable scope is `release/scope.json`. Linux enforces a GLIBC 2.28
+ceiling and licensed Stata/MP 18 and 19 evidence from BU SCC. Windows requires
+licensed Stata/MP 19. Public GitHub and SSC distribution are authorized, but
+all exact-source gates remain fail-closed.
 
 ## Evidence rules
 
@@ -29,14 +32,14 @@ position and build-only artifacts are never treated as runtime qualification.
 - [x] Tectonic 0.17.0 core with deterministic curated offline bundle.
 - [x] Academic/econometric compatibility corpus and local `net install` test.
 - [x] Thin panic-safe SPI bridge and versioned result protocol.
-- [x] Target-matching compiler helper embedded in the single installed plugin.
+- [x] Target-matching compiler helper embedded in each platform-specific plugin.
 - [x] Helper architecture validation, SHA-256 verification, private extraction,
       direct no-shell launch, timeout, identity checks, and atomic results.
 - [x] Exact-source Rust and licensed Apple Silicon Stata qualification.
 - [x] Permanent fail-closed readiness checks and canonical state generation.
 - [x] Removal of transient source-writing CI workflows.
 
-## Private-candidate completion
+## Historical private-candidate completion
 
 ### 1. License-complete redistribution inventory
 
@@ -88,7 +91,7 @@ Exit achieved: annotated tag `v0.1.0-rc.1` points to the audited release commit.
 The private prerelease attaches the exact dual-runtime-qualified package and
 its provenance manifests.
 
-## Linux-ready RC.2 completion
+## Historical Linux-ready RC.2 completion
 
 - [x] Repair exact bundle reconstruction metadata on a clean Linux checkout.
 - [x] Make private pkgconf probing, Python selection, temporary paths, and the
@@ -102,16 +105,39 @@ its provenance manifests.
       Stata/MP 18 stress1000, and Stata/MP 19 quick.
 - [x] Import scheduler/application/artifact evidence and clear every private
       candidate blocker.
-- [ ] Make an explicit decision whether to publish a new-policy `v0.1.0-rc2`
-      GitHub prerelease with both candidate packages and hashes. Never submit
-      it to SSC.
+- [x] Preserve this evidence without publishing it as the new public RC.
 
-## Deferred work
+## Public release implementation
 
-- Windows x86-64 licensed-Stata runtime qualification.
-- Public repository and public `net install` distribution.
-- Final `v0.1.0` audit, tag, release assets, and public installation URLs.
-- Final `v0.1.0` GitHub Release followed by an exact-tag SSC submission.
+- [x] Add canonical macOS, Unix, and Windows installed plugin filenames with an
+      internal Stata dispatcher and no stale generic fallback.
+- [x] Package one plugin per GitHub ZIP and all three in a deterministic SSC
+      submission with `texpdf_licenses.zip`, combined manifest, and checksums.
+- [x] Add a source-bound four-archive release index and collision-checked
+      combined SHA-256 file.
+- [x] Generalize scope/readiness for RC versus final release, required targets,
+      source SHA, and GitHub/SSC authorization.
+- [x] Add public-workflow security checks and fail-closed Windows Stata/MP 19
+      qualification tooling.
+- [x] Require the realistic corpus and all three runnable help examples in
+      every licensed quick lane.
+- [x] Remove local machine paths from newly generated public license manifests.
+- [ ] Complete and record the final history/asset safety audit, make the
+      repository public, harden repository settings, and mark RC.1 superseded.
+- [ ] Obtain SSC maintainer acceptance of the three-binary, compressed-license,
+      one-command package after the owner confirms the exact email.
+- [ ] Freeze and fully qualify the public `v0.1.0-rc2` source on all targets.
+- [ ] Publish RC.2, download its assets afresh on each target, perform clean
+      installs/corpus/help tests, and visually inspect representative PDFs.
+- [ ] Create the dated final metadata commit and repeat the complete exact-
+      source matrix; RC evidence does not transfer to the final commit.
+- [ ] Publish immutable `v0.1.0`, verify all draft assets before making it
+      latest, and submit the identical combined package to SSC.
+- [ ] After SSC publication, run `ssc install texpdf` on macOS, Linux, and
+      Windows and archive the public file list, hashes, correspondence, and URL.
+
+Never replace the final tag or assets. Any source change requested after final
+publication becomes `0.1.1`.
 
 ## Real-world compatibility development checkpoint
 
