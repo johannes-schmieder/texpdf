@@ -29,8 +29,11 @@ Presence of a file in the bundle is not by itself a support guarantee.
 
 `main` also carries a source-only synthetic corpus modeled on current latexlog
 reports, a legacy report, and a conventional multi-file economics manuscript.
-It tests PDF and PNG figures, generated-style tables, landscape/tabularx
-layouts, relative inputs, equations, natbib, `cleveref`, and `aer.bst`.
+It tests visibly colored PDF and PNG figures, generated-style tables,
+landscape/tabularx layouts, relative inputs, equations, natbib, `cleveref`, and
+`aer.bst`. The current latexlog and manuscript scenarios require actual
+chromatic drawing content; the legacy blackwhite scenario remains deliberately
+monochrome.
 
 `colortbl`, `cleveref`, and `aer.bst` are development-tested pending a full
 runtime requalification of every supported target. The obsolete `subfigure`

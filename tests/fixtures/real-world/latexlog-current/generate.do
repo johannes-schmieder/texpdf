@@ -46,26 +46,28 @@ latexlog `report': writeln "The custom command produces $\estimand$ and the disp
 latexlog `report': writeln "\[\estimand=(X^{\prime}X)^{-1}X^{\prime}y,\qquad \mathrm{E}[u\mid X]=0.\]"
 
 latexlog `report': section "Figures"
-twoway (scatter outcome index, msize(vsmall)) ///
-    (lfit outcome index), ///
-    title("Outcome over the synthetic index") legend(off) scheme(s1mono)
+latexlog `report': writeln "The color figures use navy observations and orange fitted or comparison elements."
+twoway (scatter outcome index, msize(vsmall) mcolor(navy)) ///
+    (lfit outcome index, lcolor(orange) lwidth(medthick)), ///
+    title("Outcome over the synthetic index") legend(off) scheme(s2color)
 latexlog `report': addfig, filename(figures/outcome-by-index.pdf) float ///
     title(Synthetic Outcome and Linear Fit) ///
     notes(Deterministic synthetic observations., center) width(.72)
 
-graph bar (mean) outcome, over(treatment) ///
-    title("Mean outcome by assignment") scheme(s1mono)
+graph bar (mean) outcome, over(treatment) asyvars ///
+    bar(1, color(navy)) bar(2, color(orange)) ///
+    title("Mean outcome by assignment") scheme(s2color)
 latexlog `report': writeln "The next PNG figure is included inline."
 latexlog `report': addfig, filename(figures/outcome-by-treatment.png) width(.48)
 
 latexlog `report': subsection "Subfigures"
 latexlog `report': subfigure, open title(Synthetic outcomes and exposures)
-twoway scatter outcome exposure, msize(vsmall) ///
-    title("Outcome") legend(off) scheme(s1mono)
+twoway scatter outcome exposure, msize(vsmall) mcolor(navy) ///
+    title("Outcome") legend(off) scheme(s2color)
 latexlog `report': subfigure, addfig filename(figures/panel-outcome.pdf) ///
     caption("Outcome and exposure") width(.45)
-twoway scatter exposure index, msize(vsmall) ///
-    title("Exposure") legend(off) scheme(s1mono)
+twoway scatter exposure index, msize(vsmall) mcolor(orange) ///
+    title("Exposure") legend(off) scheme(s2color)
 latexlog `report': subfigure, addfig filename(figures/panel-exposure.pdf) ///
     caption("Exposure over index") width(.45)
 latexlog `report': subfigure, close ///

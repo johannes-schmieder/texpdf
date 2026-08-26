@@ -47,6 +47,10 @@ releases or SSC versions.
 
 ### Fixed
 
+- Real-world modern corpus figures now contain obvious navy/orange color, and
+  manifest validation rejects declared color PDF/PNG assets whose drawing
+  content is actually monochrome. Snapshot normalization also preserves the
+  intended orientation of Stata PDF graphs instead of auto-rotating a panel.
 - Exact bundle reconstruction preserves every metadata field required by the
   embedded Rust bundle reader.
 - Linux pkgconf probes use the same GNU feature environment as the compiled

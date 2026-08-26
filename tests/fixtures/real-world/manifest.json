@@ -20,10 +20,16 @@
         "latexlog-current/figures/panel-outcome.pdf",
         "latexlog-current/figures/panel-exposure.pdf"
       ],
+      "color_assets": [
+        "latexlog-current/figures/outcome-by-index.pdf",
+        "latexlog-current/figures/outcome-by-treatment.png",
+        "latexlog-current/figures/panel-outcome.pdf",
+        "latexlog-current/figures/panel-exposure.pdf"
+      ],
       "capabilities": [
         "latexlog-generated-source",
-        "pdf-figure",
-        "png-figure",
+        "color-pdf-figure",
+        "color-png-figure",
         "subcaption",
         "collect-export",
         "booktabs",
@@ -74,12 +80,16 @@
         "manuscript/tables/regression.tex",
         "manuscript/references.bib"
       ],
+      "color_assets": [
+        "manuscript/figures/event-study.pdf",
+        "manuscript/figures/heterogeneity.png"
+      ],
       "capabilities": [
         "multi-file-article",
         "relative-input",
         "cleveref",
-        "pdf-figure",
-        "png-figure",
+        "color-pdf-figure",
+        "color-png-figure",
         "regression-table",
         "display-math",
         "natbib",

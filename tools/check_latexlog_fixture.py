@@ -66,6 +66,22 @@ def validate_asset(path: Path) -> None:
         raise ContractError(f"generated asset is invalid or trivial: {path}")
 
 
+def ghostscript_arguments(
+    ghostscript_bin: Path, source: Path, destination: Path
+) -> list[str]:
+    return [
+        str(ghostscript_bin),
+        "-q",
+        "-dNOPAUSE",
+        "-dBATCH",
+        "-sDEVICE=pdfwrite",
+        "-dCompatibilityLevel=1.3",
+        "-dAutoRotatePages=/None",
+        f"-sOutputFile={destination}",
+        str(source),
+    ]
+
+
 def install_asset(source: Path, destination: Path, ghostscript_bin: Path | None) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if source.suffix.lower() != ".pdf":
@@ -77,16 +93,7 @@ def install_asset(source: Path, destination: Path, ghostscript_bin: Path | None)
         )
     temporary = destination.with_suffix(".normalized.pdf")
     process = subprocess.run(
-        [
-            str(ghostscript_bin),
-            "-q",
-            "-dNOPAUSE",
-            "-dBATCH",
-            "-sDEVICE=pdfwrite",
-            "-dCompatibilityLevel=1.3",
-            f"-sOutputFile={temporary}",
-            str(source),
-        ],
+        ghostscript_arguments(ghostscript_bin, source, temporary),
         text=True,
         capture_output=True,
         check=False,

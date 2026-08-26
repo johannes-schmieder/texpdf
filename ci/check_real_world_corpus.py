@@ -7,8 +7,10 @@ import argparse
 import json
 from pathlib import Path, PurePosixPath
 import re
+import struct
 import sys
 from typing import Any
+import zlib
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / "tests/fixtures/real-world/manifest.json"
@@ -21,10 +23,122 @@ MACHINE_PATH_RE = re.compile(
 )
 TEXT_SUFFIXES = {".bib", ".do", ".md", ".tex", ".txt"}
 DIAGNOSTIC_KINDS = {"note", "warning", "error", "log"}
+PDF_RGB_RE = re.compile(
+    rb"([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+(?:rg|RG)\b"
+)
 
 
 class CorpusError(RuntimeError):
     """The corpus contract is malformed or incomplete."""
+
+
+def _channels_are_chromatic(
+    red: int | float, green: int | float, blue: int | float
+) -> bool:
+    return max(red, green, blue) - min(red, green, blue) > 1e-5
+
+
+def pdf_has_chromatic_content(path: Path) -> bool:
+    data = path.read_bytes()
+    for marker in re.finditer(rb"stream\r?\n", data):
+        end = data.find(b"endstream", marker.end())
+        if end < 0:
+            continue
+        payload = data[marker.end() : end].rstrip(b"\r\n")
+        try:
+            payload = zlib.decompress(payload)
+        except zlib.error:
+            pass
+        for match in PDF_RGB_RE.finditer(payload):
+            if _channels_are_chromatic(*(float(value) for value in match.groups())):
+                return True
+    return False
+
+
+def _paeth(left: int, above: int, upper_left: int) -> int:
+    prediction = left + above - upper_left
+    distances = (
+        abs(prediction - left),
+        abs(prediction - above),
+        abs(prediction - upper_left),
+    )
+    return (left, above, upper_left)[distances.index(min(distances))]
+
+
+def png_has_chromatic_content(path: Path) -> bool:
+    data = path.read_bytes()
+    if not data.startswith(b"\x89PNG\r\n\x1a\n"):
+        return False
+    position = 8
+    header: tuple[int, int, int, int, int, int, int] | None = None
+    compressed = bytearray()
+    while position + 12 <= len(data):
+        length = struct.unpack(">I", data[position : position + 4])[0]
+        chunk_type = data[position + 4 : position + 8]
+        chunk_data = data[position + 8 : position + 8 + length]
+        position += length + 12
+        if chunk_type == b"IHDR":
+            header = struct.unpack(">IIBBBBB", chunk_data)
+        elif chunk_type == b"IDAT":
+            compressed.extend(chunk_data)
+        elif chunk_type == b"IEND":
+            break
+    if header is None:
+        return False
+    width, height, bit_depth, color_type, compression, filtering, interlace = header
+    if (
+        bit_depth != 8
+        or color_type not in {2, 6}
+        or compression != 0
+        or filtering != 0
+        or interlace != 0
+    ):
+        raise CorpusError(f"unsupported color PNG encoding: {path}")
+    bytes_per_pixel = 3 if color_type == 2 else 4
+    stride = width * bytes_per_pixel
+    try:
+        raw = zlib.decompress(bytes(compressed))
+    except zlib.error as error:
+        raise CorpusError(f"cannot decode color PNG {path}: {error}") from error
+    if len(raw) != height * (stride + 1):
+        raise CorpusError(f"unexpected color PNG scanline size: {path}")
+    previous = bytearray(stride)
+    offset = 0
+    for _ in range(height):
+        filter_type = raw[offset]
+        encoded = raw[offset + 1 : offset + 1 + stride]
+        offset += stride + 1
+        decoded = bytearray(stride)
+        for index, value in enumerate(encoded):
+            left = decoded[index - bytes_per_pixel] if index >= bytes_per_pixel else 0
+            above = previous[index]
+            upper_left = previous[index - bytes_per_pixel] if index >= bytes_per_pixel else 0
+            if filter_type == 0:
+                predictor = 0
+            elif filter_type == 1:
+                predictor = left
+            elif filter_type == 2:
+                predictor = above
+            elif filter_type == 3:
+                predictor = (left + above) // 2
+            elif filter_type == 4:
+                predictor = _paeth(left, above, upper_left)
+            else:
+                raise CorpusError(f"unsupported PNG filter {filter_type}: {path}")
+            decoded[index] = (value + predictor) & 0xFF
+        for index in range(0, stride, bytes_per_pixel):
+            if _channels_are_chromatic(*decoded[index : index + 3]):
+                return True
+        previous = decoded
+    return False
+
+
+def asset_has_chromatic_content(path: Path) -> bool:
+    if path.suffix.lower() == ".pdf":
+        return pdf_has_chromatic_content(path)
+    if path.suffix.lower() == ".png":
+        return png_has_chromatic_content(path)
+    raise CorpusError(f"unsupported color asset type: {path}")
 
 
 def safe_relative(value: object, label: str) -> PurePosixPath:
@@ -111,6 +225,32 @@ def validate_manifest(manifest_path: Path, stata_path: Path) -> dict[str, Any]:
             managed_files.add(
                 resolve_file(root, encoded, f"{identifier} asset {asset_number}").resolve()
             )
+
+        color_assets = fixture.get("color_assets", [])
+        if not isinstance(color_assets, list):
+            raise CorpusError(f"{identifier} color_assets must be a list")
+        color_asset_names: set[str] = set()
+        for asset_number, asset in enumerate(color_assets, 1):
+            relative = safe_relative(asset, f"{identifier} color asset {asset_number}")
+            encoded = str(relative)
+            if encoded in color_asset_names:
+                raise CorpusError(f"{identifier} lists duplicate color asset {encoded}")
+            if encoded not in asset_names:
+                raise CorpusError(f"{identifier} color asset is not listed in assets: {encoded}")
+            color_asset_names.add(encoded)
+            color_path = resolve_file(
+                root, encoded, f"{identifier} color asset {asset_number}"
+            )
+            if not asset_has_chromatic_content(color_path):
+                raise CorpusError(f"{identifier} color asset is monochrome: {encoded}")
+        if identifier in {"latexlog-current", "economics-manuscript"}:
+            suffixes = {PurePosixPath(value).suffix.lower() for value in color_asset_names}
+            if suffixes != {".pdf", ".png"}:
+                raise CorpusError(
+                    f"{identifier} must declare chromatic PDF and PNG color assets"
+                )
+        elif color_asset_names:
+            raise CorpusError(f"{identifier} must remain intentionally monochrome")
 
         capabilities = fixture.get("capabilities")
         if not isinstance(capabilities, list) or not capabilities or not all(

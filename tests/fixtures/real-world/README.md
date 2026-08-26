@@ -17,6 +17,11 @@ provenance, and the only diagnostics that may be accepted. The top-level list
 permits only Tectonic lifecycle notes; empty fixture diagnostic lists therefore
 mean warning-free compilation is required.
 
+The two modern scenarios also declare `color_assets`. Validation inspects their
+actual PDF drawing operators and PNG pixel data, so a nominally RGB asset that
+contains only black, white, and gray cannot silently replace a color figure.
+The legacy blackwhite scenario is intentionally monochrome.
+
 The legacy fixture currently compiles without warnings. If the obsolete
 `subfigure` package begins emitting a platform-specific warning, only an exact
 obsolete-package diagnostic may be added; new documents should use `subcaption`.

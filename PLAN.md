@@ -120,6 +120,8 @@ its provenance manifests.
       and legacy `subfigure` resources while preserving the prior selection.
 - [x] Add direct Rust corpus enumeration and an Apple-Silicon-only installed
       Stata corpus gate.
+- [x] Make modern PDF/PNG figures visibly chromatic and fail validation if a
+      declared color asset contains only black, white, or gray content.
 - [x] Record exact-source Apple Silicon Stata and SCC Linux core results for the
       development selection (`21cf28493624191d52488146b914b8d26cc5291d`;
       SCC job `7311141`, GLIBC 2.28).
