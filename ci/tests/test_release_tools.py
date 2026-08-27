@@ -175,13 +175,29 @@ class WorkflowCompatibilityTests(unittest.TestCase):
             REPOSITORY_ROOT / ".github/workflows/build-linux-windows.yml"
         ).read_text(encoding="utf-8")
         windows = workflow.split("\n  windows:\n", 1)[1]
-        self.assertIn("git fetch origin main", windows)
-        self.assertIn("git checkout origin/main -- licenses/generated", windows)
+        self.assertIn("license_run_id:", workflow)
+        self.assertIn("actions: read", workflow)
+        self.assertIn("TEXPDF_LICENSE_RUN_ID: ${{ inputs.license_run_id }}", windows)
+        self.assertIn(
+            "uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131",
+            windows,
+        )
+        self.assertIn(
+            "name: texpdf-license-audit-${{ github.sha }}-${{ inputs.license_run_id }}",
+            windows,
+        )
+        self.assertIn("run-id: ${{ inputs.license_run_id }}", windows)
+        self.assertIn("Copy-Item -Recurse -LiteralPath $evidence", windows)
+        self.assertNotIn("git checkout origin/main -- licenses/generated", windows)
         self.assertIn(
             'status.get("source_sha") != source_sha',
             windows,
         )
         self.assertIn('status.get("release_license_complete") is True', windows)
+        self.assertIn(
+            '"license_audit_run_id": os.environ["TEXPDF_LICENSE_RUN_ID"]',
+            windows,
+        )
         self.assertIn("--public-release", windows)
         self.assertIn("Upload Windows public candidate artifact", windows)
         self.assertEqual(workflow.count("--public-release"), 1)

@@ -12,8 +12,13 @@ on:
           - linux
           - windows
         default: all
+      license_run_id:
+        description: Successful exact-source license-audit run (required for Windows)
+        required: false
+        type: string
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -171,20 +176,38 @@ jobs:
     timeout-minutes: 240
     env:
       RUSTFLAGS: "-C target-feature=+crt-static"
+      TEXPDF_LICENSE_RUN_ID: ${{ inputs.license_run_id }}
     steps:
       - name: Check out exact source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
+      - name: Require explicit source-bound license audit run
+        shell: pwsh
+        run: |
+          if ($env:TEXPDF_LICENSE_RUN_ID -notmatch '^\d+$') {
+            throw 'Windows packaging requires the successful exact-source license_run_id input'
+          }
+
+      - name: Download complete exact-source license evidence
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: texpdf-license-audit-${{ github.sha }}-${{ inputs.license_run_id }}
+          path: ${{ runner.temp }}/texpdf-license-audit
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.license_run_id }}
+
       - name: Materialize exact source-bound release license evidence
         shell: pwsh
         run: |
-          git fetch origin main
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $evidence = Join-Path $env:RUNNER_TEMP 'texpdf-license-audit\licenses\generated'
+          if (-not (Test-Path -LiteralPath $evidence)) {
+            throw "downloaded audit artifact has no complete release tree: $evidence"
+          }
           if (Test-Path licenses\generated) {
             Remove-Item -Recurse -Force licenses\generated
           }
-          git checkout origin/main -- licenses/generated
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item -Recurse -LiteralPath $evidence -Destination licenses\generated
           @'
           from pathlib import Path
           import json
@@ -342,6 +365,7 @@ jobs:
           payload = {
               "schema_version": 1,
               "source_sha": os.environ["GITHUB_SHA"],
+              "license_audit_run_id": os.environ["TEXPDF_LICENSE_RUN_ID"],
               "target": "x86_64-pc-windows-msvc",
               "build_platform": platform.platform(),
               "plugin_size_bytes": plugin.stat().st_size,
