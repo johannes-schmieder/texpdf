@@ -64,7 +64,55 @@ class ReceiptTests(unittest.TestCase):
             self.assertEqual(json.loads(path.read_text(encoding="utf-8")), payload)
             self.assertFalse(path.with_suffix(".json.tmp").exists())
 
-    def test_canonical_plugin_staging_excludes_ssc_marker(self) -> None:
+    def test_repository_staging_excludes_marker_for_tracked_canonical_plugin(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "source"
+            destination = Path(temporary) / "staged"
+            stata = root / "stata"
+            stata.mkdir(parents=True)
+            files = {
+                Path("stata/texpdf.ado"): b"program define texpdf\nend\n",
+                Path("stata/_texpdf_ssc_install.ado"): b"program define marker\nend\n",
+                Path("stata/_texpdf_plugin_macosx.plugin"): b"qualified-plugin",
+            }
+            for relative, data in files.items():
+                (root / relative).write_bytes(data)
+
+            with mock.patch.object(
+                RUN_STATA,
+                "tracked_files",
+                return_value=list(files),
+            ):
+                RUN_STATA.stage_repository(root, destination)
+
+            self.assertTrue((destination / "stata/texpdf.ado").is_file())
+            self.assertTrue(
+                (destination / "stata/_texpdf_plugin_macosx.plugin").is_file()
+            )
+            self.assertFalse(
+                (destination / "stata/_texpdf_ssc_install.ado").exists()
+            )
+
+    def test_repository_staging_preserves_marker_without_canonical_plugin(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "source"
+            destination = Path(temporary) / "staged"
+            marker = root / "stata/_texpdf_ssc_install.ado"
+            marker.parent.mkdir(parents=True)
+            marker.write_text("program define marker\nend\n", encoding="utf-8")
+
+            with mock.patch.object(
+                RUN_STATA,
+                "tracked_files",
+                return_value=[Path("stata/_texpdf_ssc_install.ado")],
+            ):
+                RUN_STATA.stage_repository(root, destination)
+
+            self.assertTrue(
+                (destination / "stata/_texpdf_ssc_install.ado").is_file()
+            )
+
+    def test_runtime_artifact_staging_excludes_ssc_marker(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             staged_root = root / "staged"

@@ -16,6 +16,11 @@ import tempfile
 
 
 DEFAULT_STATA = Path("/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp")
+CANONICAL_PLUGIN_FILENAMES = (
+    "_texpdf_plugin_macosx.plugin",
+    "_texpdf_plugin_unix.plugin",
+    "_texpdf_plugin_windows.plugin",
+)
 
 
 def command_output(command: list[str], cwd: Path) -> str:
@@ -48,12 +53,18 @@ def tracked_files(root: Path) -> list[Path]:
     return files
 
 
+def exclude_ssc_marker_from_canonical_staging(stata_directory: Path) -> None:
+    if any((stata_directory / name).is_file() for name in CANONICAL_PLUGIN_FILENAMES):
+        (stata_directory / "_texpdf_ssc_install.ado").unlink(missing_ok=True)
+
+
 def stage_repository(root: Path, destination: Path) -> None:
     for relative in tracked_files(root):
         source = root / relative
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
+    exclude_ssc_marker_from_canonical_staging(destination / "stata")
 
 
 def sha256_file(path: Path) -> str:
@@ -124,7 +135,7 @@ def stage_runtime_artifacts(staged_root: Path, run_root: Path) -> dict[str, obje
     # deliberately excludes that marker.  Mirror the installed GitHub layout
     # in the staged adopath so the source marker cannot masquerade as a second
     # SSC installation during the initial plugin smoke test.
-    (staged_plugin.parent / "_texpdf_ssc_install.ado").unlink(missing_ok=True)
+    exclude_ssc_marker_from_canonical_staging(staged_plugin.parent)
 
     staged_package: Path | None = None
     if package_source is not None:

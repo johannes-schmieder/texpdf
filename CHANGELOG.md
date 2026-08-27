@@ -93,9 +93,10 @@ releases or SSC versions.
 - The Stata dispatcher reuses only its verified platform binding and fails
   closed on an unknown/stale resident plugin instead of trying to reload a
   native library within the same session.
-- Licensed package qualification now stages the same marker-free GitHub
-  installation layout that users receive, so the SSC source marker cannot be
-  misidentified as a second installed distribution channel.
+- Licensed qualification now stages the same marker-free GitHub installation
+  layout that users receive, including build-produced plugins used by the
+  1,000-call stress lane, so the SSC source marker cannot be misidentified as a
+  second installed distribution channel.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.
