@@ -101,7 +101,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; plugin_bytes=49429136; Stata=MP 18; exact receipt profile=quick rust_mode=repository-engine",
+      "detail": "source=719421d122617317119372534216fadf791f9842; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
       "passed": true,
       "public_release_blocker": false,
@@ -117,7 +117,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=53af51d116cf7d885895482b63df37ebf81b6373; plugin_bytes=49377208",
+      "detail": "source=719421d122617317119372534216fadf791f9842; plugin_bytes=49377208",
       "key": "macos_intel_build",
       "passed": true,
       "public_release_blocker": false,
@@ -133,7 +133,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "version=0.1.0-rc2; zip_bytes=46559664; license_evidence=True; both_runtimes=None",
+      "detail": "version=0.1.0-rc2; zip_bytes=46559667; license_evidence=True; both_runtimes=None",
       "key": "macos_candidate_package",
       "passed": false,
       "public_release_blocker": true,
@@ -157,7 +157,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=719421d122617317119372534216fadf791f9842; sources=['', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8']",
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=719421d122617317119372534216fadf791f9842; sources=['', '719421d122617317119372534216fadf791f9842', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8']",
       "key": "required_target_source_coherence",
       "passed": false,
       "public_release_blocker": true,
