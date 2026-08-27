@@ -4,19 +4,17 @@
     "arm64"
   ],
   "arm_runtime_qualified": true,
-  "arm_runtime_source_sha": "6d1219afc6a2368fbd7484225e48cdbce401a481",
   "arm_stata_edition": "MP",
   "arm_stata_profile": "quick",
   "arm_stata_receipt": ".ci/stata/run/receipt.json",
   "arm_stata_version": "19",
   "candidate_package": {
-    "arm_and_intel_runtime_tested": true,
-    "license_audit_source_sha": "6d1219afc6a2368fbd7484225e48cdbce401a481",
+    "license_audit_source_sha": "366f16406773be5494a61e0badd55d0d1891e3c4",
     "license_evidence_included": true,
     "public_release": true,
     "version": "0.1.0-rc2",
-    "zip_sha256": "62349924bc3b1874c93c125a2ae35f4e9c1d8d6a4d526ffc2863c8df88c3f99a",
-    "zip_size_bytes": 46559662
+    "zip_sha256": "0df8f470c79307ab7a88cb7f83ae87211a23081248b65ebcd0be65de619444f4",
+    "zip_size_bytes": 46559667
   },
   "dynamic_dependencies": [
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
@@ -36,12 +34,9 @@
     "pginit",
     "stata_call"
   ],
-  "intel_runtime_qualified": true,
-  "intel_runtime_source_sha": "6d1219afc6a2368fbd7484225e48cdbce401a481",
-  "intel_stata_edition": "MP",
-  "intel_stata_version": "19",
+  "intel_runtime_qualified": false,
   "kind": "macOS universal Stata plugin",
-  "qualification_boundary": "Both slices were built from the exact source. The universal plugin was loaded and exercised in licensed ARM64 Stata/MP 19 and x86_64 Stata/MP 19 processes.",
+  "qualification_boundary": "Both Mach-O slices were built and inspected. The universal plugin was loaded and tested only through its ARM64 slice in licensed Stata/MP 19. Intel runtime qualification remains pending.",
   "schema_version": 1,
   "slices": {
     "arm64": {
@@ -65,7 +60,7 @@
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "6d1219afc6a2368fbd7484225e48cdbce401a481",
+  "source_sha": "366f16406773be5494a61e0badd55d0d1891e3c4",
   "universal": {
     "sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
     "size_bytes": 99091248,
