@@ -52,7 +52,7 @@ replace every target record with exact-source evidence.
 | Tested source | `0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f` |
 | Apple Silicon licensed Stata | `success` |
 | Linux core corpus | `success` |
-| Development license audit | `12cee234896767dd831c8bc951b4d291227f2f80`; complete=yes |
+| Development license audit | `c51da77cccf58ff5dec14c8f9350555837b9c2ca`; complete=yes |
 | Development TeX resources | 392/392 mapped |
 | Intel macOS / Linux licensed Stata | `not-run` / `not-run` |
 
@@ -87,7 +87,7 @@ The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b9
 
 The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
 
-The separate development audit is source-bound to `12cee234896767dd831c8bc951b4d291227f2f80` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
+The separate development audit is source-bound to `c51da77cccf58ff5dec14c8f9350555837b9c2ca` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
 
 ## Memory evidence
 
