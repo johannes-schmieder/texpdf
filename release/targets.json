@@ -22,7 +22,7 @@
       "memory_stress_iterations": 1000,
       "memory_stress_late_median_stata_rss_kib": 72304,
       "memory_stress_latest_attempt_qualified": false,
-      "memory_stress_latest_attempt_sha": "cde50c328e6cb2848d722fba68a4943e2d06ae66",
+      "memory_stress_latest_attempt_sha": "53af51d116cf7d885895482b63df37ebf81b6373",
       "memory_stress_max_allowed_growth_kib": 65536,
       "memory_stress_peak_helper_rss_kib": 196000,
       "memory_stress_peak_stata_rss_kib": 72304,
