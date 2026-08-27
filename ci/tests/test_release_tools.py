@@ -125,6 +125,27 @@ class WorkflowCompatibilityTests(unittest.TestCase):
         self.assertEqual(workflow.count("tools/prepare_curated_bundle.py"), 2)
         self.assertEqual(workflow.count("--identity bundle/DEVELOPMENT.json"), 2)
 
+    def test_hosted_builds_pin_cargo_rustc_and_rustup_toolchain(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/build-linux-windows.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            'export RUSTC="$(rustup which --toolchain '
+            '"$TEXPDF_RUST_TOOLCHAIN" rustc)"',
+            workflow,
+        )
+        self.assertIn(
+            'export RUSTUP_TOOLCHAIN="$TEXPDF_RUST_TOOLCHAIN"', workflow
+        )
+        self.assertIn(
+            "$env:RUSTC = (rustup which --toolchain "
+            "$env:TEXPDF_RUST_TOOLCHAIN rustc).Trim()",
+            workflow,
+        )
+        self.assertIn(
+            "$env:RUSTUP_TOOLCHAIN = $env:TEXPDF_RUST_TOOLCHAIN", workflow
+        )
+
     def test_intel_gate_derives_publication_mode_from_release_scope(self) -> None:
         workflow = (
             REPOSITORY_ROOT / ".github/workflows/qualify-macos-intel.yml"

@@ -105,6 +105,9 @@ releases or SSC versions.
 - Windows checkouts preserve LF bytes for every repository input whose raw
   content is validated during bundle reconstruction, including the resource
   policy and committed resource trace.
+- Hosted builders pin Cargo, rustc, and the rustup proxy environment to the
+  same release toolchain, preventing runner-default upgrades and concurrent
+  component-install races during compilation.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.

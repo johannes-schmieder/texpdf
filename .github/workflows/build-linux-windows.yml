@@ -74,7 +74,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          export RUSTUP_TOOLCHAIN="$TEXPDF_RUST_TOOLCHAIN"
+          export RUSTC="$(rustup which --toolchain "$TEXPDF_RUST_TOOLCHAIN" rustc)"
           cargo="$(rustup which --toolchain "$TEXPDF_RUST_TOOLCHAIN" cargo)"
+          "$RUSTC" --version
           export CARGO_TARGET_DIR="$RUNNER_TEMP/texpdf-target"
           "$cargo" fmt --all --check
           "$cargo" build --locked --release --package texpdf-helper \
@@ -195,7 +198,10 @@ jobs:
       - name: Test and build Windows plugin
         shell: pwsh
         run: |
+          $env:RUSTUP_TOOLCHAIN = $env:TEXPDF_RUST_TOOLCHAIN
+          $env:RUSTC = (rustup which --toolchain $env:TEXPDF_RUST_TOOLCHAIN rustc).Trim()
           $cargo = (rustup which --toolchain $env:TEXPDF_RUST_TOOLCHAIN cargo).Trim()
+          & $env:RUSTC --version
           $env:CARGO_TARGET_DIR = "$env:RUNNER_TEMP\texpdf-target"
           & $cargo fmt --all --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
