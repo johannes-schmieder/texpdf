@@ -32,9 +32,9 @@ tracked independently:
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| Current universal build source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
+| Current universal build source | `53af51d116cf7d885895482b63df37ebf81b6373` |
 | Last completed candidate license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| Latest memory-stress attempt | `cde50c328e6cb2848d722fba68a4943e2d06ae66`; qualified=no |
+| Latest memory-stress attempt | `53af51d116cf7d885895482b63df37ebf81b6373`; qualified=no |
 
 ## Development bundle on `main`
 
@@ -52,7 +52,7 @@ replace every target record with exact-source evidence.
 | Tested source | `0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f` |
 | Apple Silicon licensed Stata | `success` |
 | Linux core corpus | `success` |
-| Development license audit | `c51da77cccf58ff5dec14c8f9350555837b9c2ca`; complete=yes |
+| Development license audit | `72e3c1e339e01fb82e38fcc27b4844dbbec2a00a`; complete=yes |
 | Development TeX resources | 392/392 mapped |
 | Intel macOS / Linux licensed Stata | `not-run` / `not-run` |
 
@@ -69,37 +69,41 @@ the helper process, so a compiler crash does not run inside Stata.
 | Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
 | `aarch64-apple-darwin` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| `x86_64-apple-darwin` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
+| `x86_64-apple-darwin` | required | yes | no | `53af51d116cf7d885895482b63df37ebf81b6373` |
 | `x86_64-pc-windows-msvc` | required | no | no | `not recorded` |
 | `x86_64-unknown-linux-gnu` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 
-The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787`). The current universal plugin record is 93.97 MiB (`aca37fb2ddd5356c4144ff07419bbfec352cf7a7d3222091f9d2d5971c3e796c`).
+The current ARM64 plugin is 47.14 MiB (`71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787`). The current universal plugin record is 94.50 MiB (`74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27`).
 
 ## Active candidate blockers
 
+- `macos_intel_runtime`
 - `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 ## Previous candidate license evidence
 
 The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
 
-The separate development audit is source-bound to `c51da77cccf58ff5dec14c8f9350555837b9c2ca` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
+The separate development audit is source-bound to `72e3c1e339e01fb82e38fcc27b4844dbbec2a00a` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
 
 ## Memory evidence
 
-The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was unknown KiB against a unknown KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
+The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was None KiB against a 65536 KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
 
 ## Public-release blockers
 
+- `macos_intel_runtime`
 - `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.
