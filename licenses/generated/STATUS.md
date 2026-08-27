@@ -1,6 +1,6 @@
 # Third-party license audit status
 
-- Source SHA: `e800b685d1a5e465829b81d4efae4c8510537dcc`
+- Source SHA: `6d1219afc6a2368fbd7484225e48cdbce401a481`
 - Pipeline complete: **true**
 - Release-license complete: **true**
 - Embedded resources: 392
