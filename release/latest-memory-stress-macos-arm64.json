@@ -6,8 +6,8 @@
     "zip_size_bytes": 5263992
   },
   "development_package": {
-    "zip_sha256": "87b052001a2f33bb12ba16c36bbb37a958d2b4c5659f4ab6a37aa4a76dd87f92",
-    "zip_size_bytes": 22784826
+    "zip_sha256": "4cd28991adc9fa2518ef44e832a9f0a79d85a3b24ddd405ef11f33a9a310f296",
+    "zip_size_bytes": 22785191
   },
   "helper": {
     "sha256": "8329adf0cb32d872aa7ebea5b5568d6959638e0948737a8e96f3ba085f635e39",
@@ -15,40 +15,40 @@
     "target": "native"
   },
   "memory": {
-    "duration_seconds": 495,
+    "duration_seconds": 1,
     "expected_injected_failure_count": 42,
-    "growth_gate": true,
+    "growth_gate": false,
     "growth_threshold_rationale": "64 MiB is one eighth of the former in-process allowance and is above ordinary Stata allocator/cache noise while still detecting retained compiler state in the long-lived parent.",
-    "helper_sample_count": 1054,
-    "injected_failure_count": 42,
+    "helper_sample_count": 0,
+    "injected_failure_count": 0,
     "iterations_requested": 1000,
-    "late_median_stata_rss_kib": 74176,
+    "late_median_stata_rss_kib": null,
     "late_window": [
       900,
       1000
     ],
     "max_allowed_growth_kib": 65536,
-    "max_concurrent_helpers": 1,
-    "peak_helper_rss_kib": 195696,
-    "peak_stata_rss_kib": 74224,
-    "peak_tree_rss_kib": 299888,
-    "post_error_recovery": true,
-    "post_warmup_growth_kib": -32,
-    "post_warmup_growth_ratio": 0.9995687796463993,
+    "max_concurrent_helpers": 0,
+    "peak_helper_rss_kib": null,
+    "peak_stata_rss_kib": null,
+    "peak_tree_rss_kib": 30752,
+    "post_error_recovery": false,
+    "post_warmup_growth_kib": null,
+    "post_warmup_growth_ratio": null,
     "retained_helper_pids": [],
-    "runner_rc": 0,
-    "sample_count": 1642,
+    "runner_rc": 1,
+    "sample_count": 2,
     "schema_version": 1,
-    "stata_log_sha256": "a0bb3f1ab1e77af256ff59a656c0cb9f2a49929f8b9a5af46c3b70a851917569",
-    "stata_sample_count": 1640,
-    "successful_compile_count": 1000,
-    "warm_median_stata_rss_kib": 74208,
+    "stata_log_sha256": "939442b3b6f56b068ddb7e9755b64f963baa69db60b9ce0bf2985034a6d56819",
+    "stata_sample_count": 0,
+    "successful_compile_count": 0,
+    "warm_median_stata_rss_kib": null,
     "warm_window": [
       100,
       200
     ]
   },
-  "overall_status": "success",
+  "overall_status": "failure",
   "platform": "Unix; Mac (Apple Silicon)",
   "plugin": {
     "exports": [
@@ -62,18 +62,18 @@
   "process_architecture": "arm64",
   "profile": "stress1000",
   "qualification_boundary": "This records one exact-source macOS Apple Silicon licensed-Stata attempt through the installed plugin into one short-lived helper per request, with the Stata parent held for at least 1000 successful compiles and deliberate error recovery. Other architectures require separate runtime qualification.",
-  "qualified": true,
-  "rust_mode": "repository-engine",
-  "rust_status": "success",
+  "qualified": false,
+  "rust_mode": null,
+  "rust_status": "not_run",
   "schema_version": 3,
-  "source_sha": "d0cdc9fe06dfe9795840ab516bc5c98b1415c01a",
+  "source_sha": "422b11b2f6abd4ce1ee970084c6601e437756528",
   "stata_edition": "MP",
-  "stata_status": "success",
+  "stata_status": "failure",
   "stata_version": "19",
   "step_outcomes": {
     "build": "success",
     "profile": "success",
-    "stress": "success",
-    "validate": "success"
+    "stress": "failure",
+    "validate": "skipped"
   }
 }
