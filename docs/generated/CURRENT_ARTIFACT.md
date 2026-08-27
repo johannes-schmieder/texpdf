@@ -3,7 +3,7 @@
 This file is generated only from a successful exact-source-SHA
 embedded-engine Rust and licensed Stata run.
 
-- Source SHA: `5fc00576cff0e2731aa6b0a0fefafbe5149a0c59`
+- Source SHA: `e82ea7105a36268b94c18430990f645ab8b52105`
 - CI profile: `quick`
 - Overall status: `success`
 - Stata status: `success`
