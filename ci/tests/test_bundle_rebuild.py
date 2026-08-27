@@ -7,6 +7,7 @@ import base64
 import gzip
 import hashlib
 import importlib.util
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -73,24 +74,31 @@ class BundleRebuildTests(unittest.TestCase):
         with self.assertRaisesRegex(prepare_module.BundleError, "zip_sha256"):
             prepare_module.require_exact_identity(info, {"bundle": bundle})
 
-    def test_generated_bundle_resource_forces_lf_checkout_bytes(self) -> None:
-        result = subprocess.run(
-            [
-                "git",
-                "check-attr",
-                "eol",
-                "--",
-                "bundle/resources/language.dat",
-            ],
-            cwd=REPOSITORY_ROOT,
-            check=True,
-            capture_output=True,
-            text=True,
+    def test_hash_bound_bundle_inputs_force_lf_checkout_bytes(self) -> None:
+        manifest = json.loads(
+            (REPOSITORY_ROOT / "bundle/curated-manifest.json").read_text(
+                encoding="utf-8"
+            )
         )
-        self.assertEqual(
-            result.stdout.strip(),
-            "bundle/resources/language.dat: eol: lf",
-        )
+        paths = {
+            "bundle/resource-policy.json",
+            "bundle/resource-trace.txt.gz.b64",
+            *(
+                str(item["source"])
+                for item in manifest["resources"]
+                if item.get("generated") is True
+            ),
+        }
+        for path in sorted(paths):
+            with self.subTest(path=path):
+                result = subprocess.run(
+                    ["git", "check-attr", "eol", "--", path],
+                    cwd=REPOSITORY_ROOT,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertEqual(result.stdout.strip(), f"{path}: eol: lf")
 
     def test_committed_resource_trace_is_strict_base64(self) -> None:
         encoded = (REPOSITORY_ROOT / "bundle/resource-trace.txt.gz.b64").read_bytes()

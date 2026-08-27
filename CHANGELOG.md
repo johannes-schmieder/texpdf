@@ -102,6 +102,9 @@ releases or SSC versions.
 - Hosted Linux and Windows builders fetch only the selected TeX resource ranges
   and require the result to match every frozen bundle identity field, avoiding
   multi-gigabyte archive downloads and the rate limits they triggered.
+- Windows checkouts preserve LF bytes for every repository input whose raw
+  content is validated during bundle reconstruction, including the resource
+  policy and committed resource trace.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.

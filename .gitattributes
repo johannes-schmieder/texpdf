@@ -2,6 +2,8 @@
 licenses/texlive/LPPL-1.2.txt -whitespace
 tests/fixtures/real-world/latexlog-current/report.tex -whitespace
 
-# This project-generated resource participates in the frozen bundle identity.
-# Preserve its exact LF bytes even when Git is configured for Windows CRLF.
+# These inputs participate byte-for-byte in bundle reconstruction or its
+# source-bound validation. Preserve LF on Windows as well as Unix hosts.
+bundle/resource-policy.json text eol=lf
+bundle/resource-trace.txt.gz.b64 text eol=lf
 bundle/resources/language.dat text eol=lf
