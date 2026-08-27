@@ -1,7 +1,7 @@
 {
-  "bundle_zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
+  "bundle_zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f",
   "complete": true,
-  "license_expression_count": 17,
+  "license_expression_count": 18,
   "notice_files": [
     {
       "file": "licenses/generated/texts/texlive/license-texts/Apache-2.0.txt",
@@ -26,6 +26,12 @@
       "sha256": "49ea6cb9257bbee0a3979c48a774cd221550ac1c20c95549efe45fc99cc18050",
       "size_bytes": 1377,
       "source": "licenses/texlive/GUST-FONT-LICENSE.txt"
+    },
+    {
+      "file": "licenses/generated/texts/texlive/license-texts/LPPL-1.2.txt",
+      "sha256": "c5ccc6b3e36f75e1b44d8bfb178198a47692b6c86d936af804812c4866e0db58",
+      "size_bytes": 14439,
+      "source": "licenses/texlive/LPPL-1.2.txt"
     },
     {
       "file": "licenses/generated/texts/texlive/license-texts/LPPL-1.3c.txt",
@@ -60,6 +66,6 @@
   ],
   "policy": "licenses/texlive/license-text-policy.json",
   "resource_attribution": "licenses/generated/texts/texlive/resource-attribution.json",
-  "resource_count": 381,
+  "resource_count": 392,
   "schema_version": 1
 }

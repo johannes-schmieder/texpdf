@@ -6,12 +6,12 @@ release blockers until reviewed.
 
 ## Summary
 
-- Resources: 381
-- Mapped: 381
+- Resources: 392
+- Mapped: 392
 - Ambiguous: 0
 - Unmapped: 0
 - Mapped without license metadata: 0
-- Packages represented: 84
+- Packages represented: 88
 
 ## Review failures
 
@@ -30,6 +30,7 @@ release blockers until reviewed.
 - `licenseref-amsfonts-unchanged-or-renamed`
 - `licenseref-texlive-generated-map`
 - `lppl`
+- `lppl1.2`
 - `lppl1.3`
 - `lppl1.3c`
 - `mit`
