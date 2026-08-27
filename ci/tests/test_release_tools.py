@@ -202,6 +202,16 @@ class WorkflowCompatibilityTests(unittest.TestCase):
         self.assertIn("Upload Windows public candidate artifact", windows)
         self.assertEqual(workflow.count("--public-release"), 1)
 
+    def test_windows_runtime_receipts_exclude_machine_name(self) -> None:
+        runner = (REPOSITORY_ROOT / "ci/windows/run_qualification.ps1").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("$env:RUNNER_NAME = $env:COMPUTERNAME", runner)
+        self.assertIn(
+            "$env:RUNNER_NAME = 'windows-stata-mp19-release'",
+            runner,
+        )
+
     def test_intel_gate_derives_publication_mode_from_release_scope(self) -> None:
         workflow = (
             REPOSITORY_ROOT / ".github/workflows/qualify-macos-intel.yml"

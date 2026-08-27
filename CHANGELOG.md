@@ -124,6 +124,8 @@ releases or SSC versions.
   exact-source license-audit artifact, verifies the complete ignored license
   text tree and audit status, emits a public-release package with that unpacked
   tree, and writes portable LF-only package checksums.
+- Licensed Windows runtime receipts use a stable release-runner label instead
+  of recording the private test machine's computer name.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.
