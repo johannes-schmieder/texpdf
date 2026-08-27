@@ -108,6 +108,9 @@ releases or SSC versions.
 - Hosted builders pin Cargo, rustc, and the rustup proxy environment to the
   same release toolchain, preventing runner-default upgrades and concurrent
   component-install races during compilation.
+- Hosted Ubuntu Linux artifacts are explicitly development-only and report
+  their actual GLIBC requirements; the strict GLIBC 2.28 release ceiling
+  remains exclusively enforced on the canonical SCC RHEL 8 build.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.

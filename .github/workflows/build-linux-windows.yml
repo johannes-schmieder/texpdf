@@ -101,7 +101,6 @@ jobs:
           python3 tools/check_plugin_binary.py \
             dist/linux-x86_64/_texpdf_plugin_unix.plugin \
             --platform linux \
-            --maximum-glibc 2.28 \
             --output dist/linux-x86_64/binary-policy.json
           python3 tools/plugin_smoke.py \
             dist/linux-x86_64/_texpdf_plugin_unix.plugin \
@@ -132,8 +131,10 @@ jobs:
               "exports": ["pginit", "stata_call"],
               "dynamic_dependencies": Path("dist/linux-x86_64/ldd.txt").read_text(encoding="utf-8").splitlines(),
               "rust_tests": "success",
+              "canonical_release_builder": False,
+              "glibc_2_28_qualified": False,
               "stata_runtime_qualified": False,
-              "qualification_boundary": "Compiler/core tests passed on Linux; actual licensed Linux Stata loading is still required.",
+              "qualification_boundary": "Development-only hosted Ubuntu compiler/core build. The canonical Linux release binary and GLIBC 2.28 ceiling are qualified separately on SCC RHEL 8 with licensed Stata.",
           }
           Path("dist/linux-x86_64/manifest.json").write_text(
               json.dumps(payload, indent=2, sort_keys=True) + "\n",

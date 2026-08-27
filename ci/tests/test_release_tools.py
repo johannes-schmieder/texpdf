@@ -146,6 +146,18 @@ class WorkflowCompatibilityTests(unittest.TestCase):
             "$env:RUSTUP_TOOLCHAIN = $env:TEXPDF_RUST_TOOLCHAIN", workflow
         )
 
+    def test_only_scc_linux_builder_enforces_release_glibc_ceiling(self) -> None:
+        hosted = (
+            REPOSITORY_ROOT / ".github/workflows/build-linux-windows.yml"
+        ).read_text(encoding="utf-8")
+        scc = (REPOSITORY_ROOT / "ci/scc/build_linux.sh").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("--maximum-glibc 2.28", hosted)
+        self.assertIn('"canonical_release_builder": False', hosted)
+        self.assertIn('"glibc_2_28_qualified": False', hosted)
+        self.assertIn("--maximum-glibc 2.28", scc)
+
     def test_intel_gate_derives_publication_mode_from_release_scope(self) -> None:
         workflow = (
             REPOSITORY_ROOT / ".github/workflows/qualify-macos-intel.yml"
