@@ -4,17 +4,17 @@
     "arm64"
   ],
   "arm_runtime_qualified": true,
-  "arm_runtime_source_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
+  "arm_stata_edition": "MP",
   "arm_stata_profile": "quick",
   "arm_stata_receipt": ".ci/stata/run/receipt.json",
+  "arm_stata_version": "19",
   "candidate_package": {
-    "arm_and_intel_runtime_tested": true,
-    "license_audit_source_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
+    "license_audit_source_sha": "e82ea7105a36268b94c18430990f645ab8b52105",
     "license_evidence_included": true,
     "public_release": true,
     "version": "0.1.0-rc2",
-    "zip_sha256": "6e29e1ec6428952d255ac5f73e3ae0b51793d49d9756dd3cc3c33b85257a938d",
-    "zip_size_bytes": 46559664
+    "zip_sha256": "caa2c8a48baaf37df574b008df97f64c88194974ef633b74306d1049a8ebab85",
+    "zip_size_bytes": 46559662
   },
   "dynamic_dependencies": [
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
@@ -34,10 +34,9 @@
     "pginit",
     "stata_call"
   ],
-  "intel_runtime_qualified": true,
-  "intel_runtime_source_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
+  "intel_runtime_qualified": false,
   "kind": "macOS universal Stata plugin",
-  "qualification_boundary": "Both slices were built from the exact source. The universal plugin was loaded and exercised in licensed ARM64 and x86_64 Stata/MP 18 processes.",
+  "qualification_boundary": "Both Mach-O slices were built and inspected. The universal plugin was loaded and tested only through its ARM64 slice in licensed Stata/MP 19. Intel runtime qualification remains pending.",
   "schema_version": 1,
   "slices": {
     "arm64": {
@@ -61,7 +60,7 @@
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
+  "source_sha": "e82ea7105a36268b94c18430990f645ab8b52105",
   "universal": {
     "sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
     "size_bytes": 99091248,
