@@ -1,0 +1,59 @@
+{
+  "completed_at": "2026-08-27T14:08:58.851850Z",
+  "duration_seconds": 0.077,
+  "failure_detail": "Stata test suite returned r(601)",
+  "failure_kind": "stata_error",
+  "platform": "Unix; Mac (Apple Silicon)",
+  "process_rc": 0,
+  "profile": "quick",
+  "ref": "refs/heads/main",
+  "repository": "johannes-schmieder/texpdf",
+  "required_log_markers": [
+    {
+      "marker": "TEXPDF IN PROCESS STRESS PASS",
+      "present": false
+    },
+    {
+      "marker": "TEXPDF NET INSTALL PASS",
+      "present": false
+    },
+    {
+      "marker": "TEXPDF HELP EXAMPLES PASS",
+      "present": false
+    },
+    {
+      "marker": "TEXPDF REALISTIC CORPUS PASS",
+      "present": false
+    },
+    {
+      "marker": "TEXPDF FULL ENGINE STATA PASS",
+      "present": false
+    },
+    {
+      "marker": "TEXPDF STATA MATA SMOKE PASS",
+      "present": false
+    }
+  ],
+  "run_attempt": "1",
+  "run_id": "33080417889",
+  "runner_name": "macstudio-stata-mp18-texpdf",
+  "rust_mode": "repository-engine",
+  "rust_rc": 0,
+  "rust_status": "success",
+  "rust_toolchain": "1.97.1",
+  "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "schema_version": 1,
+  "started_at": "2026-08-27T14:08:58.774296Z",
+  "stata_bundle_version": "19.0.115",
+  "stata_edition": "MP",
+  "stata_executable": "stata-mp",
+  "stata_processors": 8,
+  "stata_rc": 601,
+  "stata_status": "failure",
+  "stata_version": "19",
+  "status": "failure",
+  "suite": "ci/stata_smoke.do",
+  "tested_sha": "2b315a4f853fe434335f3ae17102971881a6e0d6",
+  "tests_failed": 1,
+  "tests_passed": 0
+}
