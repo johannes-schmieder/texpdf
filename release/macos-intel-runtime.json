@@ -1,38 +1,39 @@
 {
-  "candidate_package_license_audit_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
+  "candidate_package_license_audit_source_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
   "candidate_package_license_evidence_included": true,
-  "candidate_package_public_release": false,
-  "candidate_package_sha256": "db7658a81409626bc980bb2d13fdcfb89949405abd3934c6b1d003a079ed899d",
-  "candidate_package_size_bytes": 45982571,
-  "candidate_package_version": "0.1.0-rc.2",
-  "intel_helper_sha256": "fc880363883be613bc993d29a5819105667b4db7f0eb21965105631244d25b8d",
-  "intel_helper_size_bytes": 48574376,
-  "intel_slice_sha256": "b9cf7f92617035a157b3577d10e3e5a4035682c695aa49d9054104dbc299d235",
-  "intel_slice_size_bytes": 49098680,
+  "candidate_package_public_release": true,
+  "candidate_package_sha256": "6e29e1ec6428952d255ac5f73e3ae0b51793d49d9756dd3cc3c33b85257a938d",
+  "candidate_package_size_bytes": 46559664,
+  "candidate_package_version": "0.1.0-rc2",
+  "intel_helper_sha256": "698c735954fec4e4332a330d4291d225966227a96951a61d1cfb7183980625b5",
+  "intel_helper_size_bytes": 48852904,
+  "intel_slice_sha256": "f2883557db5e7114d76c21fb6f0f307e7af57596f7262da7f1c627ae6382e644",
+  "intel_slice_size_bytes": 49377208,
   "qualified": true,
   "receipt": {
     "artifact": {
       "bundle_zip_sha256": null,
       "embedded_helper_sha256": null,
       "embedded_helper_size_bytes": null,
+      "installed_plugin": "_texpdf_plugin_macosx.plugin",
       "license_evidence_included": null,
-      "package_directory": "/Users/johannes/actions-runners/texpdf-stata/_work/_temp/texpdf-stata-ci-x_c4_p5o/package",
+      "package_directory": "isolated-qualified-package",
       "package_version": null,
       "package_zip_sha256": null,
       "package_zip_size_bytes": null,
-      "plugin_sha256": "aca37fb2ddd5356c4144ff07419bbfec352cf7a7d3222091f9d2d5971c3e796c",
-      "plugin_size_bytes": 98532016,
+      "plugin_sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
+      "plugin_size_bytes": 99091248,
       "schema_version": 1,
       "target": null
     },
-    "completed_at": "2026-08-25T17:32:13.876815Z",
-    "duration_seconds": 266.645,
+    "completed_at": "2026-08-27T17:00:30.369695Z",
+    "duration_seconds": 276.728,
     "failure_detail": null,
     "failure_kind": null,
     "platform": "Unix; Macintosh (Intel 64-bit)",
     "process_rc": 0,
     "profile": "quick",
-    "ref": "refs/heads/main",
+    "ref": "refs/heads/codex/qualify-v0.1.0-rc2-5fc0057",
     "repository": "johannes-schmieder/texpdf",
     "required_log_markers": [
       {
@@ -41,6 +42,14 @@
       },
       {
         "marker": "TEXPDF NET INSTALL PASS",
+        "present": true
+      },
+      {
+        "marker": "TEXPDF HELP EXAMPLES PASS",
+        "present": true
+      },
+      {
+        "marker": "TEXPDF REALISTIC CORPUS PASS",
         "present": true
       },
       {
@@ -53,7 +62,7 @@
       }
     ],
     "run_attempt": "1",
-    "run_id": "32877690543",
+    "run_id": "33094870333",
     "runner_name": "macstudio-stata-mp18-texpdf",
     "rust_mode": null,
     "rust_rc": null,
@@ -61,23 +70,23 @@
     "rust_toolchain": null,
     "rustc_version": null,
     "schema_version": 1,
-    "started_at": "2026-08-25T17:27:47.232117Z",
+    "started_at": "2026-08-27T16:55:53.641250Z",
     "stata_bundle_version": "unknown",
     "stata_edition": "MP",
-    "stata_executable": "/Users/johannes/actions-runners/texpdf-stata/_work/_temp/texpdf-stata-x86_64",
+    "stata_executable": "texpdf-stata-x86_64",
     "stata_processors": 8,
     "stata_rc": 0,
     "stata_status": "success",
-    "stata_version": "18",
+    "stata_version": "19",
     "status": "success",
     "suite": "ci/stata_smoke.do",
-    "tested_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
+    "tested_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
     "tests_failed": 0,
     "tests_passed": 1
   },
   "runtime": "macOS x86_64 Stata process under Rosetta",
   "schema_version": 1,
-  "source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
-  "universal_plugin_sha256": "aca37fb2ddd5356c4144ff07419bbfec352cf7a7d3222091f9d2d5971c3e796c",
-  "universal_plugin_size_bytes": 98532016
+  "source_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
+  "universal_plugin_sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
+  "universal_plugin_size_bytes": 99091248
 }
