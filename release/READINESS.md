@@ -27,7 +27,7 @@ Public cross-platform release ready: **false**
 | `required_target_source_coherence` | FAIL | yes | yes | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=e82ea7105a36268b94c18430990f645ab8b52105; sources=['', '5fc00576cff0e2731aa6b0a0fefafbe5149a0c59', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8'] |
 | `third_party_license_complete` | PASS | no | no | source=e82ea7105a36268b94c18430990f645ab8b52105; resources=392; mapped=392; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
 | `candidate_license_source_coherence` | FAIL | yes | yes | candidate_source=missing; license_source=e82ea7105a36268b94c18430990f645ab8b52105; ancestor=False; non_evidence_changes=[] |
-| `macos_arm_memory_stress` | FAIL | yes | yes | source=5fc00576cff0e2731aa6b0a0fefafbe5149a0c59; iterations=1000; peak_rss_kib=74784; post_warmup_growth_kib=48; growth_ratio=1.0006422607578678 |
+| `macos_arm_memory_stress` | FAIL | yes | yes | source=e82ea7105a36268b94c18430990f645ab8b52105; iterations=1000; peak_rss_kib=74240; post_warmup_growth_kib=48; growth_ratio=1.0006469700237222 |
 
 ## Active candidate blockers
 

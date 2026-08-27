@@ -34,7 +34,7 @@ tracked independently:
 | Current ARM64 artifact source | `5fc00576cff0e2731aa6b0a0fefafbe5149a0c59` |
 | Current universal build source | `e82ea7105a36268b94c18430990f645ab8b52105` |
 | Last completed candidate license-audit source | `e82ea7105a36268b94c18430990f645ab8b52105` |
-| Latest memory-stress attempt | `5fc00576cff0e2731aa6b0a0fefafbe5149a0c59`; qualified=yes |
+| Latest memory-stress attempt | `e82ea7105a36268b94c18430990f645ab8b52105`; qualified=yes |
 
 ## Development bundle on `main`
 
