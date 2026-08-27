@@ -1,14 +1,15 @@
 {
-  "candidate_package_license_audit_source_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
+  "candidate_package_license_audit_source_sha": "e82ea7105a36268b94c18430990f645ab8b52105",
   "candidate_package_license_evidence_included": true,
   "candidate_package_public_release": true,
-  "candidate_package_sha256": "6e29e1ec6428952d255ac5f73e3ae0b51793d49d9756dd3cc3c33b85257a938d",
-  "candidate_package_size_bytes": 46559664,
+  "candidate_package_sha256": "caa2c8a48baaf37df574b008df97f64c88194974ef633b74306d1049a8ebab85",
+  "candidate_package_size_bytes": 46559662,
   "candidate_package_version": "0.1.0-rc2",
   "intel_helper_sha256": "698c735954fec4e4332a330d4291d225966227a96951a61d1cfb7183980625b5",
   "intel_helper_size_bytes": 48852904,
   "intel_slice_sha256": "f2883557db5e7114d76c21fb6f0f307e7af57596f7262da7f1c627ae6382e644",
   "intel_slice_size_bytes": 49377208,
+  "platform": "Unix; Macintosh (Intel 64-bit)",
   "qualified": true,
   "receipt": {
     "artifact": {
@@ -26,14 +27,14 @@
       "schema_version": 1,
       "target": null
     },
-    "completed_at": "2026-08-27T17:00:30.369695Z",
-    "duration_seconds": 276.728,
+    "completed_at": "2026-08-27T17:35:43.851806Z",
+    "duration_seconds": 288.315,
     "failure_detail": null,
     "failure_kind": null,
     "platform": "Unix; Macintosh (Intel 64-bit)",
     "process_rc": 0,
     "profile": "quick",
-    "ref": "refs/heads/codex/qualify-v0.1.0-rc2-5fc0057",
+    "ref": "refs/heads/codex/qualify-v0.1.0-rc2-e82ea71-intel",
     "repository": "johannes-schmieder/texpdf",
     "required_log_markers": [
       {
@@ -62,7 +63,7 @@
       }
     ],
     "run_attempt": "1",
-    "run_id": "33094870333",
+    "run_id": "33098764070",
     "runner_name": "macstudio-stata-mp18-texpdf",
     "rust_mode": null,
     "rust_rc": null,
@@ -70,7 +71,7 @@
     "rust_toolchain": null,
     "rustc_version": null,
     "schema_version": 1,
-    "started_at": "2026-08-27T16:55:53.641250Z",
+    "started_at": "2026-08-27T17:30:55.535679Z",
     "stata_bundle_version": "unknown",
     "stata_edition": "MP",
     "stata_executable": "texpdf-stata-x86_64",
@@ -80,13 +81,15 @@
     "stata_version": "19",
     "status": "success",
     "suite": "ci/stata_smoke.do",
-    "tested_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
+    "tested_sha": "e82ea7105a36268b94c18430990f645ab8b52105",
     "tests_failed": 0,
     "tests_passed": 1
   },
   "runtime": "macOS x86_64 Stata process under Rosetta",
   "schema_version": 1,
-  "source_sha": "5fc00576cff0e2731aa6b0a0fefafbe5149a0c59",
+  "source_sha": "e82ea7105a36268b94c18430990f645ab8b52105",
+  "stata_edition": "MP",
+  "stata_version": "19",
   "universal_plugin_sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
   "universal_plugin_size_bytes": 99091248
 }
