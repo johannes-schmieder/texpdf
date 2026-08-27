@@ -230,8 +230,12 @@ class PackageReleaseTests(unittest.TestCase):
             self.assertNotIn("texpdf_licenses.zip", package_text)
             self.assertNotIn("f LICENSES/STATUS.json", package_text)
             self.assertEqual(build["net_install_license_file_count"], 0)
+            checksums = (root / "dist/package/CHECKSUMS.sha256").read_bytes()
+            self.assertNotIn(b"\r", checksums)
+            self.assertTrue(checksums.endswith(b"\n"))
             with zipfile.ZipFile(root / "dist/package.zip") as archive:
                 names = set(archive.namelist())
+                self.assertNotIn(b"\r", archive.read("CHECKSUMS.sha256"))
             self.assertIn("LICENSES/STATUS.json", names)
             self.assertIn("LICENSES/texts/rust/example/LICENSE", names)
             self.assertIn("LICENSES/texts/texlive/NOTICE", names)

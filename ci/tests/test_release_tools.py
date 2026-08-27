@@ -170,6 +170,22 @@ class WorkflowCompatibilityTests(unittest.TestCase):
             workflow,
         )
 
+    def test_windows_builder_requires_current_public_license_evidence(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/build-linux-windows.yml"
+        ).read_text(encoding="utf-8")
+        windows = workflow.split("\n  windows:\n", 1)[1]
+        self.assertIn("git fetch origin main", windows)
+        self.assertIn("git checkout origin/main -- licenses/generated", windows)
+        self.assertIn(
+            'status.get("source_sha") != source_sha',
+            windows,
+        )
+        self.assertIn('status.get("release_license_complete") is True', windows)
+        self.assertIn("--public-release", windows)
+        self.assertIn("Upload Windows public candidate artifact", windows)
+        self.assertEqual(workflow.count("--public-release"), 1)
+
     def test_intel_gate_derives_publication_mode_from_release_scope(self) -> None:
         workflow = (
             REPOSITORY_ROOT / ".github/workflows/qualify-macos-intel.yml"

@@ -1,4 +1,4 @@
-name: Build Linux and Windows development artifacts
+name: Build Linux development and Windows public candidate artifacts
 
 on:
   workflow_dispatch:
@@ -175,6 +175,61 @@ jobs:
       - name: Check out exact source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
+      - name: Materialize exact source-bound release license evidence
+        shell: pwsh
+        run: |
+          git fetch origin main
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (Test-Path licenses\generated) {
+            Remove-Item -Recurse -Force licenses\generated
+          }
+          git checkout origin/main -- licenses/generated
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          @'
+          from pathlib import Path
+          import json
+          import os
+
+          status_path = Path("licenses/generated/STATUS.json")
+          status = json.loads(status_path.read_text(encoding="utf-8"))
+          source_sha = os.environ["GITHUB_SHA"]
+          if status.get("source_sha") != source_sha:
+              raise SystemExit(
+                  "release license evidence source does not match exact checkout: "
+                  f"{status.get('source_sha')} != {source_sha}"
+              )
+          codes = status.get("return_codes") or status.get("stage_return_codes")
+          tex = status.get("tex_resources")
+          complete = (
+              status.get("release_license_complete") is True
+              and isinstance(codes, dict)
+              and bool(codes)
+              and all(value == 0 for value in codes.values())
+              and isinstance(tex, dict)
+              and int(tex.get("resource_count", 0)) > 0
+              and int(tex.get("ambiguous", -1)) == 0
+              and int(tex.get("unmapped", -1)) == 0
+              and int(tex.get("missing_license", -1)) == 0
+              and int(status.get("dependency_undeclared_count", -1)) == 0
+              and int(status.get("missing_rust_notice_files", -1)) == 0
+              and int(status.get("missing_native_notice_files", -1)) == 0
+              and status.get("tex_notice_complete") is True
+              and int(status.get("tex_notice_file_count", 0)) > 0
+          )
+          texts = Path("licenses/generated/texts")
+          if (
+              not complete
+              or not texts.is_dir()
+              or not any(path.is_file() for path in texts.rglob("*"))
+          ):
+              raise SystemExit("release license evidence is incomplete")
+          print(
+              "TEXPDF_WINDOWS_LICENSE_EVIDENCE_PASS "
+              f"source={source_sha} resources={tex['resource_count']}"
+          )
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Install Rust toolchain
         shell: pwsh
         run: |
@@ -315,9 +370,10 @@ jobs:
             --zip dist\texpdf-windows-x86_64.zip `
             --manifest dist\windows-x86_64\package-manifest.json `
             --target x86_64-pc-windows-msvc `
-            --package-version $candidateVersion
+            --package-version $candidateVersion `
+            --public-release
 
-      - name: Upload Windows development artifact
+      - name: Upload Windows public candidate artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: texpdf-windows-x86_64-${{ github.sha }}

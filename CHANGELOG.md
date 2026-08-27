@@ -120,6 +120,9 @@ releases or SSC versions.
 - macOS qualification records the actual Stata edition and version from each
   ARM64 and Intel/Rosetta runtime receipt instead of emitting a hard-coded
   version claim.
+- The canonical Windows builder now fails unless it can import complete license
+  evidence for the exact candidate source, emits a public-release package with
+  the full unpacked license tree, and writes portable LF-only package checksums.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.

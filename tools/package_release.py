@@ -68,12 +68,17 @@ def copy_atomic(source: Path, destination: Path) -> None:
     os.replace(temporary, destination)
 
 
+def write_text_lf(path: Path, content: str) -> None:
+    """Write generated package text with portable, deterministic LF endings."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="\n") as stream:
+        stream.write(content)
+
+
 def write_json_atomic(path: Path, payload: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    write_text_lf(temporary, json.dumps(payload, indent=2, sort_keys=True) + "\n")
     os.replace(temporary, path)
 
 
@@ -334,9 +339,9 @@ def main() -> int:
         }
         for name, source in sources.items():
             copy_atomic(source, args.output_dir / name)
-        (args.output_dir / "texpdf.pkg").write_text(
+        write_text_lf(
+            args.output_dir / "texpdf.pkg",
             render_platform_pkg(Path("stata/texpdf.pkg"), installed_plugin),
-            encoding="utf-8",
         )
 
         packaged_license_files: list[str] = []
@@ -388,11 +393,11 @@ def main() -> int:
             relative_name(args.output_dir, path): sha256_file(path)
             for path in package_files(args.output_dir)
         }
-        (args.output_dir / "CHECKSUMS.sha256").write_text(
+        write_text_lf(
+            args.output_dir / "CHECKSUMS.sha256",
             "".join(
                 f"{digest}  {name}\n" for name, digest in sorted(checksums.items())
             ),
-            encoding="utf-8",
         )
 
         args.zip_path.parent.mkdir(parents=True, exist_ok=True)
