@@ -12,14 +12,14 @@
     "tag_preserved": true
   },
   "history_audit": {
-    "bytes_scanned": 12673329,
-    "commits_scanned": 708,
+    "bytes_scanned": 12677507,
+    "commits_scanned": 712,
     "history_rewritten": false,
     "scanner": "gitleaks",
     "scanner_binary_sha256": "ba52fb1bfabbcde42f032afad3d6e0b19dff8ed105229a16e7caa338bbc0e84f",
     "scanner_version": "8.30.1",
     "secrets_found": 0,
-    "tip_sha": "e800b685d1a5e465829b81d4efae4c8510537dcc"
+    "tip_sha": "6d1219afc6a2368fbd7484225e48cdbce401a481"
   },
   "repository": "johannes-schmieder/texpdf",
   "repository_url": "https://github.com/johannes-schmieder/texpdf",
