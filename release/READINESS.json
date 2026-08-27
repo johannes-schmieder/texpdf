@@ -61,7 +61,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "kind=public_release_candidate; version=0.1.0-rc2; source=ba7345243e3a3514f9080a9c26150708d7a2aabb; required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']",
+      "detail": "kind=public_release_candidate; version=0.1.0-rc2; source=5fc00576cff0e2731aa6b0a0fefafbe5149a0c59; required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']",
       "key": "release_scope",
       "passed": true,
       "public_release_blocker": false,
@@ -85,7 +85,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "visibility=public; audit_tip=ba7345243e3a3514f9080a9c26150708d7a2aabb; scope_source=ba7345243e3a3514f9080a9c26150708d7a2aabb; sha_pinning=True; vulnerability_reporting=True",
+      "detail": "visibility=public; audit_tip=5fc00576cff0e2731aa6b0a0fefafbe5149a0c59; scope_source=5fc00576cff0e2731aa6b0a0fefafbe5149a0c59; sha_pinning=True; vulnerability_reporting=True",
       "key": "public_repository_security",
       "passed": true,
       "public_release_blocker": false,
@@ -117,7 +117,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=719421d122617317119372534216fadf791f9842; plugin_bytes=49377208",
+      "detail": "source=ba7345243e3a3514f9080a9c26150708d7a2aabb; plugin_bytes=49377208",
       "key": "macos_intel_build",
       "passed": true,
       "public_release_blocker": false,
@@ -133,7 +133,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "version=0.1.0-rc2; zip_bytes=46559667; license_evidence=True; both_runtimes=None",
+      "detail": "version=0.1.0-rc2; zip_bytes=46559664; license_evidence=True; both_runtimes=None",
       "key": "macos_candidate_package",
       "passed": false,
       "public_release_blocker": true,
@@ -157,7 +157,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=ba7345243e3a3514f9080a9c26150708d7a2aabb; sources=['', '719421d122617317119372534216fadf791f9842', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8']",
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=5fc00576cff0e2731aa6b0a0fefafbe5149a0c59; sources=['', '719421d122617317119372534216fadf791f9842', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8']",
       "key": "required_target_source_coherence",
       "passed": false,
       "public_release_blocker": true,
@@ -181,7 +181,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "source=719421d122617317119372534216fadf791f9842; iterations=1000; peak_rss_kib=73616; post_warmup_growth_kib=32; growth_ratio=1.000434877147206",
+      "detail": "source=ba7345243e3a3514f9080a9c26150708d7a2aabb; iterations=1000; peak_rss_kib=74208; post_warmup_growth_kib=80; growth_ratio=1.0010792143319662",
       "key": "macos_arm_memory_stress",
       "passed": false,
       "public_release_blocker": true,

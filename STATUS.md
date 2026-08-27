@@ -32,9 +32,9 @@ tracked independently:
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `719421d122617317119372534216fadf791f9842` |
-| Current universal build source | `719421d122617317119372534216fadf791f9842` |
+| Current universal build source | `ba7345243e3a3514f9080a9c26150708d7a2aabb` |
 | Last completed candidate license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
-| Latest memory-stress attempt | `0e7ed78f26671a26d697406dde588369d63c7a08`; qualified=no |
+| Latest memory-stress attempt | `ba7345243e3a3514f9080a9c26150708d7a2aabb`; qualified=yes |
 
 ## Development bundle on `main`
 
@@ -52,7 +52,7 @@ replace every target record with exact-source evidence.
 | Tested source | `0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f` |
 | Apple Silicon licensed Stata | `success` |
 | Linux core corpus | `success` |
-| Development license audit | `ebc32c2c2ea9fc242f62d6e22611ad196148a716`; complete=yes |
+| Development license audit | `ba7345243e3a3514f9080a9c26150708d7a2aabb`; complete=yes |
 | Development TeX resources | 392/392 mapped |
 | Intel macOS / Linux licensed Stata | `not-run` / `not-run` |
 
@@ -69,7 +69,7 @@ the helper process, so a compiler crash does not run inside Stata.
 | Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
 | `aarch64-apple-darwin` | required | yes | yes | `719421d122617317119372534216fadf791f9842` |
-| `x86_64-apple-darwin` | required | yes | no | `719421d122617317119372534216fadf791f9842` |
+| `x86_64-apple-darwin` | required | yes | no | `ba7345243e3a3514f9080a9c26150708d7a2aabb` |
 | `x86_64-pc-windows-msvc` | required | no | no | `not recorded` |
 | `x86_64-unknown-linux-gnu` | required | yes | yes | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
 
@@ -89,11 +89,11 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 
 The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
 
-The separate development audit is source-bound to `ebc32c2c2ea9fc242f62d6e22611ad196148a716` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
+The separate development audit is source-bound to `ba7345243e3a3514f9080a9c26150708d7a2aabb` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
 
 ## Memory evidence
 
-The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was unknown KiB against a unknown KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
+The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 80 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
 
 ## Public-release blockers
 
