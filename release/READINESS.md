@@ -12,10 +12,10 @@ Public cross-platform release ready: **false**
 | `package_file_texpdf.pkg` | PASS | no | no | stata/texpdf.pkg |
 | `package_file_stata.toc` | PASS | no | no | stata/stata.toc |
 | `cargo_lock` | PASS | no | no | Cargo.lock is committed |
-| `release_scope` | PASS | no | no | kind=public_release_candidate; version=0.1.0-rc2; source=0e7ed78f26671a26d697406dde588369d63c7a08; required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc'] |
+| `release_scope` | PASS | no | no | kind=public_release_candidate; version=0.1.0-rc2; source=ba7345243e3a3514f9080a9c26150708d7a2aabb; required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc'] |
 | `public_distribution` | PASS | no | no | public GitHub distribution is explicitly authorized in release scope |
 | `ssc_distribution` | PASS | no | no | SSC distribution is explicitly authorized in release scope |
-| `public_repository_security` | PASS | no | no | visibility=public; audit_tip=0e7ed78f26671a26d697406dde588369d63c7a08; scope_source=0e7ed78f26671a26d697406dde588369d63c7a08; sha_pinning=True; vulnerability_reporting=True |
+| `public_repository_security` | PASS | no | no | visibility=public; audit_tip=ba7345243e3a3514f9080a9c26150708d7a2aabb; scope_source=ba7345243e3a3514f9080a9c26150708d7a2aabb; sha_pinning=True; vulnerability_reporting=True |
 | `target_registry` | PASS | no | no | target count=4 |
 | `macos_arm_runtime` | PASS | no | no | source=719421d122617317119372534216fadf791f9842; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=99091248; arm_runtime=True |
@@ -24,7 +24,7 @@ Public cross-platform release ready: **false**
 | `macos_candidate_package` | FAIL | yes | yes | version=0.1.0-rc2; zip_bytes=46559667; license_evidence=True; both_runtimes=None |
 | `linux_x86_64_runtime` | FAIL | yes | yes | source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; glibc_max=2.28; package_version=0.1.0-rc.2; Stata18_quick=True; Stata18_stress1000=True; Stata19_quick=True |
 | `windows_x86_64_runtime` | FAIL | yes | yes | missing release/windows-x86_64.json |
-| `required_target_source_coherence` | FAIL | yes | yes | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=0e7ed78f26671a26d697406dde588369d63c7a08; sources=['', '719421d122617317119372534216fadf791f9842', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8'] |
+| `required_target_source_coherence` | FAIL | yes | yes | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=ba7345243e3a3514f9080a9c26150708d7a2aabb; sources=['', '719421d122617317119372534216fadf791f9842', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8'] |
 | `third_party_license_complete` | PASS | no | no | source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; resources=381; mapped=381; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
 | `candidate_license_source_coherence` | FAIL | yes | yes | candidate_source=missing; license_source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; ancestor=False; non_evidence_changes=[] |
 | `macos_arm_memory_stress` | FAIL | yes | yes | source=719421d122617317119372534216fadf791f9842; iterations=1000; peak_rss_kib=73616; post_warmup_growth_kib=32; growth_ratio=1.000434877147206 |
