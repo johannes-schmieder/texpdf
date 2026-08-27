@@ -25,6 +25,15 @@ if SPEC is None or SPEC.loader is None:
 module = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = module
 SPEC.loader.exec_module(module)
+PREPARE_MODULE_PATH = TOOLS / "prepare_curated_bundle.py"
+PREPARE_SPEC = importlib.util.spec_from_file_location(
+    "prepare_curated_bundle", PREPARE_MODULE_PATH
+)
+if PREPARE_SPEC is None or PREPARE_SPEC.loader is None:
+    raise RuntimeError(f"cannot load {PREPARE_MODULE_PATH}")
+prepare_module = importlib.util.module_from_spec(PREPARE_SPEC)
+sys.modules[PREPARE_SPEC.name] = prepare_module
+PREPARE_SPEC.loader.exec_module(prepare_module)
 
 
 def sha256(data: bytes) -> str:
@@ -32,6 +41,38 @@ def sha256(data: bytes) -> str:
 
 
 class BundleRebuildTests(unittest.TestCase):
+    def test_range_builder_requires_every_exact_identity_field(self) -> None:
+        bundle = {
+            "name": "academic",
+            "version": "1",
+            "transform_version": "range-v2",
+            "source_sha256": "1" * 64,
+            "index_sha256": "2" * 64,
+            "content_digest": "3" * 64,
+            "zip_sha256": "4" * 64,
+            "file_count": 10,
+            "zip_size_bytes": 20,
+            "uncompressed_resource_bytes": 30,
+            "resource_policy_sha256": "5" * 64,
+        }
+        info = {
+            "bundle_name": bundle["name"],
+            "bundle_version": bundle["version"],
+            "transform_version": bundle["transform_version"],
+            "source_sha256": bundle["source_sha256"],
+            "index_sha256": bundle["index_sha256"],
+            "tectonic_bundle_digest": bundle["content_digest"],
+            "zip_sha256": bundle["zip_sha256"],
+            "file_count": bundle["file_count"],
+            "zip_size_bytes": bundle["zip_size_bytes"],
+            "uncompressed_resource_bytes": bundle["uncompressed_resource_bytes"],
+            "resource_policy_sha256": bundle["resource_policy_sha256"],
+        }
+        prepare_module.require_exact_identity(info, {"bundle": bundle})
+        info["zip_sha256"] = "6" * 64
+        with self.assertRaisesRegex(prepare_module.BundleError, "zip_sha256"):
+            prepare_module.require_exact_identity(info, {"bundle": bundle})
+
     def test_generated_bundle_resource_forces_lf_checkout_bytes(self) -> None:
         result = subprocess.run(
             [

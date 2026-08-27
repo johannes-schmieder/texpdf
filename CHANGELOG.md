@@ -97,6 +97,11 @@ releases or SSC versions.
   layout that users receive, including build-produced plugins used by the
   1,000-call stress lane, so the SSC source marker cannot be misidentified as a
   second installed distribution channel.
+- Intel qualification derives the expected package publication mode from the
+  frozen release scope instead of carrying a stale private-candidate constant.
+- Hosted Linux and Windows builders fetch only the selected TeX resource ranges
+  and require the result to match every frozen bundle identity field, avoiding
+  multi-gigabyte archive downloads and the rate limits they triggered.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.

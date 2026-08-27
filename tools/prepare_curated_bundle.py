@@ -29,6 +29,35 @@ class BundleError(RuntimeError):
     pass
 
 
+def require_exact_identity(info: dict[str, object], identity: dict[str, object]) -> None:
+    bundle = identity.get("bundle")
+    if not isinstance(bundle, dict):
+        raise BundleError("bundle identity is missing its bundle object")
+    fields = {
+        "bundle_name": "name",
+        "bundle_version": "version",
+        "transform_version": "transform_version",
+        "source_sha256": "source_sha256",
+        "index_sha256": "index_sha256",
+        "tectonic_bundle_digest": "content_digest",
+        "zip_sha256": "zip_sha256",
+        "file_count": "file_count",
+        "zip_size_bytes": "zip_size_bytes",
+        "uncompressed_resource_bytes": "uncompressed_resource_bytes",
+        "resource_policy_sha256": "resource_policy_sha256",
+    }
+    mismatches = {
+        info_key: {"expected": bundle.get(identity_key), "actual": info.get(info_key)}
+        for info_key, identity_key in fields.items()
+        if info.get(info_key) != bundle.get(identity_key)
+    }
+    if mismatches:
+        raise BundleError(
+            "range-built bundle differs from exact identity: "
+            + json.dumps(mismatches, sort_keys=True)
+        )
+
+
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -362,6 +391,11 @@ def main() -> int:
         type=Path,
         default=Path("bundle/resource-policy.json"),
     )
+    parser.add_argument(
+        "--identity",
+        type=Path,
+        help="exact bundle identity that the range-built output must match",
+    )
     parser.add_argument("--workers", type=int, default=4)
     args = parser.parse_args()
 
@@ -594,6 +628,9 @@ def main() -> int:
             "excluded_resource_count": len(excluded_names),
             "resource_policy_sha256": sha256_file(args.resource_policy),
         }
+        if args.identity is not None:
+            identity = json.loads(args.identity.read_text(encoding="utf-8"))
+            require_exact_identity(info, identity)
         manifest_payload.update(
             {
                 "file_count": len(resources),

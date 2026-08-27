@@ -48,6 +48,7 @@ jobs:
           git fetch origin main
           git merge-base --is-ancestor "$SOURCE_SHA" origin/main
           git show origin/main:release/targets.json > "$RUNNER_TEMP/texpdf-targets.json"
+          git show origin/main:release/scope.json > "$RUNNER_TEMP/texpdf-release-scope.json"
           receipt="$RUNNER_TEMP/texpdf-source-receipt.json"
           git show "origin/main:.ci/stata/results/$SOURCE_SHA.json" > "$receipt"
           /usr/bin/python3 ci/check_stata_receipt.py \
@@ -92,6 +93,18 @@ jobs:
                   encoding="utf-8"
               )
           )
+          scope = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "texpdf-release-scope.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          if scope.get("candidate_source_sha") != os.environ["SOURCE_SHA"]:
+              raise SystemExit("release scope belongs to another source SHA")
+          if scope.get("candidate_version") != package.get("package_version"):
+              raise SystemExit("universal package version differs from release scope")
+          expected_public_release = scope.get("public_distribution_enabled") is True
+          if package.get("public_release_mode") is not expected_public_release:
+              raise SystemExit("universal package publication mode differs from release scope")
           expected = {
               "universal_build_source_sha": os.environ["SOURCE_SHA"],
               "universal_plugin_sha256": manifest["universal"]["sha256"],
@@ -102,7 +115,7 @@ jobs:
               "candidate_package_size_bytes": package["package_zip_size_bytes"],
               "candidate_package_version": package["package_version"],
               "candidate_package_license_evidence_included": True,
-              "candidate_package_public_release": False,
+              "candidate_package_public_release": expected_public_release,
           }
           if str(manifest.get("source_sha", os.environ["SOURCE_SHA"])) != os.environ["SOURCE_SHA"]:
               raise SystemExit("downloaded universal manifest belongs to another source SHA")

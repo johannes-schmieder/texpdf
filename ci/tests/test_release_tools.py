@@ -118,6 +118,25 @@ class GeneratedJsonTests(unittest.TestCase):
 
 
 class WorkflowCompatibilityTests(unittest.TestCase):
+    def test_hosted_builds_range_fetch_and_require_exact_bundle_identity(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/build-linux-windows.yml"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(workflow.count("tools/prepare_curated_bundle.py"), 2)
+        self.assertEqual(workflow.count("--identity bundle/DEVELOPMENT.json"), 2)
+
+    def test_intel_gate_derives_publication_mode_from_release_scope(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/qualify-macos-intel.yml"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn('"candidate_package_public_release": False', workflow)
+        self.assertIn("origin/main:release/scope.json", workflow)
+        self.assertIn('scope.get("public_distribution_enabled") is True', workflow)
+        self.assertIn(
+            'package.get("public_release_mode") is not expected_public_release',
+            workflow,
+        )
+
     def test_artifact_manifest_avoids_python_310_union_annotations(self) -> None:
         workflow = (
             REPOSITORY_ROOT / ".github/workflows/publish-artifact-manifest.yml"
