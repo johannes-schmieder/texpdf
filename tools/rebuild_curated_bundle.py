@@ -340,7 +340,11 @@ def rebuild(
                     raise RebuildError(f"generated resource source is missing: {source}")
                 data = source.read_bytes()
                 if len(data) != record["length"]:
-                    raise RebuildError(f"generated resource length mismatch for {name}")
+                    raise RebuildError(
+                        f"generated resource length mismatch for {name}: "
+                        f"expected {record['length']} bytes, got {len(data)}; "
+                        "verify that Git preserved the resource's declared line endings"
+                    )
                 if sha256_bytes(data) != record["sha256"]:
                     raise RebuildError(f"generated resource checksum mismatch for {name}")
                 data_by_name[name] = data

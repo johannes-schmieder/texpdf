@@ -8,6 +8,7 @@ import gzip
 import hashlib
 import importlib.util
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -31,6 +32,25 @@ def sha256(data: bytes) -> str:
 
 
 class BundleRebuildTests(unittest.TestCase):
+    def test_generated_bundle_resource_forces_lf_checkout_bytes(self) -> None:
+        result = subprocess.run(
+            [
+                "git",
+                "check-attr",
+                "eol",
+                "--",
+                "bundle/resources/language.dat",
+            ],
+            cwd=REPOSITORY_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            result.stdout.strip(),
+            "bundle/resources/language.dat: eol: lf",
+        )
+
     def test_committed_resource_trace_is_strict_base64(self) -> None:
         encoded = (REPOSITORY_ROOT / "bundle/resource-trace.txt.gz.b64").read_bytes()
         compressed = base64.b64decode(encoded, validate=True)

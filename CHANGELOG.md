@@ -87,6 +87,9 @@ releases or SSC versions.
 - Release builds reject stale helpers whose embedded bundle identity differs
   from regenerated bundle metadata.
 - Windows builds link the MSVC CRT statically and reject dynamic CRT imports.
+- Windows checkouts preserve the byte-exact LF form of the generated
+  `language.dat` resource so deterministic bundle reconstruction has the same
+  identity on every supported operating system.
 - The Stata dispatcher reuses only its verified platform binding and fails
   closed on an unknown/stale resident plugin instead of trying to reload a
   native library within the same session.
