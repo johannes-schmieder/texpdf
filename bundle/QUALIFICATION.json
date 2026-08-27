@@ -6,32 +6,34 @@
     "release_readiness": "release/READINESS.json"
   },
   "bundle": {
-    "content_digest": "a5b8af5c48f71877bf3ca8296892757cf1868503f151acc6b7b77808b85b2d51",
+    "content_digest": "343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf",
     "excluded_resource_count": 175,
-    "file_count": 382,
+    "file_count": 393,
     "index_sha256": "979a52178eb353c803dde1f66efe43ff7ae2ab908000323d4fef29e98e382ebd",
-    "name": "texpdf-academic-v1",
+    "name": "texpdf-academic-v2-development",
     "resource_policy_sha256": "8a3e2a66a480b3d8ff19b11e53935aa43e43757ceaf0d647a344dbf3ccd4e58f",
     "selection_manifest": "bundle/curated-manifest.json",
     "source_sha256": "425685e124746c15ba9bb8e0596bdaad98fce886afa347fbcf9ec0e9acd7fe79",
     "transform_version": "range-closure-v2-english-only",
-    "uncompressed_resource_bytes": 14948589,
-    "version": "33-academic-v1",
-    "zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
-    "zip_size_bytes": 4984973
+    "uncompressed_resource_bytes": 15817275,
+    "version": "33-academic-v2-dev.1",
+    "zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f",
+    "zip_size_bytes": 5263992
   },
   "ci": {
     "overall_status": "success",
     "profile": "quick",
-    "receipt": ".ci/stata/results/7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8.json",
+    "receipt": ".ci/stata/results/719421d122617317119372534216fadf791f9842.json",
     "required_markers": [
       "TEXPDF IN PROCESS STRESS PASS",
       "TEXPDF NET INSTALL PASS",
+      "TEXPDF HELP EXAMPLES PASS",
+      "TEXPDF REALISTIC CORPUS PASS",
       "TEXPDF FULL ENGINE STATA PASS",
       "TEXPDF STATA MATA SMOKE PASS"
     ],
     "run_attempt": 1,
-    "run_id": 32874995457,
+    "run_id": 33084201168,
     "rust_mode": "repository-engine",
     "rust_status": "success",
     "stata_status": "success"
@@ -42,22 +44,22 @@
   },
   "helper": {
     "materialization": "verified hash-addressed private executable",
-    "sha256": "df1bf398fae80a57cb83c0e0796a1d2189bcbd2b2965ce23b6e7326298b24f06",
-    "size_bytes": 48515440
+    "sha256": "8329adf0cb32d872aa7ebea5b5568d6959638e0948737a8e96f3ba085f635e39",
+    "size_bytes": 48796144
   },
   "package": {
     "net_install_tested": true,
     "public_release": false,
-    "zip_sha256": "2e10818d0a652f90b0aaac1e7abd03ee2f07b68df8f4c86e030e897c37a19db2",
-    "zip_size_bytes": 22496277
+    "zip_sha256": "4cd28991adc9fa2518ef44e832a9f0a79d85a3b24ddd405ef11f33a9a310f296",
+    "zip_size_bytes": 22785191
   },
   "platform": {
     "architecture": "Apple Silicon",
     "os": "macOS",
     "rust_target": "aarch64-apple-darwin",
-    "stata_bundle_version": "18.0.130",
+    "stata_bundle_version": "19.0.115",
     "stata_edition": "MP",
-    "stata_version": "18"
+    "stata_version": "19"
   },
   "plugin": {
     "dynamic_dependencies": [
@@ -69,12 +71,12 @@
       "pginit",
       "stata_call"
     ],
-    "sha256": "71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787",
-    "size_bytes": 49429136
+    "sha256": "56fe47133a1132498e6a9852212017f86a7b68c9beb9e48013b489af5b967523",
+    "size_bytes": 49709840
   },
   "qualification_boundary": "This record qualifies the exact macOS Apple Silicon plugin, embedded helper, curated bundle, and development package under licensed Stata/MP. Other architectures require separate runtime qualification; public redistribution requires a complete audit.",
-  "qualified_at": "2026-08-25T17:16:43.954416Z",
-  "qualified_source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
+  "qualified_at": "2026-08-27T15:06:01.365979Z",
+  "qualified_source_sha": "719421d122617317119372534216fadf791f9842",
   "schema_version": 3,
   "tests": {
     "academic_package_corpus": true,
