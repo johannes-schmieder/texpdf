@@ -64,6 +64,38 @@ class ReceiptTests(unittest.TestCase):
             self.assertEqual(json.loads(path.read_text(encoding="utf-8")), payload)
             self.assertFalse(path.with_suffix(".json.tmp").exists())
 
+    def test_canonical_plugin_staging_excludes_ssc_marker(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            staged_root = root / "staged"
+            staged_stata = staged_root / "stata"
+            staged_stata.mkdir(parents=True)
+            (staged_stata / "_texpdf_ssc_install.ado").write_text(
+                "program define _texpdf_ssc_install\nend\n",
+                encoding="utf-8",
+            )
+            package = root / "package-source"
+            package.mkdir()
+            plugin = package / "_texpdf_plugin_macosx.plugin"
+            plugin.write_bytes(b"qualified-plugin")
+            run_root = root / "run"
+            run_root.mkdir()
+
+            with mock.patch.object(RUN_STATA.sys, "platform", "darwin"), mock.patch.dict(
+                os.environ,
+                {"TEXPDF_STATA_PACKAGE_DIR": str(package)},
+                clear=True,
+            ):
+                identity = RUN_STATA.stage_runtime_artifacts(staged_root, run_root)
+
+            self.assertIsNotNone(identity)
+            self.assertEqual(
+                (staged_stata / "_texpdf_plugin_macosx.plugin").read_bytes(),
+                b"qualified-plugin",
+            )
+            self.assertFalse((staged_stata / "_texpdf_ssc_install.ado").exists())
+            self.assertTrue((run_root / "package/_texpdf_plugin_macosx.plugin").is_file())
+
     @staticmethod
     def normal_process(**overrides: object) -> dict[str, object]:
         value: dict[str, object] = {

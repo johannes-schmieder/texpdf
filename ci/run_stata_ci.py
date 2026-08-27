@@ -118,6 +118,14 @@ def stage_runtime_artifacts(staged_root: Path, run_root: Path) -> dict[str, obje
     staged_plugin.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(plugin_source, staged_plugin)
 
+    # The tracked source tree contains the SSC-only installation marker so it
+    # can be assembled into the combined submission.  A qualified canonical
+    # plugin, however, represents a GitHub package, whose package builder
+    # deliberately excludes that marker.  Mirror the installed GitHub layout
+    # in the staged adopath so the source marker cannot masquerade as a second
+    # SSC installation during the initial plugin smoke test.
+    (staged_plugin.parent / "_texpdf_ssc_install.ado").unlink(missing_ok=True)
+
     staged_package: Path | None = None
     if package_source is not None:
         staged_package = run_root / "package"
