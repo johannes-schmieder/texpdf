@@ -33,7 +33,7 @@ tracked independently:
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `5fc00576cff0e2731aa6b0a0fefafbe5149a0c59` |
 | Current universal build source | `5fc00576cff0e2731aa6b0a0fefafbe5149a0c59` |
-| Last completed candidate license-audit source | `7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8` |
+| Last completed candidate license-audit source | `e82ea7105a36268b94c18430990f645ab8b52105` |
 | Latest memory-stress attempt | `5fc00576cff0e2731aa6b0a0fefafbe5149a0c59`; qualified=yes |
 
 ## Development bundle on `main`
@@ -52,7 +52,7 @@ replace every target record with exact-source evidence.
 | Tested source | `0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f` |
 | Apple Silicon licensed Stata | `success` |
 | Linux core corpus | `success` |
-| Development license audit | `5fc00576cff0e2731aa6b0a0fefafbe5149a0c59`; complete=yes |
+| Development license audit | `e82ea7105a36268b94c18430990f645ab8b52105`; complete=yes |
 | Development TeX resources | 392/392 mapped |
 | Intel macOS / Linux licensed Stata | `not-run` / `not-run` |
 
@@ -85,9 +85,9 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 
 ## Previous candidate license evidence
 
-The source-bound audit covers 381 embedded TeX/font resources: 381 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
+The source-bound audit covers 392 embedded TeX/font resources: 392 mapped, 0 ambiguous, 0 unmapped, and 0 missing license metadata. Missing collected Rust/native notice files: 0/0.
 
-The separate development audit is source-bound to `5fc00576cff0e2731aa6b0a0fefafbe5149a0c59` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
+The separate development audit is source-bound to `e82ea7105a36268b94c18430990f645ab8b52105` and covers 392 resources: 392 mapped, 0 ambiguous, and 0 unmapped. It does not alter the previous candidate evidence above.
 
 ## Memory evidence
 
