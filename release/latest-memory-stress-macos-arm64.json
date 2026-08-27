@@ -14,42 +14,9 @@
     "size_bytes": 48796144,
     "target": "native"
   },
-  "memory": {
-    "duration_seconds": 515,
-    "expected_injected_failure_count": 42,
-    "growth_gate": true,
-    "growth_threshold_rationale": "64 MiB is one eighth of the former in-process allowance and is above ordinary Stata allocator/cache noise while still detecting retained compiler state in the long-lived parent.",
-    "helper_sample_count": 1047,
-    "injected_failure_count": 42,
-    "iterations_requested": 1000,
-    "late_median_stata_rss_kib": 73616,
-    "late_window": [
-      900,
-      1000
-    ],
-    "max_allowed_growth_kib": 65536,
-    "max_concurrent_helpers": 1,
-    "peak_helper_rss_kib": 195440,
-    "peak_stata_rss_kib": 73616,
-    "peak_tree_rss_kib": 299296,
-    "post_error_recovery": true,
-    "post_warmup_growth_kib": 32,
-    "post_warmup_growth_ratio": 1.000434877147206,
-    "retained_helper_pids": [],
-    "runner_rc": 0,
-    "sample_count": 1645,
-    "schema_version": 1,
-    "stata_log_sha256": "f1c817fc963d7499e96135b3a61ac3c5a5ec8d0f68adcdcb7da147edea8e422f",
-    "stata_sample_count": 1643,
-    "successful_compile_count": 1000,
-    "warm_median_stata_rss_kib": 73584,
-    "warm_window": [
-      100,
-      200
-    ]
-  },
-  "overall_status": "success",
-  "platform": "Unix; Mac (Apple Silicon)",
+  "memory": {},
+  "overall_status": "failure",
+  "platform": null,
   "plugin": {
     "exports": [
       "pginit",
@@ -62,18 +29,18 @@
   "process_architecture": "arm64",
   "profile": "stress1000",
   "qualification_boundary": "This records one exact-source macOS Apple Silicon licensed-Stata attempt through the installed plugin into one short-lived helper per request, with the Stata parent held for at least 1000 successful compiles and deliberate error recovery. Other architectures require separate runtime qualification.",
-  "qualified": true,
-  "rust_mode": "repository-engine",
-  "rust_status": "success",
+  "qualified": false,
+  "rust_mode": null,
+  "rust_status": "failure",
   "schema_version": 3,
-  "source_sha": "719421d122617317119372534216fadf791f9842",
-  "stata_edition": "MP",
-  "stata_status": "success",
-  "stata_version": "19",
+  "source_sha": "0e7ed78f26671a26d697406dde588369d63c7a08",
+  "stata_edition": null,
+  "stata_status": "failure",
+  "stata_version": null,
   "step_outcomes": {
     "build": "success",
     "profile": "success",
-    "stress": "success",
-    "validate": "success"
+    "stress": "cancelled",
+    "validate": "skipped"
   }
 }
