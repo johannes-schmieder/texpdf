@@ -204,6 +204,9 @@ jobs:
               "candidate_package_license_evidence_included": package["license_evidence_included"],
               "candidate_package_license_audit_source_sha": package["license_audit_source_sha"],
               "candidate_package_public_release": package["public_release_mode"],
+              "stata_version": receipt["stata_version"],
+              "stata_edition": receipt["stata_edition"],
+              "platform": receipt["platform"],
           }
           Path("release/macos-intel-runtime.json").write_text(
               json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -213,6 +216,8 @@ jobs:
           manifest["arm_runtime_source_sha"] = source
           manifest["intel_runtime_qualified"] = True
           manifest["intel_runtime_source_sha"] = source
+          manifest["intel_stata_version"] = receipt["stata_version"]
+          manifest["intel_stata_edition"] = receipt["stata_edition"]
           manifest["candidate_package"] = {
               "version": package["package_version"],
               "zip_sha256": package["package_zip_sha256"],
@@ -224,7 +229,10 @@ jobs:
           }
           manifest["qualification_boundary"] = (
               "Both slices were built from the exact source. The universal plugin was "
-              "loaded and exercised in licensed ARM64 and x86_64 Stata/MP 18 processes."
+              "loaded and exercised in licensed "
+              f"ARM64 Stata/{manifest['arm_stata_edition']} "
+              f"{manifest['arm_stata_version']} and x86_64 "
+              f"Stata/{receipt['stata_edition']} {receipt['stata_version']} processes."
           )
           Path("release/macos-universal.json").write_text(
               json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"

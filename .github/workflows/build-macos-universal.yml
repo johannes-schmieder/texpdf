@@ -119,10 +119,15 @@ jobs:
 
           path = Path("dist/macos-universal/manifest.json")
           data = json.loads(path.read_text(encoding="utf-8"))
+          receipt = json.loads(
+              Path(".ci/stata/run/receipt.json").read_text(encoding="utf-8")
+          )
           data["source_sha"] = os.environ["GITHUB_SHA"]
           data["arm_runtime_qualified"] = True
           data["arm_stata_profile"] = "quick"
           data["arm_stata_receipt"] = ".ci/stata/run/receipt.json"
+          data["arm_stata_version"] = receipt["stata_version"]
+          data["arm_stata_edition"] = receipt["stata_edition"]
           package = json.loads(
               Path("dist/macos-universal/package-manifest.json").read_text(
                   encoding="utf-8"
@@ -140,7 +145,8 @@ jobs:
           data["qualification_boundary"] = (
               "Both Mach-O slices were built and inspected. The universal plugin "
               "was loaded and tested only through its ARM64 slice in licensed "
-              "Stata/MP 18. Intel runtime qualification remains pending."
+              f"Stata/{receipt['stata_edition']} {receipt['stata_version']}. "
+              "Intel runtime qualification remains pending."
           )
           path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
           PY

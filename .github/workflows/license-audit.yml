@@ -60,11 +60,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          candidate_source=$(/usr/bin/python3 - <<'PY'
+          git fetch origin main
+          scope="$RUNNER_TEMP/texpdf-release-scope.json"
+          git show origin/main:release/scope.json > "$scope"
+          candidate_source=$(/usr/bin/python3 - "$scope" <<'PY'
           from pathlib import Path
           import json
+          import sys
 
-          scope = json.loads(Path("release/scope.json").read_text(encoding="utf-8"))
+          scope = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           print(scope["candidate_source_sha"])
           PY
           )

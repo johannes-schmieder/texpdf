@@ -114,6 +114,12 @@ releases or SSC versions.
 - Windows binary audits locate the installed Visual C++ tools with Microsoft's
   version-independent `vswhere` interface instead of assuming a Visual Studio
   2022 directory on newer hosted runner images.
+- License-audit publication derives the active candidate from the authoritative
+  `main` release scope, so an exact implementation checkout cannot route current
+  candidate evidence into the historical development namespace.
+- macOS qualification records the actual Stata edition and version from each
+  ARM64 and Intel/Rosetta runtime receipt instead of emitting a hard-coded
+  version claim.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.
