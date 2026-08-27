@@ -158,6 +158,18 @@ class WorkflowCompatibilityTests(unittest.TestCase):
         self.assertIn('"glibc_2_28_qualified": False', hosted)
         self.assertIn("--maximum-glibc 2.28", scc)
 
+    def test_windows_audit_discovers_visual_cpp_tools_without_version_path(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/build-linux-windows.yml"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn("Microsoft Visual Studio\\2022", workflow)
+        self.assertIn("Microsoft Visual Studio\\Installer\\vswhere.exe", workflow)
+        self.assertIn("Microsoft.VisualStudio.Component.VC.Tools.x86.x64", workflow)
+        self.assertIn(
+            'VC\\Tools\\MSVC\\**\\bin\\Hostx64\\x64\\dumpbin.exe',
+            workflow,
+        )
+
     def test_intel_gate_derives_publication_mode_from_release_scope(self) -> None:
         workflow = (
             REPOSITORY_ROOT / ".github/workflows/qualify-macos-intel.yml"

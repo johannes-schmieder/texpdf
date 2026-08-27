@@ -224,24 +224,26 @@ jobs:
       - name: Audit Windows exports and dependencies
         shell: pwsh
         run: |
-          $roots = @(
-              "$env:ProgramFiles\Microsoft Visual Studio\2022",
-              "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022"
-          )
-          $dumpbin = Get-ChildItem -Path $roots -Filter dumpbin.exe -Recurse -ErrorAction SilentlyContinue |
-              Where-Object { $_.FullName -match 'Hostx64\\x64' } |
-              Sort-Object FullName -Descending |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+          if (-not (Test-Path $vswhere)) { throw "vswhere.exe was not found" }
+          $dumpbin = & $vswhere `
+              -latest `
+              -products * `
+              -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+              -find "VC\Tools\MSVC\**\bin\Hostx64\x64\dumpbin.exe" |
               Select-Object -First 1
-          if (-not $dumpbin) { throw "dumpbin.exe was not found" }
+          if (-not $dumpbin -or -not (Test-Path $dumpbin)) {
+              throw "dumpbin.exe was not found through vswhere"
+          }
           $plugin = "dist\windows-x86_64\_texpdf_plugin_windows.plugin"
           $helper = "dist\windows-x86_64\texpdf-helper.exe"
-          $exports = & $dumpbin.FullName /exports $plugin
+          $exports = & $dumpbin /exports $plugin
           $exports | Set-Content -Encoding UTF8 dist\windows-x86_64\exports.txt
           if (-not ($exports -match '\bpginit\b')) { throw "pginit export is missing" }
           if (-not ($exports -match '\bstata_call\b')) { throw "stata_call export is missing" }
-          $dependents = & $dumpbin.FullName /dependents $plugin
+          $dependents = & $dumpbin /dependents $plugin
           $dependents | Set-Content -Encoding UTF8 dist\windows-x86_64\dependents.txt
-          $helperDependents = & $dumpbin.FullName /dependents $helper
+          $helperDependents = & $dumpbin /dependents $helper
           $helperDependents | Set-Content -Encoding UTF8 dist\windows-x86_64\helper-dependents.txt
           $allDependents = @($dependents) + @($helperDependents)
           if ($allDependents -match '(?i)(fontconfig|freetype|harfbuzz|graphite|icu|libpng|zlib|vcpkg).*\.dll') {

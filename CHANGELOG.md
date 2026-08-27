@@ -111,6 +111,9 @@ releases or SSC versions.
 - Hosted Ubuntu Linux artifacts are explicitly development-only and report
   their actual GLIBC requirements; the strict GLIBC 2.28 release ceiling
   remains exclusively enforced on the canonical SCC RHEL 8 build.
+- Windows binary audits locate the installed Visual C++ tools with Microsoft's
+  version-independent `vswhere` interface instead of assuming a Visual Studio
+  2022 directory on newer hosted runner images.
 
 No final version has been released yet. The existing private RC checkpoints
 remain prerelease evidence and are never eligible for SSC submission.
