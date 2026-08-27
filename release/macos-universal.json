@@ -7,12 +7,12 @@
   "arm_stata_profile": "quick",
   "arm_stata_receipt": ".ci/stata/run/receipt.json",
   "candidate_package": {
-    "license_audit_source_sha": "53af51d116cf7d885895482b63df37ebf81b6373",
+    "license_audit_source_sha": "719421d122617317119372534216fadf791f9842",
     "license_evidence_included": true,
     "public_release": true,
     "version": "0.1.0-rc2",
-    "zip_sha256": "4c30ea3ba8b3583ccdb227439ea75b2fa8e4df34d1b9f4a9aa168244603aa801",
-    "zip_size_bytes": 46559664
+    "zip_sha256": "34c49fcbf3cce646dcae7d3ad25d9cde6b9e42f4ee1118280c7c1c29d1c663f5",
+    "zip_size_bytes": 46559667
   },
   "dynamic_dependencies": [
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
@@ -58,7 +58,7 @@
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "53af51d116cf7d885895482b63df37ebf81b6373",
+  "source_sha": "719421d122617317119372534216fadf791f9842",
   "universal": {
     "sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
     "size_bytes": 99091248,
