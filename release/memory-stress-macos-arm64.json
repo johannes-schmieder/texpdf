@@ -1,48 +1,48 @@
 {
   "bundle": {
-    "content_digest": "a5b8af5c48f71877bf3ca8296892757cf1868503f151acc6b7b77808b85b2d51",
-    "file_count": 382,
-    "zip_sha256": "1b6864189aae5d3021512f9ceb4fe2a458ada8b5d0a7da7c321121f6366c5084",
-    "zip_size_bytes": 4984973
+    "content_digest": "343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf",
+    "file_count": 393,
+    "zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f",
+    "zip_size_bytes": 5263992
   },
   "development_package": {
-    "zip_sha256": "2e10818d0a652f90b0aaac1e7abd03ee2f07b68df8f4c86e030e897c37a19db2",
-    "zip_size_bytes": 22496277
+    "zip_sha256": "4cd28991adc9fa2518ef44e832a9f0a79d85a3b24ddd405ef11f33a9a310f296",
+    "zip_size_bytes": 22785191
   },
   "helper": {
-    "sha256": "df1bf398fae80a57cb83c0e0796a1d2189bcbd2b2965ce23b6e7326298b24f06",
-    "size_bytes": 48515440,
+    "sha256": "8329adf0cb32d872aa7ebea5b5568d6959638e0948737a8e96f3ba085f635e39",
+    "size_bytes": 48796144,
     "target": "native"
   },
   "memory": {
-    "duration_seconds": 505,
+    "duration_seconds": 515,
     "expected_injected_failure_count": 42,
     "growth_gate": true,
     "growth_threshold_rationale": "64 MiB is one eighth of the former in-process allowance and is above ordinary Stata allocator/cache noise while still detecting retained compiler state in the long-lived parent.",
-    "helper_sample_count": 1042,
+    "helper_sample_count": 1047,
     "injected_failure_count": 42,
     "iterations_requested": 1000,
-    "late_median_stata_rss_kib": 72304,
+    "late_median_stata_rss_kib": 73616,
     "late_window": [
       900,
       1000
     ],
     "max_allowed_growth_kib": 65536,
     "max_concurrent_helpers": 1,
-    "peak_helper_rss_kib": 196000,
-    "peak_stata_rss_kib": 72304,
-    "peak_tree_rss_kib": 298368,
+    "peak_helper_rss_kib": 195440,
+    "peak_stata_rss_kib": 73616,
+    "peak_tree_rss_kib": 299296,
     "post_error_recovery": true,
     "post_warmup_growth_kib": 32,
-    "post_warmup_growth_ratio": 1.0004427717511624,
+    "post_warmup_growth_ratio": 1.000434877147206,
     "retained_helper_pids": [],
     "runner_rc": 0,
-    "sample_count": 1633,
+    "sample_count": 1645,
     "schema_version": 1,
-    "stata_log_sha256": "9c5d5f36bfc487a7f23ddf1f5a5468036c504607b44d6950abe3377d1695c6a2",
-    "stata_sample_count": 1631,
+    "stata_log_sha256": "f1c817fc963d7499e96135b3a61ac3c5a5ec8d0f68adcdcb7da147edea8e422f",
+    "stata_sample_count": 1643,
     "successful_compile_count": 1000,
-    "warm_median_stata_rss_kib": 72272,
+    "warm_median_stata_rss_kib": 73584,
     "warm_window": [
       100,
       200
@@ -56,8 +56,8 @@
       "stata_call"
     ],
     "external_dynamic_dependencies": [],
-    "sha256": "71b27d7e4182c91de7fe662301270e904cb729b956e728daa35c5faa2a367787",
-    "size_bytes": 49429136
+    "sha256": "56fe47133a1132498e6a9852212017f86a7b68c9beb9e48013b489af5b967523",
+    "size_bytes": 49709840
   },
   "process_architecture": "arm64",
   "profile": "stress1000",
@@ -66,10 +66,10 @@
   "rust_mode": "repository-engine",
   "rust_status": "success",
   "schema_version": 3,
-  "source_sha": "7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8",
+  "source_sha": "719421d122617317119372534216fadf791f9842",
   "stata_edition": "MP",
   "stata_status": "success",
-  "stata_version": "18",
+  "stata_version": "19",
   "step_outcomes": {
     "build": "success",
     "profile": "success",
