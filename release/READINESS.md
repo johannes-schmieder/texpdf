@@ -17,34 +17,28 @@ Public cross-platform release ready: **false**
 | `ssc_distribution` | PASS | no | no | SSC distribution is explicitly authorized in release scope |
 | `public_repository_security` | PASS | no | no | visibility=public; audit_tip=e82ea7105a36268b94c18430990f645ab8b52105; scope_source=e82ea7105a36268b94c18430990f645ab8b52105; sha_pinning=True; vulnerability_reporting=True |
 | `target_registry` | PASS | no | no | target count=4 |
-| `macos_arm_runtime` | PASS | no | no | source=5fc00576cff0e2731aa6b0a0fefafbe5149a0c59; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine |
+| `macos_arm_runtime` | PASS | no | no | source=e82ea7105a36268b94c18430990f645ab8b52105; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine |
 | `macos_universal_build` | PASS | no | no | architectures=['arm64', 'x86_64']; universal_bytes=99091248; arm_runtime=True |
 | `macos_intel_build` | PASS | no | no | source=e82ea7105a36268b94c18430990f645ab8b52105; plugin_bytes=49377208 |
-| `macos_intel_runtime` | FAIL | yes | yes | Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed |
-| `macos_candidate_package` | FAIL | yes | yes | version=0.1.0-rc2; zip_bytes=46559662; license_evidence=True; both_runtimes=None |
+| `macos_intel_runtime` | PASS | no | no | qualified in an actual x86_64 Stata process under Rosetta; runtime_record=valid; exact receipt profile=quick rust_mode=repository-engine |
+| `macos_candidate_package` | PASS | no | no | version=0.1.0-rc2; zip_bytes=46559662; license_evidence=True; both_runtimes=True |
 | `linux_x86_64_runtime` | FAIL | yes | yes | source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; glibc_max=2.28; package_version=0.1.0-rc.2; Stata18_quick=True; Stata18_stress1000=True; Stata19_quick=True |
 | `windows_x86_64_runtime` | FAIL | yes | yes | missing release/windows-x86_64.json |
-| `required_target_source_coherence` | FAIL | yes | yes | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=e82ea7105a36268b94c18430990f645ab8b52105; sources=['', '5fc00576cff0e2731aa6b0a0fefafbe5149a0c59', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8'] |
+| `required_target_source_coherence` | FAIL | yes | yes | required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=e82ea7105a36268b94c18430990f645ab8b52105; sources=['', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8', 'e82ea7105a36268b94c18430990f645ab8b52105'] |
 | `third_party_license_complete` | PASS | no | no | source=e82ea7105a36268b94c18430990f645ab8b52105; resources=392; mapped=392; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
 | `candidate_license_source_coherence` | FAIL | yes | yes | candidate_source=missing; license_source=e82ea7105a36268b94c18430990f645ab8b52105; ancestor=False; non_evidence_changes=[] |
-| `macos_arm_memory_stress` | FAIL | yes | yes | source=e82ea7105a36268b94c18430990f645ab8b52105; iterations=1000; peak_rss_kib=74240; post_warmup_growth_kib=48; growth_ratio=1.0006469700237222 |
+| `macos_arm_memory_stress` | PASS | no | no | source=e82ea7105a36268b94c18430990f645ab8b52105; iterations=1000; peak_rss_kib=74240; post_warmup_growth_kib=48; growth_ratio=1.0006469700237222 |
 
 ## Active candidate blockers
 
-- `macos_intel_runtime`
-- `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
-- `macos_arm_memory_stress`
 
 ## Public-release blockers
 
-- `macos_intel_runtime`
-- `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
-- `macos_arm_memory_stress`

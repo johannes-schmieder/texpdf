@@ -1,12 +1,9 @@
 {
   "candidate_blockers": [
-    "macos_intel_runtime",
-    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",
-    "candidate_license_source_coherence",
-    "macos_arm_memory_stress"
+    "candidate_license_source_coherence"
   ],
   "candidate_ready": false,
   "candidate_version": "0.1.0-rc2",
@@ -101,7 +98,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=5fc00576cff0e2731aa6b0a0fefafbe5149a0c59; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
+      "detail": "source=e82ea7105a36268b94c18430990f645ab8b52105; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
       "passed": true,
       "public_release_blocker": false,
@@ -124,20 +121,20 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "Intel slice built, inspected, and packaged into an ARM-tested universal plugin; Intel Stata runtime qualification pending; runtime_record=missing/invalid; qualified source SHA is missing or malformed",
+      "candidate_release_blocker": false,
+      "detail": "qualified in an actual x86_64 Stata process under Rosetta; runtime_record=valid; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_intel_runtime",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "version=0.1.0-rc2; zip_bytes=46559662; license_evidence=True; both_runtimes=None",
+      "candidate_release_blocker": false,
+      "detail": "version=0.1.0-rc2; zip_bytes=46559662; license_evidence=True; both_runtimes=True",
       "key": "macos_candidate_package",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": true,
@@ -157,7 +154,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=e82ea7105a36268b94c18430990f645ab8b52105; sources=['', '5fc00576cff0e2731aa6b0a0fefafbe5149a0c59', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8']",
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=e82ea7105a36268b94c18430990f645ab8b52105; sources=['', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8', 'e82ea7105a36268b94c18430990f645ab8b52105']",
       "key": "required_target_source_coherence",
       "passed": false,
       "public_release_blocker": true,
@@ -180,33 +177,27 @@
       "release_blocker": true
     },
     {
-      "candidate_release_blocker": true,
+      "candidate_release_blocker": false,
       "detail": "source=e82ea7105a36268b94c18430990f645ab8b52105; iterations=1000; peak_rss_kib=74240; post_warmup_growth_kib=48; growth_ratio=1.0006469700237222",
       "key": "macos_arm_memory_stress",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     }
   ],
   "implementation_complete_macos_arm64": true,
   "public_release_blockers": [
-    "macos_intel_runtime",
-    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",
-    "candidate_license_source_coherence",
-    "macos_arm_memory_stress"
+    "candidate_license_source_coherence"
   ],
   "public_release_ready": false,
   "release_blockers": [
-    "macos_intel_runtime",
-    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",
-    "candidate_license_source_coherence",
-    "macos_arm_memory_stress"
+    "candidate_license_source_coherence"
   ],
   "release_kind": "public_release_candidate",
   "schema_version": 3
