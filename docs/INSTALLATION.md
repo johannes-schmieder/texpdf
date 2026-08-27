@@ -66,9 +66,14 @@ ado and help files, exactly one of `_texpdf_plugin_macosx.plugin`,
 notices, `BUILD_INFO.json`, and `CHECKSUMS.sha256`. A package is supported only
 when its plugin was built from and qualified for the final tag.
 
-SSC installs all three native plugin files so the same `ssc install texpdf`
-command works on every supported operating system. The ado dispatcher never
-falls back to a stale generic `_texpdf_plugin.plugin`.
+The SSC submission contains all three native source plugin files. Its `.pkg`
+uses Stata platform `g` directives to install exactly the matching source as
+`_texpdf_plugin.plugin`, then uses an `h` directive to require that installed
+plugin to load. A versioned `_texpdf_ssc_install.ado` marker lets the dispatcher
+accept this generic destination only for a coherent SSC installation. GitHub
+packages instead install one explicit platform filename. Mixed channels,
+missing marker/plugin pairs, and stale generic files fail with an actionable
+reinstallation error.
 
 ## Offline operation
 

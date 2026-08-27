@@ -204,8 +204,9 @@ RC tags use `vX.Y.Z-rcN`, remain GitHub prereleases, and are never sent to SSC.
 - Combine the already-qualified package trees with
   `tools/assemble_ssc_package.py`; require all shared files, bundle hashes, and
   license-tree digests to match.
-- Include all three canonical plugin filenames and `texpdf_licenses.zip`, but
-  do not submit a `.pkg` file because SSC generates it.
+- Include all three canonical source plugin filenames, `texpdf_licenses.zip`,
+  and the reviewed `texpdf.pkg`. Require its exact platform `g` directives,
+  generic installed destination, versioned marker, and `h` load check.
 - Require the SSC archive and all three GitHub archives to pass the same
   `tools/write_release_index.py` invocation before upload.
 

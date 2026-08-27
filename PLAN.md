@@ -109,12 +109,14 @@ its provenance manifests.
 
 ## Public release implementation
 
-- [x] Add canonical macOS, Unix, and Windows installed plugin filenames with an
-      internal Stata dispatcher and no stale generic fallback.
+- [x] Add canonical macOS, Unix, and Windows plugin filenames for GitHub and a
+      marker-validated generic destination for SSC, with no stale fallback.
 - [x] Package one plugin per GitHub ZIP and all three in a deterministic SSC
       submission with `texpdf_licenses.zip`, combined manifest, and checksums.
 - [x] Add a source-bound four-archive release index and collision-checked
       combined SHA-256 file.
+- [x] Implement the SSC maintainer-requested `.pkg` with platform `g` lines,
+      an `h` load check, and an isolated installation-contract test.
 - [x] Generalize scope/readiness for RC versus final release, required targets,
       source SHA, and GitHub/SSC authorization.
 - [x] Add public-workflow security checks and fail-closed Windows Stata/MP 19
@@ -122,10 +124,11 @@ its provenance manifests.
 - [x] Require the realistic corpus and all three runnable help examples in
       every licensed quick lane.
 - [x] Remove local machine paths from newly generated public license manifests.
-- [ ] Complete and record the final history/asset safety audit, make the
-      repository public, harden repository settings, and mark RC.1 superseded.
-- [ ] Obtain SSC maintainer acceptance of the three-binary, compressed-license,
-      one-command package after the owner confirms the exact email.
+- [x] Complete and record the history/asset safety audit, make the repository
+      public, harden repository settings, and mark RC.1 superseded.
+- [x] Obtain SSC maintainer acceptance of the three-binary,
+      compressed-license, one-command package; follow the requested `g`/`h`
+      `.pkg` convention modeled on `parqit`.
 - [ ] Freeze and fully qualify the public `v0.1.0-rc2` source on all targets.
 - [ ] Publish RC.2, download its assets afresh on each target, perform clean
       installs/corpus/help tests, and visually inspect representative PDFs.

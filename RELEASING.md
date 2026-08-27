@@ -108,8 +108,11 @@ Continue development on main
 6. Build all candidate assets from the chosen commit and record their hashes.
 7. Before the first cross-platform freeze, obtain the SSC archive maintainer's
    confirmation that one package may ship the three platform plugins plus the
-   compressed `texpdf_licenses.zip`. Record the approved recipient, subject,
-   body, and response without committing private correspondence.
+   compressed `texpdf_licenses.zip`. Follow the maintainer-requested `.pkg`
+   convention: platform `g` lines copy the applicable source plugin to the
+   common installed destination and an `h` line load-checks that destination.
+   Record the approved recipient, subject, body, and response without
+   committing private correspondence.
 
 If external testing is useful, create an annotated `vX.Y.Z-rcN` tag at that
 exact commit and a GitHub prerelease with the corresponding artifacts. RC
@@ -158,8 +161,12 @@ platform artifacts attached to that GitHub Release. Before submission:
 
 The SSC submission is assembled with `tools/assemble_ssc_package.py`. It
 combines the already-qualified platform plugins, compresses the identical
-license tree as `texpdf_licenses.zip`, and deliberately omits `texpdf.pkg`;
-SSC generates the package index. Do not rebuild a plugin during combination.
+license tree as `texpdf_licenses.zip`, and includes the reviewed `texpdf.pkg`.
+The six `g` lines cover `LINUX64`, both Intel macOS identifiers, both Apple
+Silicon identifiers, and `WIN64`; every line installs its source plugin as
+`_texpdf_plugin.plugin`, which the `h` line must load successfully. A versioned
+marker distinguishes this approved generic SSC layout from a stale generic
+plugin. Do not rebuild a plugin during combination.
 
 Run `tools/write_release_index.py` over the macOS, Linux, Windows, and SSC
 archives. Its source-bound manifest and combined `SHA256SUMS` are the release

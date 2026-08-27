@@ -44,7 +44,8 @@ releases or SSC versions.
 - Fail-closed Windows Stata/MP 19 qualification tooling, including full corpus,
   help-example, recovery, offline/no-system-TeX, and 1,000-call stress gates.
 - Deterministic SSC combination with a compressed complete license archive,
-  combined build manifest, and checksums.
+  combined build manifest, checksums, and a maintainer-approved `.pkg` index
+  that selects and load-checks exactly one native plugin for the host platform.
 - A static public-workflow security audit for immutable action pins, minimal
   permissions, and prohibition of pull-request execution on licensed or
   self-hosted runners.
@@ -63,6 +64,9 @@ releases or SSC versions.
   source, required targets, public GitHub authorization, and SSC authorization.
 - Public license manifests use portable provenance labels instead of local
   machine paths.
+- GitHub packages retain explicit platform plugin names, while SSC uses Stata's
+  `g`/`h` package directives plus a versioned installation marker; mixed,
+  incomplete, and stale installation layouts now fail closed.
 
 ### Fixed
 

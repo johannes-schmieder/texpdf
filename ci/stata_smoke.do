@@ -178,9 +178,28 @@ if `full_engine' {
         exit 601
     }
     confirm file `"`package_dir'/`installed_plugin'"'
+    capture confirm file `"`package_dir'/_texpdf_ssc_install.ado"'
+    local ssc_package = (_rc == 0)
     net install texpdf, from(`"`package_dir'"') replace
     discard
     adopath - `"`repo'/stata"'
+    if `ssc_package' {
+        capture quietly findfile "_texpdf_plugin.plugin"
+        assert _rc == 0
+        capture quietly findfile "_texpdf_ssc_install.ado"
+        assert _rc == 0
+        capture quietly findfile `"`installed_plugin'"'
+        assert _rc != 0
+        display as result "TEXPDF SSC G H INSTALL PASS"
+    }
+    else {
+        capture quietly findfile `"`installed_plugin'"'
+        assert _rc == 0
+        capture quietly findfile "_texpdf_plugin.plugin"
+        assert _rc != 0
+        capture quietly findfile "_texpdf_ssc_install.ado"
+        assert _rc != 0
+    }
     which texpdf
     which texpdf_run
     texpdf, version

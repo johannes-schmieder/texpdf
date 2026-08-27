@@ -17,6 +17,14 @@ PLATFORMS = {
     "linux": ("x86_64-unknown-linux-gnu", "_texpdf_plugin_unix.plugin"),
     "windows": ("x86_64-pc-windows-msvc", "_texpdf_plugin_windows.plugin"),
 }
+SSC_G_LINES = [
+    "g LINUX64 _texpdf_plugin_unix.plugin _texpdf_plugin.plugin",
+    "g MACINTEL64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g OSX.X8664 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g MACARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g OSX.ARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g WIN64 _texpdf_plugin_windows.plugin _texpdf_plugin.plugin",
+]
 
 
 class ReleaseIndexTests(unittest.TestCase):
@@ -57,7 +65,9 @@ class ReleaseIndexTests(unittest.TestCase):
                         "source_sha": SOURCE,
                         "archive_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
                         "archive_size_bytes": archive.stat().st_size,
-                        "submitted_pkg_file": False,
+                        "submitted_pkg_file": True,
+                        "ssc_plugin_destination": "_texpdf_plugin.plugin",
+                        "ssc_platform_selection": SSC_G_LINES,
                     }
                 ),
                 encoding="utf-8",

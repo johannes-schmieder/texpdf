@@ -17,6 +17,15 @@ PLATFORMS = {
     "linux": ("x86_64-unknown-linux-gnu", "_texpdf_plugin_unix.plugin"),
     "windows": ("x86_64-pc-windows-msvc", "_texpdf_plugin_windows.plugin"),
 }
+SSC_PLUGIN = "_texpdf_plugin.plugin"
+SSC_G_LINES = [
+    "g LINUX64 _texpdf_plugin_unix.plugin _texpdf_plugin.plugin",
+    "g MACINTEL64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g OSX.X8664 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g MACARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g OSX.ARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g WIN64 _texpdf_plugin_windows.plugin _texpdf_plugin.plugin",
+]
 
 
 def sha256(path: Path) -> str:
@@ -72,7 +81,9 @@ def build_index(args: argparse.Namespace) -> dict[str, object]:
                 or manifest.get("source_sha") != args.source_sha
                 or manifest.get("archive_sha256") != digest
                 or manifest.get("archive_size_bytes") != size
-                or manifest.get("submitted_pkg_file") is not False
+                or manifest.get("submitted_pkg_file") is not True
+                or manifest.get("ssc_plugin_destination") != SSC_PLUGIN
+                or manifest.get("ssc_platform_selection") != SSC_G_LINES
             ):
                 raise ValueError("SSC archive or manifest does not match the release")
             distribution = "ssc-combined"

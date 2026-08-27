@@ -98,16 +98,27 @@ def render_platform_pkg(source: Path, installed_plugin: str) -> str:
     inserted = False
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith("f _texpdf_plugin") and stripped.endswith(".plugin"):
+        if (
+            stripped.startswith("g ")
+            and "_texpdf_plugin_" in stripped
+            and stripped.endswith(" _texpdf_plugin.plugin")
+        ):
             if not inserted:
                 output.append(f"f {installed_plugin}")
                 inserted = True
             continue
-        if stripped == "f texpdf_licenses.zip":
+        if stripped in (
+            "f _texpdf_ssc_install.ado",
+            "h _texpdf_plugin.plugin",
+            "F texpdf_licenses.zip",
+        ):
+            continue
+        if stripped == "F BUILD_MANIFEST.json":
+            output.append("F BUILD_INFO.json")
             continue
         output.append(line)
     if not inserted:
-        raise ValueError("stata/texpdf.pkg has no native plugin entries")
+        raise ValueError("stata/texpdf.pkg has no g/h native plugin selection")
     return "\n".join(output) + "\n"
 
 

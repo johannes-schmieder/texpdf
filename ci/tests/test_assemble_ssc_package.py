@@ -18,6 +18,14 @@ PLATFORMS = {
     "linux": ("x86_64-unknown-linux-gnu", "_texpdf_plugin_unix.plugin"),
     "windows": ("x86_64-pc-windows-msvc", "_texpdf_plugin_windows.plugin"),
 }
+SSC_G_LINES = {
+    "g LINUX64 _texpdf_plugin_unix.plugin _texpdf_plugin.plugin",
+    "g MACINTEL64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g OSX.X8664 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g MACARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g OSX.ARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g WIN64 _texpdf_plugin_windows.plugin _texpdf_plugin.plugin",
+}
 
 
 class AssembleSscTests(unittest.TestCase):
@@ -56,7 +64,7 @@ class AssembleSscTests(unittest.TestCase):
         )
         return package
 
-    def test_combines_all_plugins_and_compresses_licenses_without_pkg(self) -> None:
+    def test_combines_plugins_with_ssc_platform_selection_pkg(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             packages = {
@@ -86,11 +94,42 @@ class AssembleSscTests(unittest.TestCase):
                 names = set(archive.namelist())
             self.assertTrue({value[1] for value in PLATFORMS.values()} <= names)
             self.assertIn("texpdf_licenses.zip", names)
-            self.assertFalse(any(name.endswith(".pkg") for name in names))
+            self.assertIn("texpdf.pkg", names)
+            self.assertIn("_texpdf_ssc_install.ado", names)
+            self.assertNotIn("_texpdf_plugin.plugin", names)
             self.assertFalse(any(name.startswith("LICENSES/") for name in names))
+            with zipfile.ZipFile(root / "ssc.zip") as archive:
+                pkg_lines = set(
+                    archive.read("texpdf.pkg").decode("utf-8").splitlines()
+                )
+            self.assertTrue(SSC_G_LINES <= pkg_lines)
+            self.assertIn("h _texpdf_plugin.plugin", pkg_lines)
+            self.assertIn("f _texpdf_ssc_install.ado", pkg_lines)
             manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
-            self.assertFalse(manifest["submitted_pkg_file"])
+            self.assertTrue(manifest["submitted_pkg_file"])
+            self.assertEqual(manifest["ssc_plugin_destination"], "_texpdf_plugin.plugin")
+            self.assertEqual(set(manifest["ssc_platform_selection"]), SSC_G_LINES)
+            self.assertEqual(manifest["archive"], "ssc.zip")
             self.assertEqual(set(manifest["platforms"]), set(PLATFORMS))
+
+            second_dir = root / "ssc-second"
+            second_zip = root / "ssc-second.zip"
+            second_manifest = root / "manifest-second.json"
+            second = [
+                *command[:-6],
+                "--output-dir",
+                str(second_dir),
+                "--zip",
+                str(second_zip),
+                "--manifest",
+                str(second_manifest),
+            ]
+            result = subprocess.run(second, cwd=ROOT, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(
+                hashlib.sha256((root / "ssc.zip").read_bytes()).hexdigest(),
+                hashlib.sha256(second_zip.read_bytes()).hexdigest(),
+            )
 
 
 if __name__ == "__main__":

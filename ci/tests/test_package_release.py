@@ -47,11 +47,16 @@ class PackageReleaseTests(unittest.TestCase):
         write(
             root / "stata/texpdf.pkg",
             "v 3\nf texpdf.ado\nf texpdf.sthlp\nf texpdf_run.ado\n"
-            "f _texpdf_plugin_macosx.plugin\n"
-            "f _texpdf_plugin_unix.plugin\n"
-            "f _texpdf_plugin_windows.plugin\n"
-            "f LICENSE\nf THIRD_PARTY_NOTICES.md\nf BUILD_INFO.json\n"
-            "f CHECKSUMS.sha256\n",
+            "f _texpdf_ssc_install.ado\n"
+            "g LINUX64 _texpdf_plugin_unix.plugin _texpdf_plugin.plugin\n"
+            "g MACINTEL64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin\n"
+            "g OSX.X8664 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin\n"
+            "g MACARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin\n"
+            "g OSX.ARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin\n"
+            "g WIN64 _texpdf_plugin_windows.plugin _texpdf_plugin.plugin\n"
+            "h _texpdf_plugin.plugin\n"
+            "F LICENSE\nF THIRD_PARTY_NOTICES.md\nF BUILD_MANIFEST.json\n"
+            "F CHECKSUMS.sha256\nF texpdf_licenses.zip\n",
         )
         write(root / "stata/stata.toc")
         write(root / "LICENSE", "MIT fixture\n")
@@ -216,6 +221,13 @@ class PackageReleaseTests(unittest.TestCase):
             )
             self.assertEqual(package_text.count("f _texpdf_plugin_"), 1)
             self.assertIn("f _texpdf_plugin_unix.plugin", package_text)
+            self.assertNotIn("\ng ", package_text)
+            self.assertNotIn("\nh ", package_text)
+            self.assertNotIn("_texpdf_ssc_install.ado", package_text)
+            self.assertNotIn("_texpdf_plugin.plugin", package_text)
+            self.assertIn("F BUILD_INFO.json", package_text)
+            self.assertNotIn("BUILD_MANIFEST.json", package_text)
+            self.assertNotIn("texpdf_licenses.zip", package_text)
             self.assertNotIn("f LICENSES/STATUS.json", package_text)
             self.assertEqual(build["net_install_license_file_count"], 0)
             with zipfile.ZipFile(root / "dist/package.zip") as archive:

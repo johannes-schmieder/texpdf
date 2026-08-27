@@ -27,6 +27,16 @@ SHARED_FILES = (
     "LICENSE",
     "THIRD_PARTY_NOTICES.md",
 )
+SSC_MARKER = "_texpdf_ssc_install.ado"
+SSC_PLUGIN = "_texpdf_plugin.plugin"
+SSC_G_LINES = (
+    "g LINUX64 _texpdf_plugin_unix.plugin _texpdf_plugin.plugin",
+    "g MACINTEL64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g OSX.X8664 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g MACARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g OSX.ARM64 _texpdf_plugin_macosx.plugin _texpdf_plugin.plugin",
+    "g WIN64 _texpdf_plugin_windows.plugin _texpdf_plugin.plugin",
+)
 
 
 def sha256(path: Path) -> str:
@@ -98,13 +108,17 @@ def directory_digest(root: Path) -> str:
 
 def validate_source_pkg(path: Path) -> None:
     lines = path.read_text(encoding="utf-8").splitlines()
-    plugins = sorted(
-        line.split(None, 1)[1]
-        for line in lines
-        if line.startswith("f _texpdf_plugin_") and line.endswith(".plugin")
-    )
-    expected = sorted(value[1] for value in PLATFORMS.values())
-    if plugins != expected or lines.count("f texpdf_licenses.zip") != 1:
+    plugin_lines = tuple(line for line in lines if line.startswith("g "))
+    required = {
+        f"f {SSC_MARKER}",
+        f"h {SSC_PLUGIN}",
+        "F LICENSE",
+        "F THIRD_PARTY_NOTICES.md",
+        "F BUILD_MANIFEST.json",
+        "F CHECKSUMS.sha256",
+        "F texpdf_licenses.zip",
+    }
+    if plugin_lines != SSC_G_LINES or not required.issubset(lines):
         raise ValueError("stata/texpdf.pkg is not synchronized with the SSC file set")
 
 
@@ -173,6 +187,8 @@ def assemble(args: argparse.Namespace) -> dict[str, object]:
         shutil.copyfile(first / shared, output / shared)
     for name, (_, plugin_name) in PLATFORMS.items():
         shutil.copyfile(packages[name] / plugin_name, output / plugin_name)
+    shutil.copyfile(Path("stata/texpdf.pkg"), output / "texpdf.pkg")
+    shutil.copyfile(Path("stata") / SSC_MARKER, output / SSC_MARKER)
     deterministic_zip(first / "LICENSES", output / "texpdf_licenses.zip")
 
     combined = {
@@ -187,7 +203,9 @@ def assemble(args: argparse.Namespace) -> dict[str, object]:
         "license_tree_digest": next(iter(license_digests)),
         "license_zip_sha256": sha256(output / "texpdf_licenses.zip"),
         "license_zip_size_bytes": (output / "texpdf_licenses.zip").stat().st_size,
-        "submitted_pkg_file": False,
+        "submitted_pkg_file": True,
+        "ssc_plugin_destination": SSC_PLUGIN,
+        "ssc_platform_selection": list(SSC_G_LINES),
     }
     (output / "BUILD_MANIFEST.json").write_text(
         json.dumps(combined, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -202,12 +220,12 @@ def assemble(args: argparse.Namespace) -> dict[str, object]:
         encoding="utf-8",
     )
     require_casefold_unique(output)
-    if any(path.suffix == ".pkg" for path in files(output)):
-        raise ValueError("SSC submission must not contain a .pkg file")
+    if [path.name for path in files(output) if path.suffix == ".pkg"] != ["texpdf.pkg"]:
+        raise ValueError("SSC submission must contain exactly texpdf.pkg")
     deterministic_zip(output, Path(args.zip_path))
     external = {
         **combined,
-        "archive": str(args.zip_path),
+        "archive": Path(args.zip_path).name,
         "archive_sha256": sha256(Path(args.zip_path)),
         "archive_size_bytes": Path(args.zip_path).stat().st_size,
         "installed_files": [path.relative_to(output).as_posix() for path in files(output)],

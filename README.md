@@ -9,9 +9,10 @@ texpdf using paper.tex, replace view
 texpdf, version
 ```
 
-Each GitHub package installs one operating-system-specific native Stata plugin;
-the combined SSC package installs all three and selects the correct one at
-runtime. The plugin contains a thin Rust
+Each GitHub package installs one explicitly named operating-system-specific
+native Stata plugin. The SSC submission carries all three source plugins, but
+its platform-selecting package index installs only the matching one under the
+checked `_texpdf_plugin.plugin` destination. The plugin contains a thin Rust
 SPI bridge plus a target-matching compiler helper that embeds Tectonic 0.17.0,
 its native libraries, and a curated academic TeX resource bundle. The bridge
 verifies and extracts the helper into a private cache and launches it directly.

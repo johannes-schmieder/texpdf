@@ -139,24 +139,77 @@ program define _texpdf_load_plugin
         exit 601
     }
 
+    local generic_plugin "_texpdf_plugin.plugin"
+    capture quietly findfile `"`plugin_file'"'
+    local canonical_found = (_rc == 0)
+    capture quietly findfile `"`generic_plugin'"'
+    local generic_found = (_rc == 0)
+    capture quietly findfile "_texpdf_ssc_install.ado"
+    local ssc_marker_found = (_rc == 0)
+
+    if `canonical_found' & (`generic_found' | `ssc_marker_found') {
+        display as error "texpdf found files from both GitHub and SSC installations"
+        display as error "run ado uninstall texpdf, restart Stata, and reinstall from one channel"
+        exit 601
+    }
+
+    if `canonical_found' {
+        local selected_plugin `"`plugin_file'"'
+    }
+    else if `ssc_marker_found' {
+        if !`generic_found' {
+            display as error "texpdf found an incomplete SSC installation"
+            display as error "run ssc install texpdf, replace and restart Stata"
+            exit 601
+        }
+        capture quietly _texpdf_ssc_install
+        local marker_rc = _rc
+        if `marker_rc' {
+            display as error "texpdf could not validate its SSC installation marker"
+            display as error "run ssc install texpdf, replace and restart Stata"
+            exit 601
+        }
+        local marker_version `"`r(package_version)'"'
+        local marker_distribution `"`r(distribution)'"'
+        local marker_plugin `"`r(plugin_file)'"'
+        if `"`marker_version'"' != "0.1.0" | ///
+                `"`marker_distribution'"' != "ssc-gh-v1" | ///
+                `"`marker_plugin'"' != `"`generic_plugin'"' {
+            display as error "texpdf found an obsolete or invalid SSC installation marker"
+            display as error "run ssc install texpdf, replace and restart Stata"
+            exit 601
+        }
+        local selected_plugin `"`generic_plugin'"'
+    }
+    else if `generic_found' {
+        display as error "texpdf found a stale generic native plugin without an SSC marker"
+        display as error "run ado uninstall texpdf, restart Stata, and reinstall texpdf"
+        exit 601
+    }
+    else {
+        display as error "texpdf could not find `plugin_file'"
+        display as error "reinstall texpdf for `operating_system' and restart Stata"
+        exit 601
+    }
+
     * A native plugin cannot be unloaded and safely reopened for every call.
-    * Reuse only a binding created by this dispatcher for the current OS. If
-    * an older generic binding is resident, fail closed and require a restart.
-    capture program _texpdf_plugin, plugin using("`plugin_file'")
+    * Reuse only a binding created by this dispatcher for the selected and
+    * validated installation channel.
+    capture program _texpdf_plugin, plugin using("`selected_plugin'")
     local load_rc = _rc
     if `load_rc' == 110 {
         local loaded_plugin "$TEXPDF_NATIVE_PLUGIN_FILE"
-        if `"`loaded_plugin'"' == `"`plugin_file'"' exit
+        if `"`loaded_plugin'"' == `"`selected_plugin'"' exit
         display as error "texpdf found an unknown or stale native plugin in this Stata session"
         display as error "restart Stata after reinstalling texpdf"
         exit 601
     }
     if `load_rc' {
-        display as error "texpdf could not load `plugin_file'"
+        display as error "texpdf could not load `selected_plugin'"
         display as error "reinstall texpdf for `operating_system' and restart Stata"
         exit 601
     }
-    global TEXPDF_NATIVE_PLUGIN_FILE "`plugin_file'"
+    global TEXPDF_NATIVE_PLUGIN_FILE "`selected_plugin'"
 end
 
 program define _texpdf_view_pdf
