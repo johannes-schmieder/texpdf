@@ -33,8 +33,8 @@ tracked independently:
 | Latest exact green source | `d44a6dbd25c28490f5f09154c920e7188b5051ac` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
-| Current ARM64 artifact source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
-| Current universal build source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
+| Current ARM64 artifact source | `d44a6dbd25c28490f5f09154c920e7188b5051ac` |
+| Current universal build source | `d44a6dbd25c28490f5f09154c920e7188b5051ac` |
 | Last completed candidate license-audit source | `d44a6dbd25c28490f5f09154c920e7188b5051ac` |
 | Latest memory-stress attempt | `41223b9ed4058f5aec97cdcff4783fee6ba05fa6`; qualified=no |
 
@@ -70,8 +70,8 @@ the helper process, so a compiler crash does not run inside Stata.
 
 | Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
-| `aarch64-apple-darwin` | required | yes | yes | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
-| `x86_64-apple-darwin` | compatibility only | yes | no | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
+| `aarch64-apple-darwin` | required | yes | yes | `d44a6dbd25c28490f5f09154c920e7188b5051ac` |
+| `x86_64-apple-darwin` | compatibility only | yes | no | `d44a6dbd25c28490f5f09154c920e7188b5051ac` |
 | `x86_64-pc-windows-msvc` | required | yes | yes | `366f16406773be5494a61e0badd55d0d1891e3c4` |
 | `x86_64-unknown-linux-gnu` | required | yes | yes | `366f16406773be5494a61e0badd55d0d1891e3c4` |
 
@@ -79,11 +79,11 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 
 ## Active candidate blockers
 
-- `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 ## Previous candidate license evidence
 
@@ -97,11 +97,11 @@ The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was
 
 ## Public-release blockers
 
-- `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

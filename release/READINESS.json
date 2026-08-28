@@ -1,10 +1,10 @@
 {
   "candidate_blockers": [
-    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",
-    "candidate_license_source_coherence"
+    "candidate_license_source_coherence",
+    "macos_arm_memory_stress"
   ],
   "candidate_ready": false,
   "candidate_version": "0.1.0-rc2",
@@ -99,7 +99,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=203d8c5b71395e4d1a6aa7d3868a710321dc79f4; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
+      "detail": "source=d44a6dbd25c28490f5f09154c920e7188b5051ac; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
       "passed": true,
       "public_release_blocker": false,
@@ -115,19 +115,19 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=203d8c5b71395e4d1a6aa7d3868a710321dc79f4; plugin_bytes=49377208; runtime=untested-by-policy",
+      "detail": "source=d44a6dbd25c28490f5f09154c920e7188b5051ac; plugin_bytes=49377208; runtime=untested-by-policy",
       "key": "macos_intel_compatibility_slice",
       "passed": true,
       "public_release_blocker": false,
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "version=0.1.0-rc2; zip_bytes=46558603; license_evidence=True; arm_runtime=true; intel_runtime=untested-by-policy",
+      "candidate_release_blocker": false,
+      "detail": "version=0.1.0-rc2; zip_bytes=46559396; license_evidence=True; arm_runtime=true; intel_runtime=untested-by-policy",
       "key": "macos_candidate_package",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": true,
@@ -147,7 +147,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=d44a6dbd25c28490f5f09154c920e7188b5051ac; sources=['203d8c5b71395e4d1a6aa7d3868a710321dc79f4', '366f16406773be5494a61e0badd55d0d1891e3c4']",
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=d44a6dbd25c28490f5f09154c920e7188b5051ac; sources=['366f16406773be5494a61e0badd55d0d1891e3c4', 'd44a6dbd25c28490f5f09154c920e7188b5051ac']",
       "key": "required_target_source_coherence",
       "passed": false,
       "public_release_blocker": true,
@@ -170,29 +170,29 @@
       "release_blocker": true
     },
     {
-      "candidate_release_blocker": false,
+      "candidate_release_blocker": true,
       "detail": "source=203d8c5b71395e4d1a6aa7d3868a710321dc79f4; iterations=1000; peak_rss_kib=74864; post_warmup_growth_kib=16; growth_ratio=1.0002137665669089",
       "key": "macos_arm_memory_stress",
-      "passed": true,
-      "public_release_blocker": false,
-      "release_blocker": false
+      "passed": false,
+      "public_release_blocker": true,
+      "release_blocker": true
     }
   ],
   "implementation_complete_macos_arm64": true,
   "public_release_blockers": [
-    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",
-    "candidate_license_source_coherence"
+    "candidate_license_source_coherence",
+    "macos_arm_memory_stress"
   ],
   "public_release_ready": false,
   "release_blockers": [
-    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",
-    "candidate_license_source_coherence"
+    "candidate_license_source_coherence",
+    "macos_arm_memory_stress"
   ],
   "release_kind": "public_release_candidate",
   "schema_version": 3
