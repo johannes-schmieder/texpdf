@@ -21,30 +21,27 @@ Rust toolchain, package download, or network connection.
 
 ## Project state
 
-`main` is the active development branch; it is not a stable distribution
-channel. The active scope prepares a public `0.1.0-rc2` for macOS universal,
-Linux x86-64 with a GLIBC 2.28 ceiling, and Windows x86-64. Runtime
-qualification is required on macOS Apple Silicon, Linux, and Windows. The
-universal macOS binary also includes a built and inspected Intel slice, but the
-project does not runtime-test or qualify that slice. Historical private RC
-evidence is preserved, but the new cross-platform source and artifacts must be
-fully requalified before the RC or final `v0.1.0` is published.
+`main` is the active development branch. The current target is public
+`0.1.0-rc2` for macOS universal, Linux x86-64, and Windows x86-64. Runtime
+testing covers macOS Apple Silicon, Linux, and Windows; the universal macOS
+binary also carries an untested Intel compatibility slice.
 
-Exact SHAs, artifact sizes, target support, failed attempts, and live blockers
-are generated from repository evidence in [`STATUS.md`](STATUS.md) and
-[`release/READINESS.md`](release/READINESS.md); they are deliberately not copied
-into this durable overview.
+See [`STATUS.md`](STATUS.md) for current evidence and blockers,
+[`PLAN.md`](PLAN.md) for remaining work, and [`RELEASING.md`](RELEASING.md) for
+the release and SSC policy.
 
-See:
+## Acknowledgements
 
-- [`STATUS.md`](STATUS.md) — generated current evidence and blockers;
-- [`PLAN.md`](PLAN.md) — remaining work in execution order;
-- [`RELEASING.md`](RELEASING.md) — authoritative versioning, GitHub Release, and SSC policy;
-- [`CHANGELOG.md`](CHANGELOG.md) — user-facing changes on `main` and in final releases;
-- [`IMPLEMENTATION.md`](IMPLEMENTATION.md) — durable architecture and guarantees;
-- [`docs/README.md`](docs/README.md) — documentation index;
-- [`docs/generated/CURRENT_ARTIFACT.md`](docs/generated/CURRENT_ARTIFACT.md) — exact artifact measurements;
-- [`release/targets.json`](release/targets.json) — platform qualification registry.
+`texpdf` is only possible because of the amazing work of the
+[Tectonic project](https://tectonic-typesetting.github.io/) and its
+contributors. Tectonic turns the formidable TeX ecosystem into a modern,
+embeddable, and reproducible typesetting engine. The difficult foundations of
+this package—the engine, deterministic resource handling, and the enormous
+body of TeX compatibility work—come from Tectonic and the upstream TeX
+community; `texpdf` provides a Stata bridge and distribution layer on top of
+that achievement. I am deeply grateful to everyone who has built, maintained,
+documented, tested, and supported
+[Tectonic](https://github.com/tectonic-typesetting/tectonic).
 
 ## Installation channels
 
