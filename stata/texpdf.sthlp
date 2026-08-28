@@ -98,7 +98,7 @@ inspection. Re-running an example replaces its earlier outputs.
 {space 4}{hline 10} {it:Example 2 - Build a report with latexlog} {hline 22}
 {pstd}
 This example uses the suggested but optional {help latexlog} package to create
-the document. {cmd:texpdf}, rather than {cmd:latexlog: pdf}, compiles it.
+the document. The document is compiled by {cmd:texpdf}.
 
 {cmd}{...}
 {* example_start - latexlog}{...}
@@ -206,20 +206,80 @@ This example estimates three nested models and uses Stata's built-in
 
 {pstd}
 Version 1 is a compiler only. Shell escape and arbitrary external helper
-programs are disabled. BibTeX with {cmd:natbib} is supported by the intended v1
-bundle; Biber/{cmd:biblatex}, Beamer, TikZ/PGF, and PSTricks are outside the
-initial compatibility tier. The private RC provides English-language
-hyphenation only; broad language and hyphenation collections are unsupported.
+programs are disabled. This version provides English-language hyphenation and
+internal BibTeX.
+
+{pstd}
+The bundled LaTeX package, class, and bibliography-style interfaces are:
+
+{p 4 8 2}
+{cmd:adjcalc.sty}, {cmd:adjustbox.sty}, {cmd:aer.bst}, {cmd:amsbsy.sty},
+{cmd:amsfonts.sty}, {cmd:amsgen.sty}, {cmd:amsmath.sty}, {cmd:amsopn.sty},
+{cmd:amssymb.sty}, {cmd:amstext.sty}, {cmd:array.sty}, and {cmd:article.cls}.
+
+{p 4 8 2}
+{cmd:atbegshi-ltx.sty}, {cmd:atbegshi.sty}, {cmd:atveryend-ltx.sty},
+{cmd:atveryend.sty}, {cmd:auxhook.sty}, {cmd:bigintcalc.sty}, {cmd:bitset.sty},
+{cmd:booktabs.sty}, {cmd:calc.sty}, {cmd:caption.sty}, {cmd:caption3.sty}, and
+{cmd:cleveref.sty}.
+
+{p 4 8 2}
+{cmd:collectbox.sty}, {cmd:color.sty}, {cmd:colortbl.sty}, {cmd:dcolumn.sty},
+{cmd:enumitem.sty}, {cmd:environ.sty}, {cmd:etexcmds.sty}, {cmd:etoolbox.sty},
+{cmd:expl3.sty}, {cmd:fancyhdr.sty}, {cmd:float.sty}, and {cmd:geometry.sty}.
+
+{p 4 8 2}
+{cmd:gettitlestring.sty}, {cmd:graphics.sty}, {cmd:graphicx.sty},
+{cmd:hycolor.sty}, {cmd:hyperref.sty}, {cmd:ifoddpage.sty}, {cmd:iftex.sty},
+{cmd:ifthen.sty}, {cmd:ifvtex.sty}, {cmd:infwarerr.sty}, {cmd:intcalc.sty}, and
+{cmd:keyval.sty}.
+
+{p 4 8 2}
+{cmd:kvdefinekeys.sty}, {cmd:kvoptions.sty}, {cmd:kvsetkeys.sty},
+{cmd:l3keys2e.sty}, {cmd:letltxmacro.sty}, {cmd:lmodern.sty},
+{cmd:longtable.sty}, {cmd:lscape.sty}, {cmd:ltcaption.sty}, {cmd:ltxcmds.sty},
+{cmd:mathtools.sty}, and {cmd:mhsetup.sty}.
+
+{p 4 8 2}
+{cmd:microtype.sty}, {cmd:multirow.sty}, {cmd:nameref.sty}, {cmd:natbib.sty},
+{cmd:pdfescape.sty}, {cmd:pdflscape.sty}, {cmd:pdftexcmds.sty},
+{cmd:placeins.sty}, {cmd:plainnat.bst}, {cmd:refcount.sty},
+{cmd:rerunfilecheck.sty}, and {cmd:rotating.sty}.
+
+{p 4 8 2}
+{cmd:setspace.sty}, {cmd:siunitx.sty}, {cmd:stringenc.sty},
+{cmd:subcaption.sty}, {cmd:subfigure.sty}, {cmd:tabularx.sty},
+{cmd:threeparttable.sty}, {cmd:threeparttablex.sty}, {cmd:titlesec.sty},
+{cmd:translations.sty}, {cmd:trig.sty}, and {cmd:trimclip.sty}.
+
+{p 4 8 2}
+{cmd:trimspaces.sty}, {cmd:uniquecounter.sty}, {cmd:url.sty},
+{cmd:varwidth.sty}, {cmd:xcolor.sty}, and {cmd:xkeyval.sty}.
+
+{title:Acknowledgements}
+
+{pstd}
+This package is only possible due to the amazing work of the
+{browse "https://tectonic-typesetting.github.io/":Tectonic project} and its
+contributors. Tectonic makes the formidable TeX ecosystem available as a
+modern, embeddable, and reproducible engine. {cmd:texpdf} is a small Stata
+bridge and distribution layer built on top of that achievement. I am deeply
+grateful to everyone who has designed, maintained, documented, and tested
+Tectonic and the upstream TeX software on which it builds.
 
 {title:Also see}
 
 {p 0 21}
-Online: {help table}, {help collect export}, {help graph export}, {help latexlog}
-{p_end}
-{p 0 21}
-{help etable}
+Online: {help table}, {help collect export}, {help graph export}, {help latexlog}, {help etable}
 {p_end}
 
 {title:Author}
 
 {pstd}Johannes Schmieder
+
+{pstd}
+Website: {browse "https://johannes-schmieder.com/":johannes-schmieder.com}
+{break}GitHub: {browse "https://github.com/johannes-schmieder":johannes-schmieder}
+{break}Email: {browse "mailto:johannes@bu.edu":johannes@bu.edu}
+
+{pstd}Suggestions welcome.

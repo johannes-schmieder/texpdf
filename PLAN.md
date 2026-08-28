@@ -32,6 +32,8 @@ position and build-only artifacts are never treated as runtime qualification.
 - [x] Compiler-only Stata command, stable syntax, help, and `r()` results.
 - [x] Three one-click manual, optional-latexlog, and built-in-etable help
       examples with opt-in PDF viewing and inspectable persistent outputs.
+- [x] Release-facing help contact links, Tectonic acknowledgement, and a
+      manifest-checked positive inventory of every bundled LaTeX interface.
 - [x] Tectonic 0.17.0 core with deterministic curated offline bundle.
 - [x] Academic/econometric compatibility corpus and local `net install` test.
 - [x] Thin panic-safe SPI bridge and versioned result protocol.

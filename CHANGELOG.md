@@ -52,6 +52,12 @@ releases or SSC versions.
 
 ### Changed
 
+- Installed help now includes the author's website, GitHub profile, email, an
+  invitation for suggestions, a prominent Tectonic acknowledgement, and an
+  exact manifest-checked inventory of every bundled LaTeX interface.
+- Help wording now describes only included capabilities, identifies the
+  current version directly, and keeps the `latexlog` and `etable`
+  cross-references together.
 - Release readiness now distinguishes active development, immutable candidate
   source, target runtime evidence, and public-distribution authorization.
 - Automatic evidence publishers preserve the frozen release-candidate source
