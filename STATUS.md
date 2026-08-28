@@ -36,7 +36,7 @@ tracked independently:
 | Current ARM64 artifact source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
 | Current universal build source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
 | Last completed candidate license-audit source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
-| Latest memory-stress attempt | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4`; qualified=yes |
+| Latest memory-stress attempt | `41223b9ed4058f5aec97cdcff4783fee6ba05fa6`; qualified=no |
 
 ## Development bundle on `main`
 
@@ -92,7 +92,7 @@ The separate development audit is source-bound to `13cfe5da1ac1845ff51a33f382cf1
 
 ## Memory evidence
 
-The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 16 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
+The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was unknown KiB against a unknown KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
 
 ## Public-release blockers
 
