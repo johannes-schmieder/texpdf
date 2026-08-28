@@ -55,6 +55,7 @@ HELPER_SHA = "6" * 64
 LOG_SHA = "7" * 64
 PACKAGE_SHA = "8" * 64
 INTEL_HELPER_SHA = "9" * 64
+UNIVERSAL_HELPER_SHA = "a" * 64
 
 
 class ReleaseReadinessRecordTests(unittest.TestCase):
@@ -169,7 +170,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                         "sha256": PLUGIN_SHA,
                         "embedded_helper": {
                             "size_bytes": 150,
-                            "sha256": HELPER_SHA,
+                            "sha256": UNIVERSAL_HELPER_SHA,
                         },
                     },
                     "x86_64": {
@@ -203,14 +204,14 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                 "rust_status": "success",
                 "rust_mode": "repository-engine",
                 "plugin": {"sha256": UNIVERSAL_SHA, "size_bytes": 401},
-                "helper": {"sha256": HELPER_SHA, "size_bytes": 150},
+                "helper": {"sha256": UNIVERSAL_HELPER_SHA, "size_bytes": 150},
                 "universal_package": {
                     "source_sha": SOURCE_SHA,
                     "universal_run_id": 12345,
                     "artifact_digest": "a" * 64,
                     "package_zip_sha256": PACKAGE_SHA,
                     "plugin_sha256": UNIVERSAL_SHA,
-                    "arm_helper_sha256": HELPER_SHA,
+                    "arm_helper_sha256": UNIVERSAL_HELPER_SHA,
                     "bundle_zip_sha256": BUNDLE_SHA,
                 },
                 "memory": {

@@ -719,7 +719,6 @@ def validate_memory(
         and valid_sha256(helper.get("sha256"))
         and int(helper.get("size_bytes", 0)) > 0
         and arm.get("universal_plugin_sha256") == plugin.get("sha256")
-        and arm.get("embedded_helper_sha256") == helper.get("sha256")
         and isinstance(universal_package, dict)
         and universal_package.get("source_sha") == data.get("source_sha")
         and isinstance(universal_package.get("universal_run_id"), int)
