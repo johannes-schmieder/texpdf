@@ -119,6 +119,8 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                         "bundle_zip_size_bytes": 100,
                         "plugin_sha256": PLUGIN_SHA,
                         "plugin_size_bytes": 200,
+                        "universal_plugin_sha256": UNIVERSAL_SHA,
+                        "universal_plugin_size_bytes": 401,
                         "embedded_helper_sha256": HELPER_SHA,
                         "embedded_helper_size_bytes": 150,
                         "qualified_source_sha": SOURCE_SHA,
@@ -200,8 +202,17 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                 "stata_status": "success",
                 "rust_status": "success",
                 "rust_mode": "repository-engine",
-                "plugin": {"sha256": PLUGIN_SHA, "size_bytes": 200},
+                "plugin": {"sha256": UNIVERSAL_SHA, "size_bytes": 401},
                 "helper": {"sha256": HELPER_SHA, "size_bytes": 150},
+                "universal_package": {
+                    "source_sha": SOURCE_SHA,
+                    "universal_run_id": 12345,
+                    "artifact_digest": "a" * 64,
+                    "package_zip_sha256": PACKAGE_SHA,
+                    "plugin_sha256": UNIVERSAL_SHA,
+                    "arm_helper_sha256": HELPER_SHA,
+                    "bundle_zip_sha256": BUNDLE_SHA,
+                },
                 "memory": {
                     "iterations_requested": 1000,
                     "runner_rc": 0,
@@ -350,6 +361,25 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
             path = root / "release/memory-stress-macos-arm64.json"
             record = json.loads(path.read_text(encoding="utf-8"))
             record["memory"]["retained_helper_pids"] = [1234]
+            write_json(path, record)
+            with working_directory(root):
+                checks: list[dict[str, object]] = []
+                targets = readiness.read_targets(checks)
+                readiness.validate_memory(targets, checks)
+
+        by_key = {row["key"]: row for row in checks}
+        self.assertFalse(by_key["macos_arm_memory_stress"]["passed"])
+
+    def test_memory_record_rejects_native_plugin_instead_of_universal_package(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.prepare_records(root)
+            path = root / "release/memory-stress-macos-arm64.json"
+            record = json.loads(path.read_text(encoding="utf-8"))
+            record["plugin"]["sha256"] = PLUGIN_SHA
+            record["universal_package"]["plugin_sha256"] = PLUGIN_SHA
             write_json(path, record)
             with working_directory(root):
                 checks: list[dict[str, object]] = []

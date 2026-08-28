@@ -79,9 +79,13 @@ release policy keeps the Intel build but retires the Intel/Rosetta runtime lane.
 - [x] Exercise malformed input/images, timeout, corrupt cache replacement,
       repeated failures, post-error recovery, and atomic output preservation.
 - [x] Preserve failed attempts as attempts, never qualifications.
+- [x] Require the stress lane to download and verify the exact successful
+      universal-package artifact rather than rebuilding native plugin/helper
+      bytes inside the memory workflow.
 
-Exit achieved: `macos_arm_memory_stress` passes with a reviewed permanent
-1,000-call record.
+Exit requires `macos_arm_memory_stress` to pass with a reviewed permanent
+1,000-call record whose plugin, embedded ARM helper, package ZIP, artifact
+digest, source SHA, and universal workflow run all match the public candidate.
 
 ### 4. Private RC package
 

@@ -105,6 +105,8 @@ At minimum:
 - BibTeX/`natbib` and the academic package corpus;
 - clean local `net install` test;
 - 1,000 or more installed-plugin compile calls with periodic injected errors;
+- the memory lane must use the exact public universal-package artifact already
+  accepted by the macOS build lane, not a separately rebuilt native helper;
 - separate long-lived Stata-parent and transient process-tree RSS/peak sampling;
 - shell-escape denial;
 - offline/no-system-TeX verification;

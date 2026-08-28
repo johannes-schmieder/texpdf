@@ -698,8 +698,11 @@ def validate_memory(
     memory = data.get("memory", {})
     plugin = data.get("plugin", {})
     helper = data.get("helper", {})
+    universal_package = data.get("universal_package", {})
     arm = targets.get("aarch64-apple-darwin", {})
-    iterations = memory.get("iterations_requested") if isinstance(memory, dict) else None
+    iterations = (
+        memory.get("iterations_requested") if isinstance(memory, dict) else None
+    )
     expected_failures = iterations // 25 + 2 if isinstance(iterations, int) else None
     passed = (
         data.get("schema_version") == 3
@@ -715,8 +718,18 @@ def validate_memory(
         and isinstance(helper, dict)
         and valid_sha256(helper.get("sha256"))
         and int(helper.get("size_bytes", 0)) > 0
-        and arm.get("plugin_sha256") == plugin.get("sha256")
+        and arm.get("universal_plugin_sha256") == plugin.get("sha256")
         and arm.get("embedded_helper_sha256") == helper.get("sha256")
+        and isinstance(universal_package, dict)
+        and universal_package.get("source_sha") == data.get("source_sha")
+        and isinstance(universal_package.get("universal_run_id"), int)
+        and int(universal_package.get("universal_run_id", 0)) > 0
+        and valid_sha256(universal_package.get("artifact_digest"))
+        and universal_package.get("package_zip_sha256")
+        == arm.get("candidate_package_sha256")
+        and universal_package.get("plugin_sha256") == plugin.get("sha256")
+        and universal_package.get("arm_helper_sha256") == helper.get("sha256")
+        and universal_package.get("bundle_zip_sha256") == arm.get("bundle_zip_sha256")
         and isinstance(memory, dict)
         and isinstance(iterations, int)
         and iterations >= 1000
@@ -738,6 +751,7 @@ def validate_memory(
         passed,
         (
             f"source={data.get('source_sha')}; iterations={memory.get('iterations_requested')}; "
+            f"universal_run_id={universal_package.get('universal_run_id')}; "
             f"peak_rss_kib={memory.get('peak_stata_rss_kib')}; "
             f"post_warmup_growth_kib={memory.get('post_warmup_growth_kib')}; "
             f"growth_ratio={memory.get('post_warmup_growth_ratio')}"

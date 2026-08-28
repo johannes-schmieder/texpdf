@@ -256,6 +256,25 @@ class WorkflowCompatibilityTests(unittest.TestCase):
         self.assertIn('scope["candidate_source_sha"]', workflow)
         self.assertIn("if is_candidate and record[\"qualified\"]", workflow)
 
+    def test_memory_stress_uses_exact_universal_workflow_artifact(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/stress-memory-macos.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("universal_run_id:", workflow)
+        self.assertIn("actions: read", workflow)
+        self.assertIn('"Build and test macOS universal plugin"', workflow)
+        self.assertIn("gh run download", workflow)
+        self.assertIn("ci/prepare_macos_memory_input.py", workflow)
+        self.assertIn("TEXPDF_STATA_PACKAGE_DIR:", workflow)
+        self.assertIn("TEXPDF_STATA_PACKAGE_MANIFEST:", workflow)
+        self.assertIn(
+            'arm.get("universal_plugin_sha256")',
+            (REPOSITORY_ROOT / "tools/check_release_readiness.py").read_text(
+                encoding="utf-8"
+            ),
+        )
+        self.assertNotIn("ci/record_rust_quick.sh", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

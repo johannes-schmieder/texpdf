@@ -7,20 +7,16 @@ on:
         description: Successful compile calls (100-10000)
         required: true
         default: "1000"
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/stress-memory-macos.yml"
-      - "ci/run_memory_stress.sh"
-      - "ci/stata_stress_1000.do"
-      - "ci/stata_profiles.json"
+      universal_run_id:
+        description: Successful exact-source macOS universal workflow run ID
+        required: true
 
 concurrency:
   group: texpdf-macos-memory-stress
   cancel-in-progress: true
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -31,6 +27,7 @@ jobs:
       STATA_BIN: /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp
       TEXPDF_RUST_PROFILE: engine
       TEXPDF_STRESS_ITERATIONS: ${{ inputs.iterations || '1000' }}
+      TEXPDF_UNIVERSAL_RUN_ID: ${{ inputs.universal_run_id }}
       CARGO_TERM_COLOR: always
       RUST_BACKTRACE: "1"
       TEXPDF_PYTHON: /usr/bin/python3
@@ -54,6 +51,10 @@ jobs:
           esac
           test "$TEXPDF_STRESS_ITERATIONS" -ge 100
           test "$TEXPDF_STRESS_ITERATIONS" -le 10000
+          case "$TEXPDF_UNIVERSAL_RUN_ID" in
+            ''|*[!0-9]*) echo "universal_run_id must be a positive integer" >&2; exit 2 ;;
+          esac
+          test "$TEXPDF_UNIVERSAL_RUN_ID" -gt 0
           /usr/bin/python3 - <<'PY'
           from pathlib import Path
           import json
@@ -70,38 +71,110 @@ jobs:
               raise SystemExit("committed stress1000 profile lacks its success marker")
           PY
 
-      - name: Build and test the real embedded plugin
+      - name: Download and validate exact universal candidate package
         id: build
         if: ${{ steps.profile.outcome == 'success' }}
         continue-on-error: true
         shell: bash
-        run: /bin/bash ci/record_rust_quick.sh
-
-      - name: Preserve Rust evidence
-        if: ${{ steps.build.outcome == 'success' }}
-        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          rm -rf "$RUNNER_TEMP/texpdf-rust-evidence"
-          mkdir -p "$RUNNER_TEMP/texpdf-rust-evidence"
-          cp -R .ci/stata/run/. "$RUNNER_TEMP/texpdf-rust-evidence/"
+          input_root="$RUNNER_TEMP/texpdf-universal-input"
+          prepared="$RUNNER_TEMP/texpdf-memory-package-evidence"
+          run_json="$RUNNER_TEMP/texpdf-universal-run.json"
+          artifacts_json="$RUNNER_TEMP/texpdf-universal-artifacts.json"
+          rm -rf "$input_root" "$prepared"
+          mkdir -p "$input_root" "$prepared"
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$TEXPDF_UNIVERSAL_RUN_ID" \
+            > "$run_json"
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$TEXPDF_UNIVERSAL_RUN_ID/artifacts" \
+            > "$artifacts_json"
+          artifact_name="texpdf-macos-universal-$GITHUB_SHA-$TEXPDF_UNIVERSAL_RUN_ID"
+          artifact_digest=$(/usr/bin/python3 - \
+            "$run_json" "$artifacts_json" "$artifact_name" <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import sys
+
+          run = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          artifacts = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+          expected = {
+              "name": "Build and test macOS universal plugin",
+              "status": "completed",
+              "conclusion": "success",
+              "head_sha": os.environ["GITHUB_SHA"],
+          }
+          for key, value in expected.items():
+              if run.get(key) != value:
+                  raise SystemExit(f"universal workflow run has invalid {key}")
+          repository = run.get("head_repository") or {}
+          if repository.get("full_name") != os.environ["GITHUB_REPOSITORY"]:
+              raise SystemExit("universal workflow run belongs to another repository")
+          matching = [
+              row
+              for row in artifacts.get("artifacts", [])
+              if row.get("name") == sys.argv[3]
+          ]
+          if len(matching) != 1:
+              raise SystemExit("expected exactly one exact-source universal artifact")
+          artifact = matching[0]
+          if artifact.get("expired") is not False:
+              raise SystemExit("exact-source universal artifact is expired")
+          workflow = artifact.get("workflow_run") or {}
+          if workflow.get("head_sha") != os.environ["GITHUB_SHA"]:
+              raise SystemExit("universal artifact source does not match the tested source")
+          digest = artifact.get("digest")
+          if not isinstance(digest, str) or not digest.startswith("sha256:"):
+              raise SystemExit("universal artifact lacks a SHA-256 digest")
+          print(digest)
+          PY
+          )
+          gh run download "$TEXPDF_UNIVERSAL_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$artifact_name" \
+            --dir "$input_root"
+          candidate_version=$(/usr/bin/python3 -c \
+            'import json; print(json.load(open("release/scope.json"))["candidate_version"])')
+          /usr/bin/python3 ci/prepare_macos_memory_input.py \
+            --artifact-root "$input_root" \
+            --output-dir "$prepared" \
+            --expect-source-sha "$GITHUB_SHA" \
+            --expect-package-version "$candidate_version" \
+            --universal-run-id "$TEXPDF_UNIVERSAL_RUN_ID" \
+            --artifact-name "$artifact_name" \
+            --artifact-digest "$artifact_digest"
 
       - name: Run licensed Stata stress with RSS sampling
         id: stress
         if: ${{ steps.build.outcome == 'success' }}
         continue-on-error: true
         shell: bash
+        env:
+          TEXPDF_STATA_PACKAGE_DIR: ${{ runner.temp }}/texpdf-universal-input/dist/macos-universal/texpdf
+          TEXPDF_STATA_PACKAGE_MANIFEST: ${{ runner.temp }}/texpdf-memory-package-evidence/package-manifest.json
         run: /bin/bash ci/run_memory_stress.sh stress1000
 
-      - name: Restore Rust evidence
+      - name: Restore exact universal package evidence
         if: ${{ always() && steps.build.outcome == 'success' }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p .ci/stata/run
-          if [[ -d "$RUNNER_TEMP/texpdf-rust-evidence" ]]; then
-            cp -R "$RUNNER_TEMP/texpdf-rust-evidence/." .ci/stata/run/
-          fi
+          evidence="$RUNNER_TEMP/texpdf-memory-package-evidence"
+          for name in \
+            rust-quick.status \
+            bundle-info.json \
+            package-manifest.json \
+            plugin-manifest.json \
+            helper-manifest.json \
+            memory-input.json
+          do
+            cp "$evidence/$name" ".ci/stata/run/$name"
+          done
 
       - name: Validate combined receipt and growth gate
         id: validate
@@ -178,6 +251,7 @@ jobs:
           helper = load(".ci/stata/run/helper-manifest.json")
           bundle = load(".ci/stata/run/bundle-info.json")
           package = load(".ci/stata/run/package-manifest.json")
+          input_record = load(".ci/stata/run/memory-input.json")
           outcomes = {
               "profile": os.environ.get("PROFILE_OUTCOME", "unknown"),
               "build": os.environ.get("BUILD_OUTCOME", "unknown"),
@@ -222,6 +296,17 @@ jobs:
               and package.get("plugin_sha256") == plugin_sha
               and package.get("embedded_helper_sha256") == helper_sha
               and package.get("bundle_zip_sha256") == bundle_sha
+              and package.get("public_release_mode") is True
+              and package.get("license_evidence_included") is True
+              and package.get("source_sha") == os.environ["GITHUB_SHA"]
+              and input_record.get("source_sha") == os.environ["GITHUB_SHA"]
+              and input_record.get("universal_run_id")
+                  == int(os.environ["TEXPDF_UNIVERSAL_RUN_ID"])
+              and input_record.get("package_zip_sha256")
+                  == package.get("package_zip_sha256")
+              and input_record.get("plugin_sha256") == plugin_sha
+              and input_record.get("arm_helper_sha256") == helper_sha
+              and input_record.get("bundle_zip_sha256") == bundle_sha
           )
           record = {
               "schema_version": 3,
@@ -260,13 +345,15 @@ jobs:
                   "zip_sha256": package.get("package_zip_sha256"),
                   "zip_size_bytes": package.get("package_zip_size_bytes"),
               },
+              "universal_package": input_record,
               "memory": memory,
               "qualification_boundary": (
                   "This records one exact-source macOS Apple Silicon licensed-Stata "
-                  "attempt through the installed plugin into one short-lived helper "
-                  "per request, with the Stata parent held for at least 1000 successful "
-                  "compiles and deliberate error recovery. Other architectures require "
-                  "separate runtime qualification."
+                  "attempt through the exact public universal candidate package from "
+                  "the recorded successful universal workflow artifact. The Stata "
+                  "parent was held for at least 1000 successful compiles with one "
+                  "short-lived embedded helper per request and deliberate error "
+                  "recovery. Other architectures require separate runtime qualification."
               ),
           }
           Path(".ci/stata/run/memory-qualification.json").write_text(

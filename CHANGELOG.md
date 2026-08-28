@@ -81,6 +81,10 @@ releases or SSC versions.
 
 ### Fixed
 
+- The macOS durability gate now downloads, verifies, and tests the exact
+  source-bound universal candidate package instead of rebuilding a separate
+  native helper. Memory evidence is bound to the universal workflow run,
+  artifact digest, package ZIP, universal plugin, and embedded ARM helper.
 - Cross-platform package assembly now canonicalizes shared Stata metadata to
   LF and sanitizes host paths and target-local vcpkg labels from public license
   evidence, keeping the macOS, Linux, Windows, and combined SSC archives

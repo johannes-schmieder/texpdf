@@ -171,7 +171,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "source=d44a6dbd25c28490f5f09154c920e7188b5051ac; iterations=1000; peak_rss_kib=74272; post_warmup_growth_kib=80; growth_ratio=1.0010782833728704",
+      "detail": "source=d44a6dbd25c28490f5f09154c920e7188b5051ac; iterations=1000; universal_run_id=None; peak_rss_kib=74272; post_warmup_growth_kib=80; growth_ratio=1.0010782833728704",
       "key": "macos_arm_memory_stress",
       "passed": false,
       "public_release_blocker": true,
