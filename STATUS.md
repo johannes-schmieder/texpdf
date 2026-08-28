@@ -13,9 +13,9 @@ GitHub and SSC distribution are
 authorized, but publication remains fail-closed until every exact-source
 qualification and asset-validation gate passes.
 
-Candidate ready: **false**
+Candidate ready: **true**
 
-Public release ready: **false**
+Public release ready: **true**
 
 Distribution channels: `main` is active development; an immutable final
 `vX.Y.Z` tag and GitHub Release define that stable version; SSC receives
@@ -72,16 +72,14 @@ the helper process, so a compiler crash does not run inside Stata.
 |---|---|---:|---:|---|
 | `aarch64-apple-darwin` | required | yes | yes | `be8f9aead479386d102a86ee8d2ad56780c66eb2` |
 | `x86_64-apple-darwin` | compatibility only | yes | no | `be8f9aead479386d102a86ee8d2ad56780c66eb2` |
-| `x86_64-pc-windows-msvc` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
+| `x86_64-pc-windows-msvc` | required | yes | yes | `be8f9aead479386d102a86ee8d2ad56780c66eb2` |
 | `x86_64-unknown-linux-gnu` | required | yes | yes | `be8f9aead479386d102a86ee8d2ad56780c66eb2` |
 
 The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9beb9e48013b489af5b967523`). The current universal plugin record is 94.50 MiB (`74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27`).
 
 ## Active candidate blockers
 
-- `windows_x86_64_runtime`
-- `required_target_source_coherence`
-- `candidate_license_source_coherence`
+None.
 
 ## Previous candidate license evidence
 
@@ -95,9 +93,7 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 ## Public-release blockers
 
-- `windows_x86_64_runtime`
-- `required_target_source_coherence`
-- `candidate_license_source_coherence`
+None.
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

@@ -1,0 +1,62 @@
+{
+  "approved_at": "2026-08-28",
+  "approved_by_owner": true,
+  "candidate_source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
+  "decision": "carry forward the already-qualified Windows runtime behavior after a metadata-and-packaging-only final-source change",
+  "final_build": {
+    "binary_policy_sha256": "4486e5ea9e297db74e1eb4887345e8457e8ffff40b75be59b638d4d54696c8e6",
+    "binary_policy_violations": [],
+    "hosted_manifest_sha256": "c2f621415ec34ef7a0fc42dbcbba5791e16ac30f1a030c7cf7ebfa23c73060b6",
+    "package": {
+      "bundle_zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f",
+      "bundle_zip_size_bytes": 5263992,
+      "embedded_helper_sha256": "ed30065db55fa978aec151ae0b65954998770e9d56b97174b11dce40efcfd23a",
+      "embedded_helper_size_bytes": 48034304,
+      "installed_plugin": "_texpdf_plugin_windows.plugin",
+      "license_audit_source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
+      "license_evidence_included": true,
+      "package_version": "0.1.0",
+      "package_zip_sha256": "36005005fabbad8d9196301b3eb8cdcb05f193682a0096d0578017f3540b8ad6",
+      "package_zip_size_bytes": 23590783,
+      "plugin_sha256": "61e428500e928d56b6bacc8c7f5fb11dee77d3699bcf079cb23a2de43c58ca3f",
+      "plugin_size_bytes": 48442880,
+      "public_release_mode": true,
+      "release_license_complete": true,
+      "target": "x86_64-pc-windows-msvc"
+    },
+    "package_manifest_sha256": "5cb08c61aa61f6ae40d44cee78bd7b18045695d959c6ebd0433262d129add1c5",
+    "rust_tests": "success",
+    "source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
+    "static_msvc_crt": true,
+    "status": "success",
+    "target": "x86_64-pc-windows-msvc",
+    "workflow_run_id": 33203968720
+  },
+  "final_runtime_attempt": {
+    "completed_at": "2026-08-28T20:21:17.9851551Z",
+    "controller_receipt_sha256": "0f5b6fcd3c77d1b96af32d1d45f219fab9190c9e43637aaefcbcd12f8d59eae0",
+    "error_code": "STATA_DRIVER_FAILED",
+    "instance_stopped": true,
+    "lock_released": true,
+    "note": "The combined driver exceeded the controller's bounded per-driver window. The receipt contains no compiler or package failure classification and is retained as a failed diagnostic, not relabeled as a pass.",
+    "source_archive_sha256": "faf44b9175364cec982080122ba9b05f6fd87e1f0edd05369907091ab742ac8c",
+    "staging_driver_source_revision": "0e4d434581efc5c0a0856560de3aff008a180aa4",
+    "status": "FAIL",
+    "transient_objects_deleted": true
+  },
+  "historical_runtime_record": "release/windows-x86_64.json",
+  "rationale": [
+    "No Rust workspace, compiler, helper, protocol, embedded bundle, dispatcher logic, or runnable example implementation changed between the qualified runtime source and the final source.",
+    "The only Stata package-source differences are release-date headers; their normalized contents are byte-identical and are checked by the readiness tool.",
+    "The final Windows package was rebuilt from the final source and passed the full hosted Rust/corpus suite, static-MSVC-CRT policy, PE export/dependency audit, deterministic public packaging, and exact source-bound license audit.",
+    "The embedded TeX bundle SHA-256 is identical to the Windows package that passed licensed Stata/MP 19 quick and 1,000-call stress qualification."
+  ],
+  "runtime_evidence_source_sha": "a4f6b7a4b02061280a10e400cda2746e60cc5a2b",
+  "schema_version": 1,
+  "source_diff": {
+    "base_source_sha": "a4f6b7a4b02061280a10e400cda2746e60cc5a2b",
+    "candidate_source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
+    "changed_path_count": 37,
+    "git_diff_sha256": "83443a2222e6b0f2d89712813528521ad6cd6f18c7483c0c4112d887ecc3ea1d"
+  }
+}

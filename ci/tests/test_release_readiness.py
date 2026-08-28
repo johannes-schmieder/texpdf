@@ -95,6 +95,22 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         self.assertTrue(readiness.evidence_only_path("release/targets.json"))
         self.assertFalse(readiness.evidence_only_path("tools/prepare_native_deps.sh"))
 
+    def test_windows_runtime_equivalence_rejects_runtime_source_changes(self) -> None:
+        self.assertTrue(readiness.windows_runtime_equivalence_path("CHANGELOG.md"))
+        self.assertTrue(
+            readiness.windows_runtime_equivalence_path("tools/package_release.py")
+        )
+        self.assertTrue(
+            readiness.windows_runtime_equivalence_path("release/targets.json")
+        )
+        self.assertFalse(readiness.windows_runtime_equivalence_path("Cargo.lock"))
+        self.assertFalse(
+            readiness.windows_runtime_equivalence_path("crates/texpdf-core/src/lib.rs")
+        )
+        self.assertFalse(
+            readiness.windows_runtime_equivalence_path("stata/texpdf_run.ado")
+        )
+
     def prepare_records(self, root: Path) -> None:
         write_json(
             root / ".ci/stata/results" / f"{SOURCE_SHA}.json",

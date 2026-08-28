@@ -9,6 +9,7 @@ consistent status fields and exact hashes.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -29,6 +30,7 @@ TARGETS_PATH = Path("release/targets.json")
 UNIVERSAL_PATH = Path("release/macos-universal.json")
 LINUX_RUNTIME_PATH = Path("release/linux-x86_64.json")
 WINDOWS_RUNTIME_PATH = Path("release/windows-x86_64.json")
+WINDOWS_RUNTIME_EQUIVALENCE_PATH = Path("release/windows-runtime-equivalence.json")
 MEMORY_PATH = Path("release/memory-stress-macos-arm64.json")
 LICENSE_STATUS_PATH = Path("licenses/generated/STATUS.json")
 SCOPE_PATH = Path("release/scope.json")
@@ -44,6 +46,26 @@ EVIDENCE_ONLY_FILES = {
     "release/memory-stress-macos-arm64.json",
     "release/targets.json",
 }
+WINDOWS_RUNTIME_EQUIVALENCE_FILES = {
+    "CHANGELOG.md",
+    "PLAN.md",
+    "README.md",
+    "STATUS.md",
+    "bundle/QUALIFICATION.json",
+    "stata/texpdf.ado",
+    "stata/texpdf.pkg",
+    "stata/texpdf.sthlp",
+    "tools/check_release_readiness.py",
+    "tools/package_release.py",
+    "tools/sync_project_state.py",
+}
+WINDOWS_RUNTIME_EQUIVALENCE_PREFIXES = (
+    ".ci/",
+    "ci/tests/",
+    "docs/generated/",
+    "licenses/generated/",
+    "release/",
+)
 
 
 class AuditError(RuntimeError):
@@ -93,6 +115,195 @@ def valid_source_sha(value: object) -> bool:
 
 def evidence_only_path(path: str) -> bool:
     return path in EVIDENCE_ONLY_FILES or path.startswith(EVIDENCE_ONLY_PREFIXES)
+
+
+def windows_runtime_equivalence_path(path: str) -> bool:
+    return path in WINDOWS_RUNTIME_EQUIVALENCE_FILES or path.startswith(
+        WINDOWS_RUNTIME_EQUIVALENCE_PREFIXES
+    )
+
+
+def git_bytes(revision: str, path: str) -> bytes:
+    return subprocess.check_output(["git", "show", f"{revision}:{path}"])
+
+
+def normalized_stata_metadata(revision: str, path: str) -> bytes:
+    lines = git_bytes(revision, path).splitlines(keepends=True)
+    if path == "stata/texpdf.ado":
+        return b"".join(lines[1:])
+    if path == "stata/texpdf.sthlp":
+        return b"".join(lines[:1] + lines[2:])
+    if path == "stata/texpdf.pkg":
+        return b"".join(
+            line for line in lines if not line.startswith(b"d Distribution-Date:")
+        )
+    raise ValueError(f"unsupported Stata metadata path: {path}")
+
+
+def validate_windows_runtime_equivalence(
+    data: dict[str, Any],
+    historical: dict[str, Any],
+    target: dict[str, Any],
+    candidate_version: str,
+    public_release: bool,
+) -> tuple[bool, str]:
+    candidate_source = str(data.get("candidate_source_sha", ""))
+    runtime_source = str(data.get("runtime_evidence_source_sha", ""))
+    final_build = data.get("final_build", {})
+    final_package = final_build.get("package", {}) if isinstance(final_build, dict) else {}
+    historical_package = historical.get("package", {})
+    historical_runtimes = historical.get("runtimes", {})
+    diff = data.get("source_diff", {})
+    diagnostic = data.get("final_runtime_attempt", {})
+
+    if not (
+        data.get("schema_version") == 1
+        and data.get("approved_by_owner") is True
+        and valid_source_sha(candidate_source)
+        and valid_source_sha(runtime_source)
+        and candidate_source != runtime_source
+        and historical.get("schema_version") == 1
+        and historical.get("qualified") is True
+        and historical.get("source_sha") == runtime_source
+        and historical.get("target") == "x86_64-pc-windows-msvc"
+        and isinstance(final_build, dict)
+        and final_build.get("status") == "success"
+        and final_build.get("source_sha") == candidate_source
+        and final_build.get("rust_tests") == "success"
+        and final_build.get("target") == "x86_64-pc-windows-msvc"
+        and final_build.get("static_msvc_crt") is True
+        and final_build.get("binary_policy_violations") == []
+        and isinstance(final_package, dict)
+        and final_package.get("package_version") == candidate_version
+        and final_package.get("public_release_mode") is public_release
+        and final_package.get("license_audit_source_sha") == candidate_source
+        and final_package.get("release_license_complete") is True
+        and final_package.get("license_evidence_included") is True
+        and final_package.get("target") == "x86_64-pc-windows-msvc"
+        and final_package.get("installed_plugin") == "_texpdf_plugin_windows.plugin"
+        and all(
+            valid_sha256(final_package.get(key))
+            for key in (
+                "package_zip_sha256",
+                "plugin_sha256",
+                "embedded_helper_sha256",
+                "bundle_zip_sha256",
+            )
+        )
+        and diagnostic.get("status") == "FAIL"
+        and diagnostic.get("error_code") == "STATA_DRIVER_FAILED"
+        and diagnostic.get("instance_stopped") is True
+        and diagnostic.get("transient_objects_deleted") is True
+        and diagnostic.get("lock_released") is True
+    ):
+        return False, "equivalence record or exact final build is incomplete"
+
+    if not isinstance(historical_package, dict) or not isinstance(
+        historical_runtimes, dict
+    ):
+        return False, "historical Windows runtime evidence is malformed"
+
+    historical_plugin = historical_package.get("plugin_sha256")
+    historical_package_sha = historical_package.get("package_zip_sha256")
+    historical_bundle = historical_package.get("bundle_zip_sha256")
+
+    def historical_runtime_ok(key: str, profile: str) -> bool:
+        receipt = historical_runtimes.get(key)
+        if not isinstance(receipt, dict):
+            return False
+        artifact = receipt.get("artifact", {})
+        markers = receipt.get("required_log_markers", [])
+        present = {
+            str(item.get("marker"))
+            for item in markers
+            if isinstance(item, dict) and item.get("present") is True
+        }
+        required = (
+            {"TEXPDF STRESS 1000 PASS"}
+            if profile == "stress1000"
+            else {
+                "TEXPDF REALISTIC CORPUS PASS",
+                "TEXPDF HELP EXAMPLES PASS",
+                "TEXPDF FULL ENGINE STATA PASS",
+            }
+        )
+        return (
+            receipt.get("tested_sha") == runtime_source
+            and receipt.get("status") == "success"
+            and receipt.get("stata_status") == "success"
+            and receipt.get("profile") == profile
+            and str(receipt.get("stata_version", "")).split(".", 1)[0] == "19"
+            and receipt.get("stata_edition") == "MP"
+            and "Windows" in str(receipt.get("platform", ""))
+            and isinstance(artifact, dict)
+            and artifact.get("plugin_sha256") == historical_plugin
+            and artifact.get("package_zip_sha256") == historical_package_sha
+            and artifact.get("bundle_zip_sha256") == historical_bundle
+            and required <= present
+        )
+
+    if not (
+        historical_runtime_ok("stata_19_quick", "quick")
+        and historical_runtime_ok("stata_19_stress1000", "stress1000")
+        and historical_bundle == final_package.get("bundle_zip_sha256")
+    ):
+        return False, "historical runtime receipts or bundle identity do not match"
+
+    try:
+        changed_output = subprocess.check_output(
+            ["git", "diff", "--name-only", f"{runtime_source}..{candidate_source}"],
+            text=True,
+        )
+        changed_paths = [line for line in changed_output.splitlines() if line]
+        binary_diff = subprocess.check_output(
+            ["git", "diff", "--binary", f"{runtime_source}..{candidate_source}"]
+        )
+    except subprocess.CalledProcessError:
+        return False, "cannot reproduce the source equivalence diff"
+    unexpected = [path for path in changed_paths if not windows_runtime_equivalence_path(path)]
+    if (
+        unexpected
+        or diff.get("base_source_sha") != runtime_source
+        or diff.get("candidate_source_sha") != candidate_source
+        or diff.get("changed_path_count") != len(changed_paths)
+        or diff.get("git_diff_sha256") != hashlib.sha256(binary_diff).hexdigest()
+    ):
+        return False, f"source equivalence diff mismatch; unexpected={unexpected}"
+
+    try:
+        metadata_equal = all(
+            normalized_stata_metadata(runtime_source, path)
+            == normalized_stata_metadata(candidate_source, path)
+            for path in ("stata/texpdf.ado", "stata/texpdf.sthlp", "stata/texpdf.pkg")
+        )
+    except (subprocess.CalledProcessError, ValueError):
+        metadata_equal = False
+    if not metadata_equal:
+        return False, "Stata runtime/package metadata changed beyond date headers"
+
+    registry_ok = (
+        target.get("artifact") == "_texpdf_plugin_windows.plugin"
+        and target.get("build_qualified") is True
+        and target.get("build_source_sha") == candidate_source
+        and target.get("qualified_source_sha") == candidate_source
+        and target.get("runtime_evidence_source_sha") == runtime_source
+        and target.get("stata_runtime_qualified") is True
+        and target.get("plugin_sha256") == final_package.get("plugin_sha256")
+        and target.get("embedded_helper_sha256")
+        == final_package.get("embedded_helper_sha256")
+        and target.get("candidate_package_sha256")
+        == final_package.get("package_zip_sha256")
+        and target.get("candidate_package_version") == candidate_version
+        and target.get("tested_stata_versions") == ["19"]
+        and target.get("receipt") == str(WINDOWS_RUNTIME_EQUIVALENCE_PATH)
+        and target.get("runtime_receipt") == str(WINDOWS_RUNTIME_PATH)
+    )
+    if not registry_ok:
+        return False, "target registry does not bind the final build and carried runtime"
+    return True, (
+        f"final_build_source={candidate_source}; runtime_source={runtime_source}; "
+        f"carry_forward=true; changed_paths={len(changed_paths)}"
+    )
 
 
 def successful_receipt(source_sha: str) -> tuple[bool, str]:
@@ -463,6 +674,17 @@ def validate_windows_target(
         add_check(checks, "windows_x86_64_runtime", False, f"missing {WINDOWS_RUNTIME_PATH}")
         return
     data = read_json(WINDOWS_RUNTIME_PATH)
+    if WINDOWS_RUNTIME_EQUIVALENCE_PATH.is_file():
+        equivalence = read_json(WINDOWS_RUNTIME_EQUIVALENCE_PATH)
+        passed, detail = validate_windows_runtime_equivalence(
+            equivalence,
+            data,
+            target,
+            candidate_version,
+            public_release,
+        )
+        add_check(checks, "windows_x86_64_runtime", passed, detail)
+        return
     source_sha = str(data.get("source_sha", ""))
     build = data.get("build_receipt", {})
     package = data.get("package", {})
