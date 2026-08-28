@@ -11,9 +11,9 @@ no runtime target is deferred. Public GitHub and SSC distribution are
 authorized, but publication remains fail-closed until every exact-source
 qualification and asset-validation gate passes.
 
-Candidate ready: **true**
+Candidate ready: **false**
 
-Public release ready: **true**
+Public release ready: **false**
 
 Distribution channels: `main` is active development; an immutable final
 `vX.Y.Z` tag and GitHub Release define that stable version; SSC receives
@@ -77,7 +77,7 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 
 ## Active candidate blockers
 
-None.
+- `required_target_source_coherence`
 
 ## Previous candidate license evidence
 
@@ -91,7 +91,7 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 ## Public-release blockers
 
-None.
+- `required_target_source_coherence`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.
