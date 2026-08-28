@@ -307,6 +307,39 @@ class PackageReleaseTests(unittest.TestCase):
             self.assertIn("LICENSES/texts/rust/example/LICENSE", names)
             self.assertIn("LICENSES/texts/texlive/NOTICE", names)
 
+    def test_machine_state_is_never_packaged(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plugin, bundle_info = self.prepare_project(root)
+            self.prepare_complete_license_audit(root)
+            (root / ".DS_Store").write_bytes(b"finder")
+            (root / "licenses/generated/texts/.DS_Store").write_bytes(b"finder")
+            write(root / "licenses/generated/texts/__MACOSX/metadata", "finder\n")
+            write(root / "licenses/generated/texts/texlive/Thumbs.db", "windows\n")
+
+            result = self.command(root, plugin, bundle_info, public=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            manifest = json.loads(
+                (root / "dist/manifest.json").read_text(encoding="utf-8")
+            )
+            self.assertFalse(
+                any(
+                    ".DS_Store" in name
+                    or "__MACOSX" in name
+                    or "Thumbs.db" in name
+                    for name in manifest["installed_files"]
+                )
+            )
+            with zipfile.ZipFile(root / "dist/package.zip") as archive:
+                self.assertFalse(
+                    any(
+                        ".DS_Store" in name
+                        or "__MACOSX" in name
+                        or "Thumbs.db" in name
+                        for name in archive.namelist()
+                    )
+                )
+
     def test_private_candidate_can_include_complete_license_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

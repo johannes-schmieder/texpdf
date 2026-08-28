@@ -85,6 +85,9 @@ No user-facing changes yet.
 
 ### Fixed
 
+- Release packaging excludes Finder, Windows Explorer, and archive metadata
+  files so public packages remain deterministic when built in a browsed working
+  tree.
 - The macOS durability gate now downloads, verifies, and tests the exact
   source-bound universal candidate package instead of rebuilding a separate
   native helper. Memory evidence is bound to the universal workflow run,

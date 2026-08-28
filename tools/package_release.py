@@ -49,6 +49,8 @@ PLUGIN_FILENAMES = {
     "x86_64-unknown-linux-gnu": "_texpdf_plugin_unix.plugin",
     "x86_64-pc-windows-msvc": "_texpdf_plugin_windows.plugin",
 }
+MACHINE_STATE_NAMES = {".DS_Store", "Thumbs.db", "desktop.ini"}
+MACHINE_STATE_DIRECTORIES = {"__MACOSX"}
 
 
 def sha256_file(path: Path) -> str:
@@ -143,8 +145,19 @@ def zip_info(name: str) -> zipfile.ZipInfo:
     return info
 
 
+def is_machine_state(path: Path) -> bool:
+    return any(
+        part in MACHINE_STATE_NAMES or part in MACHINE_STATE_DIRECTORIES
+        for part in path.parts
+    )
+
+
 def package_files(root: Path) -> list[Path]:
-    return sorted(path for path in root.rglob("*") if path.is_file())
+    return sorted(
+        path
+        for path in root.rglob("*")
+        if path.is_file() and not is_machine_state(path.relative_to(root))
+    )
 
 
 def relative_name(root: Path, path: Path) -> str:
@@ -232,7 +245,11 @@ def install_license_evidence(output_dir: Path) -> list[str]:
     texts_root = LICENSE_GENERATED_ROOT / "texts"
     if not texts_root.is_dir():
         raise FileNotFoundError(texts_root)
-    for source in sorted(path for path in texts_root.rglob("*") if path.is_file()):
+    for source in sorted(
+        path
+        for path in texts_root.rglob("*")
+        if path.is_file() and not is_machine_state(path.relative_to(texts_root))
+    ):
         relative = source.relative_to(LICENSE_GENERATED_ROOT)
         destination = destination_root / relative
         copy_atomic(source, destination)
