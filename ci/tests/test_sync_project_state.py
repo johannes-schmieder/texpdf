@@ -84,16 +84,8 @@ class ProjectStateTests(unittest.TestCase):
                 "universal": {"size_bytes": 200, "sha256": digest},
             },
             "licenses": {"tex_resources": {}},
-            "development_licenses": {
-                "source_sha": sha,
-                "release_license_complete": True,
-                "tex_resources": {
-                    "resource_count": 392,
-                    "mapped": 392,
-                    "ambiguous": 0,
-                    "unmapped": 0,
-                },
-            },
+            "qualification": {"bundle": {"name": "release-bundle"}},
+            "publication": {},
             "memory": {
                 "source_sha": sha,
                 "qualified": False,
@@ -104,32 +96,13 @@ class ProjectStateTests(unittest.TestCase):
                     "growth_gate": False,
                 },
             },
-            "development": {
-                "selection_status": "partial-runtime-evidence",
-                "bundle": {
-                    "name": "development-bundle",
-                    "version": "dev.1",
-                    "zip_sha256": digest,
-                    "content_digest": digest,
-                },
-                "evidence": {
-                    "tested_source_sha": sha,
-                    "macos_apple_silicon_stata": "success",
-                    "linux_core": "success",
-                    "intel_macos_stata": "not-run",
-                    "linux_stata": "not-run",
-                },
-            },
         }
         rendered = state.render_status(fixture)
         self.assertIn("failed attempt", rendered)
         self.assertIn("qualified=no", rendered)
         self.assertNotIn("memory stress qualified", rendered.lower())
-        self.assertIn("development-bundle", rendered)
-        self.assertIn("different artifacts", rendered)
-        self.assertIn("392/392 mapped", rendered)
-        self.assertIn("Last completed candidate license-audit source", rendered)
-        self.assertIn("Intel compatibility slice", rendered)
+        self.assertIn("release-bundle", rendered)
+        self.assertIn("Release license-audit source", rendered)
         self.assertIn("compatibility only", rendered)
 
     def test_status_labels_final_release_scope(self) -> None:
@@ -145,12 +118,17 @@ class ProjectStateTests(unittest.TestCase):
             "targets": {},
             "universal": {},
             "licenses": {"tex_resources": {}},
-            "development_licenses": {"tex_resources": {}},
+            "qualification": {"bundle": {}},
+            "publication": {
+                "final_release": {
+                    "published": True,
+                    "github_release_url": "https://example.test/v0.1.0",
+                }
+            },
             "memory": {"memory": {}},
-            "development": {"bundle": {}, "evidence": {}},
         }
         rendered = state.render_status(fixture)
-        self.assertIn("public `0.1.0` cross-platform final release", rendered)
+        self.assertIn("current stable GitHub release", rendered)
         self.assertIn("| Target | Release scope |", rendered)
 
 

@@ -4,50 +4,45 @@ This document separates demonstrated behavior from intended support. The
 machine-readable records under `.ci/stata/results/` and `release/` are the
 source of truth.
 
-## Active public 0.1.0 qualification
+## Public 0.1.0 qualification
 
-The active scope requires macOS Apple Silicon, Linux x86-64, and Windows
-x86-64 at one exact source SHA. The public `v0.1.0-rc2` and final
-`v0.1.0` each require their own complete evidence matrix; the final metadata
-commit is requalified rather than inheriting RC evidence. Until those records
-are complete, `release/READINESS.json` must report the public release as not
-ready.
+Version 0.1.0 is published from source
+`be8f9aead479386d102a86ee8d2ad56780c66eb2`. Its required targets are macOS
+Apple Silicon, Linux x86-64, and Windows x86-64. The generated readiness record
+reports both `candidate_ready=true` and `public_release_ready=true`.
 
 The distributed macOS plugin remains universal. Its x86-64 slice is built,
 inspected, and hash-bound to the package, but the project has no Intel/Rosetta
 runtime test capacity and makes no runtime-qualification claim for that slice.
 
-## Historical private RC.2 evidence
+## Evidence boundary
 
-The private `0.1.0-rc.2` candidate is bound to source:
-
-```text
-7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8
-```
-
-The candidate includes complete source-bound license evidence. Its required
-runtime targets are macOS Apple Silicon, macOS Intel, and Linux x86-64.
+The final source differs from the fully licensed Windows RC2 runtime source
+only in verified release metadata and packaging hygiene. The exact final
+Windows package independently passed the hosted Rust/corpus, static-CRT, PE,
+license, and package audits. The owner-approved carry-forward and the failed
+final-source controller-deadline attempt are recorded without relabeling that
+attempt as a pass in `../release/windows-runtime-equivalence.json`.
 
 ## macOS qualification
 
-For the active release, the universal package is built from the exact candidate
-source. Its ARM64 slice is exercised in licensed Stata, including the quick
+The universal package is built from the exact final source. Its ARM64 slice was
+exercised in licensed Stata, including the quick
 corpus and a 1,000-compile memory-stress run with injected failures and
 post-error recovery. The x86-64 slice receives build and binary inspection only.
-Older private candidate history included a Rosetta runtime run; that historical
-evidence does not qualify the new public artifacts or establish ongoing Intel
-support.
+Historical Rosetta evidence does not qualify the public artifact or establish
+ongoing Intel support.
 
 Authoritative records:
 
-- `.ci/stata/results/7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8.json`
+- `.ci/stata/results/be8f9aead479386d102a86ee8d2ad56780c66eb2.json`
 - `release/macos-universal.json`
 - `release/memory-stress-macos-arm64.json`
 - `release/targets.json`
 
 ## Linux qualification
 
-The Linux x86-64 candidate was built and tested on the Boston University
+The Linux x86-64 release package was built and tested on the Boston University
 Shared Computing Cluster's RHEL 8 environment. The build uses a fresh Cargo
 target directory, records the pinned toolchain, and rejects symbols newer than
 GLIBC 2.28. The exact packaged plugin was exercised in:
@@ -56,16 +51,17 @@ GLIBC 2.28. The exact packaged plugin was exercised in:
 - licensed Stata/MP 18 with the 1,000-compile stress corpus;
 - licensed Stata/MP 19 with the quick corpus.
 
-The immutable SCC run is:
+The committed canonical record, including scheduler, package, binary-policy,
+and runtime receipts, is `../release/linux-x86_64.json`.
 
-```text
-/projectnb/welfgr/texpdf/runs/20260825T1700Z-7aa7b16-linux-rc2
-```
+## Windows qualification
 
-Its SGE jobs are build `7308886`, Stata 18 quick `7308887`, Stata 18
-stress-1000 `7308888`, and Stata 19 quick `7308889`. All have `failed=0` and
-`exit_status=0`. The committed canonical record is
-`release/linux-x86_64.json`.
+The exact final Windows package was built with the static MSVC CRT and passed
+the hosted Rust workspace, realistic corpus, PE dependency, licensing, and
+deterministic packaging checks. Licensed Stata/MP 19 quick and 1,000-call
+stress behavior is carried from the behaviorally equivalent RC2 source under
+the explicit record described above. The canonical package and runtime record
+is `../release/windows-x86_64.json`.
 
 ## Demonstrated behavior
 
@@ -80,8 +76,8 @@ The qualification corpus covers:
 - exact artifact identity across packaging and runtime receipts;
 - complete bundled license notices and source-bound audit evidence.
 
-## Deliberately deferred
+## Qualification boundary
 
-The historical candidate does not certify Windows x86-64, the newer realistic
-corpus bundle, or the current cross-platform distribution layout. It remains
-valid only for its recorded bytes and must not be reused for public promotion.
+The universal macOS Intel slice is supplied for compatibility but is not
+runtime-qualified. Any code, bundle, or interface change after 0.1.0 requires
+new evidence and a new release; it cannot inherit the immutable 0.1.0 record.

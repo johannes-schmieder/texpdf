@@ -8,7 +8,7 @@ Documents written against ordinary LaTeX interfaces are the intended use case;
 documents that depend on pdfTeX-specific primitives or external programs may
 need changes.
 
-## Supported v1 tier
+## Supported 0.1.0 tier
 
 The v1 compatibility target is common academic/econometric material:
 
@@ -25,9 +25,9 @@ A package is advertised as supported only after a redistributable fixture using
 that package passes with the final curated bundle on every supported platform.
 Presence of a file in the bundle is not by itself a support guarantee.
 
-## Development real-world corpus
+## Release real-world corpus
 
-`main` also carries a source-only synthetic corpus modeled on current latexlog
+The release source carries a synthetic corpus modeled on current latexlog
 reports, a legacy report, and a conventional multi-file economics manuscript.
 It tests visibly colored PDF and PNG figures, generated-style tables,
 landscape/tabularx layouts, relative inputs, equations, natbib, `cleveref`, and
@@ -41,16 +41,16 @@ example exports a `tableonly` LaTeX fragment and places it in a minimal wrapper
 document. Stata's complete-document `etable` export adds packages outside the
 current bundle and is therefore not the documented compatibility path.
 
-`colortbl`, `cleveref`, and `aer.bst` are included in the `0.1.0` compatibility
-corpus and become release-tested only when the exact final artifact passes on
-every required target. The obsolete `subfigure`
-package is retained only for legacy compatibility; the current isolated fixture
-is warning-free, and any future allowlist is limited to an exact obsolete-package
-warning. Use `subcaption` for new work.
+`colortbl`, `cleveref`, and `aer.bst` are included in the 0.1.0 compatibility
+corpus. Windows licensed-runtime behavior is supported through the documented
+RC2-to-final equivalence record; the exact final Windows package independently
+passed the hosted Rust/corpus and binary audits. The obsolete `subfigure`
+package is retained only for legacy compatibility; its isolated fixture is
+warning-free. Use `subcaption` for new work.
 
 ## Deliberate exclusions
 
-The initial public tier excludes:
+The 0.1.0 tier excludes:
 
 - shell escape and arbitrary external commands;
 - minted/Pygments;

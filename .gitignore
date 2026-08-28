@@ -4,6 +4,7 @@
 *.pyc
 __pycache__/
 .DS_Store
+texpdf_examples/
 /target/
 /.ci/stata/run/
 /bundle/generated/

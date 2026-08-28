@@ -27,7 +27,7 @@ Windows x86-64. `main` is the active development branch. Runtime testing
 covers macOS Apple Silicon, Linux, and Windows; the universal macOS binary also
 carries an untested Intel compatibility slice. SSC publication is pending.
 
-See [`STATUS.md`](STATUS.md) for current evidence and blockers,
+See [`STATUS.md`](STATUS.md) for current release and qualification evidence,
 [`PLAN.md`](PLAN.md) for remaining work, and [`RELEASING.md`](RELEASING.md) for
 the release and SSC policy.
 
@@ -61,8 +61,8 @@ x86-64 archives plus `SHA256SUMS`.
 
 ### Stable version from SSC
 
-No final version is on SSC yet. Once SSC publishes `texpdf`, this will be the
-normal recommended installation for ordinary users:
+Version 0.1.0 has been submitted to SSC and publication is pending. Once it is
+available, this will be the normal recommended installation:
 
 ```stata
 ssc install texpdf
@@ -73,31 +73,16 @@ not to the current tip of `main` or to a release candidate.
 
 ### Development version from `main`
 
-Installation from `main` is a **development version** and may differ from SSC.
-When a public flat development installation tree is enabled, its form is:
-
-```stata
-net install texpdf, replace ///
-    from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/main/stata/")
-```
-
-Because `texpdf` requires a compiled platform plugin and binaries are not
-committed to `main`, use a platform-specific development artifact until a
-public flat development tree exists. Do not treat the command above as a
-stable-release install.
+`main` is source development and may differ from the stable release. Because
+the compiled plugins are not committed there, install development versions
+only from a platform-specific CI artifact with its manifest. Ordinary users
+should use the GitHub release above or SSC once publication completes.
 
 ### Exact historical release
 
-An immutable tag identifies exact historical source. If that tag contains the
-applicable installation tree, install it explicitly, for example:
-
-```stata
-net install texpdf, replace ///
-    from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/v0.2.0/stata/")
-```
-
-For compiled releases whose plugin is delivered as a platform-specific GitHub
-Release asset, use the immutable installation URL documented in that release.
+Each immutable tag and GitHub Release preserves an exact historical version.
+For 0.1.0, use the appropriate platform ZIP attached to
+[`v0.1.0`](https://github.com/johannes-schmieder/texpdf/releases/tag/v0.1.0).
 See [`RELEASING.md`](RELEASING.md) and
 [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
 
@@ -135,13 +120,13 @@ previously valid PDF.
 The qualified academic tier covers LaTeX core, AMS mathematics, common table
 and layout packages, PDF/PNG figures, hyperlinks, Latin Modern and TeX Gyre
 fonts, English-language hyphenation, and BibTeX with `natbib`. Broad language
-and hyphenation collections are deliberately outside this RC. The exact
+and hyphenation collections are deliberately outside version 0.1.0. The exact
 fixture-backed contract is documented
 in [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) and
 [`docs/SUPPORTED_PACKAGES.md`](docs/SUPPORTED_PACKAGES.md).
 
 Beamer, TikZ/PGF, PSTricks, Biber/`biblatex`, `minted`, shell-dependent tools,
-and arbitrary document-selected external helpers are outside the RC tier.
+and arbitrary document-selected external helpers are outside the 0.1.0 tier.
 
 ## Architecture
 
@@ -156,11 +141,11 @@ texpdf.ado
 ```
 
 Project-owned source is MIT licensed. Embedded TeX resources, fonts, Tectonic,
-and native libraries retain their upstream licenses. Candidate packaging is
+and native libraries retain their upstream licenses. Release packaging is
 fail-closed unless the exact plugin/helper graphs, bundle resources, and full
 notice tree pass the source-bound audit.
 
-The intended `0.1.0` runtime matrix is Stata 18 and 19 overall. Windows is
+The `0.1.0` runtime matrix covers Stata 18 and 19 overall. Windows is
 qualified specifically with 64-bit Stata/MP 19; the exact per-target record is
 authoritative. The macOS package is universal, but its Intel slice is supplied
 as an untested compatibility binary rather than a qualified runtime target.

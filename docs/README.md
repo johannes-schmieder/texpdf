@@ -2,7 +2,7 @@
 
 ## Users
 
-- [`INSTALLATION.md`](INSTALLATION.md) — installation model and eventual GitHub Release layout.
+- [`INSTALLATION.md`](INSTALLATION.md) — GitHub, SSC, development, and historical installation channels.
 - [`COMPATIBILITY.md`](COMPATIBILITY.md) — Tectonic/LaTeX behavior and known exclusions.
 - [`SUPPORTED_PACKAGES.md`](SUPPORTED_PACKAGES.md) — fixture-backed academic package tier.
 - [`ERRORS.md`](ERRORS.md) — Stata return codes and output guarantees.

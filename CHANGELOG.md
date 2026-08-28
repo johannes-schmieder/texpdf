@@ -7,7 +7,12 @@ releases or SSC versions.
 
 ## Unreleased
 
-No user-facing changes yet.
+### Changed
+
+- Updated generated status and maintainer documentation to reflect the live
+  GitHub 0.1.0 release and pending SSC publication.
+- Shortened the active plan and ignored local outputs from runnable help
+  examples.
 
 ## 0.1.0 - 2026-08-28
 

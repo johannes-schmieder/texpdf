@@ -1,8 +1,6 @@
 {
-  "candidate_blockers": [
-    "windows_x86_64_runtime"
-  ],
-  "candidate_ready": false,
+  "candidate_blockers": [],
+  "candidate_ready": true,
   "candidate_version": "0.1.0",
   "checks": [
     {
@@ -134,12 +132,12 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "source equivalence diff mismatch; unexpected=[]",
+      "candidate_release_blocker": false,
+      "detail": "final_build_source=be8f9aead479386d102a86ee8d2ad56780c66eb2; runtime_source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; carry_forward=true; changed_paths=37",
       "key": "windows_x86_64_runtime",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": false,
@@ -175,13 +173,9 @@
     }
   ],
   "implementation_complete_macos_arm64": true,
-  "public_release_blockers": [
-    "windows_x86_64_runtime"
-  ],
-  "public_release_ready": false,
-  "release_blockers": [
-    "windows_x86_64_runtime"
-  ],
+  "public_release_blockers": [],
+  "public_release_ready": true,
+  "release_blockers": [],
   "release_kind": "final_release",
   "schema_version": 3
 }

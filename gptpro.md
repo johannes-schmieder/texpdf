@@ -1,6 +1,9 @@
-# GPT Pro handoff: licensed Stata and Rust CI
+# Licensed Stata and Rust CI handoff
 
-This public repository uses a repository-scoped GitHub Actions runner on Johannes's Mac Studio. The runner is restricted to trusted pushes and explicit dispatches; no pull-request event can execute on it. Use it when a ChatGPT/GPT Pro session cannot execute licensed Stata or Rust in its own sandbox.
+This repository uses a repository-scoped GitHub Actions runner on Johannes's
+Mac Studio. It accepts only trusted pushes and explicit dispatches; no
+pull-request event can execute on it. Operational setup and recovery details
+live in [`STATA_CI_RUNNER.md`](STATA_CI_RUNNER.md).
 
 ## What this repository provides
 
@@ -9,25 +12,12 @@ The workflow is named **Licensed Stata and Rust CI**. A normal push to `main` or
 1. a licensed Stata/MP batch test; and
 2. a Rust quick test.
 
-At bootstrap, the Stata test is an infrastructure smoke test and the Rust test compiles and runs a synthetic program in a temporary directory. The project architecture is now specified in `PLAN.md`: the public command/package is `texpdf`, the primary backend is Tectonic, and standalone/offline operation after installation is a core requirement. When a `Cargo.toml` is added, the Rust lane automatically changes to repository checks: `cargo fmt --check`, strict Clippy, and workspace tests.
+The Stata lane runs the selected licensed profile against the repository
+package. The Rust lane runs formatting, strict Clippy, and workspace tests with
+the pinned toolchain. Release qualification uses additional platform, memory,
+license, corpus, and package workflows described in `RELEASING.md`.
 
 There is no self-hosted `pull_request` trigger and no redundant GitHub-hosted matrix on ordinary pushes.
-
-## Available test machine
-
-- Runner: `macstudio-stata-mp18-texpdf` (historical machine name)
-- Workflow labels: `self-hosted`, `macOS`, `ARM64`, `stata-mp`, `texpdf`
-- Hardware: Mac Studio `Mac14,14`, Apple M2 Ultra, arm64, 24 CPU cores, 192 GB RAM
-- Operating system: macOS 26.5.2
-- Licensed Stata: Stata/MP 19 at the default application path; Stata/MP 18 is
-  retained separately for explicit compatibility runs
-- Stata executable: `/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp`
-- Working Stata batch form: `stata-mp -q -b do FILE.do`
-- Rust: stable 1.97.1, plus installed 1.81.0 and 1.85.1 toolchains; rustfmt and Clippy are available
-- Native build tools: Apple clang/Xcode
-- TeX tools currently present on the Mac: TeX Live 2023, `latexmk`, pdfLaTeX, XeLaTeX, LuaLaTeX, BibTeX, and Biber
-
-Treat those versions as the current runner environment, not as a future public package compatibility promise. A repository `rust-toolchain.toml` may pin Rust when development begins.
 
 ## Development loop
 

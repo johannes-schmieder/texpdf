@@ -19,14 +19,15 @@ The exact source currently qualified by licensed Stata is recorded in
 | Paths | spaces and Unicode |
 | Fonts | deterministic defaults required by the fixture |
 
-These are the minimum compatibility guarantees of the current qualified
-macOS development checkpoint. The private RC's language policy is English-only.
+These are minimum guarantees of the cross-platform 0.1.0 release. Its language
+policy is English-only.
 
-## Candidate academic v1 packages
+## Bundled academic interfaces
 
-The following remain candidate packages until each has a redistributable
-fixture, a resolved resource/font closure, complete license metadata, and a
-successful final-platform corpus result:
+Version 0.1.0 bundles the following user-facing groups. The exact `.sty`,
+`.cls`, and `.bst` inventory is listed by `help texpdf` and checked against the
+curated manifest. Support claims remain fixture-based rather than inferred
+from the mere presence of a file.
 
 ### Mathematics
 
@@ -50,22 +51,22 @@ successful final-platform corpus result:
 
 - Latin Modern and a small justified TeX Gyre subset.
 
-Candidates should be promoted in small fixture-backed groups so the incremental
-bundle cost and license closure are measurable.
+Future additions should be promoted in small fixture-backed groups so their
+incremental bundle cost and license closure remain measurable.
 
-## Development-tested real-world additions
+## Real-world corpus additions
 
-The bundle on `main` contains a separate development selection that has not
-replaced the frozen private candidate. Its synthetic real-world corpus tests:
+The 0.1.0 synthetic real-world corpus tests:
 
 - `colortbl` in current latexlog-generated tables;
 - `cleveref` in a multi-file economics manuscript;
 - the `aer.bst` BibTeX style from TeX Live's `economic` package with natbib;
 - the obsolete `subfigure` package in a sanitized legacy report.
 
-These are development-tested capabilities pending full all-target runtime
-requalification. `subfigure` is supported only to open and compile legacy
-documents; new documents should use `subcaption`.
+These capabilities are included in the 0.1.0 qualification record. Windows
+licensed-runtime behavior follows the documented RC2-to-final equivalence
+boundary. `subfigure` is supported only to open and compile legacy documents;
+new documents should use `subcaption`.
 
 ## Deliberate exclusions for v1
 
@@ -79,5 +80,5 @@ documents; new documents should use `subcaption`.
 - runtime package downloads;
 - reliance on arbitrary system fonts.
 
-A development artifact may compile some excluded material accidentally. That
+A release or development artifact may compile some excluded material accidentally. That
 is not a support promise.

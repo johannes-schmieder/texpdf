@@ -1,4 +1,19 @@
 {
+  "final_release": {
+    "archive_sha256": {
+      "texpdf-linux-x86_64-0.1.0.zip": "81e2b5fa2271943c9233d22f98e7bf7cd7c28df17c0b19ae44b998f78eb6ce3b",
+      "texpdf-macos-universal-0.1.0.zip": "40770035558808620bac433bbf40217190aa2679b8fbfb7b04f816fc879fc95c",
+      "texpdf-ssc-0.1.0.zip": "6024f87227fe0f140433f4c2473e519ca0efd626e7fecf90e408e7044a5c0b75",
+      "texpdf-windows-x86_64-0.1.0.zip": "36005005fabbad8d9196301b3eb8cdcb05f193682a0096d0578017f3540b8ad6"
+    },
+    "asset_count": 13,
+    "github_release_url": "https://github.com/johannes-schmieder/texpdf/releases/tag/v0.1.0",
+    "public_assets_verified": true,
+    "published": true,
+    "published_at": "2026-08-28",
+    "source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
+    "tag": "v0.1.0"
+  },
   "historical_rc1": {
     "asset_sha256": {
       "macos-intel-runtime.json": "fa7ce2a850d4f5de6d6a0a0e878ef8613fe5865856fc49f3c3e66c525b240a26",
@@ -25,6 +40,13 @@
   "repository_url": "https://github.com/johannes-schmieder/texpdf",
   "repository_visibility": "public",
   "schema_version": 1,
+  "ssc_submission": {
+    "archive_sha256": "6024f87227fe0f140433f4c2473e519ca0efd626e7fecf90e408e7044a5c0b75",
+    "delivery": "github_release_asset_link",
+    "publication_status": "pending",
+    "submitted": true,
+    "submitted_at": "2026-08-28"
+  },
   "settings": {
     "branch_protection": {
       "allow_deletions": false,

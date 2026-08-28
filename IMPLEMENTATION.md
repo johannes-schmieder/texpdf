@@ -74,8 +74,8 @@ gates. See `SECURITY.md`.
 
 ## Platform and release boundary
 
-The public release requires macOS ARM64, Linux x86-64, and Windows x86-64
-runtime qualification from one exact source SHA. Linux support enforces a
+Version 0.1.0 qualifies macOS ARM64, Linux x86-64, and Windows x86-64 under its
+recorded evidence policy. Linux support enforces a
 GLIBC 2.28 compatibility ceiling and licensed Stata/MP 18 and 19 tests. Windows
 requires static CRT linkage and licensed Stata/MP 19. The universal macOS
 artifact still carries a built and inspected x86-64 slice, but it is explicitly

@@ -7,53 +7,43 @@ exact historical GitHub release.
 
 ## Stable installation from SSC
 
-SSC is the normal stable channel. After the first final version is accepted,
-ordinary users install with:
+SSC will be the normal stable channel. Version 0.1.0 has been submitted and is
+awaiting publication; once it is available, ordinary users install with:
 
 ```stata
 ssc install texpdf
 ```
 
-The SSC files must be taken from the corresponding final immutable GitHub tag
-and Release. SSC must never receive a release candidate or files rebuilt from a
-later `main` tip. The project is not yet available on SSC, so this command is
-documented policy rather than a currently working installation route.
+The submitted SSC archive is the verified asset from the immutable GitHub
+0.1.0 release. SSC must never receive a release candidate or files rebuilt
+from a later `main` tip. Until publication completes, use the GitHub release.
+
+## Stable installation from GitHub
+
+Download the ZIP for macOS universal, Linux x86-64, or Windows x86-64 from
+[`v0.1.0`](https://github.com/johannes-schmieder/texpdf/releases/tag/v0.1.0),
+extract it, and install from that directory:
+
+```stata
+net install texpdf, replace from("/path/to/extracted/texpdf")
+```
 
 ## Development installation from `main`
 
-`main` answers “what are we developing now?” It is never described as the
-latest stable release. When a public development installation tree is enabled,
-its command is:
-
-```stata
-net install texpdf, replace ///
-    from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/main/stata/")
-```
-
-`texpdf` contains a compiled plugin, and the source tree does not commit
-platform binaries under `stata/`. Until CI publishes a public
-flat development tree, install development builds from the platform-specific
-CI artifact and verify its manifest. This limitation must not be hidden by
-publishing a command that cannot supply the plugin.
+`main` answers “what are we developing now?” and may differ from the stable
+release. `texpdf` contains a compiled plugin, and the source tree does not
+commit platform binaries under `stata/`. Install development builds only from
+the appropriate platform-specific CI artifact and verify its manifest.
 
 ## Exact historical versions
 
-A final tag such as `v0.2.0` is the immutable answer to “what exactly was
-version 0.2.0?” If the tag contains the applicable installation tree:
-
-```stata
-net install texpdf, replace ///
-    from("https://raw.githubusercontent.com/johannes-schmieder/texpdf/v0.2.0/stata/")
-```
-
-When compiled binaries are distributed only as GitHub Release assets, use the
-platform-specific immutable asset or versioned installation URL recorded in
-that Release. Never substitute a binary from `main` into a historical tagged
-installation.
+A final tag is the immutable answer to “what exactly was this version?” Use
+the platform-specific asset attached to that GitHub Release. Never substitute
+a binary from `main` into a historical tagged installation.
 
 ## Compiled release artifacts
 
-A final GitHub Release may contain:
+A final GitHub Release contains:
 
 - one deterministic ZIP per supported platform;
 - a combined SHA-256 manifest;
