@@ -41,7 +41,7 @@
   "release_license_complete": true,
   "resource_count_matches_manifest": true,
   "schema_version": 2,
-  "source_sha": "d6dab250895efb9c1f70f5d8ef21e682f90ab946",
+  "source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
   "stage_return_codes": {
     "cargo_inventory": 0,
     "collect_license_texts": 0,
