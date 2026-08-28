@@ -1,44 +1,97 @@
 {
   "bundle": {
-    "content_digest": null,
-    "file_count": null,
-    "zip_sha256": null,
-    "zip_size_bytes": null
+    "content_digest": "343a91f13d9890e668f16dff8f4fb87940540db0eeab4f7b8cbb04aaa608accf",
+    "file_count": 393,
+    "zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f",
+    "zip_size_bytes": 5263992
   },
   "development_package": {
-    "zip_sha256": null,
-    "zip_size_bytes": null
+    "zip_sha256": "40770035558808620bac433bbf40217190aa2679b8fbfb7b04f816fc879fc95c",
+    "zip_size_bytes": 46559388
   },
   "helper": {
-    "sha256": null,
-    "size_bytes": null,
-    "target": null
+    "sha256": "8add1be8d62fd40b426e4fd12697d9466a6e381d69d137d4c7b5879fdc1dc6b1",
+    "size_bytes": 48796992,
+    "target": "aarch64-apple-darwin"
   },
-  "memory": {},
-  "overall_status": "failure",
-  "platform": null,
+  "memory": {
+    "duration_seconds": 494,
+    "expected_injected_failure_count": 42,
+    "growth_gate": true,
+    "growth_threshold_rationale": "64 MiB is one eighth of the former in-process allowance and is above ordinary Stata allocator/cache noise while still detecting retained compiler state in the long-lived parent.",
+    "helper_sample_count": 1082,
+    "injected_failure_count": 42,
+    "iterations_requested": 1000,
+    "late_median_stata_rss_kib": 74208,
+    "late_window": [
+      900,
+      1000
+    ],
+    "max_allowed_growth_kib": 65536,
+    "max_concurrent_helpers": 1,
+    "peak_helper_rss_kib": 193568,
+    "peak_stata_rss_kib": 74208,
+    "peak_tree_rss_kib": 299008,
+    "post_error_recovery": true,
+    "post_warmup_growth_kib": 112,
+    "post_warmup_growth_ratio": 1.0015115525804361,
+    "retained_helper_pids": [],
+    "runner_rc": 0,
+    "sample_count": 1607,
+    "schema_version": 1,
+    "stata_log_sha256": "713f879c2b98827c2a4ec1d7dc9aec58488298df71d51efbd1b66097fe8e9f01",
+    "stata_sample_count": 1604,
+    "successful_compile_count": 1000,
+    "warm_median_stata_rss_kib": 74096,
+    "warm_window": [
+      100,
+      200
+    ]
+  },
+  "overall_status": "success",
+  "platform": "Unix; Mac (Apple Silicon)",
   "plugin": {
-    "exports": null,
-    "external_dynamic_dependencies": null,
-    "sha256": null,
-    "size_bytes": null
+    "exports": [
+      "pginit",
+      "stata_call"
+    ],
+    "external_dynamic_dependencies": [
+      "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
+      "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)"
+    ],
+    "sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
+    "size_bytes": 99091248
   },
   "process_architecture": "arm64",
   "profile": "stress1000",
   "qualification_boundary": "This records one exact-source macOS Apple Silicon licensed-Stata attempt through the exact public universal candidate package from the recorded successful universal workflow artifact. The Stata parent was held for at least 1000 successful compiles with one short-lived embedded helper per request and deliberate error recovery. Other architectures require separate runtime qualification.",
-  "qualified": false,
-  "rust_mode": null,
-  "rust_status": "failure",
+  "qualified": true,
+  "rust_mode": "repository-engine",
+  "rust_status": "success",
   "schema_version": 3,
-  "source_sha": "d6dab250895efb9c1f70f5d8ef21e682f90ab946",
-  "stata_edition": null,
-  "stata_status": "failure",
-  "stata_version": null,
+  "source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
+  "stata_edition": "MP",
+  "stata_status": "success",
+  "stata_version": "19",
   "step_outcomes": {
-    "build": "failure",
+    "build": "success",
     "profile": "success",
-    "stress": "skipped",
-    "validate": "skipped"
+    "stress": "success",
+    "validate": "success"
   },
-  "universal_package": {}
+  "universal_package": {
+    "arm_helper_sha256": "8add1be8d62fd40b426e4fd12697d9466a6e381d69d137d4c7b5879fdc1dc6b1",
+    "arm_helper_size_bytes": 48796992,
+    "artifact_digest": "00bd2add87ed9b70662d3395c596157d5d02b2f8a563c1609d1e76f00cf5c1bd",
+    "artifact_name": "texpdf-macos-universal-be8f9aead479386d102a86ee8d2ad56780c66eb2-33203299282",
+    "bundle_zip_sha256": "cf01e151b290b63735d0070ed0294efbfd904f638fada6dc95ecb41e63a5e11f",
+    "package_version": "0.1.0",
+    "package_zip_sha256": "40770035558808620bac433bbf40217190aa2679b8fbfb7b04f816fc879fc95c",
+    "package_zip_size_bytes": 46559388,
+    "plugin_sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
+    "plugin_size_bytes": 99091248,
+    "schema_version": 1,
+    "source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
+    "universal_run_id": 33203299282
+  }
 }
