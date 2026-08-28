@@ -99,7 +99,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
+      "detail": "source=d6dab250895efb9c1f70f5d8ef21e682f90ab946; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
       "passed": true,
       "public_release_blocker": false,
@@ -147,7 +147,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=d6dab250895efb9c1f70f5d8ef21e682f90ab946; sources=['a4f6b7a4b02061280a10e400cda2746e60cc5a2b']",
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=d6dab250895efb9c1f70f5d8ef21e682f90ab946; sources=['a4f6b7a4b02061280a10e400cda2746e60cc5a2b', 'd6dab250895efb9c1f70f5d8ef21e682f90ab946']",
       "key": "required_target_source_coherence",
       "passed": false,
       "public_release_blocker": true,
@@ -163,7 +163,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "candidate_source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; license_source=d6dab250895efb9c1f70f5d8ef21e682f90ab946; ancestor=False; non_evidence_changes=[]",
+      "detail": "candidate_source=missing; license_source=d6dab250895efb9c1f70f5d8ef21e682f90ab946; ancestor=False; non_evidence_changes=[]",
       "key": "candidate_license_source_coherence",
       "passed": false,
       "public_release_blocker": true,

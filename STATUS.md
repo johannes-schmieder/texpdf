@@ -30,13 +30,13 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `d32ed955d56833bf6289fa1148a17693ba8f0696` |
+| Latest exact green source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
-| Current ARM64 artifact source | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
+| Current ARM64 artifact source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
 | Current universal build source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
 | Last completed candidate license-audit source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
-| Latest memory-stress attempt | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b`; qualified=yes |
+| Latest memory-stress attempt | `d6dab250895efb9c1f70f5d8ef21e682f90ab946`; qualified=no |
 
 ## Development bundle on `main`
 
@@ -70,7 +70,7 @@ the helper process, so a compiler crash does not run inside Stata.
 
 | Target | Release scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
-| `aarch64-apple-darwin` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
+| `aarch64-apple-darwin` | required | yes | yes | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
 | `x86_64-apple-darwin` | compatibility only | yes | no | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
 | `x86_64-pc-windows-msvc` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
 | `x86_64-unknown-linux-gnu` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
@@ -93,7 +93,7 @@ The separate development audit is source-bound to `13cfe5da1ac1845ff51a33f382cf1
 
 ## Memory evidence
 
-The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 48 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
+The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was unknown KiB against a unknown KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
 
 ## Public-release blockers
 
