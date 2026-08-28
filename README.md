@@ -21,10 +21,10 @@ Rust toolchain, package download, or network connection.
 
 ## Project state
 
-`main` is the active development branch. The current target is public
-`0.1.0-rc2` for macOS universal, Linux x86-64, and Windows x86-64. Runtime
-testing covers macOS Apple Silicon, Linux, and Windows; the universal macOS
-binary also carries an untested Intel compatibility slice.
+`main` is the active development branch. Version `0.1.0` is being qualified
+for macOS universal, Linux x86-64, and Windows x86-64. Runtime testing covers
+macOS Apple Silicon, Linux, and Windows; the universal macOS binary also
+carries an untested Intel compatibility slice.
 
 See [`STATUS.md`](STATUS.md) for current evidence and blockers,
 [`PLAN.md`](PLAN.md) for remaining work, and [`RELEASING.md`](RELEASING.md) for

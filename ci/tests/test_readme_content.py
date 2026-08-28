@@ -16,7 +16,7 @@ class ReadmeContentTests(unittest.TestCase):
         end = self.text.index("## Acknowledgements", start)
         project_state = self.text[start:end]
         self.assertLess(len(project_state.split()), 100)
-        self.assertIn("0.1.0-rc2", project_state)
+        self.assertIn("0.1.0", project_state)
         self.assertIn("untested Intel compatibility slice", project_state)
         self.assertNotIn("it is not a stable distribution channel", self.text)
         self.assertNotIn("Historical private RC evidence is preserved", self.text)

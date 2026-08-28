@@ -5,7 +5,7 @@ evidence or release scope, then regenerate it; do not hand-edit status claims.
 
 ## Release scope
 
-The active target is a **public `0.1.0-rc2` cross-platform release candidate**.
+The active target is a **public `0.1.0` cross-platform final release**.
 macOS Apple Silicon, Linux x86-64, and Windows x86-64 are the required
 runtime targets. The universal macOS package also contains an inspected
 Intel compatibility slice that is not runtime-tested or qualified. Public
@@ -13,9 +13,9 @@ GitHub and SSC distribution are
 authorized, but publication remains fail-closed until every exact-source
 qualification and asset-validation gate passes.
 
-Candidate ready: **true**
+Candidate ready: **false**
 
-Public release ready: **true**
+Public release ready: **false**
 
 Distribution channels: `main` is active development; an immutable final
 `vX.Y.Z` tag and GitHub Release define that stable version; SSC receives
@@ -68,7 +68,7 @@ the helper process, so a compiler crash does not run inside Stata.
 
 ## Target qualification
 
-| Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |
+| Target | Release scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
 | `aarch64-apple-darwin` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
 | `x86_64-apple-darwin` | compatibility only | yes | no | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
@@ -79,7 +79,9 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 
 ## Active candidate blockers
 
-None.
+- `macos_candidate_package`
+- `linux_x86_64_runtime`
+- `windows_x86_64_runtime`
 
 ## Previous candidate license evidence
 
@@ -93,7 +95,9 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 ## Public-release blockers
 
-None.
+- `macos_candidate_package`
+- `linux_x86_64_runtime`
+- `windows_x86_64_runtime`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

@@ -1,6 +1,6 @@
 v 3
 d texpdf: standalone LaTeX-to-PDF compilation for Stata
-d Distribution-Date: 20260826
+d Distribution-Date: 20260828
 d
 d Project-owned source is MIT licensed. Bundled engine and TeX resources
 d retain their upstream licenses and notices.

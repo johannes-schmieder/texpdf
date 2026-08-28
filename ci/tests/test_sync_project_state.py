@@ -48,6 +48,7 @@ class ProjectStateTests(unittest.TestCase):
         fixture = {
             "scope": {
                 "candidate_version": "0.1.0-rc.2",
+                "release_kind": "public_release_candidate",
                 "required_runtime_targets": [
                     "aarch64-apple-darwin",
                     "x86_64-unknown-linux-gnu",
@@ -130,6 +131,27 @@ class ProjectStateTests(unittest.TestCase):
         self.assertIn("Last completed candidate license-audit source", rendered)
         self.assertIn("Intel compatibility slice", rendered)
         self.assertIn("compatibility only", rendered)
+
+    def test_status_labels_final_release_scope(self) -> None:
+        fixture = {
+            "scope": {
+                "candidate_version": "0.1.0",
+                "release_kind": "final_release",
+                "required_runtime_targets": [],
+            },
+            "readiness": {},
+            "latest_engine": {},
+            "artifact_source": "1" * 40,
+            "targets": {},
+            "universal": {},
+            "licenses": {"tex_resources": {}},
+            "development_licenses": {"tex_resources": {}},
+            "memory": {"memory": {}},
+            "development": {"bundle": {}, "evidence": {}},
+        }
+        rendered = state.render_status(fixture)
+        self.assertIn("public `0.1.0` cross-platform final release", rendered)
+        self.assertIn("| Target | Release scope |", rendered)
 
 
 if __name__ == "__main__":

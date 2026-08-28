@@ -193,6 +193,11 @@ def render_status(state: dict[str, Any]) -> str:
     development_evidence = development.get("evidence", {})
     development_licenses = state.get("development_licenses", {})
     development_tex = development_licenses.get("tex_resources", {})
+    release_label = (
+        "cross-platform final release"
+        if scope.get("release_kind") == "final_release"
+        else "cross-platform release candidate"
+    )
 
     lines = [
         "# texpdf status",
@@ -202,7 +207,7 @@ def render_status(state: dict[str, Any]) -> str:
         "",
         "## Release scope",
         "",
-        f"The active target is a **public `{scope.get('candidate_version')}` cross-platform release candidate**.",
+        f"The active target is a **public `{scope.get('candidate_version')}` {release_label}**.",
         "macOS Apple Silicon, Linux x86-64, and Windows x86-64 are the required",
         "runtime targets. The universal macOS package also contains an inspected",
         "Intel compatibility slice that is not runtime-tested or qualified. Public",
@@ -265,7 +270,7 @@ def render_status(state: dict[str, Any]) -> str:
         "",
         "## Target qualification",
         "",
-        "| Target | RC scope | Build qualified | Licensed Stata runtime | Evidence source |",
+        "| Target | Release scope | Build qualified | Licensed Stata runtime | Evidence source |",
         "|---|---|---:|---:|---|",
     ]
     for target in (

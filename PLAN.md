@@ -2,7 +2,7 @@
 
 Development branch: **main**
 
-Active target: **public `0.1.0-rc2`, then immutable `0.1.0`**
+Active target: **immutable `0.1.0`**
 
 The historical private candidates remain evidence for their exact bytes only.
 New tags follow [`RELEASING.md`](RELEASING.md): `main` is development, RC tags
@@ -145,8 +145,8 @@ its provenance manifests.
       `.pkg` convention modeled on `parqit`.
 - [x] Retain the Intel slice in the universal macOS binary while removing its
       Rosetta runtime lane and release-readiness requirement.
-- [ ] Freeze and fully qualify the public `v0.1.0-rc2` source on all targets.
-- [ ] Publish RC.2, download its assets afresh on each target, perform clean
+- [x] Freeze and fully qualify the public `v0.1.0-rc2` source on all targets.
+- [x] Publish RC.2, download its assets afresh on each target, perform clean
       installs/corpus/help tests, and visually inspect representative PDFs.
 - [ ] Create the dated final metadata commit and repeat the complete exact-
       source matrix; RC evidence does not transfer to the final commit.

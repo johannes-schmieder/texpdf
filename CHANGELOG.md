@@ -7,6 +7,10 @@ releases or SSC versions.
 
 ## Unreleased
 
+No user-facing changes yet.
+
+## 0.1.0 - 2026-08-28
+
 ### Added
 
 - A compiler-only Stata command, `texpdf using ...`, with `saving()`,
@@ -142,6 +146,3 @@ releases or SSC versions.
   tree, and writes portable LF-only package checksums.
 - Licensed Windows runtime receipts use a stable release-runner label instead
   of recording the private test machine's computer name.
-
-No final version has been released yet. The existing private RC checkpoints
-remain prerelease evidence and are never eligible for SSC submission.
