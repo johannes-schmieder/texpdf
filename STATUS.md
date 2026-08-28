@@ -34,8 +34,8 @@ tracked independently:
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
-| Current universal build source | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
-| Last completed candidate license-audit source | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
+| Current universal build source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
+| Last completed candidate license-audit source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
 | Latest memory-stress attempt | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b`; qualified=yes |
 
 ## Development bundle on `main`
@@ -71,7 +71,7 @@ the helper process, so a compiler crash does not run inside Stata.
 | Target | Release scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
 | `aarch64-apple-darwin` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
-| `x86_64-apple-darwin` | compatibility only | yes | no | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
+| `x86_64-apple-darwin` | compatibility only | yes | no | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
 | `x86_64-pc-windows-msvc` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
 | `x86_64-unknown-linux-gnu` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
 
@@ -79,10 +79,11 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 
 ## Active candidate blockers
 
-- `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
+- `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 ## Previous candidate license evidence
 
@@ -96,10 +97,11 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 ## Public-release blockers
 
-- `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
+- `candidate_license_source_coherence`
+- `macos_arm_memory_stress`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.
