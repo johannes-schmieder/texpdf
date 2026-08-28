@@ -21,10 +21,11 @@ Rust toolchain, package download, or network connection.
 
 ## Project state
 
-`main` is the active development branch. Version `0.1.0` is being qualified
-for macOS universal, Linux x86-64, and Windows x86-64. Runtime testing covers
-macOS Apple Silicon, Linux, and Windows; the universal macOS binary also
-carries an untested Intel compatibility slice.
+Version [`0.1.0`](https://github.com/johannes-schmieder/texpdf/releases/tag/v0.1.0)
+is the current stable GitHub release for macOS universal, Linux x86-64, and
+Windows x86-64. `main` is the active development branch. Runtime testing
+covers macOS Apple Silicon, Linux, and Windows; the universal macOS binary also
+carries an untested Intel compatibility slice. SSC publication is pending.
 
 See [`STATUS.md`](STATUS.md) for current evidence and blockers,
 [`PLAN.md`](PLAN.md) for remaining work, and [`RELEASING.md`](RELEASING.md) for
@@ -44,6 +45,19 @@ documented, tested, and supported
 [Tectonic](https://github.com/tectonic-typesetting/tectonic).
 
 ## Installation channels
+
+### Stable version from GitHub
+
+Download the ZIP for your operating system from the
+[`v0.1.0` release](https://github.com/johannes-schmieder/texpdf/releases/tag/v0.1.0),
+extract it, and install from that directory in Stata:
+
+```stata
+net install texpdf, replace from("/path/to/extracted/texpdf")
+```
+
+The release provides separate macOS universal, Linux x86-64, and Windows
+x86-64 archives plus `SHA256SUMS`.
 
 ### Stable version from SSC
 

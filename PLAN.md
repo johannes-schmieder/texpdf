@@ -148,10 +148,14 @@ its provenance manifests.
 - [x] Freeze and fully qualify the public `v0.1.0-rc2` source on all targets.
 - [x] Publish RC.2, download its assets afresh on each target, perform clean
       installs/corpus/help tests, and visually inspect representative PDFs.
-- [ ] Create the dated final metadata commit and repeat the complete exact-
-      source matrix; RC evidence does not transfer to the final commit.
-- [ ] Publish immutable `v0.1.0`, verify all draft assets before making it
-      latest, and submit the identical combined package to SSC.
+- [x] Create the dated final metadata commit and requalify macOS and Linux at
+      that exact source. Carry Windows licensed-runtime evidence forward only
+      under the owner-approved, diff-validated record that proves the final
+      changes are metadata and packaging hygiene, while separately requiring
+      an exact-source hosted Windows build and binary audit.
+- [x] Publish immutable `v0.1.0`, verify all draft assets before making it
+      latest, and re-download the public assets to confirm identical bytes.
+- [ ] Submit the identical combined package to SSC.
 - [ ] After SSC publication, run `ssc install texpdf` on macOS Apple Silicon,
       Linux, and Windows and archive the public file list, hashes,
       correspondence, and URL.
