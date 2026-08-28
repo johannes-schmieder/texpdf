@@ -1,5 +1,6 @@
 {
   "candidate_blockers": [
+    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",
@@ -121,12 +122,12 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": false,
+      "candidate_release_blocker": true,
       "detail": "version=0.1.0-rc2; zip_bytes=46558603; license_evidence=True; arm_runtime=true; intel_runtime=untested-by-policy",
       "key": "macos_candidate_package",
-      "passed": true,
-      "public_release_blocker": false,
-      "release_blocker": false
+      "passed": false,
+      "public_release_blocker": true,
+      "release_blocker": true
     },
     {
       "candidate_release_blocker": true,
@@ -154,7 +155,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=203d8c5b71395e4d1a6aa7d3868a710321dc79f4; resources=392; mapped=392; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
+      "detail": "source=d44a6dbd25c28490f5f09154c920e7188b5051ac; resources=392; mapped=392; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
       "key": "third_party_license_complete",
       "passed": true,
       "public_release_blocker": false,
@@ -162,7 +163,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "candidate_source=missing; license_source=203d8c5b71395e4d1a6aa7d3868a710321dc79f4; ancestor=False; non_evidence_changes=[]",
+      "detail": "candidate_source=missing; license_source=d44a6dbd25c28490f5f09154c920e7188b5051ac; ancestor=False; non_evidence_changes=[]",
       "key": "candidate_license_source_coherence",
       "passed": false,
       "public_release_blocker": true,
@@ -179,6 +180,7 @@
   ],
   "implementation_complete_macos_arm64": true,
   "public_release_blockers": [
+    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",
@@ -186,6 +188,7 @@
   ],
   "public_release_ready": false,
   "release_blockers": [
+    "macos_candidate_package",
     "linux_x86_64_runtime",
     "windows_x86_64_runtime",
     "required_target_source_coherence",

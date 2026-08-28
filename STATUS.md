@@ -30,12 +30,12 @@ tracked independently:
 
 | Meaning | Authoritative value |
 |---|---|
-| Latest exact green source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
+| Latest exact green source | `d44a6dbd25c28490f5f09154c920e7188b5051ac` |
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
 | Current universal build source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
-| Last completed candidate license-audit source | `203d8c5b71395e4d1a6aa7d3868a710321dc79f4` |
+| Last completed candidate license-audit source | `d44a6dbd25c28490f5f09154c920e7188b5051ac` |
 | Latest memory-stress attempt | `41223b9ed4058f5aec97cdcff4783fee6ba05fa6`; qualified=no |
 
 ## Development bundle on `main`
@@ -79,6 +79,7 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 
 ## Active candidate blockers
 
+- `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
@@ -96,6 +97,7 @@ The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was
 
 ## Public-release blockers
 
+- `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
