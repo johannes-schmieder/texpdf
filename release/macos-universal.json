@@ -9,12 +9,12 @@
   "arm_stata_receipt": ".ci/stata/run/receipt.json",
   "arm_stata_version": "19",
   "candidate_package": {
-    "license_audit_source_sha": "0b5740f95cfdc294d3428779303280477190abfd",
+    "license_audit_source_sha": "203d8c5b71395e4d1a6aa7d3868a710321dc79f4",
     "license_evidence_included": true,
     "public_release": true,
     "version": "0.1.0-rc2",
-    "zip_sha256": "15be3ad8e3551c7acf70e7fbe3f1ed26aaf1ed57739380494fb91ed0c87eb915",
-    "zip_size_bytes": 46558604
+    "zip_sha256": "ef77cb128512704b3aaf05982114b110412602d3b48af120f68528a5f99789fd",
+    "zip_size_bytes": 46558603
   },
   "dynamic_dependencies": [
     "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
@@ -36,7 +36,7 @@
   ],
   "intel_runtime_qualified": false,
   "kind": "macOS universal Stata plugin",
-  "qualification_boundary": "Both Mach-O slices were built and inspected. The universal plugin was loaded and tested only through its ARM64 slice in licensed Stata/MP 19. Intel runtime qualification remains pending.",
+  "qualification_boundary": "Both Mach-O slices were built and inspected. The universal plugin was loaded and tested only through its ARM64 slice in licensed Stata/MP 19. No Intel/Rosetta runtime qualification is claimed.",
   "schema_version": 1,
   "slices": {
     "arm64": {
@@ -60,7 +60,7 @@
       "target": "x86_64-apple-darwin"
     }
   },
-  "source_sha": "0b5740f95cfdc294d3428779303280477190abfd",
+  "source_sha": "203d8c5b71395e4d1a6aa7d3868a710321dc79f4",
   "universal": {
     "sha256": "74158d22a98715352107568da09994d03f52b3127a4452575613ba4ede3d8f27",
     "size_bytes": 99091248,
