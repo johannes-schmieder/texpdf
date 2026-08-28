@@ -98,7 +98,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=d6dab250895efb9c1f70f5d8ef21e682f90ab946; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
+      "detail": "source=be8f9aead479386d102a86ee8d2ad56780c66eb2; plugin_bytes=49709840; Stata=MP 19; exact receipt profile=quick rust_mode=repository-engine",
       "key": "macos_arm_runtime",
       "passed": true,
       "public_release_blocker": false,
@@ -146,7 +146,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=be8f9aead479386d102a86ee8d2ad56780c66eb2; sources=['a4f6b7a4b02061280a10e400cda2746e60cc5a2b', 'd6dab250895efb9c1f70f5d8ef21e682f90ab946']",
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=be8f9aead479386d102a86ee8d2ad56780c66eb2; sources=['a4f6b7a4b02061280a10e400cda2746e60cc5a2b', 'be8f9aead479386d102a86ee8d2ad56780c66eb2']",
       "key": "required_target_source_coherence",
       "passed": false,
       "public_release_blocker": true,
