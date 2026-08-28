@@ -82,6 +82,7 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 - `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
+- `required_target_source_coherence`
 
 ## Previous candidate license evidence
 
@@ -98,6 +99,7 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 - `macos_candidate_package`
 - `linux_x86_64_runtime`
 - `windows_x86_64_runtime`
+- `required_target_source_coherence`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

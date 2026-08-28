@@ -2,7 +2,8 @@
   "candidate_blockers": [
     "macos_candidate_package",
     "linux_x86_64_runtime",
-    "windows_x86_64_runtime"
+    "windows_x86_64_runtime",
+    "required_target_source_coherence"
   ],
   "candidate_ready": false,
   "candidate_version": "0.1.0",
@@ -57,7 +58,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "kind=final_release; version=0.1.0; source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']",
+      "detail": "kind=final_release; version=0.1.0; source=d6dab250895efb9c1f70f5d8ef21e682f90ab946; required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']",
       "key": "release_scope",
       "passed": true,
       "public_release_blocker": false,
@@ -81,7 +82,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "visibility=public; audit_tip=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; scope_source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; sha_pinning=True; vulnerability_reporting=True",
+      "detail": "visibility=public; audit_tip=d6dab250895efb9c1f70f5d8ef21e682f90ab946; scope_source=d6dab250895efb9c1f70f5d8ef21e682f90ab946; sha_pinning=True; vulnerability_reporting=True",
       "key": "public_repository_security",
       "passed": true,
       "public_release_blocker": false,
@@ -144,12 +145,12 @@
       "release_blocker": true
     },
     {
-      "candidate_release_blocker": false,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; sources=['a4f6b7a4b02061280a10e400cda2746e60cc5a2b']",
+      "candidate_release_blocker": true,
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=d6dab250895efb9c1f70f5d8ef21e682f90ab946; sources=['a4f6b7a4b02061280a10e400cda2746e60cc5a2b']",
       "key": "required_target_source_coherence",
-      "passed": true,
-      "public_release_blocker": false,
-      "release_blocker": false
+      "passed": false,
+      "public_release_blocker": true,
+      "release_blocker": true
     },
     {
       "candidate_release_blocker": false,
@@ -180,13 +181,15 @@
   "public_release_blockers": [
     "macos_candidate_package",
     "linux_x86_64_runtime",
-    "windows_x86_64_runtime"
+    "windows_x86_64_runtime",
+    "required_target_source_coherence"
   ],
   "public_release_ready": false,
   "release_blockers": [
     "macos_candidate_package",
     "linux_x86_64_runtime",
-    "windows_x86_64_runtime"
+    "windows_x86_64_runtime",
+    "required_target_source_coherence"
   ],
   "release_kind": "final_release",
   "schema_version": 3
