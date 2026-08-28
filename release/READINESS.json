@@ -59,7 +59,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "kind=final_release; version=0.1.0; source=d6dab250895efb9c1f70f5d8ef21e682f90ab946; required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']",
+      "detail": "kind=final_release; version=0.1.0; source=be8f9aead479386d102a86ee8d2ad56780c66eb2; required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']",
       "key": "release_scope",
       "passed": true,
       "public_release_blocker": false,
@@ -83,7 +83,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "visibility=public; audit_tip=d6dab250895efb9c1f70f5d8ef21e682f90ab946; scope_source=d6dab250895efb9c1f70f5d8ef21e682f90ab946; sha_pinning=True; vulnerability_reporting=True",
+      "detail": "visibility=public; audit_tip=be8f9aead479386d102a86ee8d2ad56780c66eb2; scope_source=be8f9aead479386d102a86ee8d2ad56780c66eb2; sha_pinning=True; vulnerability_reporting=True",
       "key": "public_repository_security",
       "passed": true,
       "public_release_blocker": false,
@@ -147,7 +147,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=d6dab250895efb9c1f70f5d8ef21e682f90ab946; sources=['a4f6b7a4b02061280a10e400cda2746e60cc5a2b', 'd6dab250895efb9c1f70f5d8ef21e682f90ab946']",
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=be8f9aead479386d102a86ee8d2ad56780c66eb2; sources=['a4f6b7a4b02061280a10e400cda2746e60cc5a2b', 'd6dab250895efb9c1f70f5d8ef21e682f90ab946']",
       "key": "required_target_source_coherence",
       "passed": false,
       "public_release_blocker": true,
