@@ -6,8 +6,8 @@
     "zip_size_bytes": 5263992
   },
   "development_package": {
-    "zip_sha256": "8a647e455e3069d7b4e576fe1e00460c809947ac4d492c4f4e237b8d54991e1d",
-    "zip_size_bytes": 22785190
+    "zip_sha256": "a36007e443cc469513219508184f70277426bf4a6175b7981e2b7ef48df8b005",
+    "zip_size_bytes": 22785985
   },
   "helper": {
     "sha256": "8329adf0cb32d872aa7ebea5b5568d6959638e0948737a8e96f3ba085f635e39",
@@ -15,34 +15,34 @@
     "target": "native"
   },
   "memory": {
-    "duration_seconds": 503,
+    "duration_seconds": 507,
     "expected_injected_failure_count": 42,
     "growth_gate": true,
     "growth_threshold_rationale": "64 MiB is one eighth of the former in-process allowance and is above ordinary Stata allocator/cache noise while still detecting retained compiler state in the long-lived parent.",
-    "helper_sample_count": 1029,
+    "helper_sample_count": 1052,
     "injected_failure_count": 42,
     "iterations_requested": 1000,
-    "late_median_stata_rss_kib": 74864,
+    "late_median_stata_rss_kib": 74272,
     "late_window": [
       900,
       1000
     ],
     "max_allowed_growth_kib": 65536,
     "max_concurrent_helpers": 1,
-    "peak_helper_rss_kib": 195600,
-    "peak_stata_rss_kib": 74864,
-    "peak_tree_rss_kib": 300432,
+    "peak_helper_rss_kib": 195696,
+    "peak_stata_rss_kib": 74272,
+    "peak_tree_rss_kib": 299920,
     "post_error_recovery": true,
-    "post_warmup_growth_kib": 16,
-    "post_warmup_growth_ratio": 1.0002137665669089,
+    "post_warmup_growth_kib": 80,
+    "post_warmup_growth_ratio": 1.0010782833728704,
     "retained_helper_pids": [],
     "runner_rc": 0,
-    "sample_count": 1618,
+    "sample_count": 1628,
     "schema_version": 1,
-    "stata_log_sha256": "e4188db09f05bfb8e42bb473048ebe4103071c15cee497e1ec09f52d817a91bd",
-    "stata_sample_count": 1617,
+    "stata_log_sha256": "7a589e37135b559ba7157d98e984f6269d88d1a0f5ab84b84cfe10f25de15cb8",
+    "stata_sample_count": 1627,
     "successful_compile_count": 1000,
-    "warm_median_stata_rss_kib": 74848,
+    "warm_median_stata_rss_kib": 74192,
     "warm_window": [
       100,
       200
@@ -66,7 +66,7 @@
   "rust_mode": "repository-engine",
   "rust_status": "success",
   "schema_version": 3,
-  "source_sha": "203d8c5b71395e4d1a6aa7d3868a710321dc79f4",
+  "source_sha": "d44a6dbd25c28490f5f09154c920e7188b5051ac",
   "stata_edition": "MP",
   "stata_status": "success",
   "stata_version": "19",
