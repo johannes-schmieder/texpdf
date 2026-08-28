@@ -115,7 +115,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=d44a6dbd25c28490f5f09154c920e7188b5051ac; plugin_bytes=49377208; runtime=untested-by-policy",
+      "detail": "source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; plugin_bytes=49377208; runtime=untested-by-policy",
       "key": "macos_intel_compatibility_slice",
       "passed": true,
       "public_release_blocker": false,
@@ -123,7 +123,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "version=0.1.0-rc2; zip_bytes=46559396; license_evidence=True; arm_runtime=true; intel_runtime=untested-by-policy",
+      "detail": "version=0.1.0-rc2; zip_bytes=46559393; license_evidence=True; arm_runtime=true; intel_runtime=untested-by-policy",
       "key": "macos_candidate_package",
       "passed": true,
       "public_release_blocker": false,
@@ -155,7 +155,7 @@
     },
     {
       "candidate_release_blocker": false,
-      "detail": "source=d44a6dbd25c28490f5f09154c920e7188b5051ac; resources=392; mapped=392; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
+      "detail": "source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; resources=392; mapped=392; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0",
       "key": "third_party_license_complete",
       "passed": true,
       "public_release_blocker": false,
@@ -163,7 +163,7 @@
     },
     {
       "candidate_release_blocker": true,
-      "detail": "candidate_source=missing; license_source=d44a6dbd25c28490f5f09154c920e7188b5051ac; ancestor=False; non_evidence_changes=[]",
+      "detail": "candidate_source=missing; license_source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; ancestor=False; non_evidence_changes=[]",
       "key": "candidate_license_source_coherence",
       "passed": false,
       "public_release_blocker": true,
