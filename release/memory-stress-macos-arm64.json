@@ -6,7 +6,7 @@
     "zip_size_bytes": 5263992
   },
   "development_package": {
-    "zip_sha256": "494237108d13780c7d672e3b7d59f11771156cda2517b9f06289120b225f9ef3",
+    "zip_sha256": "93b377b9ddd455fe26d898771efd7b530aaa7e28f78034c2d8c6e63e579202bd",
     "zip_size_bytes": 22785191
   },
   "helper": {
@@ -15,34 +15,34 @@
     "target": "native"
   },
   "memory": {
-    "duration_seconds": 500,
+    "duration_seconds": 487,
     "expected_injected_failure_count": 42,
     "growth_gate": true,
     "growth_threshold_rationale": "64 MiB is one eighth of the former in-process allowance and is above ordinary Stata allocator/cache noise while still detecting retained compiler state in the long-lived parent.",
-    "helper_sample_count": 1052,
+    "helper_sample_count": 1092,
     "injected_failure_count": 42,
     "iterations_requested": 1000,
-    "late_median_stata_rss_kib": 73728,
+    "late_median_stata_rss_kib": 74240,
     "late_window": [
       900,
       1000
     ],
     "max_allowed_growth_kib": 65536,
     "max_concurrent_helpers": 1,
-    "peak_helper_rss_kib": 195904,
-    "peak_stata_rss_kib": 73728,
-    "peak_tree_rss_kib": 299632,
+    "peak_helper_rss_kib": 195264,
+    "peak_stata_rss_kib": 74240,
+    "peak_tree_rss_kib": 299680,
     "post_error_recovery": true,
-    "post_warmup_growth_kib": 16,
-    "post_warmup_growth_ratio": 1.0002170609941394,
+    "post_warmup_growth_kib": 128,
+    "post_warmup_growth_ratio": 1.001727115716753,
     "retained_helper_pids": [],
     "runner_rc": 0,
-    "sample_count": 1640,
+    "sample_count": 1585,
     "schema_version": 1,
-    "stata_log_sha256": "adc72eea0c2f82a8be073761ca17e015eb3ef87bd033656ce167af092800e3d5",
-    "stata_sample_count": 1639,
+    "stata_log_sha256": "32ca30550c6b9cbcec51f12ccca7ee51aec1daaa7ca7ad78298c2bcba98c4fb0",
+    "stata_sample_count": 1584,
     "successful_compile_count": 1000,
-    "warm_median_stata_rss_kib": 73712,
+    "warm_median_stata_rss_kib": 74112,
     "warm_window": [
       100,
       200
@@ -66,7 +66,7 @@
   "rust_mode": "repository-engine",
   "rust_status": "success",
   "schema_version": 3,
-  "source_sha": "366f16406773be5494a61e0badd55d0d1891e3c4",
+  "source_sha": "0b5740f95cfdc294d3428779303280477190abfd",
   "stata_edition": "MP",
   "stata_status": "success",
   "stata_version": "19",
