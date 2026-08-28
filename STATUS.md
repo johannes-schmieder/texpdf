@@ -10,9 +10,9 @@ Qualified source: `be8f9aead479386d102a86ee8d2ad56780c66eb2`.
 All 13 public release assets were downloaded and verified.
 SSC submission was sent on 2026-08-28; publication is pending.
 
-Release qualification ready: **true**
+Release qualification ready: **false**
 
-Public release ready: **true**
+Public release ready: **false**
 
 `main` is active development. The immutable tag and GitHub Release define
 version 0.1.0; later commits do not change those released bytes.
@@ -54,7 +54,7 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 
 ## Qualification blockers
 
-None.
+- `windows_x86_64_runtime`
 
 ## Release evidence
 
@@ -68,8 +68,7 @@ The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth 
 
 ## Distribution follow-up
 
-- Wait for SSC publication.
-- After publication, verify fresh `ssc install texpdf` installations on macOS, Linux, and Windows.
+- Release blocker: `windows_x86_64_runtime`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.

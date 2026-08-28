@@ -1,8 +1,8 @@
 # texpdf release-readiness audit
 
 macOS ARM64 implementation qualified: **true**
-Required-target candidate ready: **true**
-Public cross-platform release ready: **true**
+Required-target candidate ready: **false**
+Public cross-platform release ready: **false**
 
 | Check | Result | Candidate blocker | Public blocker | Detail |
 |---|---|---|---|---|
@@ -22,7 +22,7 @@ Public cross-platform release ready: **true**
 | `macos_intel_compatibility_slice` | PASS | no | no | source=be8f9aead479386d102a86ee8d2ad56780c66eb2; plugin_bytes=49377208; runtime=untested-by-policy |
 | `macos_candidate_package` | PASS | no | no | version=0.1.0; zip_bytes=46559388; license_evidence=True; arm_runtime=true; intel_runtime=untested-by-policy |
 | `linux_x86_64_runtime` | PASS | no | no | source=be8f9aead479386d102a86ee8d2ad56780c66eb2; glibc_max=2.28; package_version=0.1.0; Stata18_quick=True; Stata18_stress1000=True; Stata19_quick=True |
-| `windows_x86_64_runtime` | PASS | no | no | final_build_source=be8f9aead479386d102a86ee8d2ad56780c66eb2; runtime_source=a4f6b7a4b02061280a10e400cda2746e60cc5a2b; carry_forward=true; changed_paths=37 |
+| `windows_x86_64_runtime` | FAIL | yes | yes | source equivalence diff mismatch; unexpected=[] |
 | `required_target_source_coherence` | PASS | no | no | required_targets=['aarch64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=be8f9aead479386d102a86ee8d2ad56780c66eb2; sources=['be8f9aead479386d102a86ee8d2ad56780c66eb2'] |
 | `third_party_license_complete` | PASS | no | no | source=be8f9aead479386d102a86ee8d2ad56780c66eb2; resources=392; mapped=392; ambiguous=0; unmapped=0; missing_license=0; missing_rust_texts=0; missing_native_texts=0 |
 | `candidate_license_source_coherence` | PASS | no | no | candidate_source=be8f9aead479386d102a86ee8d2ad56780c66eb2; license_source=be8f9aead479386d102a86ee8d2ad56780c66eb2; ancestor=True; non_evidence_changes=[] |
@@ -30,8 +30,8 @@ Public cross-platform release ready: **true**
 
 ## Active candidate blockers
 
-None.
+- `windows_x86_64_runtime`
 
 ## Public-release blockers
 
-None.
+- `windows_x86_64_runtime`
