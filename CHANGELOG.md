@@ -70,6 +70,10 @@ releases or SSC versions.
 
 ### Fixed
 
+- Cross-platform package assembly now canonicalizes shared Stata metadata to
+  LF and sanitizes host paths and target-local vcpkg labels from public license
+  evidence, keeping the macOS, Linux, Windows, and combined SSC archives
+  byte-coherent without altering the underlying notice texts.
 - Development memory-stress publication now preserves the frozen candidate's
   canonical record and stores newer `main` attempts separately.
 - Real-world modern corpus figures now contain obvious navy/orange color, and

@@ -147,10 +147,37 @@ class PackageReleaseTests(unittest.TestCase):
             "missing_native_notice_files": 0,
             "tex_notice_complete": True,
             "tex_notice_file_count": 1,
+            "stages": [
+                {
+                    "command": ["/private/machine/python", "audit.py"],
+                    "name": "license_audit",
+                    "return_code": 0,
+                    "stderr_tail": "",
+                    "stdout_tail": "cache=/private/machine/cache",
+                }
+            ],
+            "tlpdb": {
+                "path": "/private/machine/texlive.tlpdb.xz",
+                "return_code": 0,
+                "sha256": "4" * 64,
+                "size_bytes": 100,
+                "url": "https://example.test/texlive.tlpdb.xz",
+            },
         }
         for name in GENERATED_LICENSE_FILES:
             if name == "STATUS.json":
                 write_json(generated / name, status)
+            elif name == "license-texts.json":
+                write_json(
+                    generated / name,
+                    {
+                        "schema_version": 1,
+                        "release_target": "aarch64-apple-darwin",
+                        "native_libraries": [
+                            {"name": "example", "vcpkg_triplet": "arm64-osx"}
+                        ],
+                    },
+                )
             else:
                 write(generated / name)
         write(generated / "texts/rust/example/LICENSE", "Example license\n")
@@ -183,6 +210,29 @@ class PackageReleaseTests(unittest.TestCase):
                 self.assertNotIn("_texpdf_plugin_macosx.plugin", archive.namelist())
                 self.assertNotIn("_texpdf_plugin_windows.plugin", archive.namelist())
                 self.assertNotIn("LICENSES/STATUS.json", archive.namelist())
+
+    def test_shared_text_is_normalized_to_lf(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plugin, bundle_info = self.prepare_project(root)
+            shared_sources = {
+                "texpdf.ado": root / "stata/texpdf.ado",
+                "texpdf.sthlp": root / "stata/texpdf.sthlp",
+                "texpdf_run.ado": root / "stata/texpdf_run.ado",
+                "stata.toc": root / "stata/stata.toc",
+                "LICENSE": root / "LICENSE",
+                "THIRD_PARTY_NOTICES.md": root / "licenses/THIRD_PARTY_NOTICES.md",
+            }
+            for source in shared_sources.values():
+                source.write_bytes(source.read_bytes().replace(b"\n", b"\r\n"))
+
+            result = self.command(root, plugin, bundle_info)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            with zipfile.ZipFile(root / "dist/package.zip") as archive:
+                for name in shared_sources:
+                    payload = archive.read(name)
+                    self.assertNotIn(b"\r", payload, name)
+                    self.assertTrue(payload.endswith(b"\n"), name)
 
     def test_public_release_fails_without_complete_audit(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -236,6 +286,23 @@ class PackageReleaseTests(unittest.TestCase):
             with zipfile.ZipFile(root / "dist/package.zip") as archive:
                 names = set(archive.namelist())
                 self.assertNotIn(b"\r", archive.read("CHECKSUMS.sha256"))
+                public_status = json.loads(archive.read("LICENSES/STATUS.json"))
+                self.assertEqual(
+                    public_status["stages"],
+                    [{"name": "license_audit", "return_code": 0}],
+                )
+                self.assertNotIn("path", public_status["tlpdb"])
+                public_texts = json.loads(
+                    archive.read("LICENSES/license-texts.json")
+                )
+                self.assertEqual(
+                    public_texts["release_target"],
+                    "source-bound-cross-platform",
+                )
+                self.assertNotIn(
+                    "vcpkg_triplet", public_texts["native_libraries"][0]
+                )
+                self.assertNotIn(b"/private/machine", archive.read("LICENSES/STATUS.json"))
             self.assertIn("LICENSES/STATUS.json", names)
             self.assertIn("LICENSES/texts/rust/example/LICENSE", names)
             self.assertIn("LICENSES/texts/texlive/NOTICE", names)

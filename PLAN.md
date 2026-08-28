@@ -124,6 +124,9 @@ its provenance manifests.
 - [x] Require the realistic corpus and all three runnable help examples in
       every licensed quick lane.
 - [x] Remove local machine paths from newly generated public license manifests.
+- [x] Canonicalize shared package text and public license evidence so Windows
+      line endings and platform-local audit provenance cannot break the
+      deterministic cross-platform SSC combination.
 - [x] Complete and record the history/asset safety audit, make the repository
       public, harden repository settings, and mark RC.1 superseded.
 - [x] Obtain SSC maintainer acceptance of the three-binary,

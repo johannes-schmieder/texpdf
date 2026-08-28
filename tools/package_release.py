@@ -36,6 +36,7 @@ LICENSE_EVIDENCE_FILES = (
     "tex-notices.json",
     "license-sources.lock.json",
 )
+SANITIZED_LICENSE_JSON_FILES = {"STATUS.json", "license-texts.json"}
 ADO_VERSION_RE = re.compile(
     r"^\*!\s+(?:version\s+)?(?:texpdf\s+)?(?P<version>\d+\.\d+\.\d+)\s+",
     re.MULTILINE,
@@ -73,6 +74,13 @@ def write_text_lf(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as stream:
         stream.write(content)
+
+
+def copy_text_lf(source: Path, destination: Path) -> None:
+    """Copy UTF-8 package metadata with canonical LF line endings."""
+    if not source.is_file():
+        raise FileNotFoundError(source)
+    write_text_lf(destination, source.read_text(encoding="utf-8"))
 
 
 def write_json_atomic(path: Path, payload: object) -> None:
@@ -174,12 +182,51 @@ def license_status_complete(status: dict[str, object] | None) -> bool:
     )
 
 
+def sanitize_public_license_json(name: str, payload: object) -> dict[str, object]:
+    """Remove host-specific audit details from public package evidence."""
+    if not isinstance(payload, dict):
+        raise ValueError(f"license evidence {name} is not a JSON object")
+    if name == "STATUS.json":
+        stages = payload.get("stages")
+        if isinstance(stages, list):
+            payload["stages"] = [
+                {
+                    key: stage[key]
+                    for key in ("name", "return_code")
+                    if isinstance(stage, dict) and key in stage
+                }
+                for stage in stages
+            ]
+        tlpdb = payload.get("tlpdb")
+        if isinstance(tlpdb, dict):
+            payload["tlpdb"] = {
+                key: tlpdb[key]
+                for key in ("url", "sha256", "size_bytes", "return_code")
+                if key in tlpdb
+            }
+    elif name == "license-texts.json":
+        payload["release_target"] = "source-bound-cross-platform"
+        native_libraries = payload.get("native_libraries")
+        if isinstance(native_libraries, list):
+            for library in native_libraries:
+                if isinstance(library, dict):
+                    library.pop("vcpkg_triplet", None)
+    return payload
+
+
 def install_license_evidence(output_dir: Path) -> list[str]:
     installed: list[str] = []
     destination_root = output_dir / "LICENSES"
     for name in LICENSE_EVIDENCE_FILES:
         source = LICENSE_GENERATED_ROOT / name
-        copy_atomic(source, destination_root / name)
+        destination = destination_root / name
+        if name in SANITIZED_LICENSE_JSON_FILES:
+            payload = json.loads(source.read_text(encoding="utf-8"))
+            write_json_atomic(
+                destination, sanitize_public_license_json(name, payload)
+            )
+        else:
+            copy_text_lf(source, destination)
         installed.append(f"LICENSES/{name}")
 
     texts_root = LICENSE_GENERATED_ROOT / "texts"
@@ -328,17 +375,17 @@ def main() -> int:
         shutil.rmtree(args.output_dir, ignore_errors=True)
         args.output_dir.mkdir(parents=True)
         installed_plugin = plugin_filename(args.target)
-        sources = {
+        text_sources = {
             "texpdf.ado": Path("stata/texpdf.ado"),
             "texpdf.sthlp": Path("stata/texpdf.sthlp"),
             "texpdf_run.ado": Path("stata/texpdf_run.ado"),
             "stata.toc": Path("stata/stata.toc"),
-            installed_plugin: args.plugin,
             "LICENSE": Path("LICENSE"),
             "THIRD_PARTY_NOTICES.md": Path("licenses/THIRD_PARTY_NOTICES.md"),
         }
-        for name, source in sources.items():
-            copy_atomic(source, args.output_dir / name)
+        for name, source in text_sources.items():
+            copy_text_lf(source, args.output_dir / name)
+        copy_atomic(args.plugin, args.output_dir / installed_plugin)
         write_text_lf(
             args.output_dir / "texpdf.pkg",
             render_platform_pkg(Path("stata/texpdf.pkg"), installed_plugin),
