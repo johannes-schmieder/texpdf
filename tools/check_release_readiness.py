@@ -27,7 +27,6 @@ REQUIRED_PACKAGE_FILES = (
 )
 TARGETS_PATH = Path("release/targets.json")
 UNIVERSAL_PATH = Path("release/macos-universal.json")
-INTEL_RUNTIME_PATH = Path("release/macos-intel-runtime.json")
 LINUX_RUNTIME_PATH = Path("release/linux-x86_64.json")
 WINDOWS_RUNTIME_PATH = Path("release/windows-x86_64.json")
 MEMORY_PATH = Path("release/memory-stress-macos-arm64.json")
@@ -40,7 +39,6 @@ EVIDENCE_ONLY_FILES = {
     "bundle/QUALIFICATION.json",
     "release/READINESS.json",
     "release/READINESS.md",
-    "release/macos-intel-runtime.json",
     "release/macos-universal.json",
     "release/memory-probe-rust-macos-arm64.json",
     "release/memory-stress-macos-arm64.json",
@@ -234,7 +232,7 @@ def validate_universal(
     slices = data.get("slices", {}) if isinstance(data, dict) else {}
     intel_slice = slices.get("x86_64", {}) if isinstance(slices, dict) else {}
     universal = data.get("universal", {}) if isinstance(data, dict) else {}
-    intel_build = (
+    intel_compatibility_slice = (
         intel.get("build_qualified") is True
         and valid_source_sha(intel.get("build_source_sha"))
         and int(intel.get("plugin_size_bytes", 0)) > 0
@@ -248,54 +246,18 @@ def validate_universal(
         == intel_slice.get("embedded_helper", {}).get("sha256")
         and intel.get("universal_plugin_size_bytes") == universal.get("size_bytes")
         and intel.get("universal_plugin_sha256") == universal.get("sha256")
+        and intel.get("stata_runtime_qualified") is False
+        and not intel.get("qualified_source_sha")
+        and data.get("intel_runtime_qualified") is False
     )
     add_check(
         checks,
-        "macos_intel_build",
-        intel_build,
+        "macos_intel_compatibility_slice",
+        intel_compatibility_slice,
         (
             f"source={intel.get('build_source_sha')}; "
-            f"plugin_bytes={intel.get('plugin_size_bytes')}"
-        ),
-    )
-    intel_source = str(intel.get("qualified_source_sha", ""))
-    intel_receipt_ok, intel_receipt_detail = (
-        successful_receipt(intel_source)
-        if valid_source_sha(intel_source)
-        else (False, "qualified source SHA is missing or malformed")
-    )
-    intel_runtime: dict[str, Any] = {}
-    if INTEL_RUNTIME_PATH.is_file():
-        intel_runtime = read_json(INTEL_RUNTIME_PATH)
-    runtime_record_ok = (
-        intel_runtime.get("qualified") is True
-        and intel_runtime.get("source_sha") == intel_source
-        and intel_runtime.get("universal_plugin_size_bytes")
-        == universal.get("size_bytes")
-        and intel_runtime.get("universal_plugin_sha256") == universal.get("sha256")
-        and intel_runtime.get("intel_slice_size_bytes") == intel_slice.get("size_bytes")
-        and intel_runtime.get("intel_slice_sha256") == intel_slice.get("sha256")
-        and intel_runtime.get("intel_helper_size_bytes")
-        == intel_slice.get("embedded_helper", {}).get("size_bytes")
-        and intel_runtime.get("intel_helper_sha256")
-        == intel_slice.get("embedded_helper", {}).get("sha256")
-        and isinstance(intel_runtime.get("receipt"), dict)
-        and intel_runtime["receipt"].get("tested_sha") == intel_source
-        and intel_runtime["receipt"].get("status") == "success"
-        and intel_runtime["receipt"].get("stata_status") == "success"
-    )
-    add_check(
-        checks,
-        "macos_intel_runtime",
-        intel.get("stata_runtime_qualified") is True
-        and valid_source_sha(intel_source)
-        and data.get("intel_runtime_qualified") is True
-        and intel_receipt_ok
-        and runtime_record_ok,
-        (
-            f"{intel.get('status', 'actual Intel Stata runtime qualification is absent')}; "
-            f"runtime_record={'valid' if runtime_record_ok else 'missing/invalid'}; "
-            f"{intel_receipt_detail}"
+            f"plugin_bytes={intel.get('plugin_size_bytes')}; "
+            "runtime=untested-by-policy"
         ),
     )
 
@@ -311,9 +273,9 @@ def validate_universal(
         and candidate.get("license_audit_source_sha")
         == read_json(LICENSE_STATUS_PATH).get("source_sha")
         and candidate.get("public_release") is public_release
-        and candidate.get("arm_and_intel_runtime_tested") is True
         and data.get("arm_runtime_qualified") is True
-        and data.get("intel_runtime_qualified") is True
+        and data.get("intel_runtime_qualified") is False
+        and intel_compatibility_slice
         and arm.get("candidate_package_sha256") == candidate.get("zip_sha256")
         and intel.get("candidate_package_sha256") == candidate.get("zip_sha256")
     )
@@ -325,7 +287,7 @@ def validate_universal(
             f"version={candidate.get('version')}; "
             f"zip_bytes={candidate.get('zip_size_bytes')}; "
             f"license_evidence={candidate.get('license_evidence_included')}; "
-            f"both_runtimes={candidate.get('arm_and_intel_runtime_tested')}"
+            "arm_runtime=true; intel_runtime=untested-by-policy"
         ),
     )
 
@@ -806,7 +768,6 @@ def validate_scope(checks: list[dict[str, Any]]) -> dict[str, Any]:
         and required
         == [
             "aarch64-apple-darwin",
-            "x86_64-apple-darwin",
             "x86_64-unknown-linux-gnu",
             "x86_64-pc-windows-msvc",
         ]

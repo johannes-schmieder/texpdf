@@ -89,6 +89,34 @@ jobs:
               )
               raise SystemExit(0)
 
+          public_receipt = {
+              "schema_version": receipt.get("schema_version"),
+              "tested_sha": source_sha,
+              "profile": receipt.get("profile"),
+              "status": receipt.get("status"),
+              "stata_status": receipt.get("stata_status"),
+              "rust_status": receipt.get("rust_status"),
+              "rust_mode": receipt.get("rust_mode"),
+              "platform": receipt.get("platform"),
+              "stata_version": receipt.get("stata_version"),
+              "stata_edition": receipt.get("stata_edition"),
+              "completed_at": receipt.get("completed_at"),
+              "required_log_markers": [
+                  {
+                      "marker": item.get("marker"),
+                      "present": item.get("present"),
+                  }
+                  for item in receipt.get("required_log_markers", [])
+                  if isinstance(item, dict)
+              ],
+          }
+          receipt_path = Path(".ci/stata/results") / f"{source_sha}.json"
+          receipt_path.parent.mkdir(parents=True, exist_ok=True)
+          receipt_path.write_text(
+              json.dumps(public_receipt, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
           plugin_sha = plugin.get("sha256") or plugin.get("plugin_sha256")
           if not isinstance(plugin_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", plugin_sha):
               raise SystemExit("plugin manifest has no valid SHA-256")
@@ -214,8 +242,10 @@ jobs:
               "qualification_boundary": (
                   "This record qualifies the exact macOS Apple Silicon plugin, "
                   "embedded helper, curated bundle, and development package under "
-                  "licensed Stata/MP. Other architectures require separate runtime "
-                  "qualification; public redistribution requires a complete audit."
+                  "licensed Stata/MP. Linux and Windows require separate runtime "
+                  "qualification. The packaged Intel macOS compatibility slice is "
+                  "build-inspected but deliberately not runtime-qualified. Public "
+                  "redistribution requires a complete audit."
               ),
           }
           Path("bundle/QUALIFICATION.json").write_text(
@@ -262,7 +292,10 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add release/targets.json bundle/QUALIFICATION.json
+          git add \
+            release/targets.json \
+            bundle/QUALIFICATION.json \
+            ".ci/stata/results/${SOURCE_SHA}.json"
           if git diff --cached --quiet; then
             exit 0
           fi

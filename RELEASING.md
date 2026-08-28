@@ -166,7 +166,9 @@ The six `g` lines cover `LINUX64`, both Intel macOS identifiers, both Apple
 Silicon identifiers, and `WIN64`; every line installs its source plugin as
 `_texpdf_plugin.plugin`, which the `h` line must load successfully. A versioned
 marker distinguishes this approved generic SSC layout from a stale generic
-plugin. Do not rebuild a plugin during combination.
+plugin. The Intel lines expose the universal binary's untested compatibility
+slice; they do not expand the qualified runtime matrix. Do not rebuild a plugin
+during combination.
 
 Run `tools/write_release_index.py` over the macOS, Linux, Windows, and SSC
 archives. Its source-bound manifest and combined `SHA256SUMS` are the release

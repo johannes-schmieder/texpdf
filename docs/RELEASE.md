@@ -69,10 +69,13 @@ The intended public v1 target set is:
 
 ```text
 aarch64-apple-darwin
-x86_64-apple-darwin
 x86_64-pc-windows-msvc
 x86_64-unknown-linux-gnu
 ```
+
+The macOS archive is nevertheless universal. Its `x86_64-apple-darwin` slice
+must be built, inspected, and hash-bound to the candidate package, while
+remaining explicitly runtime-unqualified.
 
 For each target:
 

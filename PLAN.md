@@ -9,8 +9,11 @@ New tags follow [`RELEASING.md`](RELEASING.md): `main` is development, RC tags
 use `vX.Y.Z-rcN`, final tags are immutable, and SSC receives only a final
 release.
 
-Required runtimes: **macOS ARM64, macOS Intel, Linux x86-64, and Windows
-x86-64**
+Required runtimes: **macOS ARM64, Linux x86-64, and Windows x86-64**
+
+The macOS package remains universal: its Intel slice is built and inspected as
+a compatibility binary, but Intel/Rosetta runtime testing and qualification are
+not part of the project.
 
 The machine-readable scope is `release/scope.json`. Linux enforces a GLIBC 2.28
 ceiling and licensed Stata/MP 18 and 19 evidence from BU SCC. Windows requires
@@ -53,7 +56,7 @@ Exit achieved: `third_party_license_complete` passes. Candidate assembly
 materializes the complete source-bound notice tree and keeps it archive-only so
 Stata's package-index size limit does not truncate the evidence.
 
-### 2. macOS universal and Intel runtime qualification
+### 2. Historical macOS universal and Intel runtime qualification
 
 - [x] Rebuild both plugin slices with their target-matching embedded helpers.
 - [x] Inspect the universal Mach-O exports and dynamic dependencies per slice.
@@ -62,6 +65,8 @@ Stata's package-index size limit does not truncate the evidence.
 - [x] Publish exact Intel runtime evidence without overwriting slice hashes.
 
 Exit achieved: universal build, Intel build, and Intel runtime checks all pass.
+This evidence applies only to the historical private candidate. The current
+release policy keeps the Intel build but retires the Intel/Rosetta runtime lane.
 
 ### 3. Helper-backed memory and durability gate
 
@@ -132,6 +137,8 @@ its provenance manifests.
 - [x] Obtain SSC maintainer acceptance of the three-binary,
       compressed-license, one-command package; follow the requested `g`/`h`
       `.pkg` convention modeled on `parqit`.
+- [x] Retain the Intel slice in the universal macOS binary while removing its
+      Rosetta runtime lane and release-readiness requirement.
 - [ ] Freeze and fully qualify the public `v0.1.0-rc2` source on all targets.
 - [ ] Publish RC.2, download its assets afresh on each target, perform clean
       installs/corpus/help tests, and visually inspect representative PDFs.
@@ -139,8 +146,9 @@ its provenance manifests.
       source matrix; RC evidence does not transfer to the final commit.
 - [ ] Publish immutable `v0.1.0`, verify all draft assets before making it
       latest, and submit the identical combined package to SSC.
-- [ ] After SSC publication, run `ssc install texpdf` on macOS, Linux, and
-      Windows and archive the public file list, hashes, correspondence, and URL.
+- [ ] After SSC publication, run `ssc install texpdf` on macOS Apple Silicon,
+      Linux, and Windows and archive the public file list, hashes,
+      correspondence, and URL.
 
 Never replace the final tag or assets. Any source change requested after final
 publication becomes `0.1.1`.
@@ -161,8 +169,8 @@ publication becomes `0.1.1`.
 - [x] Record exact-source Apple Silicon Stata and SCC Linux core results for the
       corrected development corpus (`0e96cb2f302914daa0bb88cfa2e76e0f4e7e1e8f`;
       SCC job `7314871`, GLIBC 2.28).
-- [x] Leave Intel macOS and licensed Linux Stata requalification intentionally
-      unrun; do not advance the active candidate source.
+- [x] Leave Intel macOS runtime requalification intentionally unrun and retain
+      the slice as build-only compatibility evidence.
 
 This checkpoint is a newer development artifact, not RC.3 and not a release.
 

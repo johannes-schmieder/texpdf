@@ -212,18 +212,6 @@ class WorkflowCompatibilityTests(unittest.TestCase):
             runner,
         )
 
-    def test_intel_gate_derives_publication_mode_from_release_scope(self) -> None:
-        workflow = (
-            REPOSITORY_ROOT / ".github/workflows/qualify-macos-intel.yml"
-        ).read_text(encoding="utf-8")
-        self.assertNotIn('"candidate_package_public_release": False', workflow)
-        self.assertIn("origin/main:release/scope.json", workflow)
-        self.assertIn('scope.get("public_distribution_enabled") is True', workflow)
-        self.assertIn(
-            'package.get("public_release_mode") is not expected_public_release',
-            workflow,
-        )
-
     def test_license_audit_derives_candidate_from_authoritative_main_scope(self) -> None:
         workflow = (
             REPOSITORY_ROOT / ".github/workflows/license-audit.yml"
@@ -236,15 +224,23 @@ class WorkflowCompatibilityTests(unittest.TestCase):
         universal = (
             REPOSITORY_ROOT / ".github/workflows/build-macos-universal.yml"
         ).read_text(encoding="utf-8")
-        intel = (
-            REPOSITORY_ROOT / ".github/workflows/qualify-macos-intel.yml"
-        ).read_text(encoding="utf-8")
         self.assertNotIn("Stata/MP 18", universal)
-        self.assertNotIn("Stata/MP 18", intel)
         self.assertIn('data["arm_stata_version"] = receipt["stata_version"]', universal)
         self.assertIn('data["arm_stata_edition"] = receipt["stata_edition"]', universal)
-        self.assertIn('manifest["intel_stata_version"] = receipt["stata_version"]', intel)
-        self.assertIn('manifest["intel_stata_edition"] = receipt["stata_edition"]', intel)
+        self.assertIn('data["intel_runtime_qualified"] = False', universal)
+        self.assertIn("No Intel/Rosetta runtime qualification is claimed.", universal)
+
+    def test_arm_publisher_commits_only_a_sanitized_public_receipt(self) -> None:
+        workflow = (
+            REPOSITORY_ROOT / ".github/workflows/publish-target-qualification.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("public_receipt = {", workflow)
+        self.assertIn('"tested_sha": source_sha', workflow)
+        self.assertIn('"required_log_markers": [', workflow)
+        self.assertIn('f"{source_sha}.json"', workflow)
+        self.assertNotIn("json.dumps(receipt, indent=2", workflow)
+        self.assertNotIn('"runner_name": receipt.get', workflow)
+        self.assertNotIn('"stata_executable": receipt.get', workflow)
 
     def test_artifact_manifest_avoids_python_310_union_annotations(self) -> None:
         workflow = (

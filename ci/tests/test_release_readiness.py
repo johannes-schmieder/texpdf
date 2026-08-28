@@ -63,12 +63,12 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         newer = "2" * 40
         scope = {
             "candidate_source_sha": candidate,
-            "required_runtime_targets": ["arm", "intel", "linux"],
+            "required_runtime_targets": ["arm", "linux", "windows"],
         }
         targets = {
             "arm": {"qualified_source_sha": newer},
-            "intel": {"qualified_source_sha": candidate},
             "linux": {"qualified_source_sha": candidate},
+            "windows": {"qualified_source_sha": candidate},
         }
         checks: list[dict[str, object]] = []
         readiness.validate_required_source_coherence(scope, targets, checks)
@@ -78,7 +78,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         candidate = "1" * 40
         scope = {
             "candidate_source_sha": candidate,
-            "required_runtime_targets": ["arm", "intel", "linux"],
+            "required_runtime_targets": ["arm", "linux", "windows"],
         }
         targets = {
             target: {"qualified_source_sha": candidate}
@@ -126,6 +126,7 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                         "stata_edition": "MP",
                         "stata_runtime_qualified": True,
                         "stata_version": "18",
+                        "candidate_package_sha256": PACKAGE_SHA,
                     },
                     "x86_64-apple-darwin": {
                         "build_qualified": True,
@@ -138,7 +139,8 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                         "universal_plugin_size_bytes": 401,
                         "qualified_source_sha": "",
                         "stata_runtime_qualified": False,
-                        "status": "Intel runtime pending",
+                        "candidate_package_sha256": PACKAGE_SHA,
+                        "status": "Intel runtime untested by project policy",
                     },
                     "x86_64-pc-windows-msvc": {
                         "stata_runtime_qualified": False,
@@ -185,7 +187,6 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
                     "license_evidence_included": True,
                     "license_audit_source_sha": SOURCE_SHA,
                     "public_release": False,
-                    "arm_and_intel_runtime_tested": False,
                 },
             },
         )
@@ -262,9 +263,9 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         self.assertTrue(by_key["target_registry"]["passed"])
         self.assertTrue(by_key["macos_arm_runtime"]["passed"])
         self.assertTrue(by_key["macos_universal_build"]["passed"])
-        self.assertTrue(by_key["macos_intel_build"]["passed"])
-        self.assertFalse(by_key["macos_intel_runtime"]["passed"])
-        self.assertFalse(by_key["macos_candidate_package"]["passed"])
+        self.assertTrue(by_key["macos_intel_compatibility_slice"]["passed"])
+        self.assertNotIn("macos_intel_runtime", by_key)
+        self.assertTrue(by_key["macos_candidate_package"]["passed"])
         self.assertTrue(by_key["third_party_license_complete"]["passed"])
         self.assertTrue(by_key["macos_arm_memory_stress"]["passed"])
         self.assertFalse(by_key["x86_64-pc-windows-msvc_runtime"]["passed"])
@@ -358,55 +359,37 @@ class ReleaseReadinessRecordTests(unittest.TestCase):
         by_key = {row["key"]: row for row in checks}
         self.assertFalse(by_key["macos_arm_memory_stress"]["passed"])
 
-    def test_private_candidate_requires_one_package_tested_in_both_runtimes(self) -> None:
+    def test_candidate_requires_unqualified_intel_compatibility_slice(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self.prepare_records(root)
-            targets_path = root / "release/targets.json"
-            registry = json.loads(targets_path.read_text(encoding="utf-8"))
-            arm = registry["targets"]["aarch64-apple-darwin"]
-            intel = registry["targets"]["x86_64-apple-darwin"]
-            arm["candidate_package_sha256"] = PACKAGE_SHA
-            intel.update(
-                {
-                    "candidate_package_sha256": PACKAGE_SHA,
-                    "qualified_source_sha": SOURCE_SHA,
-                    "stata_runtime_qualified": True,
-                }
-            )
-            write_json(targets_path, registry)
-
-            universal_path = root / "release/macos-universal.json"
-            universal = json.loads(universal_path.read_text(encoding="utf-8"))
-            universal["intel_runtime_qualified"] = True
-            universal["candidate_package"]["arm_and_intel_runtime_tested"] = True
-            write_json(universal_path, universal)
-            write_json(
-                root / "release/macos-intel-runtime.json",
-                {
-                    "qualified": True,
-                    "source_sha": SOURCE_SHA,
-                    "universal_plugin_size_bytes": 401,
-                    "universal_plugin_sha256": UNIVERSAL_SHA,
-                    "intel_slice_size_bytes": 201,
-                    "intel_slice_sha256": INTEL_SHA,
-                    "intel_helper_size_bytes": 151,
-                    "intel_helper_sha256": INTEL_HELPER_SHA,
-                    "receipt": {
-                        "tested_sha": SOURCE_SHA,
-                        "status": "success",
-                        "stata_status": "success",
-                    },
-                },
-            )
             with working_directory(root):
                 checks: list[dict[str, object]] = []
                 targets = readiness.read_targets(checks)
                 readiness.validate_universal(targets, checks)
 
         by_key = {row["key"]: row for row in checks}
-        self.assertTrue(by_key["macos_intel_runtime"]["passed"])
+        self.assertTrue(by_key["macos_intel_compatibility_slice"]["passed"])
         self.assertTrue(by_key["macos_candidate_package"]["passed"])
+
+    def test_intel_runtime_claim_invalidates_compatibility_only_record(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.prepare_records(root)
+            targets_path = root / "release/targets.json"
+            registry = json.loads(targets_path.read_text(encoding="utf-8"))
+            intel = registry["targets"]["x86_64-apple-darwin"]
+            intel["qualified_source_sha"] = SOURCE_SHA
+            intel["stata_runtime_qualified"] = True
+            write_json(targets_path, registry)
+            with working_directory(root):
+                checks: list[dict[str, object]] = []
+                targets = readiness.read_targets(checks)
+                readiness.validate_universal(targets, checks)
+
+        by_key = {row["key"]: row for row in checks}
+        self.assertFalse(by_key["macos_intel_compatibility_slice"]["passed"])
+        self.assertFalse(by_key["macos_candidate_package"]["passed"])
 
     def test_linux_candidate_requires_exact_build_package_and_three_runtimes(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

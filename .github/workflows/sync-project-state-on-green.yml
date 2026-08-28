@@ -9,7 +9,6 @@ on:
       - Publish macOS ARM64 target qualification
       - Audit third-party licenses and notices
       - macOS ARM64 1000-call memory stress
-      - Qualify macOS Intel Stata runtime
     types:
       - completed
   push:
@@ -21,7 +20,6 @@ on:
       - "bundle/DEVELOPMENT.json"
       - "licenses/development-audit/STATUS.json"
       - "licenses/generated/STATUS.json"
-      - "release/macos-intel-runtime.json"
       - "release/macos-universal.json"
       - "release/latest-memory-stress-macos-arm64.json"
       - "release/memory-stress-macos-arm64.json"

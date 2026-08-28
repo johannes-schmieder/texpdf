@@ -6,12 +6,16 @@ source of truth.
 
 ## Active public 0.1.0 qualification
 
-The active scope requires macOS Apple Silicon, macOS Intel, Linux x86-64, and
-Windows x86-64 at one exact source SHA. The public `v0.1.0-rc2` and final
+The active scope requires macOS Apple Silicon, Linux x86-64, and Windows
+x86-64 at one exact source SHA. The public `v0.1.0-rc2` and final
 `v0.1.0` each require their own complete evidence matrix; the final metadata
 commit is requalified rather than inheriting RC evidence. Until those records
 are complete, `release/READINESS.json` must report the public release as not
 ready.
+
+The distributed macOS plugin remains universal. Its x86-64 slice is built,
+inspected, and hash-bound to the package, but the project has no Intel/Rosetta
+runtime test capacity and makes no runtime-qualification claim for that slice.
 
 ## Historical private RC.2 evidence
 
@@ -26,17 +30,18 @@ runtime targets are macOS Apple Silicon, macOS Intel, and Linux x86-64.
 
 ## macOS qualification
 
-The universal package was built from the exact candidate source. Its ARM64
-slice was exercised in licensed Stata/MP 18, including the quick corpus and a
-1,000-compile memory-stress run with injected failures and post-error recovery.
-The x86-64 slice is qualified by loading the same universal candidate in an
-actual Intel Stata process under Rosetta.
+For the active release, the universal package is built from the exact candidate
+source. Its ARM64 slice is exercised in licensed Stata, including the quick
+corpus and a 1,000-compile memory-stress run with injected failures and
+post-error recovery. The x86-64 slice receives build and binary inspection only.
+Older private candidate history included a Rosetta runtime run; that historical
+evidence does not qualify the new public artifacts or establish ongoing Intel
+support.
 
 Authoritative records:
 
 - `.ci/stata/results/7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8.json`
 - `release/macos-universal.json`
-- `release/macos-intel-runtime.json`
 - `release/memory-stress-macos-arm64.json`
 - `release/targets.json`
 

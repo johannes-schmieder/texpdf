@@ -26,18 +26,16 @@ The
 comprehensive checkpoint includes a real PDF compile, local `net install`,
 Unicode/relative paths, recoverable errors, and 100 installed-plugin calls.
 
-## macOS Intel
+## macOS Intel compatibility slice
 
-1. Build the x86-64 slice with deployment target 11.0.
-2. Inspect exports, load commands, minimum OS, and dynamic dependencies.
-3. Assemble the platform installation tree.
-4. Transfer the exact artifact without modification to an Intel Mac with
-   licensed 64-bit Stata.
-5. Run the `quick` and high-iteration `stress` profiles.
-6. Record the plugin digest and Stata result in `release/targets.json`.
+The universal release binary continues to contain an x86-64 slice built with
+deployment target 11.0. Inspect its exports, load commands, minimum OS, dynamic
+dependencies, embedded helper, and hashes, then bind those exact bytes into the
+universal package record. Do not run an Intel/Rosetta Stata lane and do not set
+`stata_runtime_qualified` for this target.
 
-A universal plugin tested only on Apple Silicon qualifies its ARM slice, not its
-Intel slice.
+This is a best-effort compatibility binary, not a qualified support claim. A
+universal plugin tested only on Apple Silicon qualifies only its ARM slice.
 
 ## Linux x86-64
 

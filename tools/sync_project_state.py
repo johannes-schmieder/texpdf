@@ -181,7 +181,6 @@ def render_status(state: dict[str, Any]) -> str:
     latest = state["latest_engine"]
     targets = state["targets"]
     arm = targets.get("aarch64-apple-darwin", {})
-    intel = targets.get("x86_64-apple-darwin", {})
     universal = state["universal"]
     licenses = state["licenses"]
     tex = licenses.get("tex_resources", {})
@@ -204,8 +203,10 @@ def render_status(state: dict[str, Any]) -> str:
         "## Release scope",
         "",
         f"The active target is a **public `{scope.get('candidate_version')}` cross-platform release candidate**.",
-        "macOS universal, Linux x86-64, and Windows x86-64 are all required;",
-        "no runtime target is deferred. Public GitHub and SSC distribution are",
+        "macOS Apple Silicon, Linux x86-64, and Windows x86-64 are the required",
+        "runtime targets. The universal macOS package also contains an inspected",
+        "Intel compatibility slice that is not runtime-tested or qualified. Public",
+        "GitHub and SSC distribution are",
         "authorized, but publication remains fail-closed until every exact-source",
         "qualification and asset-validation gate passes.",
         "",
@@ -252,7 +253,7 @@ def render_status(state: dict[str, Any]) -> str:
         f"| Linux core corpus | {code(development_evidence.get('linux_core'))} |",
         f"| Development license audit | {code(development_licenses.get('source_sha'))}; complete={yes_no(development_licenses.get('release_license_complete'))} |",
         f"| Development TeX resources | {development_tex.get('mapped', 0)}/{development_tex.get('resource_count', 0)} mapped |",
-        f"| Intel macOS / Linux licensed Stata | {code(development_evidence.get('intel_macos_stata'))} / {code(development_evidence.get('linux_stata'))} |",
+        f"| Linux licensed Stata | {code(development_evidence.get('linux_stata'))} |",
         "",
         "## Architecture",
         "",
@@ -279,7 +280,8 @@ def render_status(state: dict[str, Any]) -> str:
         )
         source = record.get("qualified_source_sha") or record.get("build_source_sha")
         lines.append(
-            f"| `{target}` | {'required' if target in required else 'deferred'} | "
+            f"| `{target}` | "
+            f"{'required' if target in required else 'compatibility only'} | "
             f"{yes_no(build)} | {yes_no(record.get('stata_runtime_qualified'))} | {code(source)} |"
         )
 

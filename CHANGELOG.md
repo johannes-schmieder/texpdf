@@ -20,8 +20,8 @@ releases or SSC versions.
   relative inputs.
 - Deterministic Stata package assembly, clean local `net install` tests, and
   exact-source Rust/licensed-Stata receipts.
-- Universal macOS packaging and licensed runtime qualification on Apple
-  Silicon and in an x86-64 Stata process under Rosetta.
+- Universal macOS packaging with licensed runtime qualification on Apple
+  Silicon and a built, inspected, explicitly untested Intel compatibility slice.
 - A 1,000-call licensed-Stata durability gate with injected failures, helper
   lifecycle sampling, and bounded post-warm-up RSS growth.
 - Linux x86-64 packaging and licensed Stata/MP 18 and 19 qualification on RHEL
@@ -67,6 +67,9 @@ releases or SSC versions.
 - GitHub packages retain explicit platform plugin names, while SSC uses Stata's
   `g`/`h` package directives plus a versioned installation marker; mixed,
   incomplete, and stale installation layouts now fail closed.
+- Intel/Rosetta is no longer a required runtime qualification target. The
+  universal macOS distribution still carries the x86-64 compatibility slice,
+  with readiness enforcing that no runtime-support claim is made for it.
 
 ### Fixed
 
@@ -101,8 +104,6 @@ releases or SSC versions.
   layout that users receive, including build-produced plugins used by the
   1,000-call stress lane, so the SSC source marker cannot be misidentified as a
   second installed distribution channel.
-- Intel qualification derives the expected package publication mode from the
-  frozen release scope instead of carrying a stale private-candidate constant.
 - Hosted Linux and Windows builders fetch only the selected TeX resource ranges
   and require the result to match every frozen bundle identity field, avoiding
   multi-gigabyte archive downloads and the rate limits they triggered.
@@ -121,9 +122,8 @@ releases or SSC versions.
 - License-audit publication derives the active candidate from the authoritative
   `main` release scope, so an exact implementation checkout cannot route current
   candidate evidence into the historical development namespace.
-- macOS qualification records the actual Stata edition and version from each
-  ARM64 and Intel/Rosetta runtime receipt instead of emitting a hard-coded
-  version claim.
+- macOS ARM qualification records the actual Stata edition and version from
+  its runtime receipt instead of emitting a hard-coded version claim.
 - The canonical Windows builder now requires an explicit successful
   exact-source license-audit artifact, verifies the complete ignored license
   text tree and audit status, emits a public-release package with that unpacked

@@ -146,7 +146,7 @@ jobs:
               "Both Mach-O slices were built and inspected. The universal plugin "
               "was loaded and tested only through its ARM64 slice in licensed "
               f"Stata/{receipt['stata_edition']} {receipt['stata_version']}. "
-              "Intel runtime qualification remains pending."
+              "No Intel/Rosetta runtime qualification is claimed."
           )
           path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
           PY
@@ -218,7 +218,7 @@ jobs:
                   "embedded_helper_size_bytes": intel["embedded_helper"]["size_bytes"],
                   "universal_plugin_sha256": universal["sha256"],
                   "universal_plugin_size_bytes": universal["size_bytes"],
-                  "qualification_profile": "build + ARM licensed-Stata universal smoke",
+                  "qualification_profile": "compatibility build + ARM licensed-Stata universal smoke",
                   "qualified_source_sha": "",
                   "stata_runtime_qualified": False,
                   "stata_version": "",
@@ -227,7 +227,7 @@ jobs:
                   "candidate_package_version": package["version"],
                   "status": (
                       "Intel slice built, inspected, and packaged into an ARM-tested "
-                      "universal plugin; Intel Stata runtime qualification pending"
+                      "universal plugin; Intel runtime is untested by project policy"
                   ),
               }
           )

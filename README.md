@@ -23,10 +23,12 @@ Rust toolchain, package download, or network connection.
 
 `main` is the active development branch; it is not a stable distribution
 channel. The active scope prepares a public `0.1.0-rc2` for macOS universal,
-Linux x86-64 with a GLIBC 2.28 ceiling, and Windows x86-64. All four runtime
-targets are required and none is deferred. Historical private RC evidence is
-preserved, but the new cross-platform source and artifacts must be fully
-requalified before the RC or final `v0.1.0` is published.
+Linux x86-64 with a GLIBC 2.28 ceiling, and Windows x86-64. Runtime
+qualification is required on macOS Apple Silicon, Linux, and Windows. The
+universal macOS binary also includes a built and inspected Intel slice, but the
+project does not runtime-test or qualify that slice. Historical private RC
+evidence is preserved, but the new cross-platform source and artifacts must be
+fully requalified before the RC or final `v0.1.0` is published.
 
 Exact SHAs, artifact sizes, target support, failed attempts, and live blockers
 are generated from repository evidence in [`STATUS.md`](STATUS.md) and
@@ -149,4 +151,5 @@ notice tree pass the source-bound audit.
 
 The intended `0.1.0` runtime matrix is Stata 18 and 19 overall. Windows is
 qualified specifically with 64-bit Stata/MP 19; the exact per-target record is
-authoritative.
+authoritative. The macOS package is universal, but its Intel slice is supplied
+as an untested compatibility binary rather than a qualified runtime target.

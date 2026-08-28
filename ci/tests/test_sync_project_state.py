@@ -50,7 +50,6 @@ class ProjectStateTests(unittest.TestCase):
                 "candidate_version": "0.1.0-rc.2",
                 "required_runtime_targets": [
                     "aarch64-apple-darwin",
-                    "x86_64-apple-darwin",
                     "x86_64-unknown-linux-gnu",
                     "x86_64-pc-windows-msvc",
                 ],
@@ -129,6 +128,8 @@ class ProjectStateTests(unittest.TestCase):
         self.assertIn("different artifacts", rendered)
         self.assertIn("392/392 mapped", rendered)
         self.assertIn("Last completed candidate license-audit source", rendered)
+        self.assertIn("Intel compatibility slice", rendered)
+        self.assertIn("compatibility only", rendered)
 
 
 if __name__ == "__main__":

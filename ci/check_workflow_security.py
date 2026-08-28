@@ -17,7 +17,6 @@ WRITE_WORKFLOWS = {
     "publish-artifact-manifest.yml",
     "publish-artifact-summary.yml",
     "publish-target-qualification.yml",
-    "qualify-macos-intel.yml",
     "stress-memory-macos.yml",
     "stata-ci.yml",
     "sync-project-state-on-green.yml",
