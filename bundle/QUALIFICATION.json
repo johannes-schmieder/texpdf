@@ -23,7 +23,7 @@
   "ci": {
     "overall_status": "success",
     "profile": "quick",
-    "receipt": ".ci/stata/results/d6dab250895efb9c1f70f5d8ef21e682f90ab946.json",
+    "receipt": ".ci/stata/results/be8f9aead479386d102a86ee8d2ad56780c66eb2.json",
     "required_markers": [
       "TEXPDF IN PROCESS STRESS PASS",
       "TEXPDF NET INSTALL PASS",
@@ -33,7 +33,7 @@
       "TEXPDF STATA MATA SMOKE PASS"
     ],
     "run_attempt": 1,
-    "run_id": 33202202447,
+    "run_id": 33203296567,
     "rust_mode": "repository-engine",
     "rust_status": "success",
     "stata_status": "success"
@@ -50,8 +50,8 @@
   "package": {
     "net_install_tested": true,
     "public_release": false,
-    "zip_sha256": "dce1a0d709db0d0f12535d30de15bfe35d025afaa2b349cfc9c9d26097df3340",
-    "zip_size_bytes": 22785985
+    "zip_sha256": "61e5157d582b9f6b00c9f7f639a4443b202ebd09d69604d56f739279d268dcf6",
+    "zip_size_bytes": 22785986
   },
   "platform": {
     "architecture": "Apple Silicon",
@@ -75,8 +75,8 @@
     "size_bytes": 49709840
   },
   "qualification_boundary": "This record qualifies the exact macOS Apple Silicon plugin, embedded helper, curated bundle, and development package under licensed Stata/MP. Linux and Windows require separate runtime qualification. The packaged Intel macOS compatibility slice is build-inspected but deliberately not runtime-qualified. Public redistribution requires a complete audit.",
-  "qualified_at": "2026-08-28T19:08:19.119529Z",
-  "qualified_source_sha": "d6dab250895efb9c1f70f5d8ef21e682f90ab946",
+  "qualified_at": "2026-08-28T19:29:26.083049Z",
+  "qualified_source_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2",
   "schema_version": 3,
   "tests": {
     "academic_package_corpus": true,

@@ -1,0 +1,39 @@
+{
+  "completed_at": "2026-08-28T19:29:26.083049Z",
+  "platform": "Unix; Mac (Apple Silicon)",
+  "profile": "quick",
+  "required_log_markers": [
+    {
+      "marker": "TEXPDF IN PROCESS STRESS PASS",
+      "present": true
+    },
+    {
+      "marker": "TEXPDF NET INSTALL PASS",
+      "present": true
+    },
+    {
+      "marker": "TEXPDF HELP EXAMPLES PASS",
+      "present": true
+    },
+    {
+      "marker": "TEXPDF REALISTIC CORPUS PASS",
+      "present": true
+    },
+    {
+      "marker": "TEXPDF FULL ENGINE STATA PASS",
+      "present": true
+    },
+    {
+      "marker": "TEXPDF STATA MATA SMOKE PASS",
+      "present": true
+    }
+  ],
+  "rust_mode": "repository-engine",
+  "rust_status": "success",
+  "schema_version": 1,
+  "stata_edition": "MP",
+  "stata_status": "success",
+  "stata_version": "19",
+  "status": "success",
+  "tested_sha": "be8f9aead479386d102a86ee8d2ad56780c66eb2"
+}
