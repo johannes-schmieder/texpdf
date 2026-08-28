@@ -34,9 +34,9 @@ tracked independently:
 | Green profile / Rust mode | `quick` / `repository-engine` |
 | Licensed Stata runtime | `Unix; Mac (Apple Silicon)`; `MP` `19` |
 | Current ARM64 artifact source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
-| Current universal build source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
-| Last completed candidate license-audit source | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
-| Latest memory-stress attempt | `d6dab250895efb9c1f70f5d8ef21e682f90ab946`; qualified=no |
+| Current universal build source | `be8f9aead479386d102a86ee8d2ad56780c66eb2` |
+| Last completed candidate license-audit source | `be8f9aead479386d102a86ee8d2ad56780c66eb2` |
+| Latest memory-stress attempt | `be8f9aead479386d102a86ee8d2ad56780c66eb2`; qualified=yes |
 
 ## Development bundle on `main`
 
@@ -71,7 +71,7 @@ the helper process, so a compiler crash does not run inside Stata.
 | Target | Release scope | Build qualified | Licensed Stata runtime | Evidence source |
 |---|---|---:|---:|---|
 | `aarch64-apple-darwin` | required | yes | yes | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
-| `x86_64-apple-darwin` | compatibility only | yes | no | `d6dab250895efb9c1f70f5d8ef21e682f90ab946` |
+| `x86_64-apple-darwin` | compatibility only | yes | no | `be8f9aead479386d102a86ee8d2ad56780c66eb2` |
 | `x86_64-pc-windows-msvc` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
 | `x86_64-unknown-linux-gnu` | required | yes | yes | `a4f6b7a4b02061280a10e400cda2746e60cc5a2b` |
 
@@ -83,7 +83,6 @@ The current ARM64 plugin is 47.41 MiB (`56fe47133a1132498e6a9852212017f86a7b68c9
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
-- `macos_arm_memory_stress`
 
 ## Previous candidate license evidence
 
@@ -93,7 +92,7 @@ The separate development audit is source-bound to `13cfe5da1ac1845ff51a33f382cf1
 
 ## Memory evidence
 
-The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was unknown KiB against a unknown KiB gate; growth gate passed: no. This failed attempt is retained as evidence and is not described as qualification.
+The latest preserved attempt requested 1000 calls. Post-warmup Stata RSS growth was 112 KiB against a 65536 KiB gate; growth gate passed: yes. This attempt is a qualified helper-lifecycle result.
 
 ## Public-release blockers
 
@@ -101,7 +100,6 @@ The latest preserved attempt requested 0 calls. Post-warmup Stata RSS growth was
 - `windows_x86_64_runtime`
 - `required_target_source_coherence`
 - `candidate_license_source_coherence`
-- `macos_arm_memory_stress`
 
 See `release/READINESS.md` for the fail-closed check details and
 `docs/generated/CURRENT_ARTIFACT.md` for exact artifact measurements.
