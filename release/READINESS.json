@@ -1,11 +1,6 @@
 {
-  "candidate_blockers": [
-    "linux_x86_64_runtime",
-    "windows_x86_64_runtime",
-    "required_target_source_coherence",
-    "candidate_license_source_coherence"
-  ],
-  "candidate_ready": false,
+  "candidate_blockers": [],
+  "candidate_ready": true,
   "candidate_version": "0.1.0-rc2",
   "checks": [
     {
@@ -137,28 +132,28 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "source=7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8; glibc_max=2.28; package_version=0.1.0-rc.2; Stata18_quick=True; Stata18_stress1000=True; Stata19_quick=True",
+      "candidate_release_blocker": false,
+      "detail": "source=366f16406773be5494a61e0badd55d0d1891e3c4; glibc_max=2.28; package_version=0.1.0-rc2; Stata18_quick=True; Stata18_stress1000=True; Stata19_quick=True",
       "key": "linux_x86_64_runtime",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "missing release/windows-x86_64.json",
+      "candidate_release_blocker": false,
+      "detail": "source=366f16406773be5494a61e0badd55d0d1891e3c4; package_version=0.1.0-rc2; static_crt=True; Stata19_quick=True; Stata19_stress1000=True",
       "key": "windows_x86_64_runtime",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=366f16406773be5494a61e0badd55d0d1891e3c4; sources=['', '366f16406773be5494a61e0badd55d0d1891e3c4', '7aa7b16aca8afc75ebfd6aa27a0aa04ab04a47d8']",
+      "candidate_release_blocker": false,
+      "detail": "required_targets=['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'x86_64-pc-windows-msvc']; expected=366f16406773be5494a61e0badd55d0d1891e3c4; sources=['366f16406773be5494a61e0badd55d0d1891e3c4']",
       "key": "required_target_source_coherence",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": false,
@@ -169,12 +164,12 @@
       "release_blocker": false
     },
     {
-      "candidate_release_blocker": true,
-      "detail": "candidate_source=missing; license_source=366f16406773be5494a61e0badd55d0d1891e3c4; ancestor=False; non_evidence_changes=[]",
+      "candidate_release_blocker": false,
+      "detail": "candidate_source=366f16406773be5494a61e0badd55d0d1891e3c4; license_source=366f16406773be5494a61e0badd55d0d1891e3c4; ancestor=True; non_evidence_changes=[]",
       "key": "candidate_license_source_coherence",
-      "passed": false,
-      "public_release_blocker": true,
-      "release_blocker": true
+      "passed": true,
+      "public_release_blocker": false,
+      "release_blocker": false
     },
     {
       "candidate_release_blocker": false,
@@ -186,19 +181,9 @@
     }
   ],
   "implementation_complete_macos_arm64": true,
-  "public_release_blockers": [
-    "linux_x86_64_runtime",
-    "windows_x86_64_runtime",
-    "required_target_source_coherence",
-    "candidate_license_source_coherence"
-  ],
-  "public_release_ready": false,
-  "release_blockers": [
-    "linux_x86_64_runtime",
-    "windows_x86_64_runtime",
-    "required_target_source_coherence",
-    "candidate_license_source_coherence"
-  ],
+  "public_release_blockers": [],
+  "public_release_ready": true,
+  "release_blockers": [],
   "release_kind": "public_release_candidate",
   "schema_version": 3
 }
